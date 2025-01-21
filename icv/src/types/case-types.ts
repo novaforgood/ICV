@@ -1,3 +1,5 @@
+import { Timestamp } from 'firebase/firestore'
+
 export enum Gender {
     Male = 'Male',
     Female = 'Female',
@@ -47,7 +49,7 @@ export interface Client {
     lastName: string
     firstName: string
     middleInitial?: string
-    dateOfBirth: string // Format: YYYY-MM-DD
+    dateOfBirth: Timestamp
     gender: Gender
     otherGender?: string // Fallback for "Other"
     age: number
@@ -68,7 +70,7 @@ export interface Client {
 
     // Program and intake details
     program: string // E.g., "Homeless Outreach"
-    intakeDate: string // Format: YYYY-MM-DD
+    intakeDate: Timestamp
     primaryLanguage?: string
     clientCode: string
 
@@ -113,7 +115,7 @@ export interface Client {
 
     // Client management
     assignedClientManager?: string
-    assignedDate?: string // Format: YYYY-MM-DD
+    assignedDate?: Timestamp
     status: ClientStatus // Active or Inactive
 
     // Additional notes

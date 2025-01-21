@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { getFirestore } from 'firebase/firestore'
 
 // Firebase configuration using environment variables
 const firebaseConfig = {
@@ -12,3 +13,4 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig)
+export const db = getFirestore(app)
