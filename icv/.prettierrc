@@ -1,0 +1,7 @@
+{
+  "tabWidth": 4,
+  "semi": false,
+  "singleQuote": true,
+  "pluginSearchDirs": false,
+  "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-tailwindcss"]
+}
