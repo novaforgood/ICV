@@ -21,6 +21,6 @@ export enum ContactType {
 export interface CaseEvent {
     caseId: string // Unique identifier for the case
     date: Timestamp
-    typeOfContact: ContactType // Type of contact using the defined enum
+    contactTypes: ContactType[]
     description?: string // Optional detailed notes about the event
 }
