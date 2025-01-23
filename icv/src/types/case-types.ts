@@ -1,123 +1,128 @@
 import { Timestamp } from 'firebase/firestore'
+import { z } from 'zod'
 
-export enum Gender {
-    Male = 'Male',
-    Female = 'Female',
-    Other = 'Other',
-}
+export const Gender = z.enum(['Male', 'Female', 'Other'])
+export const Ethnicity = z.enum([
+    'African American',
+    'Asian',
+    'Latino/Hispanic',
+    'Native American',
+    'White/Caucasian',
+    'Other',
+])
+export const FosterYouthStatus = z.enum([
+    'Yes, Currently',
+    'Yes, Previously',
+    'No',
+])
+export const EmploymentStatus = z.enum([
+    'No',
+    'Yes, Part-Time',
+    'Yes, Full-Time',
+])
+export const ProbationStatus = z.enum([
+    'No',
+    'Yes, Previously',
+    'Yes, Currently',
+])
+export const ClientStatus = z.enum(['Active', 'Inactive'])
+export const OpenClientStatus = z.enum([
+    'Yes, Currently',
+    'Yes, Previously',
+    'No',
+])
 
-export enum Ethnicity {
-    AfricanAmerican = 'African American',
-    Asian = 'Asian',
-    LatinoHispanic = 'Latino/Hispanic',
-    NativeAmerican = 'Native American',
-    WhiteCaucasian = 'White/Caucasian',
-    Other = 'Other',
-}
-
-export enum FosterYouthStatus {
-    Current = 'Yes, Currently',
-    Previous = 'Yes, Previously',
-    No = 'No',
-}
-
-export enum EmploymentStatus {
-    No = 'No',
-    PartTime = 'Yes, Part-Time',
-    FullTime = 'Yes, Full-Time',
-}
-
-export enum ProbationStatus {
-    No = 'No',
-    Previously = 'Yes, Previously',
-    Currently = 'Yes, Currently',
-}
-
-export enum ClientStatus {
-    Active = 'Active',
-    Inactive = 'Inactive',
-}
-
-export enum OpenClientStatus {
-    Current = 'Yes, Currently',
-    Previous = 'Yes, Previously',
-    No = 'No',
-}
-
-export interface Client {
+export const ClientSchema = z.object({
     // Basic client details
-    lastName: string
-    firstName: string
-    middleInitial?: string
-    dateOfBirth: Timestamp
-    gender: Gender
-    otherGender?: string // Fallback for "Other"
-    age: number
+    lastName: z.string(),
+    firstName: z.string(),
+    middleInitial: z.string().optional(),
+    dateOfBirth: z.instanceof(Timestamp),
+    gender: Gender,
+    otherGender: z.string().optional(), // Fallback for "Other"
+    age: z.number(),
 
     // Spouse information
-    spouseName?: string
-    spouseAge?: number
-    spouseGender?: Gender
-    spouseOtherGender?: string // Fallback for "Other"
+    spouseName: z.string().optional(),
+    spouseAge: z.number().optional(),
+    spouseGender: Gender.optional(),
+    spouseOtherGender: z.string().optional(), // Fallback for "Other"
 
     // Location and contact details
-    address?: string
-    aptNumber?: string
-    city: string
-    zipCode: string
-    phoneNumber: string
-    email?: string
+    address: z.string().optional(),
+    aptNumber: z.string().optional(),
+    city: z.string(),
+    zipCode: z.string(),
+    phoneNumber: z.string(),
+    email: z.string().email().optional(),
 
     // Program and intake details
-    program: string // E.g., "Homeless Outreach"
-    intakeDate: Timestamp
-    primaryLanguage?: string
-    clientCode: string
+    program: z.string(),
+    intakeDate: z.instanceof(Timestamp),
+    primaryLanguage: z.string().optional(),
+    clientCode: z.string(),
 
     // Housing and referral details
-    housingType?: string // E.g., "Temporary Shelter"
-    birthplace?: string // E.g., City or Country
-    referralSource?: string // E.g., "Community Organization"
+    housingType: z.string().optional(),
+    birthplace: z.string().optional(),
+    referralSource: z.string().optional(),
 
     // Family and demographic details
-    familySize: number // Total number in family
-    numberOfChildren: number
-    childrenDetails?: { name: string; age: number }[]
-    ethnicity: Ethnicity
+    familySize: z.number(),
+    numberOfChildren: z.number(),
+    childrenDetails: z
+        .array(
+            z.object({
+                name: z.string(),
+                age: z.number(),
+            }),
+        )
+        .optional(),
+    ethnicity: Ethnicity,
 
     // Public services information
-    publicServices: {
-        generalRelief: boolean // Assistance for basic needs
-        calFresh: boolean // Food assistance (EBT)
-        calWorks: boolean // Cash aid program
-        ssi: boolean // Supplemental Security Income
-        ssa: boolean // Social Security Administration
-        unemployment: boolean // Unemployment benefits
-    }
+    publicServices: z.object({
+        generalRelief: z.boolean(),
+        calFresh: z.boolean(),
+        calWorks: z.boolean(),
+        ssi: z.boolean(),
+        ssa: z.boolean(),
+        unemployment: z.boolean(),
+    }),
 
     // Assessment and client details
-    needsAssessment?: string[] // List of specific needs
-    openClientWithChildFamilyServices?: OpenClientStatus // Current or past involvement
-    previousArrests?: boolean
-    probationStatus?: ProbationStatus
+    needsAssessment: z.array(z.string()).optional(),
+    openClientWithChildFamilyServices: OpenClientStatus.optional(),
+    previousArrests: z.boolean().optional(),
+    probationStatus: ProbationStatus.optional(),
 
     // Education and employment
-    education: {
-        hasHighSchoolDiploma: boolean
-        fosterYouthStatus?: FosterYouthStatus // Foster care history
-    }
-    employmentStatus?: EmploymentStatus
+    education: z.object({
+        hasHighSchoolDiploma: z.boolean(),
+        fosterYouthStatus: FosterYouthStatus.optional(),
+    }),
+    employmentStatus: EmploymentStatus.optional(),
 
     // Medical and mental health information
-    substanceAbuseDetails?: string // Substance abuse history
-    medicalConditions?: string[] // List of medical conditions
-    mentalHealthDiagnosis?: string[] // Mental health diagnoses
+    substanceAbuseDetails: z.string().optional(),
+    medicalConditions: z.array(z.string()).optional(),
+    mentalHealthDiagnosis: z.array(z.string()).optional(),
 
     // Client management
-    assignedClientManager?: string
-    assignedDate?: Timestamp
-    status: ClientStatus // Active or Inactive
+    assignedClientManager: z.string().optional(),
+    assignedDate: z.instanceof(Timestamp).optional(),
+    status: ClientStatus,
 
     // Additional notes
-    notes?: string
-}
+    notes: z.string().optional(),
+})
+
+export type GenderType = z.infer<typeof Gender>
+export type EthnicityType = z.infer<typeof Ethnicity>
+export type FosterYouthStatusType = z.infer<typeof FosterYouthStatus>
+export type EmploymentStatusType = z.infer<typeof EmploymentStatus>
+export type ProbationStatusType = z.infer<typeof ProbationStatus>
+export type ClientStatusType = z.infer<typeof ClientStatus>
+export type OpenClientStatusType = z.infer<typeof OpenClientStatus>
+
+export type ClientType = z.infer<typeof ClientSchema>
