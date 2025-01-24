@@ -33,6 +33,7 @@ export const OpenClientStatus = z.enum([
 ])
 
 export const ClientSchema = z.object({
+    id: z.string(),
     // Basic client details
     lastName: z.string(),
     firstName: z.string(),
