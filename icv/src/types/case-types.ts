@@ -38,7 +38,12 @@ export const ClientSchema = z.object({
     lastName: z.string(),
     firstName: z.string(),
     middleInitial: z.string().optional(),
-    dateOfBirth: z.instanceof(Timestamp),
+    dateOfBirth: z
+        .union([z.instanceof(Date), z.instanceof(Timestamp)])
+        .transform((date) => {
+            // Convert JavaScript Date to Firebase Timestamp if it's a Date object
+            return date instanceof Date ? Timestamp.fromDate(date) : date
+        }),
     gender: Gender,
     otherGender: z.string().optional(), // Fallback for "Other"
     age: z.number(),

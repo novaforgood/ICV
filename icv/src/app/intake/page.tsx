@@ -1,5 +1,6 @@
 'use client'
-import { ClientType } from '@/types/case-types'
+import { ClientSchema, ClientType } from '@/types/case-types'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 const page = () => {
@@ -8,10 +9,14 @@ const page = () => {
         handleSubmit,
         formState: { errors },
     } = useForm<ClientType>({
-        // resolver: zodResolver(ClientSchema),
+        mode: 'onChange',
+        resolver: zodResolver(ClientSchema.partial()),
     })
 
     const onSubmit = (data: ClientType) => {
+        // console.log('Loading...')
+        // console.log(errors)
+        createClient(data)
         console.log(data)
     }
 
@@ -29,7 +34,7 @@ const page = () => {
                         {...register('firstName')}
                         type="text"
                         placeholder="First Name"
-                        className="w-4/5 rounded border p-2"
+                        className="w-full rounded border p-2"
                     />
                 </div>
                 <div>
@@ -56,7 +61,9 @@ const page = () => {
                 <div>
                     <label>Date of Birth</label>
                     <input
-                        {...register('dateOfBirth')}
+                        {...register('dateOfBirth', {
+                            valueAsDate: true,
+                        })}
                         type="date"
                         className="w-full rounded border p-2"
                     />
@@ -64,7 +71,9 @@ const page = () => {
                 <div>
                     <label>Age</label>
                     <input
-                        {...register('age')}
+                        {...register('age', {
+                            valueAsNumber: true,
+                        })}
                         type="number"
                         placeholder="Age"
                         className="w-full rounded border p-2"
@@ -93,7 +102,7 @@ const page = () => {
             </div>
 
             {/* Spouse information */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div>
                     <label>Spouse Name</label>
                     <input
@@ -132,10 +141,10 @@ const page = () => {
                         className="w-full rounded border p-2"
                     />
                 </div>
-            </div>
+            </div> */}
 
             {/* Location and contact details */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div>
                     <label>Address</label>
                     <input
@@ -190,10 +199,10 @@ const page = () => {
                         className="w-full rounded border p-2"
                     />
                 </div>
-            </div>
+            </div> */}
 
             {/* Program and intake details */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div>
                     <label>Program</label>
                     <input
@@ -229,10 +238,10 @@ const page = () => {
                         className="w-full rounded border p-2"
                     />
                 </div>
-            </div>
+            </div> */}
 
             {/* Housing and referral details */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div>
                     <label>Housing Type</label>
                     <input
@@ -260,10 +269,10 @@ const page = () => {
                         className="w-full rounded border p-2"
                     />
                 </div>
-            </div>
+            </div> */}
 
             {/* Family and demographic details */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div>
                     <label>Family Size</label>
                     <input
@@ -298,10 +307,10 @@ const page = () => {
                         <option value="Other">Other</option>
                     </select>
                 </div>
-            </div>
+            </div> */}
 
             {/* Public services information */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div className="space-x-2">
                     <label>General Relief</label>
                     <input
@@ -344,10 +353,10 @@ const page = () => {
                         type="checkbox"
                     />
                 </div>
-            </div>
+            </div> */}
 
             {/* Assessment and client details */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div>
                     <label>Needs Assessment</label>
                     <input
@@ -383,10 +392,10 @@ const page = () => {
                         <option value="Yes, Currently">Yes, Currently</option>
                     </select>
                 </div>
-            </div>
+            </div> */}
 
             {/* Education and employment */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div>
                     <label>Has High School Diploma</label>
                     <input
@@ -416,10 +425,10 @@ const page = () => {
                         <option value="Yes, Full-Time">Yes, Full-Time</option>
                     </select>
                 </div>
-            </div>
+            </div> */}
 
             {/* Medical and mental health information */}
-            <div>
+            {/* <div>
                 <label>Substance Abuse Details</label>
                 <input
                     {...register('substanceAbuseDetails')}
@@ -445,10 +454,10 @@ const page = () => {
                     placeholder="Mental Health Diagnosis"
                     className="w-full rounded border p-2"
                 />
-            </div>
+            </div> */}
 
             {/* Client management */}
-            <div className="flex space-x-5">
+            {/* <div className="flex space-x-5">
                 <div>
                     <label>Assigned Client Manager</label>
                     <input
@@ -476,19 +485,20 @@ const page = () => {
                         <option value="Inactive">Inactive</option>
                     </select>
                 </div>
-            </div>
+            </div> */}
 
             {/* Additional notes */}
-            <div>
+            {/* <div>
                 <label>Notes</label>
                 <textarea
                     {...register('notes')}
                     placeholder="Additional Notes"
                     className="w-full rounded border p-2"
                 />
-            </div>
+            </div> */}
 
-            {/*{errors && <p>{JSON.stringify(errors)}</p>}*/}
+            {errors && <PrintComponent stuffToprint={errors} />}
+            {/* {errors && <p>{JSON.stringify(errors)}</p>} */}
             <button
                 type="submit"
                 className="mt-4 rounded bg-blue-500 p-2 text-white"
@@ -497,6 +507,11 @@ const page = () => {
             </button>
         </form>
     )
+}
+
+function PrintComponent(stuffToprint: any) {
+    console.log(stuffToprint)
+    return <div>printed</div>
 }
 
 export default page
