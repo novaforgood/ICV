@@ -12,9 +12,13 @@ import {
 
 export async function createClient(client: ClientType) {
     // verify that the client object is valid
-    if (ClientSchema.safeParse(client).success === false) {
-        throw new Error('Client object is invalid')
-    }
+    // let results = ClientSchema.optional().safeParse(client)
+    // if (results.success === false) {
+
+    //     throw new Error('Client object is invalid ' + JSON.stringify(results))
+    // }
+
+    console.log("asdfsdafdsfafdsasdfclient", client)
 
     const clientsCollection = collection(db, 'clients')
     const newDoc = await addDoc(clientsCollection, client)
