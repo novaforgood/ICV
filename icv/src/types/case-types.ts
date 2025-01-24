@@ -38,7 +38,7 @@ export const ClientSchema = z.object({
     lastName: z.string(),
     firstName: z.string(),
     middleInitial: z.string().optional(),
-    dateOfBirth: z.instanceof(Timestamp),
+    dateOfBirth: z.date(),
     gender: Gender,
     otherGender: z.string().optional(), // Fallback for "Other"
     age: z.number(),
@@ -117,6 +117,11 @@ export const ClientSchema = z.object({
     // Additional notes
     notes: z.string().optional(),
 })
+
+const timestampToDateSchema = z
+  .instanceof(Timestamp) // Ensure the value is a Firebase Timestamp
+  .transform((timestamp) => timestamp.toDate()); // Convert it to a JavaScript Date
+
 
 export type GenderType = z.infer<typeof Gender>
 export type EthnicityType = z.infer<typeof Ethnicity>
