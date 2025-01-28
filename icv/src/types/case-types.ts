@@ -1,5 +1,5 @@
-import { Timestamp } from 'firebase/firestore'
 import { z } from 'zod'
+import { timestampToDateSchema } from './misc-types'
 
 export const Gender = z.enum(['Male', 'Female', 'Other'])
 export const Ethnicity = z.enum([
@@ -38,12 +38,7 @@ export const ClientSchema = z.object({
     lastName: z.string(),
     firstName: z.string(),
     middleInitial: z.string().optional(),
-    dateOfBirth: z
-        .union([z.instanceof(Date), z.instanceof(Timestamp)])
-        .transform((date) => {
-            // Convert JavaScript Date to Firebase Timestamp if it's a Date object
-            return date instanceof Date ? Timestamp.fromDate(date) : date
-        }),
+    dateOfBirth: timestampToDateSchema,
     gender: Gender,
     otherGender: z.string().optional(), // Fallback for "Other"
     age: z.number(),
@@ -64,7 +59,7 @@ export const ClientSchema = z.object({
 
     // Program and intake details
     program: z.string(),
-    intakeDate: z.instanceof(Timestamp),
+    intakeDate: timestampToDateSchema,
     primaryLanguage: z.string().optional(),
     clientCode: z.string(),
 
@@ -116,7 +111,7 @@ export const ClientSchema = z.object({
 
     // Client management
     assignedClientManager: z.string().optional(),
-    assignedDate: z.instanceof(Timestamp).optional(),
+    assignedDate: timestampToDateSchema.optional(),
     status: ClientStatus,
 
     // Additional notes
