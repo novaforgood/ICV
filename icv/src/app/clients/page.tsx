@@ -1,10 +1,10 @@
 // pages/clients/page.tsx
-"use client";  // Add this line to mark it as a client-side component
+'use client' // Add this line to mark it as a client-side component
 
-import { useState, useEffect } from 'react'
 import { getAllClients } from '@/api/clients'
 import ClientsTable from '@/app/components/ClientsTable'
-import { Client } from '@/types/case-types'
+import { Client } from '@/types/client-types'
+import { useEffect, useState } from 'react'
 
 const ClientsPage = () => {
     const [clients, setClients] = useState<Client[]>([])

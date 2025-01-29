@@ -1,10 +1,9 @@
 // app/components/ClientsTable.tsx
+import { Client } from '@/types/client-types'
 import React from 'react'
-import Link from 'next/link'
-import { ClientSchema } from '@/types/case-types'
 
 interface ClientsTableProps {
-    clients: ClientSchema[];
+    clients: Client[]
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
@@ -21,8 +20,12 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                 </thead>
                 <tbody>
                     {clients.map((client) => (
-                        <tr key={client.id}> {/* Use a unique key here */}
-                            <td>{client.firstName} {client.lastName}</td>
+                        <tr key={client.id}>
+                            {' '}
+                            {/* Use a unique key here */}
+                            <td>
+                                {client.firstName} {client.lastName}
+                            </td>
                             <td>{client.email}</td>
                             {/* Render other client details */}
                         </tr>
@@ -30,8 +33,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                 </tbody>
             </table>
         </div>
-    );
-};
+    )
+}
 
-export default ClientsTable;
-
+export default ClientsTable

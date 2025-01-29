@@ -1,5 +1,5 @@
 import { db } from '@/data/firebase'
-import { ClientType, ClientSchema } from '@/types/case-types'
+import { Client, ClientSchema } from '@/types/client-types'
 
 import {
     addDoc,
@@ -10,7 +10,7 @@ import {
     updateDoc,
 } from 'firebase/firestore'
 
-export async function createClient(client: ClientType) {
+export async function createClient(client: Client) {
     // verify that the client object is valid
     // let results = ClientSchema.optional().safeParse(client)
     // if (results.success === false) {
@@ -18,7 +18,7 @@ export async function createClient(client: ClientType) {
     //     throw new Error('Client object is invalid ' + JSON.stringify(results))
     // }
 
-    console.log("asdfsdafdsfafdsasdfclient", client)
+    console.log('asdfsdafdsfafdsasdfclient', client)
 
     const clientsCollection = collection(db, 'clients')
     const newDoc = await addDoc(clientsCollection, client)
@@ -28,18 +28,18 @@ export async function createClient(client: ClientType) {
 export async function getAllClients() {
     const clientsCollection = collection(db, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
-    const clients = clientsSnapshot.docs.map((doc) => doc.data() as ClientType)
+    const clients = clientsSnapshot.docs.map((doc) => doc.data() as Client)
     return clients
 }
 
 export async function getClientById(id: string) {
     const clientsCollection = collection(db, 'clients')
     const clientDoc = await getDoc(doc(clientsCollection, id))
-    const client = clientDoc.data() as ClientType
+    const client = clientDoc.data() as Client
     return client
 }
 
-export async function updateClient(id: string, client: Partial<ClientType>) {
+export async function updateClient(id: string, client: Partial<Client>) {
     if (ClientSchema.safeParse(client).success === false) {
         throw new Error('Client object is invalid')
     }
