@@ -24,7 +24,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                             {' '}
                             {/* Use a unique key here */}
                             <td>
-                                {client.firstName} {client.lastName}
+                                {client.firstName} {client.lastName} {client.id}
                             </td>
                             <td>{client.email}</td>
                             {/* Render other client details */}
