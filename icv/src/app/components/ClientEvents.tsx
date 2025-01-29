@@ -1,19 +1,23 @@
 'use client'
 
-import { ContactType } from '@/types/event-types'
-import { useState } from 'react'
+import { CaseEventSchema, ContactType } from '@/types/event-types'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 export default function ClientEvents() {
     // register takes all input and makes it into a single object to return as data
     // handleSubmit prevents default form submission behavior; it validates the form, collects values, calls custom func, etc.
-    const { register, handleSubmit } = useForm()
-
-    const [events, setEvents] = useState<any[]>([])
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({
+        mode: 'onChange',
+        resolver: zodResolver(CaseEventSchema),
+    })
 
     const onSubmit = (data: any) => {
         console.log(data) // just prints the data collected into console
-        setEvents([...events, data])
     }
 
     return (
@@ -65,6 +69,7 @@ export default function ClientEvents() {
                     />
                 </div>
 
+                {errors && <PrintComponent stuffToprint={errors} />}
                 <button
                     type="submit"
                     className="mt-4 rounded bg-blue-500 p-2 text-white"
@@ -74,4 +79,9 @@ export default function ClientEvents() {
             </form>
         </div>
     )
+}
+
+function PrintComponent(stuffToprint: any) {
+    console.log(stuffToprint)
+    return <div>printed</div>
 }
