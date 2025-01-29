@@ -1,23 +1,33 @@
 'use client'
 
-import { CaseEventSchema, ContactType } from '@/types/event-types'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { createEvent } from '@/api/make-cases/make-event'
+import { ContactType } from '@/types/event-types'
 import { useForm } from 'react-hook-form'
 
-export default function ClientEvents() {
+interface ClientEventsProps {
+    clientID: string // Accept clientId as a prop
+}
+
+export default function ClientEvents({ clientID }: ClientEventsProps) {
     // register takes all input and makes it into a single object to return as data
     // handleSubmit prevents default form submission behavior; it validates the form, collects values, calls custom func, etc.
     const {
         register,
         handleSubmit,
-        formState: { errors },
-    } = useForm({
-        mode: 'onChange',
-        resolver: zodResolver(CaseEventSchema),
-    })
+        // formState: { errors },
+    } = useForm()
+    // {mode: 'onChange',
+    // resolver: zodResolver(CaseEventSchema),})
 
-    const onSubmit = (data: any) => {
+    const onSubmit = async (data: any) => {
         console.log(data) // just prints the data collected into console
+
+        await createEvent({
+            clientId: clientID, // Use the clientId passed as a prop
+            date: data.date,
+            contactType: data.contactType,
+            description: data.description,
+        })
     }
 
     return (
@@ -69,7 +79,7 @@ export default function ClientEvents() {
                     />
                 </div>
 
-                {errors && <PrintComponent stuffToprint={errors} />}
+                {/* {errors && <PrintComponent stuffToprint={errors} />} */}
                 <button
                     type="submit"
                     className="mt-4 rounded bg-blue-500 p-2 text-white"
@@ -81,7 +91,7 @@ export default function ClientEvents() {
     )
 }
 
-function PrintComponent(stuffToprint: any) {
-    console.log(stuffToprint)
-    return <div>printed</div>
-}
+// function PrintComponent(stuffToprint: any) {
+//     console.log(stuffToprint)
+//     return <div>have something going on</div>
+// }

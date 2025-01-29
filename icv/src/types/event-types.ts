@@ -19,9 +19,9 @@ export const ContactType = z.enum([
 
 // CaseEvent schema
 export const CaseEventSchema = z.object({
-    caseId: z.string(),
+    clientId: z.string(),
     date: z.instanceof(Timestamp),
-    contactTypes: z.array(ContactType),
+    contactType: z.array(ContactType),
     description: z.string().optional(),
 })
 
