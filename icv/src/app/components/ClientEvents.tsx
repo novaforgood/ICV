@@ -1,7 +1,8 @@
 'use client'
 
 import { createEvent } from '@/api/make-cases/make-event'
-import { ContactType } from '@/types/event-types'
+import { CaseEventSchema, ContactType } from '@/types/event-types'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 interface ClientEventsProps {
@@ -14,10 +15,10 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
     const {
         register,
         handleSubmit,
-        // formState: { errors },
-    } = useForm()
-    // {mode: 'onChange',
-    // resolver: zodResolver(CaseEventSchema),})
+        formState: { errors },
+        reset,
+        // onChange makes error messages appear/disappear dynamically
+    } = useForm({ mode: 'onChange', resolver: zodResolver(CaseEventSchema) })
 
     const onSubmit = async (data: any) => {
         console.log(data) // just prints the data collected into console
@@ -28,16 +29,16 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
             contactType: data.contactType,
             description: data.description,
         })
+
+        setTimeout(() => {
+            reset()
+        }, 100)
     }
 
     return (
         <div>
-            <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-4"
-                style={{ padding: '50px' }}
-            >
-                <h2> Client Case Notes </h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <h2 className="font-bold"> Client Case Notes </h2>
 
                 {/* Field 1: Date of Intake */}
                 <div className="flex space-x-3">
@@ -48,14 +49,24 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
                         className="w-[30%]rounded border p-2"
                     />
                 </div>
+                {/* Display error message for 'date' field */}
+                {errors.date && (
+                    <span className="mt-1 text-sm text-red-500">
+                        {(errors.date as any)?.message}
+                    </span>
+                )}
 
                 {/* Field 2: Contact Type (Dropdown) */}
                 <div className="flex space-x-3">
                     <label>Contact Code:</label>
                     <select
                         {...register('contactType')}
-                        className="w-[10%] rounded border p-2"
+                        className="w-[25%] rounded border p-2"
+                        defaultValue=""
                     >
+                        <option value="" disabled>
+                            Select Contact Type
+                        </option>
                         {/* ContactType is a zod enum; has a .Values property returning an array of all the actual contact types */}
                         {/* loops through each value in the array and returns a new <option> element */}
                         {Object.values(ContactType.Values).map((type) => (
@@ -67,6 +78,12 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
                         ))}
                     </select>
                 </div>
+                {/* Display error message for 'contactType' field */}
+                {errors.contactType && (
+                    <span className="mt-1 text-sm text-red-500">
+                        {(errors.contactType as any)?.message}
+                    </span>
+                )}
 
                 {/* Field 3: Notes */}
                 <div className="flex space-x-3">
@@ -79,7 +96,6 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
                     />
                 </div>
 
-                {/* {errors && <PrintComponent stuffToprint={errors} />} */}
                 <button
                     type="submit"
                     className="mt-4 rounded bg-blue-500 p-2 text-white"
@@ -90,8 +106,3 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
         </div>
     )
 }
-
-// function PrintComponent(stuffToprint: any) {
-//     console.log(stuffToprint)
-//     return <div>have something going on</div>
-// }

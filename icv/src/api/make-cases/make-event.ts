@@ -6,7 +6,8 @@ import {
     collection,
     getDocs,
     query,
-    where
+    where,
+    orderBy
 } from 'firebase/firestore'
 
 export async function createEvent(event: CaseEventType) {
