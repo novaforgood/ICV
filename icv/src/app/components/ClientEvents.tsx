@@ -15,7 +15,7 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isSubmitting },
         reset,
         // onChange makes error messages appear/disappear dynamically
     } = useForm({ mode: 'onChange', resolver: zodResolver(CaseEventSchema) })
@@ -31,8 +31,8 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
         })
 
         setTimeout(() => {
-            reset()
-        }, 100)
+            window.location.reload()
+        }, 200)
     }
 
     return (
@@ -98,9 +98,10 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
 
                 <button
                     type="submit"
-                    className="mt-4 rounded bg-blue-500 p-2 text-white"
+                    className={`mt-4 rounded p-2 text-white ${isSubmitting ? 'cursor-not-allowed bg-gray-400' : 'bg-blue-500'}`}
+                    disabled={isSubmitting} // Disable button when form is submitting
                 >
-                    Add Event
+                    {isSubmitting ? 'Submitting...' : 'Add Event'}
                 </button>
             </form>
         </div>
