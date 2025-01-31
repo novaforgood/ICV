@@ -1,8 +1,8 @@
 "use client";
 
 import Link from 'next/link';
-import { ClientType } from '@/types/case-types';
-import { useMemo } from 'react';
+import React from 'react';
+import { Client } from '@/types/client-types'
 import {
     flexRender,
     getCoreRowModel,
@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table';
 
 interface ClientsTableProps {
-    clients: ClientType[];
+    clients: Client[];
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {

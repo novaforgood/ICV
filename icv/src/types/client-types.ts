@@ -118,12 +118,15 @@ export const ClientSchema = z.object({
     notes: z.string().optional(),
 })
 
-export type GenderType = z.infer<typeof Gender>
-export type EthnicityType = z.infer<typeof Ethnicity>
-export type FosterYouthStatusType = z.infer<typeof FosterYouthStatus>
-export type EmploymentStatusType = z.infer<typeof EmploymentStatus>
-export type ProbationStatusType = z.infer<typeof ProbationStatus>
-export type ClientStatusType = z.infer<typeof ClientStatus>
-export type OpenClientStatusType = z.infer<typeof OpenClientStatus>
+export type Gender = z.infer<typeof Gender>
+export type Ethnicity = z.infer<typeof Ethnicity>
+export type FosterYouthStatus = z.infer<typeof FosterYouthStatus>
+export type EmploymentStatus = z.infer<typeof EmploymentStatus>
+export type ProbationStatus = z.infer<typeof ProbationStatus>
+export type ClientStatus = z.infer<typeof ClientStatus>
+export type OpenClientStatus = z.infer<typeof OpenClientStatus>
 
-export type ClientType = z.infer<typeof ClientSchema>
+export type Client = z.infer<typeof ClientSchema>
+
+export const PartialClientSchema = ClientSchema.partial()
+export type PartialClient = z.infer<typeof PartialClientSchema>
