@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { getAllClients } from '@/api/clients'
 import ClientsTable from '@/app/components/ClientsTable'
 import { Client } from '@/types/client-types'
-import { useEffect, useState } from 'react'
 
 const ClientsPage = () => {
     const [clients, setClients] = useState<Client[]>([])

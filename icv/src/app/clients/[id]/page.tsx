@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getClientById, updateClient } from "@/api/clients"; // assuming you have an updateClient function
-import { ClientType } from "@/types/case-types";
+import { Client } from "@/types/case-types";
 import { Timestamp } from "firebase/firestore";
 
 const ClientDetailPage = () => {
   const { id } = useParams();
-  const [client, setClient] = useState<ClientType | null>(null);
+  const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editMode, setEditMode] = useState(false);
-  const [clientData, setClientData] = useState<ClientType | null>(null);
+  const [clientData, setClientData] = useState<Client | null>(null);
 
   useEffect(() => {
     const fetchClient = async () => {

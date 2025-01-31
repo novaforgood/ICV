@@ -9,20 +9,20 @@ export async function getAllClients(): Promise<Client[]> {
     const clientsList = clientsSnapshot.docs.map((doc) => ({
         id: doc.id, // Firebase document ID
         ...doc.data(), // Other client fields
-    })) as ClientType[]
+    })) as Client[]
 
     return clientsList
 }
 
-export async function getClientById(clientId: string): Promise<ClientType | null> {
+export async function getClientById(clientId: string): Promise<Client | null> {
     const clientRef = doc(db, 'clients', clientId);
     const clientSnap = await getDoc(clientRef);
     
-    return clientSnap.exists() ? ({ id: clientSnap.id, ...clientSnap.data() } as ClientType) : null;
+    return clientSnap.exists() ? ({ id: clientSnap.id, ...clientSnap.data() } as Client) : null;
 
 }
 
-export const updateClient = async (id: string, updatedClientData: ClientType) => {
+export const updateClient = async (id: string, updatedClientData: Client) => {
   const clientRef = doc(db, "clients", id);
   await updateDoc(clientRef, updatedClientData);
 };
