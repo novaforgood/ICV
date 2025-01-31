@@ -16,6 +16,7 @@ const page = () => {
 
     const onSubmit = (data: Dog) => {
         console.log(data, 'createDog')
+        console.log("yay");
         createDog(data)
     }
 
