@@ -54,7 +54,7 @@ export const ClientSchema = z.object({
     aptNumber: z.string().optional(),
     city: z.string(),
     zipCode: z.string(),
-    phoneNumber: z.string(),
+    phoneNumber: z.string().optional(),
     email: z.string().email().optional(),
 
     // Program and intake details
@@ -69,13 +69,13 @@ export const ClientSchema = z.object({
     referralSource: z.string().optional(),
 
     // Family and demographic details
-    familySize: z.number(),
-    numberOfChildren: z.number(),
+    familySize: z.number().optional(),
+    numberOfChildren: z.number().optional(),
     childrenDetails: z
         .array(
             z.object({
-                name: z.string(),
-                age: z.number(),
+                name: z.string().optional(),
+                age: z.number().optional(),
             }),
         )
         .optional(),

@@ -38,6 +38,12 @@ const page = () => {
                         placeholder="First Name"
                         className="w-full rounded border p-2"
                     />
+                    {/* Display error message for 'firstName' field */}
+                    {errors.firstName && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.firstName as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Last Name</label>
@@ -47,6 +53,11 @@ const page = () => {
                         placeholder="Last Name"
                         className="w-full rounded border p-2"
                     />
+                    {errors.lastName && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.firstName as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Middle Initial</label>
@@ -56,6 +67,11 @@ const page = () => {
                         placeholder="Middle Initial"
                         className="w-full rounded border p-2"
                     />
+                    {errors.middleInitial && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.middleInitial as any)?.message}
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -69,6 +85,11 @@ const page = () => {
                         type="date"
                         className="w-full rounded border p-2"
                     />
+                    {errors.dateOfBirth && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.dateOfBirth as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Age</label>
@@ -82,6 +103,11 @@ const page = () => {
                         placeholder="Age"
                         className="w-full rounded border p-2"
                     />
+                    {errors.age && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.age as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Gender</label>
