@@ -1,6 +1,7 @@
-import { db } from '@/data/firebase'
+import { clientDb } from '@/lib/firebase'
 import { CaseEventType } from '@/types/event-types'
 
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore'
 import {
     addDoc,
     collection,
@@ -54,9 +55,9 @@ async function updateContactTypeCount(contactType: string) {
 }
 
 export async function getEventsbyClientId(clientId: string) {
-    const eventsCollection = collection(db, 'events')
+    const eventsCollection = collection(clientDb, 'events')
     const q = query(eventsCollection, where('clientId', '==', clientId))
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(q)
     const events = querySnapshot.docs.map((doc) => doc.data())
     return events
 }
