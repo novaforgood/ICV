@@ -1,9 +1,9 @@
 import { db } from '@/data/firebase'
-import { ClientType } from '@/types/case-types'
+import { Client } from '@/types/client-types'
 import { collection, getDocs, doc, getDoc, QueryDocumentSnapshot, updateDoc } from 'firebase/firestore'
 
-export async function getAllClients(): Promise<ClientType[]> {
-    const clientsCollection = collection(db, 'clients')  // Ensure the collection name is correct
+export async function getAllClients(): Promise<Client[]> {
+    const clientsCollection = collection(db, 'clients') // Ensure the collection name is correct
     const clientsSnapshot = await getDocs(clientsCollection)
 
     const clientsList = clientsSnapshot.docs.map((doc) => ({
