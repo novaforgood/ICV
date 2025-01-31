@@ -1,7 +1,7 @@
 "use client";  // Add this line to mark it as a client-side component
 
 import { useState, useEffect } from 'react'
-import { getAllClients } from '@/api/clients'
+import { getAllClients } from '@/api/make-cases/make-case'
 import ClientsTable from '@/app/components/ClientsTable'
 import { Client } from '@/types/client-types'
 

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { getClientById, updateClient } from "@/api/clients"; // assuming you have an updateClient function
-import { Client } from "@/types/case-types";
+import { getClientById, updateClient } from "@/api/make-cases/make-case"; // assuming you have an updateClient function
+import { Client } from "@/types/c-types";
 import { Timestamp } from "firebase/firestore";
 
 const ClientDetailPage = () => {
