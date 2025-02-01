@@ -38,7 +38,7 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <h2 className="font-bold"> Client Case Notes </h2>
+                <h2 className="font-bold"> Client Case Notes: </h2>
 
                 {/* Field 1: Date of Intake */}
                 <div className="flex space-x-3">
