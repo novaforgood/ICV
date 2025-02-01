@@ -1,6 +1,6 @@
 'use client'
 
-import { updateEvent } from '@/api/make-cases/make-event'
+import { getEventsbyClientId, updateEvent } from '@/api/make-cases/make-event'
 import { ContactType } from '@/types/event-types'
 import { useState } from 'react'
 import ClientEvents from './ClientEvents'
@@ -14,6 +14,16 @@ const EditEvents = ({
 }) => {
     const [eventList, setEventList] = useState(events || []) // actively stores list (updating elements based on any edits)
     const [isEditing, setIsEditing] = useState(false) // basically a boolean tracking whether table is being edited
+
+    const refetchEvents = async () => {
+        try {
+            // Assuming you have an API function to fetch the events
+            const updatedEvents = await getEventsbyClientId(clientId)
+            setEventList(updatedEvents) // Update the events state with the fetched events
+        } catch (error) {
+            console.error('Error refetching events:', error)
+        }
+    }
 
     // id: matches event being edited, field is the column, value is the actual data
     const handleEditEvent = (id: string, field: string, value: string) => {
@@ -31,6 +41,7 @@ const EditEvents = ({
     const handleSaveEvent = async (event: any) => {
         await updateEvent(event.id, event)
         console.log('Saving event', event)
+        await refetchEvents()
         setIsEditing(false) // exits editing mode when save is clicked
     }
 
