@@ -45,10 +45,24 @@ const EditEvents = ({
         setIsEditing(false) // exits editing mode when save is clicked
     }
 
-    const toggleEditing = () => {
+    const handleSaveAll = async () => {
+        // Save all edited events
+        for (let event of eventList) {
+            if (event.isEdited) {
+                await updateEvent(event.id, event) // Save only if edited
+                console.log('Saving event', event)
+            }
+        }
+
+        // Refetch events after saving
+        await refetchEvents()
+        setIsEditing(false)
+    }
+
+    const toggleEditing = async () => {
         if (isEditing) {
             // When cancel is clicked, reset the event list to the original data
-            setEventList(events)
+            await refetchEvents()
         }
         setIsEditing((prev) => !prev)
     }
@@ -85,13 +99,14 @@ const EditEvents = ({
                                                 type="date"
                                                 value={event.date}
                                                 // 'e' holds the new value in the input field when onChange is triggered
-                                                onChange={(e) =>
+                                                onChange={(e) => {
                                                     handleEditEvent(
                                                         event.id,
                                                         'date',
                                                         e.target.value,
                                                     )
-                                                }
+                                                    event.isEdited = true // Mark this event as edited
+                                                }}
                                                 className="w-[100%] border p-2"
                                             />
                                         ) : (
@@ -102,13 +117,14 @@ const EditEvents = ({
                                         {isEditing ? (
                                             <select
                                                 value={event.contactType}
-                                                onChange={(e) =>
+                                                onChange={(e) => {
                                                     handleEditEvent(
                                                         event.id,
                                                         'contactType',
                                                         e.target.value,
                                                     )
-                                                }
+                                                    event.isEdited = true // Mark this event as edited
+                                                }}
                                                 className="w-[100%] border p-2"
                                             >
                                                 {Object.values(
@@ -133,13 +149,14 @@ const EditEvents = ({
                                             <input
                                                 type="text"
                                                 value={event.description}
-                                                onChange={(e) =>
+                                                onChange={(e) => {
                                                     handleEditEvent(
                                                         event.id,
                                                         'description',
                                                         e.target.value,
                                                     )
-                                                }
+                                                    event.isEdited = true // Mark this event as edited
+                                                }}
                                                 className="w-[100%] border p-2"
                                             />
                                         ) : (
@@ -175,13 +192,24 @@ const EditEvents = ({
                     </tbody>
                 </table>
 
-                {/* Button to toggle editing mode */}
-                <button
-                    onClick={toggleEditing}
-                    className="mb-4 rounded bg-blue-500 p-2 text-white"
-                >
-                    {isEditing ? 'Cancel' : 'Edit'}
-                </button>
+                <div className="space-x-5">
+                    {/* Button to toggle editing mode */}
+                    <button
+                        onClick={toggleEditing}
+                        className="mb-4 rounded bg-blue-500 p-2 text-white"
+                    >
+                        {isEditing ? 'Cancel' : 'Edit'}
+                    </button>
+                    {/* Save All button */}
+                    {isEditing && (
+                        <button
+                            onClick={handleSaveAll}
+                            className="mb-4 rounded bg-blue-500 p-2 text-white"
+                        >
+                            Save All
+                        </button>
+                    )}
+                </div>
 
                 {/* Form to add new events */}
                 <ClientEvents clientID={clientId} />
