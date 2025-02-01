@@ -8,7 +8,8 @@ import {
     query,
     where,
     doc,
-    updateDoc
+    updateDoc,
+    deleteDoc
 } from 'firebase/firestore'
 
 export async function createEvent(event: CaseEventType) {
@@ -37,4 +38,19 @@ export async function getEventsbyClientId(clientId: string) {
 export async function updateEvent(id: string, updatedEvent: CaseEventType) {
     const eventRef = doc(db, "events", id);
     await updateDoc(eventRef, updatedEvent)
+}
+
+export async function deleteEvent(eventId: string) {
+    try {
+        // Reference to the specific event document in the 'events' collection
+        const eventRef = doc(db, 'events', eventId)
+        
+        // Delete the event document from Firestore
+        await deleteDoc(eventRef)
+        
+        console.log(`Event with ID ${eventId} successfully deleted`)
+    } catch (error) {
+        console.error('Error deleting event:', error)
+        throw new Error('Failed to delete event')
+    }
 }
