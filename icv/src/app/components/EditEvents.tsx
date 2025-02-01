@@ -252,7 +252,10 @@ const EditEvents = ({
                 </div>
 
                 {/* Form to add new events */}
-                <ClientEvents clientID={clientId} />
+                <ClientEvents
+                    clientID={clientId}
+                    refetchEvents={refetchEvents}
+                />
             </div>
             {/* Confirmation Modal */}
             {showDeleteWarning && (
