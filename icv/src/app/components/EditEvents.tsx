@@ -43,14 +43,6 @@ const EditEvents = ({
         )
     }
 
-    // function that saves updated event to server
-    const handleSaveEvent = async (event: any) => {
-        await updateEvent(event.id, event)
-        console.log('Saving event', event)
-        await refetchEvents()
-        setIsEditing(false) // exits editing mode when save is clicked
-    }
-
     const handleSaveAll = async () => {
         // Save all edited events
         for (let event of eventList) {
@@ -195,16 +187,6 @@ const EditEvents = ({
                                     </td>
                                     {isEditing && (
                                         <td className="border p-2">
-                                            {/* individual save button per row (event) */}
-                                            <button
-                                                onClick={() =>
-                                                    // passes relevant event to handleSave
-                                                    handleSaveEvent(event)
-                                                }
-                                                className="rounded bg-blue-500 p-2 text-white"
-                                            >
-                                                Save
-                                            </button>
                                             <button
                                                 onClick={() =>
                                                     openDeleteWarning(event.id)
