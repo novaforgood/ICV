@@ -16,7 +16,7 @@ import {
 
 export async function createEvent(event: CaseEventType) {
     try {
-    const eventsCollection = collection(db, 'events')
+    const eventsCollection = collection(clientDb, 'events')
     const newDoc = await addDoc(eventsCollection, event)
 
     await updateContactTypeCount(event.contactType);
@@ -29,7 +29,7 @@ export async function createEvent(event: CaseEventType) {
 
 
 async function updateContactTypeCount(contactType: string) {
-    const contactTypeCountDocRef = doc(db, 'events', 'contactTypeCount');
+    const contactTypeCountDocRef = doc(clientDb, 'events', 'contactTypeCount');
 
     try {
         const docSnapshot = await getDoc(contactTypeCountDocRef);
@@ -51,12 +51,4 @@ async function updateContactTypeCount(contactType: string) {
     } catch (error) {
         console.error("Error updating contact type count: ", error);
     }
-}
-
-export async function getEventsbyClientId(clientId: string) {
-    const eventsCollection = collection(clientDb, 'events')
-    const q = query(eventsCollection, where('clientId', '==', clientId))
-    const querySnapshot = await getDocs(q)
-    const events = querySnapshot.docs.map((doc) => doc.data())
-    return events
 }
