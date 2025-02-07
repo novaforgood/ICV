@@ -35,13 +35,13 @@ export const OpenClientStatus = z.enum([
 export const ClientSchema = z.object({
     id: z.string(),
     // Basic client details
-    lastName: z.string().min(1, { message: 'Enter a last name' }),
-    firstName: z.string().min(1, { message: 'Enter a first name' }),
+    lastName: z.string().optional(),
+    firstName: z.string().optional(),
     middleInitial: z.string().optional(),
-    dateOfBirth: timestampToDateSchema,
-    gender: Gender,
+    dateOfBirth: timestampToDateSchema.optional(),
+    gender: Gender.optional(),
     otherGender: z.string().optional(), // Fallback for "Other"
-    age: z.number().min(1, { message: 'Enter a valid age' }),
+    age: z.number().optional(),
 
     // Spouse information
     spouseName: z.string().optional(),
@@ -52,16 +52,16 @@ export const ClientSchema = z.object({
     // Location and contact details
     address: z.string().optional(),
     aptNumber: z.string().optional(),
-    city: z.string().min(1, { message: 'City is required' }),
+    city: z.string().optional(),
     zipCode: z.string().optional(),
     phoneNumber: z.string().optional(),
     email: z.string().email().optional(),
 
     // Program and intake details
-    program: z.string().min(1, { message: 'Program is required' }),
-    intakeDate: timestampToDateSchema,
+    program: z.string().optional(),
+    intakeDate: timestampToDateSchema.optional(),
     primaryLanguage: z.string().optional(),
-    clientCode: z.string().min(1, { message: 'Client code is required' }),
+    clientCode: z.string().optional(),
 
     // Housing and referral details
     housingType: z.string().optional(),
@@ -89,7 +89,7 @@ export const ClientSchema = z.object({
         ssi: z.boolean(),
         ssa: z.boolean(),
         unemployment: z.boolean(),
-    }),
+    }).optional(),
 
     // Assessment and client details
     needsAssessment: z.array(z.string()).optional(),
@@ -115,7 +115,7 @@ export const ClientSchema = z.object({
     status: ClientStatus.refine(
         (val) => val !== undefined,
         { message: 'Client status is required' }
-    ),
+    ).optional(),
 
     // Additional notes
     notes: z.string().optional(),
