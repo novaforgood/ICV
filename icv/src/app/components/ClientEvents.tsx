@@ -90,8 +90,7 @@ export default function ClientEvents({
                 {/* Field 3: Notes */}
                 <div className="flex space-x-3">
                     <label>Notes:</label>
-                    <input
-                        type="text"
+                    <textarea
                         {...register('description')}
                         placeholder="Enter details..."
                         className="w-[70%] rounded border p-4"
