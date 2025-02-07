@@ -11,7 +11,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@tanstack/react-table": "^8.20.6",
-    "cookies-next": "^5.1.0",
+    "cookies-next": "^4.3.0",
     "firebase": "^11.2.0",
     "next": "15.1.5",
     "react": "^19.0.0",

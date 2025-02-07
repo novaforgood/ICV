@@ -8,3 +8,4 @@ export async function getAllClients(): Promise<Client[]> {
     const clientsList = clientsSnapshot.docs.map((doc) => doc.data() as Client)
     return clientsList
 }
+
