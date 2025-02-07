@@ -1,4 +1,4 @@
-import { clientDb } from '@/lib/firebase'
+import { db } from '@/data/firebase'
 import { addDoc, collection } from 'firebase/firestore'
 
 export async function createNewFirebaseDocument() {
@@ -8,6 +8,6 @@ export async function createNewFirebaseDocument() {
         firstName: 'John',
         dateOfBirth: new Date(),
     }
-    const clientsCollection = collection(clientDb, 'clients')
+    const clientsCollection = collection(db, 'clients')
     const newDoc = await addDoc(clientsCollection, newClient)
 }
