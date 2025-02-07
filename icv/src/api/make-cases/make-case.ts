@@ -28,12 +28,7 @@ export async function createClient(client: Client) {
 export async function getAllClients() {
     const clientsCollection = collection(clientDb, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
-
-    const clients = clientsSnapshot.docs.map((doc) => ({
-        id: doc.id, // Firebase document ID
-        ...doc.data(), // Other client fields
-    })) as Client[]
-
+    const clients = clientsSnapshot.docs.map((doc) => doc.data() as Client)
     return clients
 }
 
@@ -44,7 +39,11 @@ export async function getClientById(id: string) {
     return client
 }
 
-export const updateClient = async (id: string, updatedClientData: Client) => {
-    const clientRef = doc(clientDb, "clients", id);
-    await updateDoc(clientRef, updatedClientData);
-  };
+export async function updateClient(id: string, client: Partial<Client>) {
+    if (ClientSchema.safeParse(client).success === false) {
+        throw new Error('Client object is invalid')
+    }
+
+    const clientsCollection = collection(clientDb, 'clients')
+    await updateDoc(doc(clientsCollection, id), client)
+}

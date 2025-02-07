@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import React from 'react';
 import { Client } from '@/types/client-types'
-import { useMemo } from 'react';
-
 import {
     flexRender,
     getCoreRowModel,
