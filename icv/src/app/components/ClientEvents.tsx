@@ -7,9 +7,13 @@ import { useForm } from 'react-hook-form'
 
 interface ClientEventsProps {
     clientID: string // Accept clientId as a prop
+    refetchEvents: () => Promise<void>
 }
 
-export default function ClientEvents({ clientID }: ClientEventsProps) {
+export default function ClientEvents({
+    clientID,
+    refetchEvents,
+}: ClientEventsProps) {
     // register takes all input and makes it into a single object to return as data
     // handleSubmit prevents default form submission behavior; it validates the form, collects values, calls custom func, etc.
     const {
@@ -29,16 +33,14 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
             contactType: data.contactType,
             description: data.description,
         })
-
-        setTimeout(() => {
-            window.location.reload()
-        }, 200)
+        reset()
+        await refetchEvents()
     }
 
     return (
         <div>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <h2 className="font-bold"> Client Case Notes </h2>
+                <h2 className="font-bold"> Client Case Notes: </h2>
 
                 {/* Field 1: Date of Intake */}
                 <div className="flex space-x-3">
@@ -88,8 +90,7 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
                 {/* Field 3: Notes */}
                 <div className="flex space-x-3">
                     <label>Notes:</label>
-                    <input
-                        type="text"
+                    <textarea
                         {...register('description')}
                         placeholder="Enter details..."
                         className="w-[70%] rounded border p-4"

@@ -35,13 +35,13 @@ export const OpenClientStatus = z.enum([
 export const ClientSchema = z.object({
     id: z.string(),
     // Basic client details
-    lastName: z.string(),
-    firstName: z.string(),
+    lastName: z.string().min(1, { message: 'Enter a last name' }),
+    firstName: z.string().min(1, { message: 'Enter a first name' }),
     middleInitial: z.string().optional(),
     dateOfBirth: timestampToDateSchema,
     gender: Gender,
     otherGender: z.string().optional(), // Fallback for "Other"
-    age: z.number(),
+    age: z.number().min(1, { message: 'Enter a valid age' }),
 
     // Spouse information
     spouseName: z.string().optional(),
@@ -52,16 +52,16 @@ export const ClientSchema = z.object({
     // Location and contact details
     address: z.string().optional(),
     aptNumber: z.string().optional(),
-    city: z.string(),
-    zipCode: z.string(),
-    phoneNumber: z.string(),
+    city: z.string().min(1, { message: 'City is required' }),
+    zipCode: z.string().optional(),
+    phoneNumber: z.string().optional(),
     email: z.string().email().optional(),
 
     // Program and intake details
-    program: z.string(),
+    program: z.string().min(1, { message: 'Program is required' }),
     intakeDate: timestampToDateSchema,
     primaryLanguage: z.string().optional(),
-    clientCode: z.string(),
+    clientCode: z.string().min(1, { message: 'Client code is required' }),
 
     // Housing and referral details
     housingType: z.string().optional(),
@@ -69,17 +69,17 @@ export const ClientSchema = z.object({
     referralSource: z.string().optional(),
 
     // Family and demographic details
-    familySize: z.number(),
-    numberOfChildren: z.number(),
+    familySize: z.number().optional(),
+    numberOfChildren: z.number().optional(),
     childrenDetails: z
         .array(
             z.object({
-                name: z.string(),
-                age: z.number(),
+                name: z.string().optional(),
+                age: z.number().optional(),
             }),
         )
         .optional(),
-    ethnicity: Ethnicity,
+    ethnicity: Ethnicity.optional(),
 
     // Public services information
     publicServices: z.object({
@@ -112,7 +112,10 @@ export const ClientSchema = z.object({
     // Client management
     assignedClientManager: z.string().optional(),
     assignedDate: timestampToDateSchema.optional(),
-    status: ClientStatus,
+    status: ClientStatus.refine(
+        (val) => val !== undefined,
+        { message: 'Client status is required' }
+    ),
 
     // Additional notes
     notes: z.string().optional(),
