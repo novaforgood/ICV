@@ -1,4 +1,4 @@
-import { db } from '@/data/firebase'
+import { clientDb } from '@/lib/firebase'
 import { Client, ClientSchema } from '@/types/client-types'
 
 import {
@@ -20,20 +20,20 @@ export async function createClient(client: Client) {
 
     console.log('asdfsdafdsfafdsasdfclient', client)
 
-    const clientsCollection = collection(db, 'clients')
+    const clientsCollection = collection(clientDb, 'clients')
     const newDoc = await addDoc(clientsCollection, client)
     console.log('Case added with ID: ', newDoc.id)
 }
 
 export async function getAllClients() {
-    const clientsCollection = collection(db, 'clients')
+    const clientsCollection = collection(clientDb, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
     const clients = clientsSnapshot.docs.map((doc) => doc.data() as Client)
     return clients
 }
 
 export async function getClientById(id: string) {
-    const clientsCollection = collection(db, 'clients')
+    const clientsCollection = collection(clientDb, 'clients')
     const clientDoc = await getDoc(doc(clientsCollection, id))
     const client = clientDoc.data() as Client
     return client
@@ -44,6 +44,6 @@ export async function updateClient(id: string, client: Partial<Client>) {
         throw new Error('Client object is invalid')
     }
 
-    const clientsCollection = collection(db, 'clients')
+    const clientsCollection = collection(clientDb, 'clients')
     await updateDoc(doc(clientsCollection, id), client)
 }
