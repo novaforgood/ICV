@@ -127,13 +127,26 @@ export default function ClientEvents({
                     />
                 </div>
 
-                <button
-                    type="submit"
-                    className={`mt-4 rounded p-2 text-white ${isSubmitting ? 'cursor-not-allowed bg-gray-400' : 'bg-blue-500'}`}
-                    disabled={isSubmitting} // Disable button when form is submitting
-                >
-                    {isSubmitting ? 'Submitting...' : 'Add Event'}
-                </button>
+                <div className="space-x-4">
+                    <button
+                        type="submit"
+                        className={`mt-4 rounded p-2 text-white ${isSubmitting ? 'cursor-not-allowed bg-gray-400' : 'bg-blue-500'}`}
+                        disabled={isSubmitting} // Disable button when form is submitting
+                    >
+                        {isSubmitting ? 'Submitting...' : 'Add Event'}
+                    </button>
+                    {/* Cancel Button */}
+                    <button
+                        type="button"
+                        className="`mt-4 rounded bg-blue-500 p-2 text-white"
+                        onClick={() => {
+                            reset() // Clears form fields
+                            localStorage.removeItem(storageKey) // Deletes saved data
+                        }}
+                    >
+                        Cancel
+                    </button>
+                </div>
             </form>
         </div>
     )
