@@ -1,76 +1,39 @@
-"use client";
-
-import Link from 'next/link';
-import React from 'react';
+// app/components/ClientsTable.tsx
 import { Client } from '@/types/client-types'
-import {
-    flexRender,
-    getCoreRowModel,
-    useReactTable,
-} from '@tanstack/react-table';
+import React from 'react'
 
 interface ClientsTableProps {
-    clients: Client[];
+    clients: Client[]
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
-    // Define table columns
-    const columns = useMemo(
-        () => [
-            {
-                accessorKey: 'name',
-                header: 'Name',
-                cell: ({ row }: any) => (
-                    <Link href={`/clients/${row.original.id}`} className="text-blue-600 hover:underline">
-                        {row.original.firstName} {row.original.lastName}
-                    </Link>
-                ),
-            },
-            {
-                accessorKey: 'id',
-                header: 'Id',
-                cell: ({ row }: any) => <div>{row.original.id}</div>
-            }
-        ],
-        []
-    );
-
-    // Table instance
-    const table = useReactTable({
-        data: clients || [],
-        columns,
-        getCoreRowModel: getCoreRowModel(),
-    });
-
     return (
         <div>
-            <h1>Clients</h1>
+            <h1>Clients Table</h1>
             <table>
                 <thead>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
-                                <th key={header.id}>
-                                    {flexRender(header.column.columnDef.header, header.getContext())}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        {/* Add more headers as needed */}
+                    </tr>
                 </thead>
                 <tbody>
-                    {table.getRowModel().rows.map((row) => (
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map((cell) => (
-                                <td key={cell.id}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
+                    {clients.map((client) => (
+                        <tr key={client.id}>
+                            {' '}
+                            {/* Use a unique key here */}
+                            <td>
+                                {client.firstName} {client.lastName} {client.id}
+                            </td>
+                            <td>{client.email}</td>
+                            {/* Render other client details */}
                         </tr>
                     ))}
                 </tbody>
             </table>
         </div>
-    );
-};
+    )
+}
 
-export default ClientsTable;
+export default ClientsTable
