@@ -1,54 +1,48 @@
 import { clientDb } from '@/lib/firebase'
 import { CaseEventType } from '@/types/event-types'
-
 import {
     addDoc,
     collection,
-    getDocs,
-    query,
-    where,
-    orderBy,
     doc,
     getDoc,
+    runTransaction,
     setDoc,
     updateDoc
 } from 'firebase/firestore'
 
 export async function createEvent(event: CaseEventType) {
-    try {
     const eventsCollection = collection(clientDb, 'events')
-    const newDoc = await addDoc(eventsCollection, event)
-
-    await updateContactTypeCount(event.contactType);
-
-    console.log('Event added with ID: ', newDoc.id)
-    } catch(error) {
-        console.error("Error adding event: ", error);
-    }
-}
-
-
-async function updateContactTypeCount(contactType: string) {
-    const contactTypeCountDocRef = doc(clientDb, 'events', 'contactTypeCount');
+    const contactTypeCountDocRef = doc(clientDb, 'events', 'contactTypeCount')
 
     try {
-        const docSnapshot = await getDoc(contactTypeCountDocRef);
+        // Start the transaction to ensure atomicity
+        await runTransaction(clientDb, async (transaction) => {
+            // Get the current contactTypeCount document
+            const docSnapshot = await transaction.get(contactTypeCountDocRef)
 
-        if (docSnapshot.exists()) {
-            // If document exists, update the count
-            const data = docSnapshot.data();
-            const currentCount = data[contactType] || 0;
+            // If the contactTypeCount document exists, update the count
+            if (docSnapshot.exists()) {
+                const data = docSnapshot.data()
+                const currentCount = data[event.contactType] || 0
 
-            await updateDoc(contactTypeCountDocRef, {
-                [contactType]: currentCount + 1
-            });
-        } else {
-            // If document doesn't exist, create it
-            await setDoc(contactTypeCountDocRef, {
-                [contactType]: 1
-            });
-        }
+                // Update the contactTypeCount in the same transaction
+                transaction.update(contactTypeCountDocRef, {
+                    [event.contactType]: currentCount + 1
+                })
+            } else {
+                // If the document doesn't exist, create it with initial count for the contactType
+                transaction.set(contactTypeCountDocRef, {
+                    [event.contactType]: 1
+                })
+            }
+
+            // Add the new event to the events collection as part of the same transaction
+            const newEventRef = doc(eventsCollection)
+            transaction.set(newEventRef, event)
+        })
+
+        console.log('Event added and contact type count updated successfully')
     } catch (error) {
-        console.error("Error updating contact type count: ", error);
+        console.error("Error adding event and updating contact type count: ", error)
     }
 }
