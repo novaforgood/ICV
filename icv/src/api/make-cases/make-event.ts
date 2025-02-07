@@ -1,5 +1,6 @@
 import { clientDb } from '@/lib/firebase'
 import { CaseEventType } from '@/types/event-types'
+
 import {
     addDoc,
     collection,
