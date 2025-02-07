@@ -3,6 +3,7 @@
 import { createEvent } from '@/api/make-cases/make-event'
 import { CaseEventSchema, ContactType } from '@/types/event-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 interface ClientEventsProps {
@@ -14,6 +15,8 @@ export default function ClientEvents({
     clientID,
     refetchEvents,
 }: ClientEventsProps) {
+    const storageKey = 'client-event-form${clientID}' // changes when different client is loaded
+
     // register takes all input and makes it into a single object to return as data
     // handleSubmit prevents default form submission behavior; it validates the form, collects values, calls custom func, etc.
     const {
@@ -21,8 +24,33 @@ export default function ClientEvents({
         handleSubmit,
         formState: { errors, isSubmitting },
         reset,
+        watch, // track form changes
+        setValue, // used to set the values of the form when loading saved info
         // onChange makes error messages appear/disappear dynamically
     } = useForm({ mode: 'onChange', resolver: zodResolver(CaseEventSchema) })
+
+    // Update localStorage whenever the user types something into the form field
+    useEffect(() => {
+        // tracks all form fields and their changes, capturing input in 'data'
+        const subscription = watch((data) => {
+            localStorage.setItem(storageKey, JSON.stringify(data))
+        })
+        // stop tracking input info when the form updates are gone (i.e. submitted/refreshed)
+        return () => subscription.unsubscribe()
+    }, [watch, storageKey]) // runs on mounts (initial load) and whenever watch or storageKey changes
+
+    // Load saved form data from localStorage upon refresh/exit without submission
+    useEffect(() => {
+        const savedData = localStorage.getItem(storageKey) // get saved data from local storage
+        if (savedData) {
+            const parsedData = JSON.parse(savedData) // converts saved data into object
+
+            // loops through each 'key' in stored data to update relevant fields
+            Object.keys(parsedData).forEach((key) => {
+                setValue(key as any, parsedData[key])
+            })
+        }
+    }, [setValue, storageKey])
 
     const onSubmit = async (data: any) => {
         console.log(data) // just prints the data collected into console
@@ -33,6 +61,8 @@ export default function ClientEvents({
             contactType: data.contactType,
             description: data.description,
         })
+
+        localStorage.removeItem(storageKey) // no longer save info to local storage when form is submitted
         reset()
         await refetchEvents()
     }
