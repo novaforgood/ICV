@@ -32,6 +32,8 @@ export async function createDog(dog: Dog) {
 }
 
 export async function getAllDogs() {
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const db = getFirestore(firebaseServerApp)
     const dogsCollection = collection(db, 'dogs')
     const dogsSnapshot = await getDocs(dogsCollection)
     const dogs = dogsSnapshot.docs.map((doc) => doc.data() as Dog)
@@ -39,6 +41,8 @@ export async function getAllDogs() {
 }
 
 export async function getDogById(id: string) {
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const db = getFirestore(firebaseServerApp)
     const dogsCollection = collection(db, 'dogs')
     const dogDoc = await getDoc(doc(dogsCollection, id))
     const dog = dogDoc.data() as Dog
@@ -46,6 +50,9 @@ export async function getDogById(id: string) {
 }
 
 export async function updateDog(id: string, dog: Dog) {
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const db = getFirestore(firebaseServerApp)
+
     if (DogSchema.safeParse(dog).success === false) {
         throw new Error('Dog object is invalid')
     }
