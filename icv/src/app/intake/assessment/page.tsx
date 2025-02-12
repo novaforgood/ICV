@@ -241,7 +241,7 @@ const page = (props: Props) => {
                 <div className="space-x-4">
                     <button
                         type="button"
-                        onClick={() => router.push('/intake')}
+                        onClick={() => router.push('/intake/demographics')}
                         className="mt-4 rounded bg-blue-500 p-2 text-white"
                     >
                         Back
