@@ -69,17 +69,17 @@ export const ClientSchema = z.object({
     referralSource: z.string().optional(),
 
     // Family and demographic details
-    familySize: z.number().optional(),
-    numberOfChildren: z.number().optional(),
+    familySize: z.number(),
+    numberOfChildren: z.number(),
     childrenDetails: z
         .array(
             z.object({
-                name: z.string().optional(),
-                age: z.number().optional(),
+                name: z.string(),
+                age: z.number(),
             }),
         )
         .optional(),
-    ethnicity: Ethnicity.optional(),
+    ethnicity: Ethnicity,
 
     // Public services information
     publicServices: z.object({
