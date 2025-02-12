@@ -38,6 +38,12 @@ const page = () => {
                         placeholder="First Name"
                         className="w-full rounded border p-2"
                     />
+                    {/* Display error message for 'firstName' field */}
+                    {errors.firstName && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.firstName as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Last Name</label>
@@ -47,6 +53,11 @@ const page = () => {
                         placeholder="Last Name"
                         className="w-full rounded border p-2"
                     />
+                    {errors.lastName && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.lastName as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Middle Initial</label>
@@ -56,6 +67,11 @@ const page = () => {
                         placeholder="Middle Initial"
                         className="w-full rounded border p-2"
                     />
+                    {errors.middleInitial && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.middleInitial as any)?.message}
+                        </span>
+                    )}
                 </div>
             </div>
 
@@ -69,6 +85,11 @@ const page = () => {
                         type="date"
                         className="w-full rounded border p-2"
                     />
+                    {errors.dateOfBirth && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.dateOfBirth as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Age</label>
@@ -82,6 +103,11 @@ const page = () => {
                         placeholder="Age"
                         className="w-full rounded border p-2"
                     />
+                    {errors.age && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.age as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Gender</label>
@@ -93,6 +119,11 @@ const page = () => {
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                     </select>
+                    {errors.gender && (
+                        <span className="mt-1 text-sm text-red-500">
+                            {(errors.gender as any)?.message}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <label>Other Gender</label>
@@ -159,6 +190,11 @@ const page = () => {
                                 placeholder="Address"
                                 className="w-full rounded border p-2"
                             />
+                            {errors.address && (
+                                <span className="mt-1 text-sm text-red-500">
+                                    {(errors.address as any)?.message}
+                                </span>
+                            )}
                         </div>
                         <div>
                             <label>Apt Number</label>
@@ -177,6 +213,11 @@ const page = () => {
                                 placeholder="City"
                                 className="w-full rounded border p-2"
                             />
+                            {errors.city && (
+                                <span className="mt-1 text-sm text-red-500">
+                                    {(errors.city as any)?.message}
+                                </span>
+                            )}
                         </div>
                         <div>
                             <label>Zip Code</label>
@@ -217,6 +258,11 @@ const page = () => {
                                 placeholder="Program"
                                 className="w-full rounded border p-2"
                             />
+                            {errors.program && (
+                                <span className="mt-1 text-sm text-red-500">
+                                    {(errors.program as any)?.message}
+                                </span>
+                            )}
                         </div>
                         <div>
                             <label>Intake Date</label>
@@ -243,6 +289,11 @@ const page = () => {
                                 placeholder="Client Code"
                                 className="w-full rounded border p-2"
                             />
+                            {errors.clientCode && (
+                                <span className="mt-1 text-sm text-red-500">
+                                    {(errors.clientCode as any)?.message}
+                                </span>
+                            )}
                         </div>
                     </div>
 
@@ -494,7 +545,7 @@ const page = () => {
             )}
 
             {/* Client management */}
-            {/* <div className="flex space-x-5">
+            <div className="flex space-x-5">
                 <div>
                     <label>Assigned Client Manager</label>
                     <input
@@ -534,8 +585,6 @@ const page = () => {
                 />
             </div>
 
-            {errors && <PrintComponent stuffToprint={errors} />}
-            {/* {errors && <p>{JSON.stringify(errors)}</p>} */}
             <button
                 type="submit"
                 className="mt-4 rounded bg-blue-500 p-2 text-white"
@@ -544,11 +593,6 @@ const page = () => {
             </button>
         </form>
     )
-}
-
-function PrintComponent(stuffToprint: any) {
-    console.log(stuffToprint)
-    return <div>printed</div>
 }
 
 export default page

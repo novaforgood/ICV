@@ -1,7 +1,4 @@
-'use server'
-import 'server-only'
-
-import { getAuthenticatedAppForUser } from '@/lib/serverApp'
+import { db } from '@/data/firebase'
 import { Dog, DogSchema } from '@/types/example-types'
 import {
     addDoc,
@@ -9,26 +6,18 @@ import {
     doc,
     getDoc,
     getDocs,
-    getFirestore,
     updateDoc,
 } from 'firebase/firestore'
 
 export async function createDog(dog: Dog) {
-    // verify that the user is logged in
-
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
-    const db = getFirestore(firebaseServerApp)
-
     // verify that the dog object is valid
     if (DogSchema.safeParse(dog).success === false) {
-        console.log('Dog object is invalid')
         throw new Error('Dog object is invalid')
     }
 
     const dogsCollection = collection(db, 'dogs')
     const newDoc = await addDoc(dogsCollection, dog)
     console.log('Dog added with ID: ', newDoc.id)
-    return newDoc.id
 }
 
 export async function getAllDogs() {

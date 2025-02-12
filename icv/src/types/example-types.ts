@@ -4,7 +4,7 @@ export const DogSchema = z.object({
     name: z.string(),
     age: z.number(),
     breed: z.string().optional(),
-    isGoodBoy: z.boolean().optional(),
+    isGoodBoy: z.boolean(),
 })
 
 // Infer TypeScript type from the schema
