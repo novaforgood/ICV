@@ -7,6 +7,7 @@ import { getAuth } from 'firebase/auth'
 import { cookies } from 'next/headers'
 import { firebaseConfig } from './firebaseConfig'
 
+
 export async function getAuthenticatedAppForUser() {
     const idToken = await getCookie('idToken', { cookies })
 
@@ -31,6 +32,6 @@ export async function getAuthenticatedAppForUser() {
     if (!auth.currentUser) {
         throw new Error('No user found')
     }
-
     return { firebaseServerApp, currentUser: auth.currentUser }
+
 }
