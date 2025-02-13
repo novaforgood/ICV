@@ -22,7 +22,7 @@ const page = (props: Props) => {
         reset,
         formState: { errors },
     } = useForm<Partial<Dog>>({
-        resolver: zodResolver(DogSchema),
+        resolver: zodResolver(DogSchema.partial()),
         defaultValues: loadedForm,
     })
 
@@ -40,8 +40,10 @@ const page = (props: Props) => {
     }, [watch, loadedForm])
 
     const onSubmit = (data: Partial<Dog>) => {
+        console.log('on submit')
         updateForm(data)
         // go to the next page
+        console.log('data', data)
         router.push('/examples/makedog/background')
     }
 

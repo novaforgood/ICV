@@ -21,7 +21,7 @@ const page = (props: Props) => {
         watch,
         formState: { errors },
     } = useForm<Dog>({
-        resolver: zodResolver(DogSchema),
+        resolver: zodResolver(DogSchema.partial()),
         defaultValues: loadedForm,
     })
 
@@ -41,7 +41,7 @@ const page = (props: Props) => {
     const onSubmit = async (data: Dog) => {
         const newDogId = await createDog(data)
         clearForm()
-        router.push(`/examples/makedog/dog/${newDogId}`)
+        router.push(`/examples/dog/${newDogId}`)
     }
 
     return (
