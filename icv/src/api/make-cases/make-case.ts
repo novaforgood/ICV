@@ -13,8 +13,7 @@ import {
 } from 'firebase/firestore'
 
 
-const { firebaseServerApp } = await getAuthenticatedAppForUser()
-const ssrdb = getFirestore(firebaseServerApp)
+
 
 export async function createClient(client: Client) {
     // verify that the client object is valid
@@ -23,6 +22,8 @@ export async function createClient(client: Client) {
 
     //     throw new Error('Client object is invalid ' + JSON.stringify(results))
     // }
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
     console.log('asdfsdafdsfafdsasdfclient', client)
     const clientsCollection = collection(ssrdb, 'clients')
     const newDoc = await addDoc(clientsCollection, client)
@@ -30,6 +31,9 @@ export async function createClient(client: Client) {
 }
 
 export async function getAllClients() {
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
+
     const clientsCollection = collection(ssrdb, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
     const clients = clientsSnapshot.docs.map((doc) => doc.data() as Client)
@@ -37,6 +41,9 @@ export async function getAllClients() {
 }
 
 export async function getClientById(id: string) {
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
+
     const clientsCollection = collection(ssrdb, 'clients')
     const clientDoc = await getDoc(doc(clientsCollection, id))
     const client = clientDoc.data() as Client
@@ -44,6 +51,9 @@ export async function getClientById(id: string) {
 }
 
 export async function updateClient(id: string, client: Partial<Client>) {
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
+    
     if (ClientSchema.safeParse(client).success === false) {
         throw new Error('Client object is invalid')
     }
