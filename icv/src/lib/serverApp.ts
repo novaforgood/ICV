@@ -5,7 +5,7 @@ import { initializeServerApp } from 'firebase/app'
 import { getCookie } from 'cookies-next'
 import { getAuth } from 'firebase/auth'
 import { cookies } from 'next/headers'
-import { firebaseConfig } from './firebaseConfig'
+import { firebaseConfig } from '@/data/firebase'
 
 
 export async function getAuthenticatedAppForUser() {
