@@ -1,3 +1,6 @@
+'use server'
+import 'server-only'
+
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import { CaseEventType } from '@/types/event-types'
 
