@@ -1,23 +1,51 @@
 'use client'
 
-import { Client, ClientSchema } from '@/types/client-types'
+import { BasicIntakeSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { TypeOf } from 'zod'
+import { useIntakeFormStore } from '../lib/useIntakeFormStore'
 
-const page = () => {
+interface Props {}
+
+const Page = (props: Props) => {
+    const { form: loadedForm, updateForm } = useIntakeFormStore()
+    type BasicIntakeType = TypeOf<typeof BasicIntakeSchema>
+
     const {
         register,
         handleSubmit,
+        watch,
+        reset,
         formState: { errors },
-    } = useForm<Partial<Client>>({
+    } = useForm<BasicIntakeType>({
         mode: 'onChange',
-        resolver: zodResolver(ClientSchema.partial()),
+        resolver: zodResolver(BasicIntakeSchema),
+        defaultValues: loadedForm,
     })
 
     const router = useRouter()
 
-    function onSubmit() {
+    useEffect(() => {
+        // console.log('loadedForm', loadedForm)
+        reset(loadedForm)
+    }, [loadedForm, reset])
+
+    useEffect(() => {
+        const unsubscribe = watch((data) => {
+            updateForm(data)
+        }).unsubscribe
+        console.log(loadedForm)
+        console.log(errors)
+
+        return unsubscribe
+    }, [watch, loadedForm])
+
+    const onSubmit = (data: BasicIntakeType) => {
+        console.log('in submit...')
+        updateForm(data)
         router.push('/intake/demographics')
     }
 
@@ -43,9 +71,7 @@ const page = () => {
                     {/* <div>
                         <label>Assigned Date</label>
                         <input
-                            {...register('assignedDate',
-
-                            )}
+                            {...register('assignedDate')}
                             type="date"
                             className="w-full rounded border p-2"
                         />
@@ -61,22 +87,10 @@ const page = () => {
                         </select>
                     </div>
                 </div>
+            </div>
 
-                <div>
-                    <label>First Name</label>
-                    <input
-                        {...register('firstName')}
-                        type="text"
-                        placeholder="First Name"
-                        className="w-full rounded border p-2"
-                    />
-                    {/* Display error message for 'firstName' field */}
-                    {errors.firstName && (
-                        <span className="mt-1 text-sm text-red-500">
-                            {(errors.firstName as any)?.message}
-                        </span>
-                    )}
-                </div>
+            <label>Client Info:</label>
+            <div className="flex space-x-5">
                 <div>
                     <label>Last Name</label>
                     <input
@@ -85,11 +99,15 @@ const page = () => {
                         placeholder="Last Name"
                         className="w-full rounded border p-2"
                     />
-                    {errors.lastName && (
-                        <span className="mt-1 text-sm text-red-500">
-                            {(errors.lastName as any)?.message}
-                        </span>
-                    )}
+                </div>
+                <div>
+                    <label>First Name</label>
+                    <input
+                        {...register('firstName')}
+                        type="text"
+                        placeholder="First Name"
+                        className="w-full rounded border p-2"
+                    />
                 </div>
                 <div>
                     <label>Middle Initial</label>
@@ -99,11 +117,6 @@ const page = () => {
                         placeholder="Middle Initial"
                         className="w-full rounded border p-2"
                     />
-                    {errors.middleInitial && (
-                        <span className="mt-1 text-sm text-red-500">
-                            {(errors.middleInitial as any)?.message}
-                        </span>
-                    )}
                 </div>
             </div>
 
@@ -117,29 +130,18 @@ const page = () => {
                         type="date"
                         className="w-full rounded border p-2"
                     />
-                    {errors.dateOfBirth && (
-                        <span className="mt-1 text-sm text-red-500">
-                            {(errors.dateOfBirth as any)?.message}
-                        </span>
-                    )}
                 </div> */}
                 <div>
                     <label>Age</label>
                     <input
                         {...register('age', {
                             // valueAsNumber: true,
-                            setValueAs: (v) =>
-                                v === '' ? -1 : parseInt(v, 10),
+                            setValueAs: (v) => (v === '' ? 0 : parseInt(v, 10)),
                         })}
                         type="number"
                         placeholder="Age"
                         className="w-full rounded border p-2"
                     />
-                    {errors.age && (
-                        <span className="mt-1 text-sm text-red-500">
-                            {(errors.age as any)?.message}
-                        </span>
-                    )}
                 </div>
                 <div>
                     <label>Gender</label>
@@ -151,11 +153,6 @@ const page = () => {
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                     </select>
-                    {errors.gender && (
-                        <span className="mt-1 text-sm text-red-500">
-                            {(errors.gender as any)?.message}
-                        </span>
-                    )}
                 </div>
                 <div>
                     <label>Other Gender</label>
@@ -166,12 +163,31 @@ const page = () => {
                         className="w-full rounded border p-2"
                     />
                 </div>
+                <div>
+                    <label>Phone Number</label>
+                    <input
+                        {...register('phoneNumber')}
+                        type="text"
+                        placeholder="Phone Number"
+                        className="w-full rounded border p-2"
+                    />
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input
+                        {...register('email')}
+                        type="email"
+                        placeholder="Email"
+                        className="w-full rounded border p-2"
+                    />
+                </div>
             </div>
 
+            <label>Housing:</label>
             {/* Location and contact details */}
             <div className="flex space-x-5">
                 <div>
-                    <label>Address</label>
+                    <label>Street Address</label>
                     <input
                         {...register('address')}
                         type="text"
@@ -183,15 +199,6 @@ const page = () => {
                             {(errors.address as any)?.message}
                         </span>
                     )}
-                </div>
-                <div>
-                    <label>Apt Number</label>
-                    <input
-                        {...register('aptNumber')}
-                        type="text"
-                        placeholder="Apt Number"
-                        className="w-full rounded border p-2"
-                    />
                 </div>
                 <div>
                     <label>City</label>
@@ -217,29 +224,19 @@ const page = () => {
                     />
                 </div>
                 <div>
-                    <label>Phone Number</label>
+                    <label>Apt Number</label>
                     <input
-                        {...register('phoneNumber')}
+                        {...register('aptNumber')}
                         type="text"
-                        placeholder="Phone Number"
+                        placeholder="Apt Number"
                         className="w-full rounded border p-2"
                     />
                 </div>
-                {/* <div>
-                    <label>Email</label>
-                    <input
-                        {...register('email')}
-                        type="email"
-                        placeholder="Email"
-                        className="w-full rounded border p-2"
-                    />
-                </div> */}
             </div>
 
             <button
                 type="submit"
                 className="mt-4 rounded bg-blue-500 p-2 text-white"
-                // onClick={() => router.push('/intake/demographics')}
             >
                 Next
             </button>
@@ -247,4 +244,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page

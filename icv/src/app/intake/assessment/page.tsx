@@ -1,36 +1,58 @@
 'use client'
 
 import { createClient } from '@/api/make-cases/make-case'
-import { Client, ClientSchema } from '@/types/client-types'
+import { AssessmentIntakeSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { TypeOf } from 'zod'
+import { useIntakeFormStore } from '../../lib/useIntakeFormStore'
 
 interface Props {}
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
+    const { form: loadedForm, updateForm, clearForm } = useIntakeFormStore()
+    type AssessmentIntakeType = TypeOf<typeof AssessmentIntakeSchema>
+
     const {
         register,
         handleSubmit,
+        watch,
+        reset,
         formState: { errors },
-    } = useForm<Client>({
+    } = useForm<AssessmentIntakeType>({
         mode: 'onChange',
-        resolver: zodResolver(ClientSchema.partial()),
+        resolver: zodResolver(AssessmentIntakeSchema),
+        defaultValues: loadedForm,
     })
 
-    const onSubmit = (data: Client) => {
-        // console.log('Loading...')
-        // console.log(errors)
-        createClient(data)
-        console.log(data)
+    useEffect(() => {
+        console.log(loadedForm)
+        reset(loadedForm)
+    }, [loadedForm, reset])
+
+    useEffect(() => {
+        const unsubscribe = watch((data) => {
+            updateForm(data)
+        }).unsubscribe
+        // console.log(loadedForm)
+
+        return unsubscribe
+    }, [watch, loadedForm])
+
+    const onSubmit = (data: AssessmentIntakeType) => {
+        const fullClientData = { ...loadedForm, ...data }
+        createClient(fullClientData)
+        clearForm()
     }
 
     const router = useRouter()
     return (
-        <div>
+        <div className="space-x-5">
             <form onSubmit={handleSubmit(onSubmit)}>
                 {/* Additional notes */}
-                <div>
+                <div className="space-x-5">
                     <label>Notes</label>
                     <textarea
                         {...register('notes')}
@@ -40,7 +62,7 @@ const page = (props: Props) => {
                 </div>
 
                 {/* Medical and mental health information */}
-                <div>
+                {/* <div>
                     <label>Substance Abuse Details</label>
                     <input
                         {...register('substanceAbuseDetails')}
@@ -48,8 +70,8 @@ const page = (props: Props) => {
                         placeholder="Substance Abuse Details"
                         className="w-full rounded border p-2"
                     />
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                     <label>Medical Conditions</label>
                     <input
                         {...register('medicalConditions')}
@@ -57,8 +79,8 @@ const page = (props: Props) => {
                         placeholder="Medical Conditions"
                         className="w-full rounded border p-2"
                     />
-                </div>
-                <div>
+                </div> */}
+                {/* <div>
                     <label>Mental Health Diagnosis</label>
                     <input
                         {...register('mentalHealthDiagnosis')}
@@ -66,11 +88,11 @@ const page = (props: Props) => {
                         placeholder="Mental Health Diagnosis"
                         className="w-full rounded border p-2"
                     />
-                </div>
+                </div> */}
 
                 {/* Program and intake details */}
                 <div className="flex space-x-5">
-                    <div>
+                    {/* <div>
                         <label>Program</label>
                         <input
                             {...register('program')}
@@ -83,16 +105,16 @@ const page = (props: Props) => {
                                 {(errors.program as any)?.message}
                             </span>
                         )}
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                         <label>Intake Date</label>
                         <input
                             {...register('intakeDate')}
                             type="date"
                             className="w-full rounded border p-2"
                         />
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                         <label>Primary Language</label>
                         <input
                             {...register('primaryLanguage')}
@@ -114,11 +136,11 @@ const page = (props: Props) => {
                                 {(errors.clientCode as any)?.message}
                             </span>
                         )}
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Housing and referral details */}
-                <div className="flex space-x-5">
+                {/* <div className="flex space-x-5">
                     <div>
                         <label>Housing Type</label>
                         <input
@@ -146,10 +168,10 @@ const page = (props: Props) => {
                             className="w-full rounded border p-2"
                         />
                     </div>
-                </div>
+                </div> */}
 
                 {/* Assessment and client details */}
-                <div className="flex space-x-5">
+                {/* <div className="flex space-x-5">
                     <div>
                         <label>Needs Assessment</label>
                         <input
@@ -196,10 +218,10 @@ const page = (props: Props) => {
                             </option>
                         </select>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Education and employment */}
-                <div className="flex space-x-5">
+                {/* <div className="flex space-x-5">
                     <div>
                         <label>Has High School Diploma</label>
                         <input
@@ -237,7 +259,7 @@ const page = (props: Props) => {
                             </option>
                         </select>
                     </div>
-                </div>
+                </div> */}
                 <div className="space-x-4">
                     <button
                         type="button"
@@ -258,4 +280,4 @@ const page = (props: Props) => {
     )
 }
 
-export default page
+export default Page

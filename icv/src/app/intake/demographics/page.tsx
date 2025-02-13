@@ -1,27 +1,52 @@
 'use client'
 
-import { Client, ClientSchema } from '@/types/client-types'
+import { DemographicIntakeSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { TypeOf } from 'zod'
+import { useIntakeFormStore } from '../../lib/useIntakeFormStore'
 
 interface Props {}
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
+    const { form: loadedForm, updateForm } = useIntakeFormStore()
+    type DemographicIntakeType = TypeOf<typeof DemographicIntakeSchema>
+
     const {
         register,
         handleSubmit,
+        watch,
+        reset,
         formState: { errors },
-    } = useForm<Client>({
+    } = useForm<DemographicIntakeType>({
         mode: 'onChange',
-        resolver: zodResolver(ClientSchema.partial()),
+        resolver: zodResolver(DemographicIntakeSchema),
+        defaultValues: loadedForm,
     })
 
-    function onSubmit() {
+    const router = useRouter()
+
+    useEffect(() => {
+        // console.log('loadedForm', loadedForm)
+        reset(loadedForm)
+    }, [loadedForm, reset])
+
+    useEffect(() => {
+        const unsubscribe = watch((data) => {
+            updateForm(data)
+        }).unsubscribe
+        console.log(loadedForm)
+        console.log(errors)
+
+        return unsubscribe
+    }, [watch, loadedForm])
+
+    const onSubmit = (data: DemographicIntakeType) => {
+        updateForm(data)
         router.push('/intake/assessment')
     }
-
-    const router = useRouter()
     return (
         <div>
             <form
@@ -49,7 +74,7 @@ const page = (props: Props) => {
                             className="w-full rounded border p-2"
                         />
                     </div> */}
-                    <div>
+                    {/* <div>
                         <label>Spouse Gender</label>
                         <select
                             {...register('spouseGender')}
@@ -59,8 +84,8 @@ const page = (props: Props) => {
                             <option value="Female">Female</option>
                             <option value="Other">Other</option>
                         </select>
-                    </div>
-                    <div>
+                    </div> */}
+                    {/* <div>
                         <label>Spouse Other Gender</label>
                         <input
                             {...register('spouseOtherGender')}
@@ -68,7 +93,7 @@ const page = (props: Props) => {
                             placeholder="Spouse Other Gender"
                             className="w-full rounded border p-2"
                         />
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Family and demographic details */}
@@ -91,7 +116,7 @@ const page = (props: Props) => {
                             className="w-full rounded border p-2"
                         />
                     </div> */}
-                    <div>
+                    {/* <div>
                         <label>Ethnicity</label>
                         <select
                             {...register('ethnicity')}
@@ -112,11 +137,11 @@ const page = (props: Props) => {
                             </option>
                             <option value="Other">Other</option>
                         </select>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Public services information */}
-                <div className="flex space-x-5">
+                {/* <div className="flex space-x-5">
                     <div className="space-x-2">
                         <label>General Relief</label>
                         <input
@@ -158,8 +183,8 @@ const page = (props: Props) => {
                             {...register('publicServices.unemployment')}
                             type="checkbox"
                         />
-                    </div>
-                </div>
+                    </div> */}
+                {/* </div> */}
                 <div className="space-x-4">
                     <button
                         type="button"
@@ -180,4 +205,4 @@ const page = (props: Props) => {
     )
 }
 
-export default page
+export default Page
