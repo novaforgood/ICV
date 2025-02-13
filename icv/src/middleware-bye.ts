@@ -1,34 +1,20 @@
-// import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
+import { getAuthenticatedAppForUser } from "./lib/serverApp";
+import { match } from "assert";
 
-// export async function middleware(req: NextRequest) {
-//     // Extract the Firebase Auth token from headers or cookies
-//     // await auth.authStateReady()
-//     // if (!auth.currentUser) {
-//     //     return NextResponse.next()
-//     // }
 
-//     console.log('INSIDE MIDDLEWARE')
-//     console.log('Middleware is running:', req.nextUrl.pathname)
+export async function middleware(req: NextRequest) {
+    try {
+        await getAuthenticatedAppForUser()
 
-//     // const token = await getIdToken(auth.currentUser)
-//     const token = 'MEOW'
+        return NextResponse.next()
+    } catch (error){
+        console.error("authentication error", error)
 
-//     if (token) {
-//         // Clone the request and set the Authorization header
-//         const requestHeaders = new Headers(req.headers)
-//         requestHeaders.set('Authorization', `Bearer ${token}`)
-
-//         return NextResponse.next({
-//             request: {
-//                 headers: requestHeaders,
-//             },
-//         })
-//     }
-
-//     return NextResponse.next()
-// }
-
-// // Apply middleware to all routes or specific routes
-// export const config = {
-//     matcher: ['/:path*'],
-// }
+        //if auth fails, return 401 unauthorized response
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+}
+export const config = {
+    matchers: '/api/:path*', //protect all api routes
+}
