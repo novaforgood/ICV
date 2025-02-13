@@ -102,12 +102,7 @@ export async function deleteEvent(eventId: string) {
 export async function getEventsbyClientId(clientId: string) {
     const eventsCollection = collection(db, 'events')
     const q = query(eventsCollection, where('clientId', '==', clientId))
-    const querySnapshot = await getDocs(q);
-    
-    // Map through documents and include their 'id' along with data
-    const events = querySnapshot.docs.map((doc) => ({
-        id: doc.id, // Firebase-generated unique ID
-        ...doc.data() // Spread the document data
-    }));
+    const querySnapshot = await getDocs(q)
+    const events = querySnapshot.docs.map((doc) => doc.data())
     return events
 }
