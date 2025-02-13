@@ -1,6 +1,5 @@
 'use client'
 
-import { createEvent } from '@/api/make-cases/make-event'
 import { CaseEventSchema, ContactType } from '@/types/event-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -23,16 +22,16 @@ export default function ClientEvents({ clientID }: ClientEventsProps) {
     const onSubmit = async (data: any) => {
         console.log(data) // just prints the data collected into console
 
-        await createEvent({
-            clientId: clientID, // Use the clientId passed as a prop
-            date: data.date,
-            contactType: data.contactType,
-            description: data.description,
-        })
+        // await createEvent({
+        //     clientId: clientID, // Use the clientId passed as a prop
+        //     date: data.date,
+        //     contactType: data.contactType,
+        //     description: data.description,
+        // })
 
-        setTimeout(() => {
-            window.location.reload()
-        }, 200)
+        // setTimeout(() => {
+        //     window.location.reload()
+        // }, 200)
     }
 
     return (
