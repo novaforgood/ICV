@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Client } from '@/types/client-types'
 import {
     flexRender,

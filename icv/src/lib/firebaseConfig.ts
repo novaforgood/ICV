@@ -1,3 +1,7 @@
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
+
 // Firebase configuration using environment variables
 
 export const firebaseConfig = {
@@ -8,3 +12,10 @@ export const firebaseConfig = {
     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 }
+
+
+// 🚀 Initialize Firebase App
+const app = initializeApp(firebaseConfig);
+
+// 🔥 Initialize Firestore Database
+export const db = getFirestore(app);
