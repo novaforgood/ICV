@@ -15,6 +15,10 @@ const SearchComponent = () => {
         dateOfBirth: string;
        }[]>([]);
     const [loading, setLoading] = useState(false);
+    const [filters, setFilters] = useState({
+        gender: '',
+        id: '',
+    });
 
     const handleSearch = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -22,10 +26,15 @@ const SearchComponent = () => {
 
         setLoading(true);
         const data = await searchByKeyword(searchTerm);
-        // console.log("Search results:", data);
         setResults(data);
         setLoading(false);
     };
+
+    const filteredResults = results.filter(user => {
+        if (filters.gender && user.gender !== filters.gender) return false;
+        if (filters.id && !user.id.toLowerCase().includes(filters.id.toLowerCase())) return false;
+        return true;
+    });
 
     return (
         <div className="w-full max-w-md p-4 border rounded-md shadow-md">
@@ -42,12 +51,34 @@ const SearchComponent = () => {
                 </button>
             </form>
 
+            <div className="mt-4 mb-4">
+                <select 
+                    value={filters.gender}
+                    onChange={(e) => setFilters({...filters, gender: e.target.value,})}
+                    className="p-2 border rounded-md"
+                >
+                    <option value="">All Genders</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+
+            <div>
+                <input
+                    type="text"
+                    value={filters.id}
+                    onChange={(e) => setFilters({...filters, id: e.target.value,})}
+                    placeholder="Filter by ID..."
+                    className="p-2 border rounded-md"
+                />
+            </div>
+
             {loading && <p className="mt-2 text-gray-500">Searching...</p>}
 
             <ul className="mt-4">
-                {results.length > 0 ? (
+                {filteredResults.length > 0 ? (
                     <div className="flex flex-wrap gap-4">
-                        {results.map((user) => (
+                        {filteredResults.map((user) => (
                             <div key={user.id} className="p-4 border rounded-md shadow-sm w-80">
                     <div className="space-y-2">
                         <div>
