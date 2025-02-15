@@ -322,6 +322,7 @@ export const ClientIntakeSchema = z.object({
     }).optional(),
 
     // Additional Notes
+    // image
     notes: z.string().optional(),
 
-})
+}) 
