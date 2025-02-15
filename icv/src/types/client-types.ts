@@ -1,40 +1,37 @@
-import { z } from 'zod'
+import { date, z } from 'zod'
 import { timestampToDateSchema } from './misc-types'
 
 export const Gender = z.enum(['Male', 'Female', 'Other', 'N/A'])
 export const Ethnicity = z.enum([
-    'African American',
+    'White',
+    'Black or African American',
+    'Hispanic, Latino, or Spanish Origin',
     'Asian',
-    'Latino/Hispanic',
     'Native American',
-    'White/Caucasian',
+    'Middle Eastern',
+    'Hawaiian or Pacific Islander',
     'Other',
-    'N/A',
 ])
 export const FosterYouthStatus = z.enum([
     'Yes, Currently',
     'Yes, Previously',
     'No',
-    'N/A',
 ])
 export const EmploymentStatus = z.enum([
     'No',
     'Yes, Part-Time',
     'Yes, Full-Time',
-    'N/A',
 ])
 export const ProbationStatus = z.enum([
     'No',
     'Yes, Previously',
     'Yes, Currently',
-    'N/A',
 ])
-export const ClientStatus = z.enum(['Active', 'Inactive', 'N/A'])
+export const ClientStatus = z.enum(['Active', 'Inactive'])
 export const OpenClientStatus = z.enum([
     'Yes, Currently',
     'Yes, Previously',
     'No',
-    'N/A',
 ])
 
 export const ClientSchema = z.object({
@@ -188,5 +185,143 @@ export const AssessmentIntakeSchema = ClientSchema.pick({
     // education: true,
     // employmentStatus: true,
     
+
+})
+
+export const ClientIntakeSchema = z.object({
+    // ----- PAGE 1: Basic intake information -----
+    // Intake Information
+    // programInfo
+    // staffInfo
+    // dateInfo
+
+    // Client Profile
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    dateOfBirth: z.date().optional(),
+    gender: Gender.optional(),
+    age: z.number().optional(),
+    clientNumber: z.string().optional(),
+
+    // Address
+    housingType: z.string().optional(),
+    atRisk: z.boolean().optional(),
+    streetAddress: z.string().optional(),
+    aptNumber: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zipCode: z.string().optional(),
+
+    // Contact Information
+    email: z.string().optional(),
+    areaCode: z.string().optional(),
+    phoneNumber: z.string().optional(),
+
+    // ----- PAGE 2: Family Information -----
+    familySize: z.number().optional(),
+    spouse: z.object({
+        hasSpouse: z.enum(['Yes', 'No']).optional(),
+        name: z.string().optional(),
+        dateOfBirth: z.date().optional(),
+        age: z.number().optional(),
+    }).optional(),
+
+    hasChildren: z.enum(['Yes', 'No']).optional(),
+    children: z.array(
+        z.object({
+            name: z.string().optional(),
+            dateOfBirth: z.date().optional(),
+            age: z.number().optional(),
+        }),
+    ).optional(),
+
+    pets: z.object({
+        hasPets: z.enum(['Yes', 'No']).optional(),
+        numberOfPets: z.number().optional(),
+    }),
+
+    // ----- PAGE 3: Background Information -----
+    ethnicity: Ethnicity.optional(),
+    mentalHealth: z.string().optional(),
+    disabilities: z.string().optional(),
+    substanceAbuse: z.string().optional(),
+    sexualOffenses: z.string().optional(),
+
+    publicServices: z.object({
+        generalRelief: z.boolean().optional(),
+        calFresh: z.boolean().optional(),
+        calWorks: z.boolean().optional(),
+        ssi: z.boolean().optional(),
+        ssa: z.boolean().optional(),
+        unemployment: z.boolean().optional(),
+    }).optional(),
+
+    // ----- PAGE 4: Services -----
+    // Mentoring
+    mentoring: z.object({
+        problemSolving: z.boolean().optional(),
+        goalSetting: z.boolean().optional(),
+        academic: z.boolean().optional(),
+        groupMentoring: z.boolean().optional(),
+        conflictRes: z.boolean().optional(),
+        rumorControl: z.boolean().optional(),
+    }).optional(),
+
+    // Personal Development
+    personalDev: z.object({
+        jobReady: z.boolean().optional(),
+        employAssist: z.boolean().optional(),
+        careerDev: z.boolean().optional(),
+        creativity: z.boolean().optional(),
+    }).optional(),
+
+    // Housing Assistance
+    housingAssistance: z.object({
+        assistShelter: z.boolean().optional(),
+        hotel: z.boolean().optional(),
+        sharedLiving: z.boolean().optional(),
+        management: z.boolean().optional(),
+        transport: z.boolean().optional(),
+    }).optional(),
+
+    // Redirection Program
+    redirection: z.object({
+        redirShelter: z.boolean().optional(),
+        humanTraffic: z.boolean().optional(),
+        personalDev: z.boolean().optional(),
+        domesticViolence: z.boolean().optional(),
+        informalCase: z.boolean().optional(),
+    }).optional(),
+
+    // Education & Training Support
+    education: z.object({
+        independent: z.boolean().optional(),
+        charter: z.boolean().optional(),
+        ged: z.boolean().optional(),
+        vocational: z.boolean().optional(),
+        financialAid: z.boolean().optional(),
+    }).optional(),
+
+    // Health & Wellness Support
+    healthWellness: z.object({
+        mentalHealth: z.boolean().optional(),
+        medicalServices: z.boolean().optional(),
+        substanceAbuse: z.boolean().optional(),
+        basicNeeds: z.boolean().optional(),
+    }).optional(),
+
+    // Referral/Linkages Services
+    referral: z.object({
+        legalAssistance: z.boolean().optional(),
+        dvCrisis: z.boolean().optional(),
+        reentry: z.boolean().optional(),
+        immigration: z.boolean().optional(),
+        financialLit: z.boolean().optional(),
+        angerManage: z.boolean().optional(),
+        financialAssist: z.boolean().optional(),
+    }).optional(),
+
+    // Additional Notes
+    notes: z.string().optional(),
 
 })
