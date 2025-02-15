@@ -254,6 +254,7 @@ export const ClientIntakeSchema = z.object({
         ssi: z.boolean().optional(),
         ssa: z.boolean().optional(),
         unemployment: z.boolean().optional(),
+        other: z.boolean().optional(),
     }).optional(),
 
     // ----- PAGE 4: Services -----
@@ -326,3 +327,8 @@ export const ClientIntakeSchema = z.object({
     notes: z.string().optional(),
 
 }) 
+
+export const BackgroundSchema = ClientIntakeSchema.pick({
+    ethnicity: true,
+    publicServices: true,
+})
