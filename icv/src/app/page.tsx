@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import EventList from './components/EventList'
 
 export default function Home() {
     const [textValue, setTextValue] = useState('')
@@ -38,6 +39,9 @@ export default function Home() {
             />
 
             <button onClick={createNewFirebaseDocument}>make doc</button>
+            <EventList />
+
+            {/* <button onClick={createNewFirebaseDocument}>make doc</button>
             <button onClick={createNewFirebaseDocument}>make doc</button>
             <button onClick={createNewFirebaseDocument}>make doc</button>
             <button onClick={createNewFirebaseDocument}>make doc</button>
@@ -70,8 +74,7 @@ export default function Home() {
             <button onClick={createNewFirebaseDocument}>make doc</button>
             <button onClick={createNewFirebaseDocument}>make doc</button>
             <button onClick={createNewFirebaseDocument}>make doc</button>
-            <button onClick={createNewFirebaseDocument}>make doc</button>
-            <button onClick={createNewFirebaseDocument}>make doc</button>
+            <button onClick={createNewFirebaseDocument}>make doc</button> */}
             {/* <button onClick={createNewFirebasesDocument}>make doc</button> */}
         </div>
     )

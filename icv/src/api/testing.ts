@@ -2,7 +2,6 @@ import { db } from '@/data/firebase'
 'use server'
 import 'server-only'
 
-import { clientDb } from '@/lib/firebase'
 import { addDoc, collection } from 'firebase/firestore'
 
 export async function createNewFirebaseDocument() {
