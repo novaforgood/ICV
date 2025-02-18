@@ -1,5 +1,9 @@
-import { clientDb } from '@/lib/firebase'
+'use server'
+import 'server-only'
+
+import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import { CaseEventType } from '@/types/event-types'
+import { db } from '@/data/firebase'
 
 import {
     addDoc,
@@ -16,12 +20,12 @@ import {
 } from 'firebase/firestore'
 
 export async function createEvent(event: CaseEventType) {
-    const eventsCollection = collection(clientDb, 'events')
-    const contactTypeCountDocRef = doc(clientDb, 'events', 'contactTypeCount')
+    const eventsCollection = collection(db, 'events')
+    const contactTypeCountDocRef = doc(db, 'events', 'contactTypeCount')
 
     try {
         // Start the transaction to ensure atomicity
-        await runTransaction(clientDb, async (transaction) => {
+        await runTransaction(db, async (transaction) => {
             // Get the current contactTypeCount document
             const docSnapshot = await transaction.get(contactTypeCountDocRef)
 
@@ -102,7 +106,12 @@ export async function deleteEvent(eventId: string) {
 export async function getEventsbyClientId(clientId: string) {
     const eventsCollection = collection(db, 'events')
     const q = query(eventsCollection, where('clientId', '==', clientId))
-    const querySnapshot = await getDocs(q)
-    const events = querySnapshot.docs.map((doc) => doc.data())
+    const querySnapshot = await getDocs(q);
+    
+    // Map through documents and include their 'id' along with data
+    const events = querySnapshot.docs.map((doc) => ({
+        id: doc.id, // Firebase-generated unique ID
+        ...doc.data() // Spread the document data
+    }));
     return events
 }

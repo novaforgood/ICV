@@ -1,16 +1,16 @@
-"use client";
+'use client'
 
-import Link from 'next/link';
-import React, { useMemo } from 'react';
 import { Client } from '@/types/client-types'
 import {
     flexRender,
     getCoreRowModel,
     useReactTable,
-} from '@tanstack/react-table';
+} from '@tanstack/react-table'
+import Link from 'next/link'
+import React, { useMemo } from 'react'
 
 interface ClientsTableProps {
-    clients: Client[];
+    clients: Client[]
 }
 
 const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
@@ -21,7 +21,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                 accessorKey: 'name',
                 header: 'Name',
                 cell: ({ row }: any) => (
-                    <Link href={`/clients/${row.original.id}`} className="text-blue-600 hover:underline">
+                    <Link
+                        href={`/clients/${row.original.id}`}
+                        className="text-blue-600 hover:underline"
+                    >
                         {row.original.firstName} {row.original.lastName}
                     </Link>
                 ),
@@ -29,29 +32,32 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
             {
                 accessorKey: 'id',
                 header: 'Id',
-                cell: ({ row }: any) => <div>{row.original.id}</div>
-            }
+                cell: ({ row }: any) => <div>{row.original.id}</div>,
+            },
         ],
-        []
-    );
+        [],
+    )
 
     // Table instance
     const table = useReactTable({
         data: clients || [],
         columns,
         getCoreRowModel: getCoreRowModel(),
-    });
+    })
 
     return (
         <div>
-            <h1>Clients</h1>
+            <h1>Clients Table</h1>
             <table>
                 <thead>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <tr key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
                                 <th key={header.id}>
-                                    {flexRender(header.column.columnDef.header, header.getContext())}
+                                    {flexRender(
+                                        header.column.columnDef.header,
+                                        header.getContext(),
+                                    )}
                                 </th>
                             ))}
                         </tr>
@@ -62,7 +68,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                         <tr key={row.id}>
                             {row.getVisibleCells().map((cell) => (
                                 <td key={cell.id}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    {flexRender(
+                                        cell.column.columnDef.cell,
+                                        cell.getContext(),
+                                    )}
                                 </td>
                             ))}
                         </tr>
@@ -70,7 +79,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                 </tbody>
             </table>
         </div>
-    );
-};
+    )
+}
 
-export default ClientsTable;
+export default ClientsTable

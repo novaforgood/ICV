@@ -1,6 +1,5 @@
-import { clientDb } from '@/lib/firebase'
-import { Client, ClientSchema } from '@/types/client-types'
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
+import { Client, ClientSchema } from '@/types/client-types'
 
 import {
     addDoc,
@@ -8,12 +7,9 @@ import {
     doc,
     getDoc,
     getDocs,
-    updateDoc,
     getFirestore,
+    updateDoc,
 } from 'firebase/firestore'
-
-
-
 
 export async function createClient(client: Client) {
     // verify that the client object is valid
@@ -41,6 +37,10 @@ export async function getAllClients() {
 }
 
 export async function getClientById(id: string) {
+    // if (!id) {
+    //     return
+    //     throw new Error('Client ID is required')
+    // }
     const { firebaseServerApp } = await getAuthenticatedAppForUser()
     const ssrdb = getFirestore(firebaseServerApp)
 
@@ -53,7 +53,7 @@ export async function getClientById(id: string) {
 export async function updateClient(id: string, client: Partial<Client>) {
     const { firebaseServerApp } = await getAuthenticatedAppForUser()
     const ssrdb = getFirestore(firebaseServerApp)
-    
+
     if (ClientSchema.safeParse(client).success === false) {
         throw new Error('Client object is invalid')
     }
@@ -61,4 +61,3 @@ export async function updateClient(id: string, client: Partial<Client>) {
     const clientsCollection = collection(ssrdb, 'clients')
     await updateDoc(doc(clientsCollection, id), client)
 }
-

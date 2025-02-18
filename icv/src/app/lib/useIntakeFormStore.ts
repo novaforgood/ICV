@@ -1,17 +1,19 @@
-import { Dog } from '@/types/example-types'
+import { Client, PartialClient } from '@/types/client-types'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export type State = {
-    form: Partial<Dog>
-}
-
-export type Actions = {
-    updateForm: (form: Partial<Dog>) => void
+    form: Partial<Client>
+ }
+ 
+ 
+ export type Actions = {
+    updateForm: (form: Partial<Client>) => void
     clearForm: () => void
-}
-
-export const useDogFormStore = create<State & Actions>()(
+ }
+ 
+ 
+ export const useIntakeFormStore = create<State & Actions>()(
     persist(
         (set) => ({
             form: {},
@@ -20,7 +22,8 @@ export const useDogFormStore = create<State & Actions>()(
             clearForm: () => set({ form: {} }),
         }),
         {
-            name: 'dog-form-storage',
+            name: 'intake-form-storage',
         },
     ),
-)
+ )
+ 

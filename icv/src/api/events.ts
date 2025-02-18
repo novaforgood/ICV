@@ -1,4 +1,4 @@
-import { clientDb } from '@/lib/firebase'
+import { db } from '@/data/firebase'
 import { CaseEventType } from '@/types/event-types'
 
 import {

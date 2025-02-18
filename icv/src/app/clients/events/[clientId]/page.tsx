@@ -1,6 +1,6 @@
 import { getClientById } from '@/api/make-cases/make-case'
 import { getEventsbyClientId } from '@/api/make-cases/make-event'
-import EditEvents from '@/app/components/EditEvents'
+// import EditEvents from '@/app/components/EditEvents'
 
 const page = async ({
     params,
@@ -11,7 +11,8 @@ const page = async ({
 }) => {
     const { clientId } = await params
     const client = await getClientById(clientId)
-    const events = await getEventsbyClientId(clientId)
+    // const events = await getEventsbyClientId(clientId)
+    const events = {}
 
     // console.log('client', client)
 
@@ -24,7 +25,7 @@ const page = async ({
             </div>
 
             {/* Passing clientId and events to ClientEditor */}
-            <EditEvents clientId={clientId} events={events} />
+            {/* <EditEvents clientId={clientId} events={events} /> */}
         </div>
     )
 }
