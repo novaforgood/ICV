@@ -132,6 +132,7 @@ export type ClientStatus = z.infer<typeof ClientStatus>
 export type OpenClientStatus = z.infer<typeof OpenClientStatus>
 
 export type Client = z.infer<typeof ClientSchema>
+export type NewClient = z.infer<typeof ClientIntakeSchema>
 
 export const PartialClientSchema = ClientSchema.partial()
 export type PartialClient = z.infer<typeof PartialClientSchema>
@@ -241,21 +242,13 @@ export const ClientIntakeSchema = z.object({
     }),
 
     // ----- PAGE 3: Background Information -----
-    ethnicity: Ethnicity.optional(),
+    ethnicity: z.array(z.string()).optional(),
     mentalHealth: z.string().optional(),
     disabilities: z.string().optional(),
     substanceAbuse: z.string().optional(),
     sexualOffenses: z.string().optional(),
 
-    publicServices: z.object({
-        generalRelief: z.boolean().optional(),
-        calFresh: z.boolean().optional(),
-        calWorks: z.boolean().optional(),
-        ssi: z.boolean().optional(),
-        ssa: z.boolean().optional(),
-        unemployment: z.boolean().optional(),
-        other: z.boolean().optional(),
-    }).optional(),
+    publicServices: z.array(z.string()).optional(),
 
     // ----- PAGE 4: Services -----
     // Mentoring
