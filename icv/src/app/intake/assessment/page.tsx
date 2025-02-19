@@ -41,7 +41,7 @@ const Page = (props: Props) => {
         return unsubscribe
     }, [watch, loadedForm])
 
-    const onSubmit = (data: AssessmentIntakeType) => {
+    const onSubmit = async (data: AssessmentIntakeType) => {
         const fullClientData = { ...loadedForm, ...data }
         createClient(fullClientData)
         clearForm()

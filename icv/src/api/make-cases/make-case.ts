@@ -1,5 +1,9 @@
+'use server'
+import 'server-only'
+
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import { Client, ClientSchema } from '@/types/client-types'
+// import 'server-only'
 
 import {
     addDoc,
