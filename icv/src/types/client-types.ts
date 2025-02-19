@@ -271,9 +271,12 @@ export const ClientIntakeSchema = z.object({
 
     // Referral/Linkages Services
     referral: z.array(z.string()).optional(),
+    
     // Additional Notes
-    // image
     notes: z.string().optional(),
+    
+    // Image Upload - store the URL in Firebase
+    // imageURL: z.string().url().optional()
 
 }) 
 
@@ -294,6 +297,7 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     education: true,
     healthWellness: true,
     referral: true,
+    // imageURL: true,
     notes: true,
 })
 

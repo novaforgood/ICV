@@ -149,106 +149,115 @@ const Page = (props: Props) => {
             onSubmit={handleSubmit(onSubmit)}
         >
             <div className="space-y-8">
-                {/* COLUMN 1  */}
                 <label className="bold text-2xl">Services</label>
-                {/* Mentoring */}
-                <div>
-                    <label>Mentoring</label>
-                    <CheckboxList
-                        options={MENTORING}
-                        selectedValues={selectedMentoring}
-                        onChange={(updatedMentoring) =>
-                            setValue('mentoring', updatedMentoring)
-                        }
-                        name="mentoring"
-                    />
-                </div>
-                {/* Housing Assistance */}
-                <div>
-                    <label>Housing Assistance</label>
-                    <CheckboxList
-                        options={HOUSING}
-                        selectedValues={selectedHousing}
-                        onChange={(updatedHousing) =>
-                            setValue('housing', updatedHousing)
-                        }
-                        name="housing"
-                    />
-                </div>
-                {/* Education & Training */}
-                <div>
-                    <label>Education & Training Support</label>
-                    <CheckboxList
-                        options={EDUTRAIN}
-                        selectedValues={selectedEducation}
-                        onChange={(updatedEducation) =>
-                            setValue('education', updatedEducation)
-                        }
-                        name="education"
-                    />
-                </div>
-                {/* Referrals/Linkages */}
-                <div>
-                    <label>Referrals/Linkages Services</label>
-                    <CheckboxList
-                        options={REFERRAL}
-                        selectedValues={selectedReferral}
-                        onChange={(updatedReferral) =>
-                            setValue('referral', updatedReferral)
-                        }
-                        name="referral"
-                    />
-                </div>
 
-                {/* COLUMN 2 */}
-                {/* Personal Development */}
-                <div>
-                    <label>Personal Development</label>
-                    <CheckboxList
-                        options={PERSONAL_DEV}
-                        selectedValues={selectedPersonal}
-                        onChange={(updatedPersonal) =>
-                            setValue('personalDev', updatedPersonal)
-                        }
-                        name="redirection"
-                    />
-                </div>
-                {/* Redirection */}
-                <div>
-                    <label>Redirection Program</label>
-                    <CheckboxList
-                        options={REDIRECTION}
-                        selectedValues={selectedRedirection}
-                        onChange={(updatedRedirection) =>
-                            setValue('redirection', updatedRedirection)
-                        }
-                        name="redirection"
-                    />
-                </div>
-                {/* Health & Wellness */}
-                <div>
-                    <label>Health & Wellness Support</label>
-                    <CheckboxList
-                        options={HEALTH_WELLNESS}
-                        selectedValues={selectedHealth}
-                        onChange={(updatedHealth) =>
-                            setValue('healthWellness', updatedHealth)
-                        }
-                        name="healthWellness"
-                    />
+                <div className="grid grid-cols-2 gap-4">
+                    {/* COLUMN 1  */}
+                    <div className="space-y-10">
+                        {/* Mentoring */}
+                        <div>
+                            <label>Mentoring</label>
+                            <CheckboxList
+                                options={MENTORING}
+                                selectedValues={selectedMentoring}
+                                onChange={(updatedMentoring) =>
+                                    setValue('mentoring', updatedMentoring)
+                                }
+                                name="mentoring"
+                            />
+                        </div>
+                        {/* Housing Assistance */}
+                        <div>
+                            <label>Housing Assistance</label>
+                            <CheckboxList
+                                options={HOUSING}
+                                selectedValues={selectedHousing}
+                                onChange={(updatedHousing) =>
+                                    setValue('housing', updatedHousing)
+                                }
+                                name="housing"
+                            />
+                        </div>
+                        {/* Education & Training */}
+                        <div>
+                            <label>Education & Training Support</label>
+                            <CheckboxList
+                                options={EDUTRAIN}
+                                selectedValues={selectedEducation}
+                                onChange={(updatedEducation) =>
+                                    setValue('education', updatedEducation)
+                                }
+                                name="education"
+                            />
+                        </div>
+                        {/* Referrals/Linkages */}
+                        <div>
+                            <label>Referrals/Linkages Services</label>
+                            <CheckboxList
+                                options={REFERRAL}
+                                selectedValues={selectedReferral}
+                                onChange={(updatedReferral) =>
+                                    setValue('referral', updatedReferral)
+                                }
+                                name="referral"
+                            />
+                        </div>
+                    </div>
+
+                    {/* COLUMN 2 */}
+                    <div className="space-y-10">
+                        {/* Personal Development */}
+                        <div>
+                            <label>Personal Development</label>
+                            <CheckboxList
+                                options={PERSONAL_DEV}
+                                selectedValues={selectedPersonal}
+                                onChange={(updatedPersonal) =>
+                                    setValue('personalDev', updatedPersonal)
+                                }
+                                name="redirection"
+                            />
+                        </div>
+                        {/* Redirection */}
+                        <div>
+                            <label>Redirection Program</label>
+                            <CheckboxList
+                                options={REDIRECTION}
+                                selectedValues={selectedRedirection}
+                                onChange={(updatedRedirection) =>
+                                    setValue('redirection', updatedRedirection)
+                                }
+                                name="redirection"
+                            />
+                        </div>
+                        {/* Health & Wellness */}
+                        <div>
+                            <label>Health & Wellness Support</label>
+                            <CheckboxList
+                                options={HEALTH_WELLNESS}
+                                selectedValues={selectedHealth}
+                                onChange={(updatedHealth) =>
+                                    setValue('healthWellness', updatedHealth)
+                                }
+                                name="healthWellness"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 {/* ADDITIONAL FEATURES */}
-                <label className="bold text-2xl">Additional</label>
-                {/* Notes */}
-                <div>
-                    <label>Notes</label>
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Additional</label>
+                    {/* Notes */}
                     <div>
-                        <textarea
-                            {...register('notes')}
-                            placeholder="Text"
-                            className="w-[80%] rounded border p-2"
-                        />
+                        <label>Additional Notes</label>
+                        <div>
+                            <textarea
+                                {...register('notes')}
+                                placeholder="Text"
+                                className="w-[80%] rounded border p-2"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
