@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,100..900;1,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,6 +7,10 @@
 :root {
     --background: white;
     --foreground: #27262a;
+}
+
+* {
+    font-family: 'Epilogue', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
