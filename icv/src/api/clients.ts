@@ -1,6 +1,7 @@
 import { db } from '@/data/firebase'
 import { Client } from '@/types/client-types'
 import { collection, getDocs, getFirestore } from 'firebase/firestore'
+import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 
 export async function getAllClients(): Promise<Client[]> {
     const { firebaseServerApp } = await getAuthenticatedAppForUser()
