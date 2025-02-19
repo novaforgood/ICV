@@ -187,7 +187,47 @@ const Page = (props: Props) => {
                         )}
                     </div>
                 </div>
-
+                {/* Health Information */}
+                <div>
+                    <label>Mental Health History</label>
+                    <div>
+                        <textarea
+                            {...register('mentalHealth')}
+                            placeholder="Text"
+                            className="w-[80%] rounded border p-2"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label>Disabilities</label>
+                    <div>
+                        <textarea
+                            {...register('disabilities')}
+                            placeholder="Text"
+                            className="w-[80%] rounded border p-2"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label>Substance Abuse History</label>
+                    <div>
+                        <textarea
+                            {...register('substanceAbuse')}
+                            placeholder="Text"
+                            className="w-[80%] rounded border p-2"
+                        />
+                    </div>
+                </div>
+                <div>
+                    <label>Sexual Offense History</label>
+                    <div>
+                        <textarea
+                            {...register('sexualOffenses')}
+                            placeholder="Text"
+                            className="w-[80%] rounded border p-2"
+                        />
+                    </div>
+                </div>
                 {/* Public Services */}
                 <div>
                     <label>Public Services</label>

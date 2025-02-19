@@ -324,4 +324,8 @@ export const ClientIntakeSchema = z.object({
 export const BackgroundSchema = ClientIntakeSchema.pick({
     ethnicity: true,
     publicServices: true,
+    mentalHealth: true,
+    disabilities: true,
+    substanceAbuse: true,
+    sexualOffenses: true,
 })
