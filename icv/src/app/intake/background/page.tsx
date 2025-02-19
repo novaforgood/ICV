@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useNewIntake } from '../../lib/useNewIntake'
+import { CheckboxListWithOther } from '../components/MakeOptions'
 
 interface Props {}
 
@@ -48,14 +49,9 @@ const Page = (props: Props) => {
 
     const router = useRouter()
     const selectedServices = watch('publicServices') ?? []
-    const otherService =
-        selectedServices.find((s) => !PUBLIC_SERVICES.includes(s)) ?? ''
-
     const selectedEthnicities = Array.isArray(watch('ethnicity'))
         ? (watch('ethnicity') ?? [])
         : []
-    const otherEthnicity =
-        selectedEthnicities.find((s) => !ETHNICITY.includes(s)) ?? ''
 
     useEffect(() => {
         reset(loadedForm)
@@ -81,8 +77,8 @@ const Page = (props: Props) => {
 
     const onSubmit = (data: BackgroundInfoType) => {
         console.log('in submit...', data)
-        // updateForm(data)
-        router.push('/intake/demographics')
+        updateForm(data)
+        router.push('/intake/services')
     }
 
     return (
@@ -97,94 +93,16 @@ const Page = (props: Props) => {
                 <div>
                     <label>Ethnicity</label>
                     <div className="flex flex-col space-y-2">
-                        {ETHNICITY.map((ethnicity) => (
-                            <div
-                                key={ethnicity}
-                                className="flex items-center space-x-2"
-                            >
-                                <input
-                                    type="checkbox"
-                                    value={ethnicity}
-                                    checked={selectedEthnicities.includes(
-                                        ethnicity,
-                                    )}
-                                    onChange={(e) => {
-                                        const updatedEthnicities = e.target
-                                            .checked
-                                            ? [
-                                                  ...selectedEthnicities,
-                                                  ethnicity,
-                                              ]
-                                            : selectedEthnicities.filter(
-                                                  (e) => e !== ethnicity,
-                                              )
-
-                                        setValue(
-                                            'ethnicity',
-                                            updatedEthnicities.length > 0
-                                                ? updatedEthnicities
-                                                : undefined,
-                                        )
-                                    }}
-                                    id={ethnicity}
-                                />
-                                <label htmlFor={ethnicity}>{ethnicity}</label>
-                            </div>
-                        ))}
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                checked={!!otherEthnicity} // Keep checked if there is input
-                                onChange={(e) => {
-                                    if (!e.target.checked) {
-                                        // Remove "Other" when unchecked
-                                        setValue(
-                                            'ethnicity',
-                                            selectedEthnicities.filter((e) =>
-                                                ETHNICITY.includes(e),
-                                            ),
-                                        )
-                                    } else {
-                                        // Keep "Other" as an identifiable placeholder
-                                        setValue('ethnicity', [
-                                            ...selectedEthnicities,
-                                            'Other: ',
-                                        ])
-                                    }
-                                }}
-                                id="other"
-                            />
-                            <label htmlFor="other">Other</label>
-                        </div>
-                        {selectedEthnicities.some((e) =>
-                            e.startsWith('Other: '),
-                        ) && (
-                            <input
-                                type="text"
-                                placeholder="Specify other service"
-                                className="border p-2"
-                                value={otherEthnicity.replace('Other: ', '')} // Remove "Other: " prefix for user display
-                                onChange={(e) => {
-                                    const updatedValue = e.target.value
-                                    const filteredEthnicities =
-                                        selectedEthnicities.filter((e) =>
-                                            ETHNICITY.includes(e),
-                                        ) // Keep only predefined options
-
-                                    if (updatedValue) {
-                                        setValue('ethnicity', [
-                                            ...filteredEthnicities,
-                                            `Other: ${updatedValue}`,
-                                        ]) // Store with "Other: " prefix
-                                    } else {
-                                        setValue(
-                                            'ethnicity',
-                                            filteredEthnicities,
-                                        ) // Remove "Other" when empty
-                                    }
-                                }}
-                            />
-                        )}
+                        <CheckboxListWithOther
+                            options={ETHNICITY}
+                            selectedValues={selectedEthnicities}
+                            onChange={(updatedEthnicities) =>
+                                setValue('ethnicity', updatedEthnicities)
+                            }
+                            name="ethnicity"
+                            otherLabel="Other"
+                            otherPlaceholder="Specify other ethnicity"
+                        />
                     </div>
                 </div>
                 {/* Health Information */}
@@ -232,88 +150,16 @@ const Page = (props: Props) => {
                 <div>
                     <label>Public Services</label>
                     <div className="flex flex-col space-y-2">
-                        {PUBLIC_SERVICES.map((service) => (
-                            <div
-                                key={service}
-                                className="flex items-center space-x-2"
-                            >
-                                <input
-                                    type="checkbox"
-                                    value={service}
-                                    checked={selectedServices.includes(service)}
-                                    onChange={(e) => {
-                                        const updatedServices = e.target.checked
-                                            ? [...selectedServices, service]
-                                            : selectedServices.filter(
-                                                  (s) => s !== service,
-                                              )
-
-                                        setValue(
-                                            'publicServices',
-                                            updatedServices.length > 0
-                                                ? updatedServices
-                                                : undefined,
-                                        )
-                                    }}
-                                    id={service}
-                                />
-                                <label htmlFor={service}>{service}</label>
-                            </div>
-                        ))}
-                        <div className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                checked={!!otherService} // Keep checked if there is input
-                                onChange={(e) => {
-                                    if (!e.target.checked) {
-                                        // Remove "Other" when unchecked
-                                        setValue(
-                                            'publicServices',
-                                            selectedServices.filter((s) =>
-                                                PUBLIC_SERVICES.includes(s),
-                                            ),
-                                        )
-                                    } else {
-                                        // Keep "Other" as an identifiable placeholder
-                                        setValue('publicServices', [
-                                            ...selectedServices,
-                                            'Other: ',
-                                        ])
-                                    }
-                                }}
-                                id="other"
-                            />
-                            <label htmlFor="other">Other</label>
-                        </div>
-                        {selectedServices.some((s) =>
-                            s.startsWith('Other: '),
-                        ) && (
-                            <input
-                                type="text"
-                                placeholder="Specify other service"
-                                className="border p-2"
-                                value={otherService.replace('Other: ', '')} // Remove "Other: " prefix for user display
-                                onChange={(e) => {
-                                    const updatedValue = e.target.value
-                                    const filteredServices =
-                                        selectedServices.filter((s) =>
-                                            PUBLIC_SERVICES.includes(s),
-                                        ) // Keep only predefined options
-
-                                    if (updatedValue) {
-                                        setValue('publicServices', [
-                                            ...filteredServices,
-                                            `Other: ${updatedValue}`,
-                                        ]) // Store with "Other: " prefix
-                                    } else {
-                                        setValue(
-                                            'publicServices',
-                                            filteredServices,
-                                        ) // Remove "Other" when empty
-                                    }
-                                }}
-                            />
-                        )}
+                        <CheckboxListWithOther
+                            options={PUBLIC_SERVICES}
+                            selectedValues={selectedServices}
+                            onChange={(updatedServices) =>
+                                setValue('publicServices', updatedServices)
+                            }
+                            name="services"
+                            otherLabel="Other"
+                            otherPlaceholder="Specify other service"
+                        />
                     </div>
                 </div>
             </div>
@@ -322,7 +168,7 @@ const Page = (props: Props) => {
                 type="submit"
                 className="mt-4 rounded bg-blue-500 p-2 text-white"
             >
-                Next
+                Continue
             </button>
         </form>
     )

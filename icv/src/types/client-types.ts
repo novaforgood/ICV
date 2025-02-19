@@ -252,69 +252,25 @@ export const ClientIntakeSchema = z.object({
 
     // ----- PAGE 4: Services -----
     // Mentoring
-    mentoring: z.object({
-        problemSolving: z.boolean().optional(),
-        goalSetting: z.boolean().optional(),
-        academic: z.boolean().optional(),
-        groupMentoring: z.boolean().optional(),
-        conflictRes: z.boolean().optional(),
-        rumorControl: z.boolean().optional(),
-    }).optional(),
+    mentoring: z.array(z.string()).optional(),
 
     // Personal Development
-    personalDev: z.object({
-        jobReady: z.boolean().optional(),
-        employAssist: z.boolean().optional(),
-        careerDev: z.boolean().optional(),
-        creativity: z.boolean().optional(),
-    }).optional(),
+    personalDev: z.array(z.string()).optional(),
 
     // Housing Assistance
-    housingAssistance: z.object({
-        assistShelter: z.boolean().optional(),
-        hotel: z.boolean().optional(),
-        sharedLiving: z.boolean().optional(),
-        management: z.boolean().optional(),
-        transport: z.boolean().optional(),
-    }).optional(),
+    housing: z.array(z.string()).optional(),
 
     // Redirection Program
-    redirection: z.object({
-        redirShelter: z.boolean().optional(),
-        humanTraffic: z.boolean().optional(),
-        personalDev: z.boolean().optional(),
-        domesticViolence: z.boolean().optional(),
-        informalCase: z.boolean().optional(),
-    }).optional(),
+    redirection: z.array(z.string()).optional(),
 
     // Education & Training Support
-    education: z.object({
-        independent: z.boolean().optional(),
-        charter: z.boolean().optional(),
-        ged: z.boolean().optional(),
-        vocational: z.boolean().optional(),
-        financialAid: z.boolean().optional(),
-    }).optional(),
+    education: z.array(z.string()).optional(),
 
     // Health & Wellness Support
-    healthWellness: z.object({
-        mentalHealth: z.boolean().optional(),
-        medicalServices: z.boolean().optional(),
-        substanceAbuse: z.boolean().optional(),
-        basicNeeds: z.boolean().optional(),
-    }).optional(),
+    healthWellness: z.array(z.string()).optional(),
 
     // Referral/Linkages Services
-    referral: z.object({
-        legalAssistance: z.boolean().optional(),
-        dvCrisis: z.boolean().optional(),
-        reentry: z.boolean().optional(),
-        immigration: z.boolean().optional(),
-        financialLit: z.boolean().optional(),
-        angerManage: z.boolean().optional(),
-        financialAssist: z.boolean().optional(),
-    }).optional(),
-
+    referral: z.array(z.string()).optional(),
     // Additional Notes
     // image
     notes: z.string().optional(),
@@ -329,3 +285,15 @@ export const BackgroundSchema = ClientIntakeSchema.pick({
     substanceAbuse: true,
     sexualOffenses: true,
 })
+
+export const ServicesSchema = ClientIntakeSchema.pick({
+    mentoring: true,
+    personalDev: true,
+    housing: true,
+    redirection: true,
+    education: true,
+    healthWellness: true,
+    referral: true,
+    notes: true,
+})
+
