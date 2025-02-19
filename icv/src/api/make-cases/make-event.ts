@@ -1,8 +1,7 @@
 'use server'
 import 'server-only'
 
-import { db } from '@/data/firebase'
-// import { getAuthenticatedAppForUser } from '@/lib/serverApp'
+import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import { CaseEventType } from '@/types/event-types'
 
 import {
@@ -18,11 +17,11 @@ import {
 } from 'firebase/firestore'
 
 export async function createEvent(event: CaseEventType) {
-    // const { firebaseServerApp } = await getAuthenticatedAppForUser()
-    // const ssrdb = getFirestore(firebaseServerApp)
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
 
     try {
-        const eventsCollection = collection(db, 'events')
+        const eventsCollection = collection(ssrdb, 'events')
         const newDoc = await addDoc(eventsCollection, event)
         console.log('Event added with ID: ', newDoc.id)
     } catch (error) {
@@ -31,10 +30,10 @@ export async function createEvent(event: CaseEventType) {
 }
 
 export async function getEventsbyClientId(clientId: string) {
-    // const { firebaseServerApp } = await getAuthenticatedAppForUser()
-    // const ssrdb = getFirestore(firebaseServerApp)
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
 
-    const eventsCollection = collection(db, 'events')
+    const eventsCollection = collection(ssrdb, 'events')
     const q = query(eventsCollection, where('clientId', '==', clientId))
     const querySnapshot = await getDocs(q);
     
@@ -47,18 +46,18 @@ export async function getEventsbyClientId(clientId: string) {
 }
 
 export async function updateEvent(id: string, updatedEvent: CaseEventType) {
-    // const { firebaseServerApp } = await getAuthenticatedAppForUser()
-    // const ssrdb = getFirestore(firebaseServerApp)
-    const eventRef = doc(db, "events", id);
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
+    const eventRef = doc(ssrdb, "events", id);
     await updateDoc(eventRef, updatedEvent)
 }
 
 export async function deleteEvent(eventId: string) {
-    // const { firebaseServerApp } = await getAuthenticatedAppForUser()
-    // const ssrdb = getFirestore(firebaseServerApp)
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
     try {
         // Reference to the specific event document in the 'events' collection
-        const eventRef = doc(db, 'events', eventId)
+        const eventRef = doc(ssrdb, 'events', eventId)
         
         // Delete the event document from Firestore
         await deleteDoc(eventRef)
