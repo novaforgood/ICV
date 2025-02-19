@@ -11,7 +11,7 @@ const page = async ({
         clientId: string
     }
 }) => {
-    const { clientId } = await params
+    const { clientId } = params
     console.log('id', clientId)
     const client = await getClientById(clientId)
     console.log('client', client)
