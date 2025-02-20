@@ -1,7 +1,8 @@
 import { date, z } from 'zod'
-import { timestampToDateSchema } from './misc-types'
+import { timestampToDateSchema} from './misc-types'
 
-export const Gender = z.enum(['Male', 'Female', 'Other', 'N/A'])
+export const Gender = z.enum(['Male', 'Female', 'Non-Binary', 'Other'])
+export const HousingType = z.enum(['Not Sure', 'What Design', 'Wants Here', 'Other'])
 export const Ethnicity = z.enum([
     'White',
     'Black or African American',
@@ -124,6 +125,7 @@ export const ClientSchema = z.object({
 })
 
 export type Gender = z.infer<typeof Gender>
+export type HousingType = z.infer<typeof HousingType>
 export type Ethnicity = z.infer<typeof Ethnicity>
 export type FosterYouthStatus = z.infer<typeof FosterYouthStatus>
 export type EmploymentStatus = z.infer<typeof EmploymentStatus>
@@ -199,13 +201,13 @@ export const ClientIntakeSchema = z.object({
     // Client Profile
     firstName: z.string().optional(),
     lastName: z.string().optional(),
-    dateOfBirth: z.date().optional(),
-    gender: Gender.optional(),
+    dateOfBirth: z.string().optional(),
     age: z.number().optional(),
+    gender: Gender.optional(),
     clientNumber: z.string().optional(),
 
-    // Address
-    housingType: z.string().optional(),
+    // Housing
+    housingType: HousingType.optional(),
     atRisk: z.boolean().optional(),
     streetAddress: z.string().optional(),
     aptNumber: z.string().optional(),
@@ -301,3 +303,31 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     notes: true,
 })
 
+export const ProfileSchema = ClientIntakeSchema.pick({
+    firstName:true,
+    lastName: true,
+    dateOfBirth: true,
+    age: true,
+    gender: true,
+    clientNumber: true,
+
+    // Housing
+    housingType: true,
+    atRisk: true,
+    streetAddress: true,
+    aptNumber:true,
+    city: true,
+    state: true,
+    zipCode: true,
+
+    // Contact Information
+    email: true,
+    areaCode: true,
+    phoneNumber: true,
+
+})
+
+export const FamilySchema = ClientIntakeSchema.pick({
+    familySize: true,
+    
+})
