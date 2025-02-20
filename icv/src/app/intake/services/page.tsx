@@ -129,7 +129,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: ServiceType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/demographics')
+        router.push('/intake/confirmation')
     }
 
     const selectedMentoring = watch('mentoring') ?? []
