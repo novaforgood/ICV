@@ -6,14 +6,21 @@ import { getCookie } from 'cookies-next'
 import { getAuth } from 'firebase/auth'
 import { cookies } from 'next/headers'
 import { firebaseConfig } from './firebaseConfig'
+import { redirect } from 'next/dist/server/api-utils'
 
 
 export async function getAuthenticatedAppForUser() {
     const idToken = await getCookie('idToken', { cookies })
 
     if (!idToken) {
-        throw new Error('No idToken found')
+        return {
+            redirect: {
+                destination: '../login/page.tsx',
+                permanent: false,
+            },
+        }
     }
+    
 
     console.log('idToken', idToken)
 

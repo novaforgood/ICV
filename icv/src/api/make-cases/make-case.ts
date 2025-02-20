@@ -24,6 +24,7 @@ export async function createClient(client: Client) {
     // }
     const { firebaseServerApp } = await getAuthenticatedAppForUser()
     const ssrdb = getFirestore(firebaseServerApp)
+    
     console.log('asdfsdafdsfafdsasdfclient', client)
     const clientsCollection = collection(ssrdb, 'clients')
     const newDoc = await addDoc(clientsCollection, client)
