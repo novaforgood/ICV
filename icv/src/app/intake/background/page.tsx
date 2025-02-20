@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useNewIntake } from '../../lib/useNewIntake'
+import { useIntakeFormStore } from '../../lib/useIntakeFormStore'
 import { CheckboxListWithOther } from '../components/MakeOptions'
 
 interface Props {}
@@ -31,7 +31,7 @@ const ETHNICITY = [
 ]
 
 const Page = (props: Props) => {
-    const { form: loadedForm, updateForm } = useNewIntake()
+    const { form: loadedForm, updateForm } = useIntakeFormStore()
     type BackgroundInfoType = TypeOf<typeof BackgroundSchema>
 
     const {

@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useNewIntake } from '../../lib/useNewIntake'
+import { useIntakeFormStore } from '../../lib/useIntakeFormStore'
 
 interface Props {}
 
 const Page = (props: Props) => {
-    const { form: loadedForm, updateForm } = useNewIntake()
+    const { form: loadedForm, updateForm } = useIntakeFormStore()
     type FamilyType = TypeOf<typeof FamilySchema>
 
     const {

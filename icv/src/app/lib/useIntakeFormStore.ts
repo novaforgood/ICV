@@ -1,14 +1,14 @@
-import { Client, PartialClient } from '@/types/client-types'
+import { NewClient} from '@/types/client-types'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export type State = {
-    form: Partial<Client>
+    form: Partial<NewClient>
  }
  
  
  export type Actions = {
-    updateForm: (form: Partial<Client>) => void
+    updateForm: (form: Partial<NewClient>) => void
     clearForm: () => void
  }
  
@@ -22,7 +22,7 @@ export type State = {
             clearForm: () => set({ form: {} }),
         }),
         {
-            name: 'intake-form-storage',
+            name: 'new-intake-form-storage',
         },
     ),
  )

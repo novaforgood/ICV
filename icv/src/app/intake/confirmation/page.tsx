@@ -5,20 +5,16 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useNewIntake } from '../../lib/useNewIntake'
+import { useIntakeFormStore } from '../../lib/useIntakeFormStore'
 
 interface Props {}
 
 const Page = (props: Props) => {
-    const { form: loadedForm, updateForm } = useNewIntake()
+    const { form: loadedForm, clearForm } = useIntakeFormStore()
     type ClientType = TypeOf<typeof ClientIntakeSchema>
 
     const {
-        register,
         handleSubmit,
-        reset,
-        watch,
-        setValue,
         formState: { errors },
     } = useForm<ClientType>({
         mode: 'onChange',
@@ -31,6 +27,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: ClientType) => {
         console.log('in submit...', data)
         // createClient(data)
+        clearForm()
         router.push('/intake')
     }
 
@@ -41,7 +38,7 @@ const Page = (props: Props) => {
             onSubmit={handleSubmit(onSubmit)}
         >
             <div className="space-y-8">
-                <label className="bold text-2xl">Services</label>
+                <label className="bold text-2xl">Confirmation</label>
             </div>
 
             <button
