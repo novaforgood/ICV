@@ -82,11 +82,9 @@ const Page = (props: Props) => {
                             <div className="flex flex-col">
                                 <label>Age</label>
                                 <input
-                                    {...register('age', {
-                                        valueAsNumber: true,
-                                    })}
-                                    type="number"
-                                    placeholder="Age"
+                                    {...register('age')}
+                                    type="text"
+                                    placeholder="Text"
                                     className="w-full rounded border p-2"
                                 />
                             </div>
@@ -152,7 +150,7 @@ const Page = (props: Props) => {
                     </div>
 
                     <div className="flex flex-col">
-                        <label className="bold text-lg">At Risk</label>
+                        <label>At Risk</label>
                         <div className="mt-2 flex flex-col gap-2">
                             <label className="flex items-center gap-2">
                                 <input

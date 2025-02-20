@@ -3,6 +3,7 @@ import { timestampToDateSchema} from './misc-types'
 
 export const Gender = z.enum(['Male', 'Female', 'Non-Binary', 'Other'])
 export const HousingType = z.enum(['Not Sure', 'What Design', 'Wants Here', 'Other'])
+export const Pets = z.enum(['Dog', 'Cat', 'Bird', "Hamster", 'Rabbit', 'Reptile', 'Other'])
 export const Ethnicity = z.enum([
     'White',
     'Black or African American',
@@ -44,11 +45,11 @@ export const ClientSchema = z.object({
     dateOfBirth: timestampToDateSchema.optional(),
     gender: Gender.optional(),
     otherGender: z.string().optional(), // Fallback for "Other"
-    age: z.number().optional(),
+    age: z.string().optional(),
 
     // Spouse information
     spouseName: z.string().optional(),
-    spouseAge: z.number().optional(),
+    spouseAge: z.string().optional(),
     spouseGender: Gender.optional(),
     spouseOtherGender: z.string().optional(), // Fallback for "Other"
 
@@ -72,13 +73,12 @@ export const ClientSchema = z.object({
     referralSource: z.string().optional(),
 
     // Family and demographic details
-    familySize: z.number().optional(),
-    numberOfChildren: z.number().optional(),
+    familySize: z.string().optional(),
     childrenDetails: z
         .array(
             z.object({
                 name: z.string().optional(),
-                age: z.number().optional(),
+                age: z.string().optional(),
             }),
         )
         .optional(),
@@ -132,6 +132,7 @@ export type EmploymentStatus = z.infer<typeof EmploymentStatus>
 export type ProbationStatus = z.infer<typeof ProbationStatus>
 export type ClientStatus = z.infer<typeof ClientStatus>
 export type OpenClientStatus = z.infer<typeof OpenClientStatus>
+export type Pets = z.infer<typeof Pets>
 
 export type Client = z.infer<typeof ClientSchema>
 export type NewClient = z.infer<typeof ClientIntakeSchema>
@@ -202,7 +203,7 @@ export const ClientIntakeSchema = z.object({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     dateOfBirth: z.string().optional(),
-    age: z.number().optional(),
+    age: z.string().optional(),
     gender: Gender.optional(),
     clientNumber: z.string().optional(),
 
@@ -221,27 +222,25 @@ export const ClientIntakeSchema = z.object({
     phoneNumber: z.string().optional(),
 
     // ----- PAGE 2: Family Information -----
-    familySize: z.number().optional(),
-    spouse: z.object({
-        hasSpouse: z.enum(['Yes', 'No']).optional(),
-        name: z.string().optional(),
-        dateOfBirth: z.date().optional(),
-        age: z.number().optional(),
-    }).optional(),
+    familySize: z.string().optional(),
+    hasSpouse: z.boolean().optional(),
+    spouseFirstName: z.string().optional(),
+    spouseLastName: z.string().optional(),
+    spouseDOB: z.string().optional(),
+    spouseAge: z.string().optional(),
 
-    hasChildren: z.enum(['Yes', 'No']).optional(),
     children: z.array(
         z.object({
             name: z.string().optional(),
-            dateOfBirth: z.date().optional(),
-            age: z.number().optional(),
+            age: z.string().optional(),
         }),
     ).optional(),
 
-    pets: z.object({
-        hasPets: z.enum(['Yes', 'No']).optional(),
-        numberOfPets: z.number().optional(),
-    }),
+    pets: z.array(
+        z.object({
+            breed: Pets.optional()
+        })
+    ).optional(),
 
     // ----- PAGE 3: Background Information -----
     ethnicity: z.array(z.string()).optional(),
@@ -329,5 +328,11 @@ export const ProfileSchema = ClientIntakeSchema.pick({
 
 export const FamilySchema = ClientIntakeSchema.pick({
     familySize: true,
-    
+    hasSpouse: true,
+    spouseFirstName: true,
+    spouseLastName: true,
+    spouseDOB: true,
+    spouseAge: true,
+    children: true,
+    pets: true,
 })
