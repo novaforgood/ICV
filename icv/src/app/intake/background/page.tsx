@@ -87,22 +87,27 @@ const Page = (props: Props) => {
             style={{ padding: '50px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
+            <div>
+                <label className="bold text-3xl">Intake Form</label>
+            </div>
             <div className="space-y-8">
-                <label className="bold text-2xl">Background</label>
-                {/* Demographics */}
-                <div>
-                    <label>Ethnicity</label>
-                    <div className="flex flex-col space-y-2">
-                        <CheckboxListWithOther
-                            options={ETHNICITY}
-                            selectedValues={selectedEthnicities}
-                            onChange={(updatedEthnicities) =>
-                                setValue('ethnicity', updatedEthnicities)
-                            }
-                            name="ethnicity"
-                            otherLabel="Other"
-                            otherPlaceholder="Specify other ethnicity"
-                        />
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Background</label>
+                    {/* Demographics */}
+                    <div>
+                        <label>Ethnicity</label>
+                        <div className="flex flex-col space-y-2">
+                            <CheckboxListWithOther
+                                options={ETHNICITY}
+                                selectedValues={selectedEthnicities}
+                                onChange={(updatedEthnicities) =>
+                                    setValue('ethnicity', updatedEthnicities)
+                                }
+                                name="ethnicity"
+                                otherLabel="Other"
+                                otherPlaceholder="Specify other ethnicity"
+                            />
+                        </div>
                     </div>
                 </div>
                 {/* Health Information */}
@@ -164,12 +169,21 @@ const Page = (props: Props) => {
                 </div>
             </div>
 
-            <button
-                type="submit"
-                className="mt-4 rounded bg-blue-500 p-2 text-white"
-            >
-                Continue
-            </button>
+            <div className="flex justify-between">
+                <button
+                    type="button"
+                    onClick={() => router.push('/intake')}
+                    className="mt-4 rounded bg-blue-500 p-2 text-white"
+                >
+                    Back
+                </button>
+                <button
+                    type="submit"
+                    className="mt-4 rounded bg-blue-500 p-2 text-white"
+                >
+                    Continue
+                </button>
+            </div>
         </form>
     )
 }

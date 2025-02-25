@@ -75,21 +75,55 @@ const Page = (props: Props) => {
             style={{ padding: '50px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
+            <div>
+                <label className="bold text-3xl">Intake Form</label>
+            </div>
             <div className="space-y-8">
-                <label className="bold text-2xl">Client Profile</label>
-                <div className="grid grid-cols-2 gap-8">
-                    {/* Left Column */}
-                    <div className="space-y-4">
-                        <div className="flex flex-col">
-                            <label>First Name</label>
-                            <input
-                                {...register('firstName')}
-                                type="text"
-                                placeholder="First Name"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label>Program</label>
+                        <select
+                            {...register('program')}
+                            defaultValue="Select Program"
+                            className="w-full rounded border p-2"
+                        >
+                            <option value="Homeless Department">
+                                Homeless Department
+                            </option>
+                            <option value="School Outreach">
+                                School Outreach
+                            </option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div className="flex flex-col">
+                        {/* get all registered staff members in program */}
+                        <label>Assessing Staff</label>
+                        <select
+                            {...register('assessingStaff')}
+                            defaultValue="Select Staff"
+                            className="w-full rounded border p-2"
+                        >
+                            <option value="Staff 1">Staff 1</option>
+                            <option value="Staff 2">Staff 2</option>
+                            <option value="Staff 3">Staff 3</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Client Profile</label>
+                    <div className="grid grid-cols-2 gap-8">
+                        {/* Left Column */}
+                        <div className="space-y-4">
+                            <div className="flex flex-col">
+                                <label>First Name</label>
+                                <input
+                                    {...register('firstName')}
+                                    type="text"
+                                    placeholder="First Name"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
                             <div className="flex flex-col">
                                 <label>Date of Birth</label>
                                 <input
@@ -99,44 +133,27 @@ const Page = (props: Props) => {
                                     className="w-full rounded border p-2"
                                 />
                             </div>
-                            <div className="flex flex-col">
-                                <label>Age</label>
-                                <input
-                                    {...register('age')}
-                                    type="text"
-                                    placeholder="Text"
-                                    className="w-full rounded border p-2"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right Column */}
-                    <div className="space-y-4">
-                        <div className="flex flex-col">
-                            <label>Last Name</label>
+                            {/* <div className="flex flex-col">
+                            <label>Age</label>
                             <input
-                                {...register('lastName')}
+                                {...register('age')}
                                 type="text"
-                                placeholder="Last Name"
+                                placeholder="Text"
                                 className="w-full rounded border p-2"
                             />
+                        </div> */}
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+
+                        {/* Right Column */}
+                        <div className="space-y-4">
                             <div className="flex flex-col">
-                                <label>Gender</label>
-                                <select
-                                    {...register('gender')}
-                                    defaultValue="Select"
+                                <label>Last Name</label>
+                                <input
+                                    {...register('lastName')}
+                                    type="text"
+                                    placeholder="Last Name"
                                     className="w-full rounded border p-2"
-                                >
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Non-Binary">
-                                        Non-Binary
-                                    </option>
-                                    <option value="Other">Other</option>
-                                </select>
+                                />
                             </div>
                             <div className="flex flex-col">
                                 <label>Client Number</label>
@@ -147,6 +164,45 @@ const Page = (props: Props) => {
                                     className="w-full rounded border p-2"
                                 />
                             </div>
+                        </div>
+
+                        <div className="flex flex-col">
+                            <label>Gender</label>
+                            <select
+                                {...register('gender')}
+                                defaultValue="Select Gender"
+                                className="w-full rounded border p-2"
+                            >
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Non-Binary">Non-Binary</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Contact Information</label>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label>Email Address</label>
+                            <input
+                                {...register('email')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label>Phone Number</label>
+                            <input
+                                {...register('phoneNumber')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
                         </div>
                     </div>
                 </div>
@@ -160,7 +216,7 @@ const Page = (props: Props) => {
                         <select
                             {...register('housingType')}
                             defaultValue="Select"
-                            className="w-full rounded border p-2"
+                            className="w-[40%] rounded border p-2"
                         >
                             <option value="Not Sure">Not Sure</option>
                             <option value="What Design">What Design</option>
@@ -223,67 +279,26 @@ const Page = (props: Props) => {
                             />
                         </div>
                         <div className="flex flex-col">
-                            <label>State/Province</label>
+                            <label>Postal/Zip Code</label>
                             <input
-                                {...register('state')}
+                                {...register('zipCode')}
                                 type="text"
-                                placeholder="Text"
+                                placeholder="Zip Code"
                                 className="w-[60%] rounded border p-2"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex flex-col">
-                        <label>Postal/Zip Code</label>
-                        <input
-                            {...register('zipCode')}
-                            type="text"
-                            placeholder="Zip Code"
-                            className="w-[60%] rounded border p-2"
-                        />
-                    </div>
-                </div>
-
-                {/* Contact Information */}
-                <div className="space-y-4">
-                    <label className="bold text-2xl">Contact Information</label>
-                    <div>
-                        <label>Email Address</label>
-                        <input
-                            {...register('email')}
-                            type="text"
-                            placeholder="Text"
-                            className="w-full rounded border p-2"
-                        />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col">
-                            <label>Area Code</label>
-                            <input
-                                {...register('areaCode')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div className="flex flex-col">
-                            <label>Phone Number</label>
-                            <input
-                                {...register('phoneNumber')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
                             />
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button
-                type="submit"
-                className="mt-4 rounded bg-blue-500 p-2 text-white"
-            >
-                Continue
-            </button>
+            <div className="flex justify-between">
+                <button
+                    type="submit"
+                    className="ml-auto mt-4 rounded bg-blue-500 p-2 text-white"
+                >
+                    Continue
+                </button>
+            </div>
         </form>
     )
 }
