@@ -3,16 +3,20 @@
 import { ProfileSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../lib/useIntakeFormStore'
-import { ProgressBox } from './components/ProgressBar'
 
 interface Props {}
 
 const Page = (props: Props) => {
-    const { form: loadedForm, updateForm } = useIntakeFormStore()
+    const {
+        form: loadedForm,
+        progress: loadedProgress,
+        updateForm,
+        updateProgress,
+    } = useIntakeFormStore()
     type ProfileType = TypeOf<typeof ProfileSchema>
 
     const {
@@ -30,14 +34,6 @@ const Page = (props: Props) => {
 
     const router = useRouter()
 
-    const [progress, setProgress] = useState({
-        clientProfile: 'in-progress',
-        family: 'not-started',
-        background: 'not-started',
-        services: 'not-started',
-        confirmation: 'not-started',
-    })
-
     useEffect(() => {
         reset(loadedForm)
     }, [loadedForm, reset])
@@ -45,8 +41,23 @@ const Page = (props: Props) => {
     useEffect(() => {
         const unsubscribe = watch((data) => {
             updateForm(data)
+
+            const isAnyFieldFilled = Object.values(data).some((field) => {
+                if (Array.isArray(field)) {
+                    return field.length > 0
+                }
+                if (typeof field === 'boolean') {
+                    return true
+                }
+                return field?.length > 0 || field !== undefined
+            })
+
+            updateProgress({
+                clientProfile: isAnyFieldFilled ? 'in-progress' : 'not-started',
+            })
         }).unsubscribe
         console.log(loadedForm)
+        console.log(loadedProgress)
         console.log(errors)
 
         return unsubscribe
@@ -64,19 +75,6 @@ const Page = (props: Props) => {
             style={{ padding: '50px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <div className="mb-5 flex items-center justify-center">
-                <ProgressBox
-                    title="Client Profile"
-                    status={progress.clientProfile}
-                />
-                <ProgressBox title="Family" status={progress.family} />
-                <ProgressBox title="Background" status={progress.background} />
-                <ProgressBox title="Services" status={progress.services} />
-                <ProgressBox
-                    title="Confirmation"
-                    status={progress.confirmation}
-                />
-            </div>
             <div className="space-y-8">
                 <label className="bold text-2xl">Client Profile</label>
                 <div className="grid grid-cols-2 gap-8">
