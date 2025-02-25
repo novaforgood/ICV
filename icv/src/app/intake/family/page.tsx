@@ -203,7 +203,7 @@ const Page = (props: Props) => {
                                 onClick={() => removeSpouse(index)}
                                 className="mt-4 rounded bg-red-900 p-2 text-white"
                             >
-                                - Remove Spouse
+                                - Remove Spouse {index + 1}
                             </button>
                         </div>
                     ))}
@@ -245,7 +245,7 @@ const Page = (props: Props) => {
                                 onClick={() => removeChild(index)}
                                 className="mt-4 rounded bg-red-900 p-2 text-white"
                             >
-                                - Remove Child
+                                - Remove Child {index + 1}
                             </button>
                         </div>
                     ))}
@@ -285,7 +285,7 @@ const Page = (props: Props) => {
                                 onClick={() => removePet(index)}
                                 className="mt-4 rounded bg-red-900 p-2 text-white"
                             >
-                                - Remove Pet
+                                - Remove Pet {index + 1}
                             </button>
                         </div>
                     ))}
