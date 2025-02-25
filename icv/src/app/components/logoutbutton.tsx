@@ -1,29 +1,43 @@
 'use client'
 import { auth } from '@/lib/firebase'
-import { getIdToken, onAuthStateChanged, signOut } from 'firebase/auth'
-import { setCookie } from 'cookies-next'
-import { useEffect } from 'react'
-
+import { deleteCookie, getCookie } from 'cookies-next'
+import { signOut } from 'firebase/auth'
+import { useRouter } from 'next/navigation'
 
 export default function LogoutButton() {
-    
+    const router = useRouter()
 
-const handleSignOut = async () => {
-    try {
-        await signOut(auth) // Firebase sign out
-        await setCookie('idToken', '', { maxAge: 0 }) // Remove token cookie
-        // console.log('User signed out')
-        if (auth.currentUser === null) {
-            console.log('User is confirmed as signed out')
+    const handleSignOut = async () => {
+        try {
+            // Log cookie before logout
+            console.log('Cookie before logout:', getCookie('idToken'))
+
+            // Firebase sign out
+            await signOut(auth)
+
+            // Delete cookie more definitively
+            deleteCookie('idToken', { path: '/' })
+
+            console.log('User signed out')
+            console.log('Cookie after logout:', getCookie('idToken'))
+
+            // Force a page reload to ensure middleware runs on the next navigation
+            // This will ensure the middleware redirects the user to the login page
+            router.push('/login')
+
+            // For extra safety, you can also force a full page reload
+            // window.location.href = '/login'
+        } catch (error) {
+            console.error('Sign out error:', error)
         }
-    } catch (error) {
-        console.error('Sign out error:', error)
     }
-}
 
-return(
-<button className="flex w-full flex-row items-center justify-center gap-4 rounded-md p-4 text-center hover:bg-slate-300" onClick={handleSignOut}>
-                        Logout
-                    </button>
-)
+    return (
+        <button
+            className="flex w-full flex-row items-center justify-center gap-4 rounded-md p-4 text-center hover:bg-slate-300"
+            onClick={handleSignOut}
+        >
+            Logout
+        </button>
+    )
 }

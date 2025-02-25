@@ -18,22 +18,39 @@
 // export const config = {
 //     matchers: '/api/:path*', //protect all api routes
 // }
-import { NextResponse } from 'next/server'
-import { getCookie } from 'cookies-next'
+import { NextResponse, NextRequest } from 'next/server'
 
-export function middleware(request: Request) {
-    const idToken = getCookie('idToken', { req: request })
+export function middleware(request: NextRequest) {
+   
+    const idToken = request.cookies.get('idToken')?.value
 
-    if (!idToken) {
-        // If no idToken is found, redirect to the login page
-        return NextResponse.redirect(new URL('/login', request.url))
+    console.log("Request URL:", request.url)
+    console.log("Cookies:", request.cookies.toString())
+    console.log("ID Token exists:", !!idToken)
+
+    
+    if (!idToken || idToken.trim() === '') {
+        console.log("No valid token found, redirecting to login")
+        // Use a 307 temporary redirect to preserve the request method
+        return NextResponse.redirect(new URL('/login', request.url), { status: 307 })
     }
 
-    // Allow the request to proceed if the user is authenticated
+    console.log("Token found, allowing request to proceed")
     return NextResponse.next()
 }
 
 // Define the paths to which this middleware should apply
 export const config = {
-    matcher: ['/protected', '/protected/*'], // Add the protected paths here
+    // Match all paths except login, static assets, API routes, etc.
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - login (auth page)
+         * - api (API routes)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         */
+        '/((?!login|api|_next/static|_next/image|favicon.ico).*)'
+    ]
 }

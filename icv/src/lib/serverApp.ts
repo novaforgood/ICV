@@ -13,6 +13,7 @@ export async function getAuthenticatedAppForUser() {
     const idToken = await getCookie('idToken', { cookies })
 
     if (!idToken) {
+        console.error("not logged in")
         return {
             redirect: {
                 destination: '../login/page.tsx',

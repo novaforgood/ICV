@@ -4,11 +4,15 @@ import { auth } from '@/lib/firebase'
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
+    updateProfile,
 } from 'firebase/auth'
 import { useState } from 'react'
+import { setCookie } from 'cookies-next';
 
 const page = () => {
     const [email, setEmail] = useState('')
+    const [firstname, setFirstName] = useState('')
+    const [lastname, setLastName] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
@@ -19,13 +23,34 @@ const page = () => {
 
         try {
             if (loading) {
-                await createUserWithEmailAndPassword(auth, email, password)
+                const userCreds = await createUserWithEmailAndPassword(auth, email, password)
+                const user = userCreds.user
+
+                //update display name in firebase auth
+                await updateProfile( user, {
+                    displayName: `${firstname} ${lastname}`,
+                })
+                console.log("user name stored: ", auth.currentUser?.displayName)
             } else {
-                await signInWithEmailAndPassword(auth, email, password)
+                const usercred = await signInWithEmailAndPassword(auth, email, password)
+                const user = usercred.user;
+                if (user) {
+                    const token = await user.getIdToken()
+                    
+                    // Set cookie
+                    setCookie('idToken', token, {
+                        path: '/', 
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'lax'
+                    });
+        
+                    console.log("Token set in cookie:", token)
+                    console.log("Welcome, ", auth.currentUser?.displayName)
+                }
             }
             alert('Successfully logged in')
         } catch (err) {
-            setError(err.message)
+            setError((err as Error).message)
         }
     }
 
@@ -39,6 +64,25 @@ const page = () => {
                 </h2>
                 {error && <p className="text-sm text-red-500">{error}</p>}
                 <form onSubmit={handleAuth} className="flex flex-col">
+                {(loading &&                    
+                <>
+                        <input
+                            type="text"
+                            placeholder='First Name'
+                            className="mt-2 border border-gray-200 p-2"
+                            value={firstname}
+                            onChange={(e) => setFirstName(e.target.value)}
+                        />
+                        <input
+                            type="text"
+                            placeholder='Last Name'
+                            className="mt-2 border border-gray-200 p-2"
+                            value={lastname}
+                            onChange={(e) => setLastName(e.target.value)}
+                        />
+                    </>
+                    )}
+            
                     <input
                         type="email"
                         placeholder="Email"

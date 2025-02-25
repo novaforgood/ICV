@@ -1,5 +1,8 @@
 'use client'
+export const dynamic = 'force-dynamic'
+
 import { useState } from 'react'
+
 
 export default function Home() {
     const [textValue, setTextValue] = useState('')
@@ -37,7 +40,7 @@ export default function Home() {
                 className="w-full rounded-md border border-gray-300 p-4 text-lg focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            <button onClick={createNewFirebaseDocument}>make doc</button>
+            <button onClick={createNewFirebaseDocument}>make doc THIS is landing page, should not be able to login</button>
             <button onClick={createNewFirebaseDocument}>make doc</button>
             <button onClick={createNewFirebaseDocument}>make doc</button>
             <button onClick={createNewFirebaseDocument}>make doc</button>
