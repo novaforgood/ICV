@@ -1,29 +1,14 @@
-// import { NextRequest, NextResponse } from "next/server";
-// import { getAuthenticatedAppForUser } from "../lib/serverApp";
-// import { match } from "assert";
-
-
-// export async function middleware(req: NextRequest) {
-//     try {
-//         await getAuthenticatedAppForUser()
-//         console.log("this should not print if signed out")
-//         return NextResponse.next()
-//     } catch (error){
-//         console.error("authentication error", error)
-
-//         //if auth fails, return 401 unauthorized response
-//         return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-//     }
-// }
-// export const config = {
-//     matchers: '/api/:path*', //protect all api routes
-// }
 import { NextResponse, NextRequest } from 'next/server'
+
+// The middleware file needs to be in the root directory, not in the app directory
+// Move this file to /src/middleware.ts or /middleware.ts
 
 export function middleware(request: NextRequest) {
    
     const idToken = request.cookies.get('idToken')?.value
 
+    // For debugging middleware execution
+    console.log("Middleware executed for:", request.nextUrl.pathname);
     console.log("Request URL:", request.url)
     console.log("Cookies:", request.cookies.toString())
     console.log("ID Token exists:", !!idToken)
