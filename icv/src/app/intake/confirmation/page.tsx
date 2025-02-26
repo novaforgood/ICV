@@ -1,5 +1,6 @@
 'use client'
 
+import { createClient } from '@/api/make-cases/make-case'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
@@ -26,7 +27,7 @@ const Page = (props: Props) => {
 
     const onSubmit = (data: ClientType) => {
         console.log('in submit...', data)
-        // createClient(data)
+        createClient(data)
         clearForm()
         router.push('/intake')
     }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { FaCalendar, FaChartBar, FaCog, FaHome } from 'react-icons/fa'
 import { FaPeopleGroup } from 'react-icons/fa6'
 // import AuthSetup from './components/AuthSetup'
+import AuthSetup from './components/AuthSetup'
 import './globals.css'
 
 // const geistSans = Geist({
@@ -31,7 +32,7 @@ export default function RootLayout({
                 // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
                 className={`antialiased`}
             >
-                {/* <AuthSetup /> */}
+                <AuthSetup />
                 <div className="fixed left-0 top-0 flex h-full w-56 flex-col items-center gap-4 bg-slate-200 p-4">
                     <div className="gap flex w-full flex-col items-center justify-center">
                         <img
