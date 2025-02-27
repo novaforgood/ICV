@@ -1,6 +1,6 @@
 'use client'
 
-import { auth } from '@/lib/firebase'
+import { auth } from '../data/firebase'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -21,6 +21,7 @@ export default function RootLayout({
     
     const [name, setName] = useState<string>('')
     const [email, setEmail] = useState<string>('')
+    const [photoURL, setPhotoURL] = useState<string>('') 
     // This useEffect hook listens for changes in the user's authentication state
     // When the user logs in or out, it updates the displayed name
     // The hook sets up a listener when the component mounts and cleans it up on unmount
@@ -32,9 +33,11 @@ export default function RootLayout({
                 setName(user.displayName || '')
                 console.log('User display name:', user.displayName)
                 setEmail(user.email || '')
+                setPhotoURL(user.photoURL || '')
             } else {
                 setName('')
                 setEmail('')
+                setPhotoURL('')
             }
         })
 
@@ -53,7 +56,7 @@ export default function RootLayout({
                 <div className="fixed left-0 top-0 flex h-full w-56 flex-col items-center gap-4 bg-slate-200 p-4">
                     <div className="gap flex w-full flex-col items-center justify-center">
                         <img
-                            src="https://picsum.photos/seed/meow/200"
+                            src={photoURL}
                             alt="logo"
                             className="m-4 h-20 w-20 rounded-full"
                         />
