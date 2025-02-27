@@ -13,7 +13,7 @@ export async function getAuthenticatedAppForUser() {
     const idToken = await getCookie('idToken', { cookies })
 
     if (!idToken) {
-        console.error("not logged in")
+        console.error("not logged in, redirecting to login page from serverApp.ts")
         return {
             redirect: {
                 destination: '../login/page.tsx',

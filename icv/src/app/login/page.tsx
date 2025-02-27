@@ -22,7 +22,7 @@ const page = () => {
         setError('')
 
         try {
-            if (loading) {
+            if (loading) {//if user is creating an account
                 const userCreds = await createUserWithEmailAndPassword(auth, email, password)
                 const user = userCreds.user
 
@@ -30,6 +30,7 @@ const page = () => {
                 await updateProfile( user, {
                     displayName: `${firstname} ${lastname}`,
                 })
+                await auth.currentUser?.reload() // Reload user data
                 console.log("user name stored: ", auth.currentUser?.displayName)
             } else {
                 const usercred = await signInWithEmailAndPassword(auth, email, password)
