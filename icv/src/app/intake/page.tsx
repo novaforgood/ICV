@@ -1,554 +1,306 @@
 'use client'
 
-import { createClient } from '@/api/make-cases/make-case'
-import { Client, ClientSchema } from '@/types/client-types'
+import { ProfileSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { TypeOf } from 'zod'
+import { useIntakeFormStore } from '../lib/useIntakeFormStore'
 
-const page = () => {
+interface Props {}
+
+const Page = (props: Props) => {
+    const {
+        form: loadedForm,
+        progress: loadedProgress,
+        updateForm,
+        updateProgress,
+    } = useIntakeFormStore()
+    type ProfileType = TypeOf<typeof ProfileSchema>
+
     const {
         register,
         handleSubmit,
+        reset,
+        watch,
+        setValue,
         formState: { errors },
-    } = useForm<Client>({
+    } = useForm<ProfileType>({
         mode: 'onChange',
-        resolver: zodResolver(ClientSchema.partial()),
+        resolver: zodResolver(ProfileSchema),
+        defaultValues: loadedForm,
     })
 
-    const onSubmit = (data: Client) => {
-        // console.log('Loading...')
-        // console.log(errors)
-        createClient(data)
-        console.log(data)
+    const router = useRouter()
+
+    useEffect(() => {
+        reset(loadedForm)
+    }, [loadedForm, reset])
+
+    useEffect(() => {
+        const unsubscribe = watch((data) => {
+            updateForm(data)
+
+            const isAnyFieldFilled = Object.values(data).some((field) => {
+                if (Array.isArray(field)) {
+                    return field.length > 0
+                }
+                if (typeof field === 'boolean') {
+                    return true
+                }
+                return field?.length > 0 || field !== undefined
+            })
+
+            updateProgress({
+                clientProfile: isAnyFieldFilled ? 'in-progress' : 'not-started',
+            })
+        }).unsubscribe
+        console.log(loadedForm)
+        console.log(loadedProgress)
+        console.log(errors)
+
+        return unsubscribe
+    }, [watch, loadedForm])
+
+    const onSubmit = (data: ProfileType) => {
+        console.log('in submit...', data)
+        updateForm(data)
+        router.push('/intake/family')
     }
 
     return (
         <form
-            onSubmit={handleSubmit(onSubmit)}
             className="space-y-4"
             style={{ padding: '50px' }}
+            onSubmit={handleSubmit(onSubmit)}
         >
-            {/* Basic client details */}
-            <div className="flex space-x-5">
-                <div>
-                    <label>First Name</label>
-                    <input
-                        {...register('firstName')}
-                        type="text"
-                        placeholder="First Name"
-                        className="w-full rounded border p-2"
-                    />
-                </div>
-                <div>
-                    <label>Last Name</label>
-                    <input
-                        {...register('lastName')}
-                        type="text"
-                        placeholder="Last Name"
-                        className="w-full rounded border p-2"
-                    />
-                </div>
-                <div>
-                    <label>Middle Initial</label>
-                    <input
-                        {...register('middleInitial')}
-                        type="text"
-                        placeholder="Middle Initial"
-                        className="w-full rounded border p-2"
-                    />
-                </div>
+            <div>
+                <label className="bold text-3xl">Intake Form</label>
             </div>
-
-            <div className="flex space-x-5">
-                <div>
-                    <label>Date of Birth</label>
-                    <input
-                        {...register('dateOfBirth', {
-                            valueAsDate: true,
-                        })}
-                        type="date"
-                        className="w-full rounded border p-2"
-                    />
+            <div className="space-y-8">
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label>Program</label>
+                        <select
+                            {...register('program')}
+                            defaultValue="Select Program"
+                            className="w-full rounded border p-2"
+                        >
+                            <option value="Homeless Department">
+                                Homeless Department
+                            </option>
+                            <option value="School Outreach">
+                                School Outreach
+                            </option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div className="flex flex-col">
+                        {/* get all registered staff members in program */}
+                        <label>Assessing Staff</label>
+                        <select
+                            {...register('assessingStaff')}
+                            defaultValue="Select Staff"
+                            className="w-full rounded border p-2"
+                        >
+                            <option value="Staff 1">Staff 1</option>
+                            <option value="Staff 2">Staff 2</option>
+                            <option value="Staff 3">Staff 3</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label>Age</label>
-                    <input
-                        {...register('age', {
-                            // valueAsNumber: true,
-                            setValueAs: (v) =>
-                                v === '' ? -1 : parseInt(v, 10),
-                        })}
-                        type="number"
-                        placeholder="Age"
-                        className="w-full rounded border p-2"
-                    />
-                </div>
-                <div>
-                    <label>Gender</label>
-                    <select
-                        {...register('gender')}
-                        className="w-full rounded border p-2"
-                    >
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Other Gender</label>
-                    <input
-                        {...register('otherGender')}
-                        type="text"
-                        placeholder="Other Gender"
-                        className="w-full rounded border p-2"
-                    />
-                </div>
-            </div>
-
-            {false && (
-                <>
-                    {/* Spouse information */}
-                    <div className="flex space-x-5">
-                        <div>
-                            <label>Spouse Name</label>
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Client Profile</label>
+                    <div className="grid grid-cols-2 gap-8">
+                        {/* Left Column */}
+                        <div className="space-y-4">
+                            <div className="flex flex-col">
+                                <label>First Name</label>
+                                <input
+                                    {...register('firstName')}
+                                    type="text"
+                                    placeholder="First Name"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                            <div className="flex flex-col">
+                                <label>Date of Birth</label>
+                                <input
+                                    {...register('dateOfBirth')}
+                                    type="date"
+                                    placeholder="MM/DD/YYYY"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                            {/* <div className="flex flex-col">
+                            <label>Age</label>
                             <input
-                                {...register('spouseName')}
+                                {...register('age')}
                                 type="text"
-                                placeholder="Spouse Name"
+                                placeholder="Text"
                                 className="w-full rounded border p-2"
                             />
+                        </div> */}
                         </div>
-                        <div>
-                            <label>Spouse Age</label>
-                            <input
-                                {...register('spouseAge')}
-                                type="number"
-                                placeholder="Spouse Age"
-                                className="w-full rounded border p-2"
-                            />
+
+                        {/* Right Column */}
+                        <div className="space-y-4">
+                            <div className="flex flex-col">
+                                <label>Last Name</label>
+                                <input
+                                    {...register('lastName')}
+                                    type="text"
+                                    placeholder="Last Name"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                            <div className="flex flex-col">
+                                <label>Client Number</label>
+                                <input
+                                    {...register('clientNumber')}
+                                    type="text"
+                                    placeholder="Text"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <label>Spouse Gender</label>
+
+                        <div className="flex flex-col">
+                            <label>Gender</label>
                             <select
-                                {...register('spouseGender')}
+                                {...register('gender')}
+                                defaultValue="Select Gender"
                                 className="w-full rounded border p-2"
                             >
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
+                                <option value="Non-Binary">Non-Binary</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                        <div>
-                            <label>Spouse Other Gender</label>
-                            <input
-                                {...register('spouseOtherGender')}
-                                type="text"
-                                placeholder="Spouse Other Gender"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
                     </div>
+                </div>
 
-                    {/* Location and contact details */}
-                    <div className="flex space-x-5">
+                {/* Contact Information */}
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Contact Information</label>
+                    <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label>Address</label>
+                            <label>Email Address</label>
                             <input
-                                {...register('address')}
+                                {...register('email')}
                                 type="text"
-                                placeholder="Address"
+                                placeholder="Text"
                                 className="w-full rounded border p-2"
                             />
                         </div>
-                        <div>
-                            <label>Apt Number</label>
-                            <input
-                                {...register('aptNumber')}
-                                type="text"
-                                placeholder="Apt Number"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>City</label>
-                            <input
-                                {...register('city')}
-                                type="text"
-                                placeholder="City"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Zip Code</label>
-                            <input
-                                {...register('zipCode')}
-                                type="text"
-                                placeholder="Zip Code"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
+                        <div className="flex flex-col">
                             <label>Phone Number</label>
                             <input
                                 {...register('phoneNumber')}
                                 type="text"
-                                placeholder="Phone Number"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Email</label>
-                            <input
-                                {...register('email')}
-                                type="email"
-                                placeholder="Email"
+                                placeholder="Text"
                                 className="w-full rounded border p-2"
                             />
                         </div>
                     </div>
+                </div>
 
-                    {/* Program and intake details */}
-                    <div className="flex space-x-5">
-                        <div>
-                            <label>Program</label>
-                            <input
-                                {...register('program')}
-                                type="text"
-                                placeholder="Program"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Intake Date</label>
-                            <input
-                                {...register('intakeDate')}
-                                type="date"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Primary Language</label>
-                            <input
-                                {...register('primaryLanguage')}
-                                type="text"
-                                placeholder="Primary Language"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Client Code</label>
-                            <input
-                                {...register('clientCode')}
-                                type="text"
-                                placeholder="Client Code"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
+                {/* Housing Information */}
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Housing</label>
+
+                    <div className="flex flex-col">
+                        <label>Housing Type</label>
+                        <select
+                            {...register('housingType')}
+                            defaultValue="Select"
+                            className="w-[40%] rounded border p-2"
+                        >
+                            <option value="Not Sure">Not Sure</option>
+                            <option value="What Design">What Design</option>
+                            <option value="Wants Here">Wants Here</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
 
-                    {/* Housing and referral details */}
-                    <div className="flex space-x-5">
-                        <div>
-                            <label>Housing Type</label>
-                            <input
-                                {...register('housingType')}
-                                type="text"
-                                placeholder="Housing Type"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Birthplace</label>
-                            <input
-                                {...register('birthplace')}
-                                type="text"
-                                placeholder="Birthplace"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Referral Source</label>
-                            <input
-                                {...register('referralSource')}
-                                type="text"
-                                placeholder="Referral Source"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Family and demographic details */}
-                    <div className="flex space-x-5">
-                        <div>
-                            <label>Family Size</label>
-                            <input
-                                {...register('familySize')}
-                                type="number"
-                                placeholder="Family Size"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Number of Children</label>
-                            <input
-                                {...register('numberOfChildren')}
-                                type="number"
-                                placeholder="Number of Children"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>Ethnicity</label>
-                            <select
-                                {...register('ethnicity')}
-                                className="w-full rounded border p-2"
-                            >
-                                <option value="African American">
-                                    African American
-                                </option>
-                                <option value="Asian">Asian</option>
-                                <option value="Latino/Hispanic">
-                                    Latino/Hispanic
-                                </option>
-                                <option value="Native American">
-                                    Native American
-                                </option>
-                                <option value="White/Caucasian">
-                                    White/Caucasian
-                                </option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Public services information */}
-                    <div className="flex space-x-5">
-                        <div className="space-x-2">
-                            <label>General Relief</label>
-                            <input
-                                {...register('publicServices.generalRelief')}
-                                type="checkbox"
-                            />
-                        </div>
-                        <div className="space-x-2">
-                            <label>Cal Fresh</label>
-                            <input
-                                {...register('publicServices.calFresh')}
-                                type="checkbox"
-                            />
-                        </div>
-                        <div className="space-x-2">
-                            <label>Cal Works</label>
-                            <input
-                                {...register('publicServices.calWorks')}
-                                type="checkbox"
-                            />
-                        </div>
-                        <div className="space-x-2">
-                            <label>SSI</label>
-                            <input
-                                {...register('publicServices.ssi')}
-                                type="checkbox"
-                            />
-                        </div>
-                        <div className="space-x-2">
-                            <label>SSA</label>
-                            <input
-                                {...register('publicServices.ssa')}
-                                type="checkbox"
-                            />
-                        </div>
-                        <div className="space-x-2">
-                            <label>Unemployment</label>
-                            <input
-                                {...register('publicServices.unemployment')}
-                                type="checkbox"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Assessment and client details */}
-                    <div className="flex space-x-5">
-                        <div>
-                            <label>Needs Assessment</label>
-                            <input
-                                {...register('needsAssessment')}
-                                type="text"
-                                placeholder="Needs Assessment"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div>
-                            <label>
-                                Open Client with Child/Family Services
+                    <div className="flex flex-col">
+                        <label>At Risk</label>
+                        <div className="mt-2 flex flex-col gap-2">
+                            <label className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    {...register('atRisk')}
+                                />
+                                Yes
                             </label>
-                            <select
-                                {...register(
-                                    'openClientWithChildFamilyServices',
-                                )}
-                                className="w-full rounded border p-2"
-                            >
-                                <option value="Yes, Currently">
-                                    Yes, Currently
-                                </option>
-                                <option value="Yes, Previously">
-                                    Yes, Previously
-                                </option>
-                                <option value="No">No</option>
-                            </select>
+                            <label className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    checked={!watch('atRisk')}
+                                    onChange={() => setValue('atRisk', false)}
+                                />
+                                No
+                            </label>
                         </div>
-                        <div>
-                            <label>Previous Arrests</label>
+                    </div>
+
+                    {/* Street Address & Apt No. (Same Row) */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col">
+                            <label>Street Address</label>
                             <input
-                                {...register('previousArrests')}
-                                type="checkbox"
+                                {...register('streetAddress')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
                             />
                         </div>
-                        <div>
-                            <label>Probation Status</label>
-                            <select
-                                {...register('probationStatus')}
-                                className="w-full rounded border p-2"
-                            >
-                                <option value="No">No</option>
-                                <option value="Yes, Previously">
-                                    Yes, Previously
-                                </option>
-                                <option value="Yes, Currently">
-                                    Yes, Currently
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Education and employment */}
-                    <div className="flex space-x-5">
-                        <div>
-                            <label>Has High School Diploma</label>
+                        <div className="flex flex-col">
+                            <label>Apt No.</label>
                             <input
-                                {...register('education.hasHighSchoolDiploma')}
-                                type="checkbox"
+                                {...register('aptNumber')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-[30%] rounded border p-2"
                             />
                         </div>
-                        <div>
-                            <label>Foster Youth Status</label>
-                            <select
-                                {...register('education.fosterYouthStatus')}
-                                className="w-full rounded border p-2"
-                            >
-                                <option value="Yes, Currently">
-                                    Yes, Currently
-                                </option>
-                                <option value="Yes, Previously">
-                                    Yes, Previously
-                                </option>
-                                <option value="No">No</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Employment Status</label>
-                            <select
-                                {...register('employmentStatus')}
-                                className="w-full rounded border p-2"
-                            >
-                                <option value="No">No</option>
-                                <option value="Yes, Part-Time">
-                                    Yes, Part-Time
-                                </option>
-                                <option value="Yes, Full-Time">
-                                    Yes, Full-Time
-                                </option>
-                            </select>
-                        </div>
                     </div>
 
-                    {/* Medical and mental health information */}
-                    <div>
-                        <label>Substance Abuse Details</label>
-                        <input
-                            {...register('substanceAbuseDetails')}
-                            type="text"
-                            placeholder="Substance Abuse Details"
-                            className="w-full rounded border p-2"
-                        />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-col">
+                            <label>City</label>
+                            <input
+                                {...register('city')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label>Postal/Zip Code</label>
+                            <input
+                                {...register('zipCode')}
+                                type="text"
+                                placeholder="Zip Code"
+                                className="w-[60%] rounded border p-2"
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label>Medical Conditions</label>
-                        <input
-                            {...register('medicalConditions')}
-                            type="text"
-                            placeholder="Medical Conditions"
-                            className="w-full rounded border p-2"
-                        />
-                    </div>
-                    <div>
-                        <label>Mental Health Diagnosis</label>
-                        <input
-                            {...register('mentalHealthDiagnosis')}
-                            type="text"
-                            placeholder="Mental Health Diagnosis"
-                            className="w-full rounded border p-2"
-                        />
-                    </div>
-                </>
-            )}
-
-            {/* Client management */}
-            {/* <div className="flex space-x-5">
-                <div>
-                    <label>Assigned Client Manager</label>
-                    <input
-                        {...register('assignedClientManager')}
-                        type="text"
-                        placeholder="Assigned Client Manager"
-                        className="w-full rounded border p-2"
-                    />
-                </div>
-                <div>
-                    <label>Assigned Date</label>
-                    <input
-                        {...register('assignedDate')}
-                        type="date"
-                        className="w-full rounded border p-2"
-                    />
-                </div>
-                <div>
-                    <label>Status</label>
-                    <select
-                        {...register('status')}
-                        className="w-full rounded border p-2"
-                    >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
                 </div>
             </div>
 
-            {/* Additional notes */}
-            <div>
-                <label>Notes</label>
-                <textarea
-                    {...register('notes')}
-                    placeholder="Additional Notes"
-                    className="w-full rounded border p-2"
-                />
+            <div className="flex justify-between">
+                <button
+                    type="submit"
+                    className="ml-auto mt-4 rounded bg-blue-500 p-2 text-white"
+                >
+                    Continue
+                </button>
             </div>
-
-            {errors && <PrintComponent stuffToprint={errors} />}
-            {/* {errors && <p>{JSON.stringify(errors)}</p>} */}
-            <button
-                type="submit"
-                className="mt-4 rounded bg-blue-500 p-2 text-white"
-            >
-                Submit
-            </button>
         </form>
     )
 }
 
-function PrintComponent(stuffToprint: any) {
-    console.log(stuffToprint)
-    return <div>printed</div>
-}
-
-export default page
+export default Page

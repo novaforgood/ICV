@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { FaCalendar, FaChartBar, FaCog, FaHome } from 'react-icons/fa'
 import { FaPeopleGroup } from 'react-icons/fa6'
+// import AuthSetup from './components/AuthSetup'
 import AuthSetup from './components/AuthSetup'
 import LogoutButton from './components/logoutbutton'
 

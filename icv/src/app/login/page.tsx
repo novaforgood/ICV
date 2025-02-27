@@ -1,13 +1,12 @@
-// import {useState} from "react"
 'use client'
-import { auth } from '@/lib/firebase'
+import { auth } from '@/data/firebase'
+import { setCookie } from 'cookies-next'
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     updateProfile,
 } from 'firebase/auth'
 import { useState } from 'react'
-import { setCookie } from 'cookies-next';
 
 const page = () => {
     const [email, setEmail] = useState('')
@@ -23,37 +22,48 @@ const page = () => {
 
         try {
             if (loading) {
-                const userCreds = await createUserWithEmailAndPassword(auth, email, password)
+                const userCreds = await createUserWithEmailAndPassword(
+                    auth,
+                    email,
+                    password,
+                )
                 const user = userCreds.user
 
                 //update display name in firebase auth
-                await updateProfile( user, {
+                await updateProfile(user, {
                     displayName: `${firstname} ${lastname}`,
                 })
-                console.log("user name stored: ", auth.currentUser?.displayName)
+                console.log('user name stored: ', auth.currentUser?.displayName)
             } else {
-                const usercred = await signInWithEmailAndPassword(auth, email, password)
-                const user = usercred.user;
+                const usercred = await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password,
+                )
+                const user = usercred.user
                 if (user) {
                     const token = await user.getIdToken()
-                    
+
                     // Set cookie
                     setCookie('idToken', token, {
-                        path: '/', 
+                        path: '/',
                         secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'lax'
-                    });
-        
-                    console.log("Token set in cookie:", token)
-                    console.log("Welcome, ", auth.currentUser?.displayName)
+                        sameSite: 'lax',
+                    })
+
+                    console.log('Token set in cookie:', token)
+                    console.log('Welcome, ', auth.currentUser?.displayName)
                 }
             }
             alert('Successfully logged in')
         } catch (err) {
-            setError((err as Error).message)
+            if (err instanceof Error) {
+                setError(err.message)
+            } else {
+                setError('An unknown error occurred')
+            }
         }
     }
-
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6">
             <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-md">
@@ -64,25 +74,25 @@ const page = () => {
                 </h2>
                 {error && <p className="text-sm text-red-500">{error}</p>}
                 <form onSubmit={handleAuth} className="flex flex-col">
-                {(loading &&                    
-                <>
-                        <input
-                            type="text"
-                            placeholder='First Name'
-                            className="mt-2 border border-gray-200 p-2"
-                            value={firstname}
-                            onChange={(e) => setFirstName(e.target.value)}
-                        />
-                        <input
-                            type="text"
-                            placeholder='Last Name'
-                            className="mt-2 border border-gray-200 p-2"
-                            value={lastname}
-                            onChange={(e) => setLastName(e.target.value)}
-                        />
-                    </>
+                    {loading && (
+                        <>
+                            <input
+                                type="text"
+                                placeholder="First Name"
+                                className="mt-2 border border-gray-200 p-2"
+                                value={firstname}
+                                onChange={(e) => setFirstName(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Last Name"
+                                className="mt-2 border border-gray-200 p-2"
+                                value={lastname}
+                                onChange={(e) => setLastName(e.target.value)}
+                            />
+                        </>
                     )}
-            
+
                     <input
                         type="email"
                         placeholder="Email"
