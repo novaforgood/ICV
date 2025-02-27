@@ -1,6 +1,9 @@
-import { clientDb } from '@/lib/firebase'
-import { Client, ClientSchema } from '@/types/client-types'
+'use server'
+import 'server-only'
+
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
+import { NewClient, ClientIntakeSchema } from '@/types/client-types'
+// import 'server-only'
 
 import {
     addDoc,
@@ -8,14 +11,11 @@ import {
     doc,
     getDoc,
     getDocs,
-    updateDoc,
     getFirestore,
+    updateDoc,
 } from 'firebase/firestore'
 
-
-
-
-export async function createClient(client: Client) {
+export async function createClient(client: NewClient) {
     // verify that the client object is valid
     // let results = ClientSchema.optional().safeParse(client)
     // if (results.success === false) {
@@ -37,29 +37,32 @@ export async function getAllClients() {
 
     const clientsCollection = collection(ssrdb, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
-    const clients = clientsSnapshot.docs.map((doc) => doc.data() as Client)
+    const clients = clientsSnapshot.docs.map((doc) => doc.data() as NewClient)
     return clients
 }
 
 export async function getClientById(id: string) {
+    // if (!id) {
+    //     return
+    //     throw new Error('Client ID is required')
+    // }
     const { firebaseServerApp } = await getAuthenticatedAppForUser()
     const ssrdb = getFirestore(firebaseServerApp)
 
     const clientsCollection = collection(ssrdb, 'clients')
     const clientDoc = await getDoc(doc(clientsCollection, id))
-    const client = clientDoc.data() as Client
+    const client = clientDoc.data() as NewClient
     return client
 }
 
-export async function updateClient(id: string, client: Partial<Client>) {
+export async function updateClient(id: string, client: Partial<NewClient>) {
     const { firebaseServerApp } = await getAuthenticatedAppForUser()
     const ssrdb = getFirestore(firebaseServerApp)
-    
-    if (ClientSchema.safeParse(client).success === false) {
+
+    if (ClientIntakeSchema.safeParse(client).success === false) {
         throw new Error('Client object is invalid')
     }
 
     const clientsCollection = collection(ssrdb, 'clients')
     await updateDoc(doc(clientsCollection, id), client)
 }
-

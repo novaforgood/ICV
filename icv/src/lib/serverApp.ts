@@ -2,18 +2,16 @@ import 'server-only'
 
 import { initializeServerApp } from 'firebase/app'
 
+import { firebaseConfig } from '@/data/firebaseConfig'
 import { getCookie } from 'cookies-next'
 import { getAuth } from 'firebase/auth'
 import { cookies } from 'next/headers'
-import { firebaseConfig } from './firebaseConfig'
-import { redirect } from 'next/dist/server/api-utils'
-
 
 export async function getAuthenticatedAppForUser() {
     const idToken = await getCookie('idToken', { cookies })
 
     if (!idToken) {
-        console.error("not logged in, redirecting to login page from serverApp.ts")
+        console.error('not logged in')
         return {
             redirect: {
                 destination: '../login/page.tsx',
@@ -21,7 +19,6 @@ export async function getAuthenticatedAppForUser() {
             },
         }
     }
-    
 
     console.log('idToken', idToken)
 
@@ -41,5 +38,4 @@ export async function getAuthenticatedAppForUser() {
         throw new Error('No user found')
     }
     return { firebaseServerApp, currentUser: auth.currentUser }
-
 }

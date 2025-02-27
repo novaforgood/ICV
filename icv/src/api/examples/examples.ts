@@ -1,8 +1,9 @@
 'use server'
 import 'server-only'
 
-import { getAuthenticatedAppForUser } from '@/lib/serverApp'
+import { db } from '@/data/firebase'
 import { Dog, DogSchema } from '@/types/example-types'
+import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import {
     addDoc,
     collection,

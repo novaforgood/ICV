@@ -1,6 +1,6 @@
 'use client'
+import { auth } from '@/data/firebase' // Adjust path as needed
 import { useUser } from '@/hooks/useUser'
-import { auth } from '@/lib/firebase' // Adjust path as needed
 import { signOut } from 'firebase/auth'
 
 const handleLogout = async () => {

@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { useDogFormStore } from '../../lib/useDogFormStore'
+import { useDogFormStore } from '../lib/useDogFormStore'
 
 interface Props {}
 
