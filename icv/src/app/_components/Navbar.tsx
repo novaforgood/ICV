@@ -1,11 +1,11 @@
 'use client'
 
-import clsx from 'clsx'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { cn } from '@/lib/utils'
+import Symbol from '../../components/Symbol'
 import LogoutButton from './LogoutButton'
-import Symbol from './Symbol'
 
 const Navbar = () => {
     return (
@@ -23,6 +23,10 @@ const Navbar = () => {
                 <NavLink href="/">
                     <Symbol symbol="home" />
                     Home
+                </NavLink>
+                <NavLink href="/intake">
+                    <Symbol symbol="add" />
+                    Intake
                 </NavLink>
                 <NavLink href="/calendar">
                     <Symbol symbol="calendar_month" />
@@ -61,7 +65,7 @@ const NavLink = (props: NavLinkProps) => {
     return (
         <Link
             href={props.href}
-            className={clsx(
+            className={cn(
                 'flex w-full flex-row items-center justify-start gap-2 px-6 py-4 text-center transition-colors',
                 {
                     'bg-background': isActive,
