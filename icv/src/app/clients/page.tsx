@@ -30,6 +30,8 @@ const ClientsPage = async () => {
 
     const clients = await getAllClients()
 
+    return null
+
     return <ClientsTable clients={clients} />
 }
 

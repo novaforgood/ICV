@@ -9,12 +9,12 @@ import Symbol from './Symbol'
 
 const Navbar = () => {
     return (
-        <div className="fixed left-0 top-0 flex h-full w-56 flex-col items-center gap-4 bg-foreground text-background">
-            <div className="flex w-full flex-col items-center justify-center">
+        <div className="fixed left-0 top-0 flex h-full w-64 flex-col items-center gap-4 bg-foreground text-background">
+            <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
                 <img
                     src="https://picsum.photos/seed/meow/200"
                     alt="logo"
-                    className="m-4 h-20 w-20 rounded-full"
+                    className="m-4 h-16 w-16 rounded-full"
                 />
                 <h1 className="text-xl font-bold">Akhilesh Basetty</h1>
                 <p>bakhilesh@gmail.com</p>
@@ -29,7 +29,7 @@ const Navbar = () => {
                     Calendar
                 </NavLink>
                 <NavLink href="/clients">
-                    <Symbol symbol="add" />
+                    <Symbol symbol="group" />
                     Clients
                 </NavLink>
                 <NavLink href="/database">
@@ -55,13 +55,14 @@ const NavLink = (props: NavLinkProps) => {
     console.log('pathname', pathname)
 
     // check if the current route starts with the href
-    const isActive = pathname.startsWith(props.href)
+    let isActive = pathname.startsWith(props.href)
+    if (props.href === '/') isActive = pathname === '/' // special case for home
 
     return (
         <Link
             href={props.href}
             className={clsx(
-                'flex w-full flex-row items-center justify-start gap-2 p-4 text-center transition-colors',
+                'flex w-full flex-row items-center justify-start gap-2 px-6 py-4 text-center transition-colors',
                 {
                     'bg-background': isActive,
                     'text-foreground': isActive,

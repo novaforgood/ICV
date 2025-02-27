@@ -26,7 +26,7 @@ export default function RootLayout({
             <body className={`${epilogFont.variable} antialiased`}>
                 <AuthSetup />
                 <Navbar />
-                <div className="pl-56">{children}</div>
+                <div className="pl-64">{children}</div>
             </body>
         </html>
     )
