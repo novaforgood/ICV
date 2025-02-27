@@ -1,5 +1,5 @@
 'use client'
-import { auth } from '@/lib/firebase'
+import { auth } from '@/data/firebase'
 import { deleteCookie, getCookie } from 'cookies-next'
 import { signOut } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
