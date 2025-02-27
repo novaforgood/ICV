@@ -48,10 +48,7 @@ export default function RootLayout({
 
     return (
         <html lang="en">
-            <body
-                // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-                className={`antialiased`}
-            >
+            <body className={`${epilogFont.variable} antialiased`}>
                 <AuthSetup />
                 <div className="fixed left-0 top-0 flex h-full w-56 flex-col items-center gap-4 bg-slate-200 p-4">
                     <div className="gap flex w-full flex-col items-center justify-center">

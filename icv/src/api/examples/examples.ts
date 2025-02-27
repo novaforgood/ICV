@@ -1,9 +1,8 @@
 'use server'
 import 'server-only'
 
-import { db } from '@/data/firebase'
-import { Dog, DogSchema } from '@/types/example-types'
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
+import { Dog, DogSchema } from '@/types/example-types'
 import {
     addDoc,
     collection,
@@ -17,7 +16,12 @@ import {
 export async function createDog(dog: Dog) {
     // verify that the user is logged in
 
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
+
     const db = getFirestore(firebaseServerApp)
 
     // verify that the dog object is valid
@@ -33,7 +37,11 @@ export async function createDog(dog: Dog) {
 }
 
 export async function getAllDogs() {
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
     const db = getFirestore(firebaseServerApp)
     const dogsCollection = collection(db, 'dogs')
     const dogsSnapshot = await getDocs(dogsCollection)
@@ -42,7 +50,11 @@ export async function getAllDogs() {
 }
 
 export async function getDogById(id: string) {
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
     const db = getFirestore(firebaseServerApp)
     const dogsCollection = collection(db, 'dogs')
     const dogDoc = await getDoc(doc(dogsCollection, id))
@@ -51,7 +63,11 @@ export async function getDogById(id: string) {
 }
 
 export async function updateDog(id: string, dog: Dog) {
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
     const db = getFirestore(firebaseServerApp)
 
     if (DogSchema.safeParse(dog).success === false) {
