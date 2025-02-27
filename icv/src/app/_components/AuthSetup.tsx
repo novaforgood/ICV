@@ -14,6 +14,7 @@ const AuthSetup = (props: Props) => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
                 console.log('User is signed in')
+                console.log("Welcome, ", auth.currentUser?.displayName)
                 const idToken = await getIdToken(user)
 
                 await setCookie('idToken', idToken, {

@@ -1,6 +1,5 @@
 'use client'
 
-import { createDog } from '@/api/examples/examples'
 import { Dog, DogSchema } from '@/types/example-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
@@ -12,7 +11,7 @@ interface Props {}
 
 const page = (props: Props) => {
     // get name and updateForm from the store
-    const { form: loadedForm, updateForm, clearForm } = useDogFormStore()
+    const { form: loadedForm, updateForm } = useDogFormStore()
 
     const {
         register,
@@ -20,8 +19,8 @@ const page = (props: Props) => {
         reset,
         watch,
         formState: { errors },
-    } = useForm<Dog>({
-        resolver: zodResolver(DogSchema.partial()),
+    } = useForm<Partial<Dog>>({
+        resolver: zodResolver(DogSchema),
         defaultValues: loadedForm,
     })
 
@@ -38,10 +37,10 @@ const page = (props: Props) => {
         return unsubscribe
     }, [watch, loadedForm])
 
-    const onSubmit = async (data: Dog) => {
-        const newDogId = await createDog(data)
-        clearForm()
-        router.push(`/examples/dog/${newDogId}`)
+    const onSubmit = (data: Partial<Dog>) => {
+        updateForm(data)
+        // go to the next page
+        router.push('/examples/makedog/notes')
     }
 
     return (
@@ -49,16 +48,20 @@ const page = (props: Props) => {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4 rounded-md bg-slate-200 p-4"
         >
-            <label className="meow" htmlFor="isGoodBoy">
-                Is Good Boy?
+            <label className="meow" htmlFor="age">
+                Age
             </label>
             <input
                 className="meow"
-                id="isGoodBoy"
-                type="checkbox"
-                {...register('isGoodBoy')}
+                id="age"
+                type="number"
+                {...register('age', { valueAsNumber: true })}
             />
-            <button type="submit">Submit</button>
+            <label className="meow" htmlFor="breed">
+                Breed
+            </label>
+            <input className="meow" id="breed" {...register('breed')} />
+            <button type="submit">Next</button>
         </form>
     )
 }

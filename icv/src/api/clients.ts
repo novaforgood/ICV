@@ -1,19 +1,6 @@
-import { db } from '@/data/firebase'
 import { Client } from '@/types/client-types'
-
-import {
-    addDoc,
-    collection,
-    getDocs,
-    query,
-    where,
-    deleteDoc,
-    doc,
-    getDoc,
-    runTransaction,
-    setDoc,
-    updateDoc
-} from 'firebase/firestore'
+import { collection, getDocs, getFirestore } from 'firebase/firestore'
+import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 
 export async function getAllClients(): Promise<Client[]> {
     const clientsCollection = collection(db, 'clients') // Ensure the collection name is correct
