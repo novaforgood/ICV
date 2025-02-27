@@ -1,7 +1,6 @@
 'use client'
 
-import { auth } from '../data/firebase'
-import type { Metadata } from 'next'
+import { auth } from '@/data/firebase'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { FaCalendar, FaChartBar, FaCog, FaHome } from 'react-icons/fa'
@@ -34,6 +33,7 @@ export default function RootLayout({
                 console.log('User display name:', user.displayName)
                 setEmail(user.email || '')
                 setPhotoURL(user.photoURL || '')
+                console.log('User photoURL:', user.photoURL)
             } else {
                 setName('')
                 setEmail('')
@@ -56,7 +56,7 @@ export default function RootLayout({
                 <div className="fixed left-0 top-0 flex h-full w-56 flex-col items-center gap-4 bg-slate-200 p-4">
                     <div className="gap flex w-full flex-col items-center justify-center">
                         <img
-                            src={photoURL}
+                            src={!photoURL ? '/cavediva.jpeg' : photoURL}
                             alt="logo"
                             className="m-4 h-20 w-20 rounded-full"
                         />
