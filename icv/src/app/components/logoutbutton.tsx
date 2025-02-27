@@ -34,7 +34,7 @@ export default function LogoutButton() {
 
     return (
         <button
-            className="flex w-full flex-row items-center justify-center gap-4 rounded-md p-4 text-center hover:bg-slate-300"
+            className="flex w-full flex-row items-center justify-center gap-4 rounded-md p-4 text-center"
             onClick={handleSignOut}
         >
             Logout

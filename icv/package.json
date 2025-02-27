@@ -11,10 +11,12 @@
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@tanstack/react-table": "^8.20.6",
+    "clsx": "^2.1.1",
     "cookies-next": "^5.1.0",
     "date-fns": "^4.1.0",
     "firebase": "^11.2.0",
     "firebase-admin": "^13.1.0",
+    "material-symbols": "^0.28.2",
     "next": "15.1.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
