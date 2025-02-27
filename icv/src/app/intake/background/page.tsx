@@ -83,20 +83,26 @@ const Page = (props: Props) => {
 
     return (
         <form
-            className="space-y-4"
-            style={{ padding: '50px' }}
+            className="space-y-[24px]"
+            style={{ padding: '24px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <div>
-                <label className="bold text-3xl">Intake Form</label>
+            <div className="space-y-[24px]">
+                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
+                    Intake Form
+                </label>
             </div>
-            <div className="space-y-8">
-                <div className="space-y-4">
-                    <label className="bold text-2xl">Background</label>
-                    {/* Demographics */}
-                    <div>
-                        <label>Ethnicity</label>
-                        <div className="flex flex-col space-y-2">
+            <div className="flex min-h-screen items-center justify-center">
+                <div className="min-w-[800px] space-y-[48px]">
+                    <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
+                        Background
+                    </label>
+                    <div className="space-y-[8px]">
+                        {/* Demographics */}
+                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                            Ethnicity
+                        </label>
+                        <div className="flex flex-col space-y-[8px]">
                             <CheckboxListWithOther
                                 options={ETHNICITY}
                                 selectedValues={selectedEthnicities}
@@ -109,80 +115,90 @@ const Page = (props: Props) => {
                             />
                         </div>
                     </div>
-                </div>
-                {/* Health Information */}
-                <div>
-                    <label>Mental Health History</label>
-                    <div>
-                        <textarea
-                            {...register('mentalHealth')}
-                            placeholder="Text"
-                            className="w-[80%] rounded border p-2"
-                        />
+                    {/* Health Information */}
+                    <div className="space-y-[8px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Mental Health History
+                        </label>
+                        <div>
+                            <textarea
+                                {...register('mentalHealth')}
+                                placeholder="Text"
+                                className="w-[80%] rounded border p-2"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label>Disabilities</label>
-                    <div>
-                        <textarea
-                            {...register('disabilities')}
-                            placeholder="Text"
-                            className="w-[80%] rounded border p-2"
-                        />
+                    <div className="space-y-[8px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Disabilities
+                        </label>
+                        <div>
+                            <textarea
+                                {...register('disabilities')}
+                                placeholder="Text"
+                                className="w-[80%] rounded border p-2"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label>Substance Abuse History</label>
-                    <div>
-                        <textarea
-                            {...register('substanceAbuse')}
-                            placeholder="Text"
-                            className="w-[80%] rounded border p-2"
-                        />
+                    <div className="space-y-[8px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Substance Abuse History
+                        </label>
+                        <div>
+                            <textarea
+                                {...register('substanceAbuse')}
+                                placeholder="Text"
+                                className="w-[80%] rounded border p-2"
+                            />
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <label>Sexual Offense History</label>
-                    <div>
-                        <textarea
-                            {...register('sexualOffenses')}
-                            placeholder="Text"
-                            className="w-[80%] rounded border p-2"
-                        />
+                    <div className="space-y-[8px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Sexual Offense History
+                        </label>
+                        <div>
+                            <textarea
+                                {...register('sexualOffenses')}
+                                placeholder="Text"
+                                className="w-[80%] rounded border p-2"
+                            />
+                        </div>
                     </div>
-                </div>
-                {/* Public Services */}
-                <div>
-                    <label>Public Services</label>
-                    <div className="flex flex-col space-y-2">
-                        <CheckboxListWithOther
-                            options={PUBLIC_SERVICES}
-                            selectedValues={selectedServices}
-                            onChange={(updatedServices) =>
-                                setValue('publicServices', updatedServices)
-                            }
-                            name="services"
-                            otherLabel="Other"
-                            otherPlaceholder="Specify other service"
-                        />
+                    {/* Public Services */}
+                    <div className="space-y-[8px]">
+                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                            Public Services
+                        </label>
+                        <div className="flex flex-col space-y-[8px]">
+                            <CheckboxListWithOther
+                                options={PUBLIC_SERVICES}
+                                selectedValues={selectedServices}
+                                onChange={(updatedServices) =>
+                                    setValue('publicServices', updatedServices)
+                                }
+                                name="services"
+                                otherLabel="Other"
+                                otherPlaceholder="Specify other service"
+                            />
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <div className="flex justify-between">
-                <button
-                    type="button"
-                    onClick={() => router.push('/intake')}
-                    className="mt-4 rounded bg-blue-500 p-2 text-white"
-                >
-                    Back
-                </button>
-                <button
-                    type="submit"
-                    className="mt-4 rounded bg-blue-500 p-2 text-white"
-                >
-                    Continue
-                </button>
+                    <div className="flex justify-between">
+                        <button
+                            type="button"
+                            onClick={() => router.push('/intake/family')}
+                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                        >
+                            Back
+                        </button>
+                        <button
+                            type="submit"
+                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                        >
+                            Continue
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
     )
