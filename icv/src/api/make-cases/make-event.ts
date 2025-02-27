@@ -103,8 +103,69 @@ export async function deleteEvent(eventId: string) {
     }
 }
 
+
+export async function updateEvent(id: string, updatedEvent: CaseEventType) {
+    const eventRef = doc(clientDb, 'events', id)
+    const contactTypeCountDocRef = doc(clientDb, 'events', 'contactTypeCount')
+
+    try {
+        // Run the transaction to ensure atomicity
+        await runTransaction(clientDb, async (transaction) => {
+            // Get the current event data to check the old contact type
+            const eventSnapshot = await transaction.get(eventRef)
+
+            if (!eventSnapshot.exists()) {
+                throw new Error('Event not found')
+            }
+
+            const oldEventData = eventSnapshot.data()
+            const oldContactType = oldEventData?.contactType
+
+            // Get the new contact type from the updated event
+            const newContactType = updatedEvent.contactType
+
+            // Only update the counts if the contact type has changed
+            if (oldContactType !== newContactType) {
+                // Decrement the old contact type count
+                if (oldContactType) {
+                    const docSnapshot = await transaction.get(contactTypeCountDocRef)
+                    if (docSnapshot.exists()) {
+                        const data = docSnapshot.data()
+                        const currentCount = data[oldContactType] || 0
+
+                        // Only decrement if there's a count > 0
+                        if (currentCount > 0) {
+                            transaction.update(contactTypeCountDocRef, {
+                                [oldContactType]: currentCount - 1
+                            })
+                        }
+                    }
+                }
+
+                // Increment the new contact type count
+                const docSnapshot = await transaction.get(contactTypeCountDocRef)
+                if (docSnapshot.exists()) {
+                    const data = docSnapshot.data()
+                    const currentCount = data[newContactType] || 0
+                    transaction.update(contactTypeCountDocRef, {
+                        [newContactType]: currentCount + 1
+                    })
+                }
+            }
+
+            // Update the event document in the 'events' collection
+            transaction.update(eventRef, updatedEvent)
+        })
+
+        console.log(`Event with ID ${id} successfully updated`)
+    } catch (error) {
+        console.error('Error updating event:', error)
+        throw new Error('Failed to update event')
+    }
+}
+
 export async function getEventsbyClientId(clientId: string) {
-    const eventsCollection = collection(db, 'events')
+    const eventsCollection = collection(clientDb, 'events')
     const q = query(eventsCollection, where('clientId', '==', clientId))
     const querySnapshot = await getDocs(q);
     

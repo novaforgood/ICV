@@ -1,5 +1,6 @@
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import { Client, ClientSchema } from '@/types/client-types'
+import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 
 import {
     addDoc,
@@ -32,7 +33,12 @@ export async function getAllClients() {
 
     const clientsCollection = collection(ssrdb, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
-    const clients = clientsSnapshot.docs.map((doc) => doc.data() as Client)
+
+    const clients = clientsSnapshot.docs.map((doc) => ({
+        id: doc.id, // Firebase document ID
+        ...doc.data(), // Other client fields
+    })) as Client[]
+
     return clients
 }
 
@@ -46,7 +52,9 @@ export async function getClientById(id: string) {
 
     const clientsCollection = collection(ssrdb, 'clients')
     const clientDoc = await getDoc(doc(clientsCollection, id))
+    console.log("C")
     const client = clientDoc.data() as Client
+    console.log("D")
     return client
 }
 
