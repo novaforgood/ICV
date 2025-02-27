@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useIntakeFormStore } from '../../lib/useIntakeFormStore'
+import { useIntakeFormStore } from '../../_lib/useIntakeFormStore'
 
 interface Props {}
 

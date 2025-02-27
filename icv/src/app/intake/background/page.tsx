@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useIntakeFormStore } from '../../lib/useIntakeFormStore'
+import { useIntakeFormStore } from '../../_lib/useIntakeFormStore'
 import { CheckboxListWithOther } from '../components/MakeOptions'
 
 interface Props {}

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 // import AuthSetup from './components/AuthSetup'
 import 'material-symbols/outlined.css'
 import { Epilogue } from 'next/font/google'
-import AuthSetup from './components/AuthSetup'
-import Navbar from './components/Navbar'
+import AuthSetup from './_components/AuthSetup'
+import Navbar from './_components/Navbar'
 import './globals.css'
 
 const epilogFont = Epilogue({

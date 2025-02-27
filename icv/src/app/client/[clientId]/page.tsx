@@ -2,7 +2,7 @@
 
 import { getClientById } from '@/api/make-cases/make-case'
 import { getEventsbyClientId } from '@/api/make-cases/make-event'
-import ClientEvents from '@/app/components/ClientEvents'
+import ClientEvents from '@/app/_components/ClientEvents'
 
 const page = async ({
     params,

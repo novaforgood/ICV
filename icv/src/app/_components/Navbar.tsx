@@ -9,7 +9,7 @@ import Symbol from './Symbol'
 
 const Navbar = () => {
     return (
-        <div className="fixed left-0 top-0 flex h-full w-56 flex-col items-center gap-4 bg-foreground">
+        <div className="fixed left-0 top-0 flex h-full w-56 flex-col items-center gap-4 bg-foreground text-background">
             <div className="flex w-full flex-col items-center justify-center">
                 <img
                     src="https://picsum.photos/seed/meow/200"

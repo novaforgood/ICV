@@ -3,7 +3,7 @@
 // 'use client' // Add this line to mark it as a client-side component
 
 import { getAllClients } from '@/api/clients'
-import ClientsTable from '@/app/components/ClientsTable'
+import ClientsTable from '@/app/_components/ClientsTable'
 
 const ClientsPage = async () => {
     // const [clients, setClients] = useState<Client[]>([])
