@@ -10,7 +10,6 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
-import Symbol from '../components/Symbol'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,27 +35,30 @@ export default function Home() {
                     </Select>
                 </div>
 
-                <div className="mt-8 flex flex-row gap-6">
-                    <Card className="flex-1">
-                        <h1 className="mb-8 text-4xl font-bold">1</h1>
+                {/* 2 column grid */}
+                <div className="mt-8 grid grid-cols-2 gap-6">
+                    <Card className="flex flex-1 flex-row justify-between">
+                        <h1 className="text-4xl font-bold">3</h1>
                         <p className="flex flex-row items-center gap-2">
-                            <Symbol symbol="group" />
-                            new clients
-                        </p>
-                    </Card>
-                    <Card className="flex-1">
-                        <h1 className="mb-8 text-4xl font-bold">2</h1>
-                        <p className="flex flex-row items-center gap-2">
-                            <Symbol symbol="soup_kitchen" />
-                            meal kits given
-                        </p>
-                    </Card>
-
-                    <Card className="flex-1">
-                        <h1 className="mb-8 text-4xl font-bold">3</h1>
-                        <p className="flex flex-row items-center gap-2">
-                            <Symbol symbol="calendar_month" />
                             check-ins
+                        </p>
+                    </Card>
+                    <Card className="flex flex-1 flex-row justify-between">
+                        <h1 className="text-4xl font-bold">1</h1>
+                        <p className="flex flex-row items-center gap-2">
+                            hot meals
+                        </p>
+                    </Card>
+                    <Card className="flex flex-1 flex-row justify-between">
+                        <h1 className="text-4xl font-bold">2</h1>
+                        <p className="flex flex-row items-center gap-2">
+                            hygiene kits
+                        </p>
+                    </Card>
+                    <Card className="flex flex-1 flex-row justify-between">
+                        <h1 className="text-4xl font-bold">1</h1>
+                        <p className="flex flex-row items-center gap-2">
+                            snack packs
                         </p>
                     </Card>
                 </div>
