@@ -2,7 +2,7 @@
 import 'server-only'
 
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
-import { NewClient, ClientIntakeSchema } from '@/types/client-types'
+import { ClientIntakeSchema, NewClient } from '@/types/client-types'
 // import 'server-only'
 
 import {
@@ -22,9 +22,13 @@ export async function createClient(client: NewClient) {
 
     //     throw new Error('Client object is invalid ' + JSON.stringify(results))
     // }
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
     const ssrdb = getFirestore(firebaseServerApp)
-    
+
     console.log('asdfsdafdsfafdsasdfclient', client)
     const clientsCollection = collection(ssrdb, 'clients')
     const newDoc = await addDoc(clientsCollection, client)
@@ -32,7 +36,11 @@ export async function createClient(client: NewClient) {
 }
 
 export async function getAllClients() {
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
     const ssrdb = getFirestore(firebaseServerApp)
 
     const clientsCollection = collection(ssrdb, 'clients')
@@ -46,7 +54,11 @@ export async function getClientById(id: string) {
     //     return
     //     throw new Error('Client ID is required')
     // }
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
     const ssrdb = getFirestore(firebaseServerApp)
 
     const clientsCollection = collection(ssrdb, 'clients')
@@ -56,7 +68,11 @@ export async function getClientById(id: string) {
 }
 
 export async function updateClient(id: string, client: Partial<NewClient>) {
-    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
     const ssrdb = getFirestore(firebaseServerApp)
 
     if (ClientIntakeSchema.safeParse(client).success === false) {

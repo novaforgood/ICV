@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { initializeServerApp } from 'firebase/app'
+import { FirebaseServerApp, initializeServerApp } from 'firebase/app'
 
 import { firebaseConfig } from '@/data/firebaseConfig'
 import { getCookie } from 'cookies-next'
@@ -22,7 +22,7 @@ export async function getAuthenticatedAppForUser() {
 
     console.log('idToken', idToken)
 
-    const firebaseServerApp = initializeServerApp(
+    const firebaseServerApp: FirebaseServerApp = initializeServerApp(
         firebaseConfig,
         idToken
             ? {
