@@ -16,14 +16,14 @@ import {
 } from 'firebase/firestore'
 
 export async function getAllEvents() {
-    const eventsCollection = collection(clientDb, 'events')
+    const eventsCollection = collection(db, 'events')
     const querySnapshot = await getDocs(eventsCollection)
     const events = querySnapshot.docs.map((doc) => doc.data() as CaseEventType)
     return events
 }
 
 export async function getEventsbyClientId(clientId: string) {
-    const eventsCollection = collection(clientDb, 'events')
+    const eventsCollection = collection(db, 'events')
     const q = query(eventsCollection, where('clientId', '==', clientId))
     const querySnapshot = await getDocs(q)
     const events = querySnapshot.docs.map((doc) => doc.data())

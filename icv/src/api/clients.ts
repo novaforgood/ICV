@@ -19,8 +19,11 @@ export async function getAllClients(): Promise<NewClient[]> {
 }
 
 export async function getClientById(id: string) {
-    const clientsCollection = collection(db, 'clients')
+    const { firebaseServerApp } = await getAuthenticatedAppForUser()
+    const ssrdb = getFirestore(firebaseServerApp)
+
+    const clientsCollection = collection(ssrdb, 'clients')
     const clientDoc = await getDoc(doc(clientsCollection, id))
-    const client = clientDoc.data() as Client
+    const client = clientDoc.data() as NewClient
     return client
 }

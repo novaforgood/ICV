@@ -1,6 +1,6 @@
 'use client'
 
-import { auth } from '@/lib/firebase'
+import { auth } from '@/data/firebase'
 import { setCookie } from 'cookies-next'
 import { getIdToken, onAuthStateChanged } from 'firebase/auth'
 import { useEffect } from 'react'
