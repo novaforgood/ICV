@@ -1,7 +1,7 @@
 'use server'
 
 import { getAllClients } from '@/api/clients'
-import ClientsTable from '../_components/ClientsTable'
+import ClientsTable from './_components/ClientsTable'
 
 interface Props {}
 

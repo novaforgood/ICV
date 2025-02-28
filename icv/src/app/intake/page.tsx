@@ -71,233 +71,272 @@ const Page = (props: Props) => {
 
     return (
         <form
-            className="space-y-4"
-            style={{ padding: '50px' }}
+            className="space-y-[24px]"
+            style={{ padding: '24px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <div>
-                <label className="bold text-3xl">Intake Form</label>
+            <div className="space-y-[24px]">
+                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
+                    Intake Form
+                </label>
             </div>
-            <div className="space-y-8">
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label>Program</label>
-                        <select
-                            {...register('program')}
-                            defaultValue="Select Program"
-                            className="w-full rounded border p-2"
-                        >
-                            <option value="Homeless Department">
-                                Homeless Department
-                            </option>
-                            <option value="School Outreach">
-                                School Outreach
-                            </option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div className="flex flex-col">
-                        {/* get all registered staff members in program */}
-                        <label>Assessing Staff</label>
-                        <select
-                            {...register('assessingStaff')}
-                            defaultValue="Select Staff"
-                            className="w-full rounded border p-2"
-                        >
-                            <option value="Staff 1">Staff 1</option>
-                            <option value="Staff 2">Staff 2</option>
-                            <option value="Staff 3">Staff 3</option>
-                        </select>
-                    </div>
-                </div>
-                <div className="space-y-4">
-                    <label className="bold text-2xl">Client Profile</label>
-                    <div className="grid grid-cols-2 gap-8">
-                        {/* Left Column */}
-                        <div className="space-y-4">
-                            <div className="flex flex-col">
-                                <label>First Name</label>
-                                <input
-                                    {...register('firstName')}
-                                    type="text"
-                                    placeholder="First Name"
-                                    className="w-full rounded border p-2"
-                                />
-                            </div>
-                            <div className="flex flex-col">
-                                <label>Date of Birth</label>
-                                <input
-                                    {...register('dateOfBirth')}
-                                    type="date"
-                                    placeholder="MM/DD/YYYY"
-                                    className="w-full rounded border p-2"
-                                />
-                            </div>
-                            {/* <div className="flex flex-col">
-                            <label>Age</label>
-                            <input
-                                {...register('age')}
-                                type="text"
-                                placeholder="Text"
+            <div className="flex min-h-screen items-center justify-center">
+                <div className="min-w-[800px] space-y-[60px]">
+                    <div className="grid grid-cols-2 gap-[12px]">
+                        <div>
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Program
+                            </label>
+                            <select
+                                {...register('program')}
+                                defaultValue="Select Program"
                                 className="w-full rounded border p-2"
-                            />
-                        </div> */}
+                            >
+                                <option value="Homeless Department">
+                                    Homeless Department
+                                </option>
+                                <option value="School Outreach">
+                                    School Outreach
+                                </option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
+                        <div>
+                            {/* get all registered staff members in program */}
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Assessing Staff
+                            </label>
+                            <select
+                                {...register('assessingStaff')}
+                                defaultValue="Select Staff"
+                                className="w-full rounded border p-2"
+                            >
+                                <option value="Staff 1">Staff 1</option>
+                                <option value="Staff 2">Staff 2</option>
+                                <option value="Staff 3">Staff 3</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
+                            Client Profile
+                        </label>
+                    </div>
+                    <div className="space-y-[24px]">
+                        <div className="space-y-[24px]">
+                            <div className="grid grid-cols-2 gap-[12px]">
+                                {/* Left Column */}
+                                <div className="space-y-[24px]">
+                                    <div className="flex flex-col space-y-[4px]">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            First Name
+                                        </label>
+                                        <input
+                                            {...register('firstName')}
+                                            type="text"
+                                            placeholder="First Name"
+                                            className="w-full rounded border p-2"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col space-y-[4px]">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            Date of Birth
+                                        </label>
+                                        <input
+                                            {...register('dateOfBirth')}
+                                            type="date"
+                                            placeholder="MM/DD/YYYY"
+                                            className="w-full rounded border p-2"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col space-y-[4px]">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            Gender
+                                        </label>
+                                        <select
+                                            {...register('gender')}
+                                            defaultValue="Select Gender"
+                                            className="w-full rounded border p-2"
+                                        >
+                                            <option value="Male">Male</option>
+                                            <option value="Female">
+                                                Female
+                                            </option>
+                                            <option value="Non-Binary">
+                                                Non-Binary
+                                            </option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-                        {/* Right Column */}
-                        <div className="space-y-4">
-                            <div className="flex flex-col">
-                                <label>Last Name</label>
+                                {/* Right Column */}
+                                <div className="space-y-[24px]">
+                                    <div className="flex flex-col space-y-[4px]">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            Last Name
+                                        </label>
+                                        <input
+                                            {...register('lastName')}
+                                            type="text"
+                                            placeholder="Last Name"
+                                            className="w-full rounded border p-2"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col space-y-[4px]">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            Client Number
+                                        </label>
+                                        <input
+                                            {...register('clientNumber')}
+                                            type="text"
+                                            placeholder="Text"
+                                            className="w-full rounded border p-2"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Contact Information */}
+                    <div className="space-y-[24px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Contact Information
+                        </label>
+                        <div className="grid grid-cols-2 gap-[12px]">
+                            <div>
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Email Address
+                                </label>
                                 <input
-                                    {...register('lastName')}
+                                    {...register('email')}
                                     type="text"
-                                    placeholder="Last Name"
+                                    placeholder="Text"
                                     className="w-full rounded border p-2"
                                 />
                             </div>
-                            <div className="flex flex-col">
-                                <label>Client Number</label>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Phone Number
+                                </label>
                                 <input
-                                    {...register('clientNumber')}
+                                    {...register('phoneNumber')}
                                     type="text"
                                     placeholder="Text"
                                     className="w-full rounded border p-2"
                                 />
                             </div>
                         </div>
+                    </div>
 
-                        <div className="flex flex-col">
-                            <label>Gender</label>
+                    {/* Housing Information */}
+                    <div className="space-y-[24px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Housing
+                        </label>
+
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Housing Type
+                            </label>
                             <select
-                                {...register('gender')}
-                                defaultValue="Select Gender"
-                                className="w-full rounded border p-2"
+                                {...register('housingType')}
+                                defaultValue="Select"
+                                className="w-[40%] rounded border p-2"
                             >
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Non-Binary">Non-Binary</option>
+                                <option value="Not Sure">Not Sure</option>
+                                <option value="What Design">What Design</option>
+                                <option value="Wants Here">Wants Here</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                    </div>
-                </div>
 
-                {/* Contact Information */}
-                <div className="space-y-4">
-                    <label className="bold text-2xl">Contact Information</label>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label>Email Address</label>
-                            <input
-                                {...register('email')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                At Risk
+                            </label>
+                            <div className="mt-2 flex flex-col gap-[4px]">
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        {...register('atRisk')}
+                                    />
+                                    Yes
+                                </label>
+                                <label className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={!watch('atRisk')}
+                                        onChange={() =>
+                                            setValue('atRisk', false)
+                                        }
+                                    />
+                                    No
+                                </label>
+                            </div>
                         </div>
-                        <div className="flex flex-col">
-                            <label>Phone Number</label>
-                            <input
-                                {...register('phoneNumber')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
+
+                        {/* Street Address & Apt No. (Same Row) */}
+                        <div className="grid grid-cols-2 gap-[12px]">
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Street Address
+                                </label>
+                                <input
+                                    {...register('streetAddress')}
+                                    type="text"
+                                    placeholder="Text"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Apt No.
+                                </label>
+                                <input
+                                    {...register('aptNumber')}
+                                    type="text"
+                                    placeholder="Text"
+                                    className="w-[30%] rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-[12px]">
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    City
+                                </label>
+                                <input
+                                    {...register('city')}
+                                    type="text"
+                                    placeholder="Text"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Postal/Zip Code
+                                </label>
+                                <input
+                                    {...register('zipCode')}
+                                    type="text"
+                                    placeholder="Zip Code"
+                                    className="w-[60%] rounded border p-2"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                {/* Housing Information */}
-                <div className="space-y-4">
-                    <label className="bold text-2xl">Housing</label>
-
-                    <div className="flex flex-col">
-                        <label>Housing Type</label>
-                        <select
-                            {...register('housingType')}
-                            defaultValue="Select"
-                            className="w-[40%] rounded border p-2"
+                    <div className="flex justify-end">
+                        <button
+                            type="submit"
+                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                         >
-                            <option value="Not Sure">Not Sure</option>
-                            <option value="What Design">What Design</option>
-                            <option value="Wants Here">Wants Here</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    <div className="flex flex-col">
-                        <label>At Risk</label>
-                        <div className="mt-2 flex flex-col gap-2">
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    {...register('atRisk')}
-                                />
-                                Yes
-                            </label>
-                            <label className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={!watch('atRisk')}
-                                    onChange={() => setValue('atRisk', false)}
-                                />
-                                No
-                            </label>
-                        </div>
-                    </div>
-
-                    {/* Street Address & Apt No. (Same Row) */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col">
-                            <label>Street Address</label>
-                            <input
-                                {...register('streetAddress')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div className="flex flex-col">
-                            <label>Apt No.</label>
-                            <input
-                                {...register('aptNumber')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-[30%] rounded border p-2"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col">
-                            <label>City</label>
-                            <input
-                                {...register('city')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                        <div className="flex flex-col">
-                            <label>Postal/Zip Code</label>
-                            <input
-                                {...register('zipCode')}
-                                type="text"
-                                placeholder="Zip Code"
-                                className="w-[60%] rounded border p-2"
-                            />
-                        </div>
+                            Continue
+                        </button>
                     </div>
                 </div>
-            </div>
-
-            <div className="flex justify-between">
-                <button
-                    type="submit"
-                    className="ml-auto mt-4 rounded bg-blue-500 p-2 text-white"
-                >
-                    Continue
-                </button>
             </div>
         </form>
     )

@@ -21,12 +21,8 @@ const page = () => {
         setError('')
 
         try {
-            if (loading) {
-                const userCreds = await createUserWithEmailAndPassword(
-                    auth,
-                    email,
-                    password,
-                )
+            if (loading) {//if user is creating an account
+                const userCreds = await createUserWithEmailAndPassword(auth, email, password)
                 const user = userCreds.user
 
                 //update display name in firebase auth
