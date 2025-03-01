@@ -3,18 +3,19 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
+import EventsSchedule from './_components/EventsSchedule'
 
 export const dynamic = 'force-dynamic'
 
 export default function Home() {
-    const router = useRouter()
+  const router = useRouter()
 
     return (
         <div className="flex flex-row gap-6 p-6 pt-12">
@@ -62,6 +63,7 @@ export default function Home() {
                         </p>
                     </Card>
                 </div>
+                <EventsSchedule  />
             </div>
             <div className="flex w-1/3 flex-col gap-6">
                 <Button
