@@ -6,9 +6,12 @@ import { useEffect, useState } from 'react'
 import { FaCalendar, FaChartBar, FaCog, FaHome } from 'react-icons/fa'
 import { FaPeopleGroup } from 'react-icons/fa6'
 // import AuthSetup from './components/AuthSetup'
-import AuthSetup from './components/AuthSetup'
-import LogoutButton from './components/logoutbutton'
+import AuthSetup from './_components/AuthSetup'
+import LogoutButton from './_components/LogoutButton'
 import './globals.css'
+
+// Define epilogFont variable
+const epilogFont = { variable: 'font-epilog' }
 
 
 
