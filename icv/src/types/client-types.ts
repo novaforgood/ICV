@@ -32,6 +32,7 @@ export const ClientIntakeSchema = z.object({
     // dateInfo
 
     // Client Profile
+    id: z.string().optional(),
     program: z.string().optional(),
     assessingStaff: z.string().optional(),
     firstName: z.string().optional(),
