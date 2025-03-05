@@ -144,26 +144,23 @@ const Page = (props: Props) => {
 
     return (
         <form
-            className="space-y-[24px]"
-            style={{ padding: '24px' }}
+            className="space-y-4"
+            style={{ padding: '50px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <div className="space-y-[24px]">
-                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
-                    Intake Form
-                </label>
+            <div>
+                <label className="bold text-3xl">Intake Form</label>
             </div>
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="min-w-[800px] space-y-[60px]">
-                    <div className="space-y-[60px]">
-                        <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
-                            Services
-                        </label>
-                        <div className="grid grid-cols-2 gap-[12px]">
+            <div className="space-y-8">
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Services</label>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* COLUMN 1  */}
+                        <div className="space-y-10">
+                            {/* Mentoring */}
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Mentoring
-                                </label>
+                                <label>Mentoring</label>
                                 <CheckboxList
                                     options={MENTORING}
                                     selectedValues={selectedMentoring}
@@ -173,25 +170,9 @@ const Page = (props: Props) => {
                                     name="mentoring"
                                 />
                             </div>
+                            {/* Housing Assistance */}
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Personal Development
-                                </label>
-                                <CheckboxList
-                                    options={PERSONAL_DEV}
-                                    selectedValues={selectedPersonal}
-                                    onChange={(updatedPersonal) =>
-                                        setValue('personalDev', updatedPersonal)
-                                    }
-                                    name="redirection"
-                                />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-[12px]">
-                            <div>
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Housing Assistance
-                                </label>
+                                <label>Housing Assistance</label>
                                 <CheckboxList
                                     options={HOUSING}
                                     selectedValues={selectedHousing}
@@ -201,10 +182,49 @@ const Page = (props: Props) => {
                                     name="housing"
                                 />
                             </div>
+                            {/* Education & Training */}
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Redirection Program
-                                </label>
+                                <label>Education & Training Support</label>
+                                <CheckboxList
+                                    options={EDUTRAIN}
+                                    selectedValues={selectedEducation}
+                                    onChange={(updatedEducation) =>
+                                        setValue('education', updatedEducation)
+                                    }
+                                    name="education"
+                                />
+                            </div>
+                            {/* Referrals/Linkages */}
+                            <div>
+                                <label>Referrals/Linkages Services</label>
+                                <CheckboxList
+                                    options={REFERRAL}
+                                    selectedValues={selectedReferral}
+                                    onChange={(updatedReferral) =>
+                                        setValue('referral', updatedReferral)
+                                    }
+                                    name="referral"
+                                />
+                            </div>
+                        </div>
+
+                        {/* COLUMN 2 */}
+                        <div className="space-y-10">
+                            {/* Personal Development */}
+                            <div>
+                                <label>Personal Development</label>
+                                <CheckboxList
+                                    options={PERSONAL_DEV}
+                                    selectedValues={selectedPersonal}
+                                    onChange={(updatedPersonal) =>
+                                        setValue('personalDev', updatedPersonal)
+                                    }
+                                    name="redirection"
+                                />
+                            </div>
+                            {/* Redirection */}
+                            <div>
+                                <label>Redirection Program</label>
                                 <CheckboxList
                                     options={REDIRECTION}
                                     selectedValues={selectedRedirection}
@@ -217,25 +237,9 @@ const Page = (props: Props) => {
                                     name="redirection"
                                 />
                             </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-[12px]">
+                            {/* Health & Wellness */}
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Education & Training Support
-                                </label>
-                                <CheckboxList
-                                    options={EDUTRAIN}
-                                    selectedValues={selectedEducation}
-                                    onChange={(updatedEducation) =>
-                                        setValue('education', updatedEducation)
-                                    }
-                                    name="education"
-                                />
-                            </div>
-                            <div>
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Health & Wellness Support
-                                </label>
+                                <label>Health & Wellness Support</label>
                                 <CheckboxList
                                     options={HEALTH_WELLNESS}
                                     selectedValues={selectedHealth}
@@ -249,53 +253,40 @@ const Page = (props: Props) => {
                                 />
                             </div>
                         </div>
-                        <div>
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Referrals/Linkages Services
-                            </label>
-                            <CheckboxList
-                                options={REFERRAL}
-                                selectedValues={selectedReferral}
-                                onChange={(updatedReferral) =>
-                                    setValue('referral', updatedReferral)
-                                }
-                                name="referral"
-                            />
-                        </div>
+                    </div>
+                </div>
 
-                        {/* ADDITIONAL FEATURES */}
-                        {/* Notes */}
+                {/* ADDITIONAL FEATURES */}
+                <div className="space-y-4">
+                    <label className="bold text-2xl">Additional</label>
+                    {/* Notes */}
+                    <div>
+                        <label>Additional Notes</label>
                         <div>
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Additional Notes
-                            </label>
-                            <div>
-                                <textarea
-                                    {...register('notes')}
-                                    placeholder="Text"
-                                    className="w-[80%] rounded border p-2"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex justify-between">
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    router.push('/intake/background')
-                                }
-                                className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
-                            >
-                                Back
-                            </button>
-                            <button
-                                type="submit"
-                                className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
-                            >
-                                Continue
-                            </button>
+                            <textarea
+                                {...register('notes')}
+                                placeholder="Text"
+                                className="w-[80%] rounded border p-2"
+                            />
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div className="flex justify-between">
+                <button
+                    type="button"
+                    onClick={() => router.push('/intake/family')}
+                    className="mt-4 rounded bg-blue-500 p-2 text-white"
+                >
+                    Back
+                </button>
+                <button
+                    type="submit"
+                    className="mt-4 rounded bg-blue-500 p-2 text-white"
+                >
+                    Continue
+                </button>
             </div>
         </form>
     )
