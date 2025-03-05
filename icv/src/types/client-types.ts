@@ -121,6 +121,14 @@ export const ClientIntakeSchema = z.object({
     clientBC: z.string().optional(),
     otherFiles: z.string().optional(),
 
+    clientImageName: z.string().optional(),
+    clientIDName: z.string().optional(),
+    clientPassportName: z.string().optional(),
+    clientMedName: z.string().optional(),
+    clientSSNName: z.string().optional(),
+    clientBCName: z.string().optional(),
+    otherFilesName: z.string().optional(),
+
 }) 
 
 export const BackgroundSchema = ClientIntakeSchema.pick({
@@ -146,6 +154,13 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     clientSSN: true,
     clientBC: true,
     otherFiles: true,
+    clientImageName: true,
+    clientIDName: true,
+    clientPassportName: true,
+    clientMedName: true,
+    clientSSNName: true,
+    clientBCName: true,
+    otherFilesName: true,
     notes: true,
 })
 
