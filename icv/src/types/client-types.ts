@@ -114,20 +114,20 @@ export const ClientIntakeSchema = z.object({
     notes: z.string().optional(),
     
     // Image Upload
-    clientImage: z.string().optional(),
-    clientPassport: z.string().optional(),
-    clientMed: z.string().optional(),
-    clientSSN: z.string().optional(),
-    clientBC: z.string().optional(),
-    otherFiles: z.string().optional(),
+    clientImage: z.array(z.string().optional(),).optional(),
+    clientPassport: z.array(z.string().optional(),).optional(),
+    clientMed: z.array(z.string().optional(),).optional(),
+    clientSSN: z.array(z.string().optional(),).optional(),
+    clientBC: z.array(z.string().optional(),).optional(),
+    otherFiles: z.array(z.string().optional(),).optional(),
 
-    clientImageName: z.string().optional(),
-    clientIDName: z.string().optional(),
-    clientPassportName: z.string().optional(),
-    clientMedName: z.string().optional(),
-    clientSSNName: z.string().optional(),
-    clientBCName: z.string().optional(),
-    otherFilesName: z.string().optional(),
+    clientImageName: z.array(z.string().optional(),).optional(),
+    clientIDName: z.array(z.string().optional(),).optional(),
+    clientPassportName: z.array(z.string().optional(),).optional(),
+    clientMedName: z.array(z.string().optional(),).optional(),
+    clientSSNName: z.array(z.string().optional(),).optional(),
+    clientBCName: z.array(z.string().optional(),).optional(),
+    otherFilesName: z.array(z.string().optional(),).optional(),
 
 }) 
 

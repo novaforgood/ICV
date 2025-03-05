@@ -2,14 +2,19 @@ import { useRef } from 'react'
 
 interface FileUploadProps {
     label: string
-    fileName?: string
+    fileName?: string[]
     handleFileChange: (
         e: React.ChangeEvent<HTMLInputElement>,
         field: string,
         nameField: string,
     ) => void
     handleAddFile: (ref: React.RefObject<HTMLInputElement>) => void
-    deleteFile: (field: string, nameField: string) => void
+    deleteFile: (
+        index: number,
+        fileName: string,
+        fileType: string,
+        nameType: string,
+    ) => void
     field: string
     nameField: string
     buttonText: string
@@ -17,7 +22,7 @@ interface FileUploadProps {
 
 const FileUpload: React.FC<FileUploadProps> = ({
     label,
-    fileName,
+    fileName = [],
     handleFileChange,
     handleAddFile,
     deleteFile,
@@ -32,15 +37,21 @@ const FileUpload: React.FC<FileUploadProps> = ({
             <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
                 {label}
             </label>
-            {fileName && (
-                <div className="flex justify-between">
-                    <p>{fileName}</p>
-                    <button
-                        type="button"
-                        onClick={() => deleteFile(field, nameField)}
-                    >
-                        Delete
-                    </button>
+            {fileName && Array.isArray(fileName) && fileName.length > 0 && (
+                <div className="flex flex-col space-y-2">
+                    {fileName.map((name, index) => (
+                        <div key={index} className="flex justify-between">
+                            <p>{name}</p>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    deleteFile(index, name, field, nameField)
+                                }
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    ))}
                 </div>
             )}
             <div className="space-y-[24px]">
@@ -54,6 +65,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 <input
                     ref={fileInputRef}
                     type="file"
+                    multiple
                     onChange={(e) => handleFileChange(e, field, nameField)}
                     className="hidden" // Hide the actual file input
                 />

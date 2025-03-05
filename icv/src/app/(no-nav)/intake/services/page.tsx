@@ -105,39 +105,51 @@ const Page = (props: Props) => {
     ) => {
         console.log('in image func!')
         // was a file selected and is it in the input field?
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0]
-            const fileName = file.name
+        if (e.target.files && e.target.files.length > 0) {
+            const files = Array.from(e.target.files)
+            const fileNames = files.map((file) => file.name)
 
-            updateForm({ [name]: fileName })
+            updateForm({ [name]: fileNames })
 
-            // get the old image URL if it exists (from zustand)
-            const oldImageUrl = loadedForm?.[field as keyof typeof loadedForm]
+            const oldImageUrls = loadedForm?.[field as keyof typeof loadedForm]
 
-            // if there's an old image, delete it from Firebase Storage
-            if (oldImageUrl) {
-                const oldImageRef = ref(storage, oldImageUrl as string) // ref to the old image
-                try {
-                    await deleteObject(oldImageRef)
-                    console.log('Old image deleted successfully')
-                } catch (error) {
-                    console.error('Error deleting old image:', error)
-                }
+            if (oldImageUrls && Array.isArray(oldImageUrls)) {
+                // Delete all old images from Firebase Storage
+                await Promise.all(
+                    oldImageUrls.map(async (url) => {
+                        const oldImageRef = ref(storage, url as string)
+                        try {
+                            await deleteObject(oldImageRef)
+                            console.log(`Deleted old image: ${url}`)
+                        } catch (error) {
+                            console.error(
+                                `Error deleting old image ${url}:`,
+                                error,
+                            )
+                        }
+                    }),
+                )
             }
-
             // uploading new image
-            const storageRef = ref(storage, `${file.name}`)
-            try {
-                const snapshot = await uploadBytes(storageRef, file)
-                // retrieve download URL from firebase storage
-                const downloadURL = await getDownloadURL(snapshot.ref)
+            const uploadPromises = files.map(async (file) => {
+                const storageRef = ref(storage, file.name)
+                try {
+                    const snapshot = await uploadBytes(storageRef, file)
+                    const downloadURL = await getDownloadURL(snapshot.ref)
+                    console.log(`Uploaded file URL: ${downloadURL}`)
+                    return downloadURL
+                } catch (error) {
+                    console.error(`Error uploading file ${file.name}:`, error)
+                    return null
+                }
+            })
 
-                console.log('Uploaded file URL:', downloadURL)
+            const downloadURLs = (await Promise.all(uploadPromises)).filter(
+                Boolean,
+            ) // Remove null values
 
-                // stores image URL in zustand for specified field
-                updateForm({ [field]: downloadURL })
-            } catch (error) {
-                console.error('Error uploading file:', error)
+            if (downloadURLs.length > 0) {
+                updateForm({ [field]: downloadURLs }) // Store new image URLs in Zustand
             }
         }
     }
@@ -185,26 +197,57 @@ const Page = (props: Props) => {
         }
     }
 
-    const deleteFile = async (fieldName: string, fileName: string) => {
-        // Get the old image URL (from Zustand or loadedForm)
-        const oldImageUrl = loadedForm?.[fieldName as keyof typeof loadedForm] // from loadedForm
-        // Or if you're using Zustand
-        // const oldImageUrl = useFileStore.getState().clientImageURL
+    const deleteFile = async (
+        index: number,
+        fileName: string,
+        field: string,
+        nameField: string,
+    ) => {
+        const fileIndex = (
+            loadedForm[nameField as keyof typeof loadedForm] as string[]
+        ).indexOf(fileName)
+        if (fileIndex === -1) {
+            console.log('File name not found.')
+            return
+        }
 
-        if (oldImageUrl) {
-            const oldImageRef = ref(storage, oldImageUrl as string) // Create a reference to the file
+        // Get the corresponding file URL from fileURLs using the index
+        const fileURL = (
+            loadedForm[field as keyof typeof loadedForm] as string[]
+        )[fileIndex]
+        if (!fileURL) {
+            console.log('No URL found for the given file.')
+            return
+        }
+        const fileRef = ref(storage, fileURL)
 
-            try {
-                await deleteObject(oldImageRef) // Delete the file
-                console.log('Old image deleted successfully')
+        try {
+            console.log(fileURL)
+            console.log(fileName)
+            // Delete the file from Firebase Storage
+            await deleteObject(fileRef)
+            console.log(`File ${fileName} deleted successfully from storage.`)
 
-                updateForm({ [fieldName]: null })
-                updateForm({ [fileName]: null })
-            } catch (error) {
-                console.error('Error deleting old image:', error)
+            const fileIndex = (
+                loadedForm[nameField as keyof typeof loadedForm] as string[]
+            ).indexOf(fileName)
+            if (fileIndex === -1) {
+                console.log('File name not found.')
+                return
             }
-        } else {
-            console.log('No old image URL found to delete')
+
+            const updatedFileURLs = (
+                loadedForm[field as keyof typeof loadedForm] as string[]
+            ).filter((_, index) => index !== fileIndex)
+            const updatedFileNames = (
+                loadedForm[nameField as keyof typeof loadedForm] as string[]
+            ).filter((_, index) => index !== fileIndex)
+
+            // Update the Zustand store with the new arrays
+            updateForm({ [field]: updatedFileURLs })
+            updateForm({ [nameField]: updatedFileNames })
+        } catch (error) {
+            console.error('Error deleting file:', error)
         }
     }
     const onSubmit = (data: ServiceType) => {
@@ -348,7 +391,10 @@ const Page = (props: Props) => {
                             {/* Image */}
                             <FileUpload
                                 label="Image"
-                                fileName={loadedForm.clientImageName}
+                                fileName={loadedForm.clientImageName?.filter(
+                                    (name): name is string =>
+                                        name !== undefined,
+                                )}
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
@@ -359,7 +405,10 @@ const Page = (props: Props) => {
                             {/* ID */}
                             <FileUpload
                                 label="ID"
-                                fileName={loadedForm.clientIDName}
+                                fileName={loadedForm.clientIDName?.filter(
+                                    (name): name is string =>
+                                        name !== undefined,
+                                )}
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
@@ -370,7 +419,10 @@ const Page = (props: Props) => {
                             {/* Passport */}
                             <FileUpload
                                 label="Passport"
-                                fileName={loadedForm.clientPassportName}
+                                fileName={loadedForm.clientPassportName?.filter(
+                                    (name): name is string =>
+                                        name !== undefined,
+                                )}
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
@@ -381,7 +433,10 @@ const Page = (props: Props) => {
                             {/* MediCal */}
                             <FileUpload
                                 label="MediCal"
-                                fileName={loadedForm.clientMedName}
+                                fileName={loadedForm.clientMedName?.filter(
+                                    (name): name is string =>
+                                        name !== undefined,
+                                )}
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
@@ -393,7 +448,10 @@ const Page = (props: Props) => {
                             {/* SSN */}
                             <FileUpload
                                 label="SSN"
-                                fileName={loadedForm.clientSSNName}
+                                fileName={loadedForm.clientSSNName?.filter(
+                                    (name): name is string =>
+                                        name !== undefined,
+                                )}
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
@@ -404,7 +462,10 @@ const Page = (props: Props) => {
                             {/* Birth Certificate */}
                             <FileUpload
                                 label="Birth Certificate"
-                                fileName={loadedForm.clientBCName}
+                                fileName={loadedForm.clientBCName?.filter(
+                                    (name): name is string =>
+                                        name !== undefined,
+                                )}
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
@@ -415,7 +476,10 @@ const Page = (props: Props) => {
                             {/* Other Files */}
                             <FileUpload
                                 label="Other Files"
-                                fileName={loadedForm.otherFilesName}
+                                fileName={loadedForm.otherFilesName?.filter(
+                                    (name): name is string =>
+                                        name !== undefined,
+                                )}
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
