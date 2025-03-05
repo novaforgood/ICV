@@ -115,7 +115,11 @@ export const ClientIntakeSchema = z.object({
     
     // Image Upload
     clientImage: z.string().optional(),
-
+    clientPassport: z.string().optional(),
+    clientMed: z.string().optional(),
+    clientSSN: z.string().optional(),
+    clientBC: z.string().optional(),
+    otherFiles: z.string().optional(),
 
 }) 
 
@@ -137,6 +141,11 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     healthWellness: true,
     referral: true,
     clientImage: true,
+    clientPassport: true,
+    clientMed: true,
+    clientSSN: true,
+    clientBC: true,
+    otherFiles: true,
     notes: true,
 })
 

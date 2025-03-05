@@ -328,6 +328,102 @@ const Page = (props: Props) => {
                             </div>
                         </div>
 
+                        {/* ID */}
+                        <div>
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                ID
+                            </label>
+                            <div>
+                                <input
+                                    type="file"
+                                    onChange={(e) =>
+                                        handleImageChange(e, 'clientID')
+                                    }
+                                    className="w-[80%] rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Passport */}
+                        <div>
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Passport
+                            </label>
+                            <div>
+                                <input
+                                    type="file"
+                                    onChange={(e) =>
+                                        handleImageChange(e, 'clientPassport')
+                                    }
+                                    className="w-[80%] rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Medical */}
+                        <div>
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                MediCal
+                            </label>
+                            <div>
+                                <input
+                                    type="file"
+                                    onChange={(e) =>
+                                        handleImageChange(e, 'clientMed')
+                                    }
+                                    className="w-[80%] rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
+                        {/* SSN */}
+                        <div>
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                SSN
+                            </label>
+                            <div>
+                                <input
+                                    type="file"
+                                    onChange={(e) =>
+                                        handleImageChange(e, 'clientSSN')
+                                    }
+                                    className="w-[80%] rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Birth Certificate */}
+                        <div>
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Birth Certificate
+                            </label>
+                            <div>
+                                <input
+                                    type="file"
+                                    onChange={(e) =>
+                                        handleImageChange(e, 'clientBC')
+                                    }
+                                    className="w-[80%] rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Other Files */}
+                        <div>
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Other
+                            </label>
+                            <div>
+                                <input
+                                    type="file"
+                                    onChange={(e) =>
+                                        handleImageChange(e, 'otherFiles')
+                                    }
+                                    className="w-[80%] rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
                         {/* Notes */}
                         <div>
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
