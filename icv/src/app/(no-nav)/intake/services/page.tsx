@@ -14,6 +14,7 @@ import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../_lib/useIntakeFormStore'
+import FileUpload from '../components/FileUpload'
 import { CheckboxList } from '../components/MakeOptions'
 
 interface Props {}
@@ -222,14 +223,6 @@ const Page = (props: Props) => {
     const selectedRedirection = watch('redirection') ?? []
     const selectedHealth = watch('healthWellness') ?? []
 
-    const fileInputRefImage = useRef<HTMLInputElement>(null!)
-    const fileInputRefID = useRef<HTMLInputElement>(null!)
-    const fileInputRefP = useRef<HTMLInputElement>(null!)
-    const fileInputRefM = useRef<HTMLInputElement>(null!)
-    const fileInputRefS = useRef<HTMLInputElement>(null!)
-    const fileInputRefBC = useRef<HTMLInputElement>(null!)
-    const fileInputRefO = useRef<HTMLInputElement>(null!)
-
     return (
         <form
             className="space-y-[24px]"
@@ -353,326 +346,83 @@ const Page = (props: Props) => {
                         {/* ADDITIONAL FEATURES */}
                         <div className="space-y-[32px]">
                             {/* Image */}
-                            <div className="space-y-[24px]">
-                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                    Image
-                                </label>
-                                <div className="space-y-[24px]">
-                                    {loadedForm.clientImageName && (
-                                        <div className="flex justify-between">
-                                            <p>
-                                                {' '}
-                                                {
-                                                    loadedForm.clientImageName
-                                                }{' '}
-                                            </p>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    deleteFile(
-                                                        'clientImage',
-                                                        'clientImageName',
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    )}
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleAddFile(fileInputRefImage)
-                                        }
-                                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
-                                    >
-                                        + Add Image
-                                    </button>
-                                    <input
-                                        ref={fileInputRefImage}
-                                        type="file"
-                                        onChange={(e) =>
-                                            handleImageChange(
-                                                e,
-                                                'clientImage',
-                                                'clientImageName',
-                                            )
-                                        }
-                                        className="hidden" // Hide the actual file input
-                                    />
-                                </div>
-                            </div>
+                            <FileUpload
+                                label="Image"
+                                fileName={loadedForm.clientImageName}
+                                handleFileChange={handleImageChange}
+                                handleAddFile={handleAddFile}
+                                deleteFile={deleteFile}
+                                field="clientImage"
+                                nameField="clientImageName"
+                                buttonText="Add image"
+                            />
                             {/* ID */}
-                            <div className="space-y-[24px]">
-                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                    ID
-                                </label>
-                                {loadedForm.clientIDName && (
-                                    <div className="flex justify-between">
-                                        <p> {loadedForm.clientIDName} </p>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                deleteFile(
-                                                    'clientID',
-                                                    'clientIDName',
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="space-y-[24px]">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleAddFile(fileInputRefID)
-                                        }
-                                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
-                                    >
-                                        + Add ID
-                                    </button>
-                                    <input
-                                        ref={fileInputRefID}
-                                        type="file"
-                                        onChange={(e) =>
-                                            handleImageChange(
-                                                e,
-                                                'clientID',
-                                                'clientIDName',
-                                            )
-                                        }
-                                        className="hidden"
-                                    />
-                                </div>
-                            </div>
+                            <FileUpload
+                                label="ID"
+                                fileName={loadedForm.clientIDName}
+                                handleFileChange={handleImageChange}
+                                handleAddFile={handleAddFile}
+                                deleteFile={deleteFile}
+                                field="clientID"
+                                nameField="clientIDName"
+                                buttonText="Add ID"
+                            />
                             {/* Passport */}
-                            <div className="space-y-[24px]">
-                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                    Passport
-                                </label>
-                                {loadedForm.clientPassportName && (
-                                    <div className="flex justify-between">
-                                        <p> {loadedForm.clientPassportName} </p>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                deleteFile(
-                                                    'clientPassport',
-                                                    'clientPassportName',
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="space-y-[24px]">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleAddFile(fileInputRefP)
-                                        }
-                                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
-                                    >
-                                        + passport
-                                    </button>
-                                    <input
-                                        ref={fileInputRefP}
-                                        type="file"
-                                        onChange={(e) =>
-                                            handleImageChange(
-                                                e,
-                                                'clientPassport',
-                                                'clientPassportName',
-                                            )
-                                        }
-                                        className="hidden"
-                                    />
-                                </div>
-                            </div>
+                            <FileUpload
+                                label="Passport"
+                                fileName={loadedForm.clientPassportName}
+                                handleFileChange={handleImageChange}
+                                handleAddFile={handleAddFile}
+                                deleteFile={deleteFile}
+                                field="clientPassport"
+                                nameField="clientPassportName"
+                                buttonText="Add passport"
+                            />
                             {/* MediCal */}
-                            <div className="space-y-[24px]">
-                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                    MediCal
-                                </label>
-                                {loadedForm.clientMedName && (
-                                    <div className="flex justify-between">
-                                        <p> {loadedForm.clientMedName} </p>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                deleteFile(
-                                                    'clientMed',
-                                                    'clientMedName',
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="space-y-[24px]">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleAddFile(fileInputRefM)
-                                        }
-                                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
-                                    >
-                                        + Add MediCal
-                                    </button>
-                                    <input
-                                        ref={fileInputRefM}
-                                        type="file"
-                                        onChange={(e) =>
-                                            handleImageChange(
-                                                e,
-                                                'clientMed',
-                                                'clientMedName',
-                                            )
-                                        }
-                                        className="hidden" // Hide the actual file input
-                                    />
-                                </div>
-                            </div>
+                            <FileUpload
+                                label="MediCal"
+                                fileName={loadedForm.clientMedName}
+                                handleFileChange={handleImageChange}
+                                handleAddFile={handleAddFile}
+                                deleteFile={deleteFile}
+                                field="clientMed"
+                                nameField="clientMedName"
+                                buttonText="Add MediCal"
+                            />
 
                             {/* SSN */}
-                            <div className="space-y-[24px]">
-                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                    SSN
-                                </label>
-                                {loadedForm.clientSSNName && (
-                                    <div className="flex justify-between">
-                                        <p> {loadedForm.clientSSNName} </p>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                deleteFile(
-                                                    'clientSSN',
-                                                    'clientSSNName',
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="space-y-[24px]">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleAddFile(fileInputRefS)
-                                        }
-                                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
-                                    >
-                                        + Add SSN
-                                    </button>
-                                    <input
-                                        ref={fileInputRefS}
-                                        type="file"
-                                        onChange={(e) =>
-                                            handleImageChange(
-                                                e,
-                                                'clientSSN',
-                                                'clientSSNName',
-                                            )
-                                        }
-                                        className="hidden"
-                                    />
-                                </div>
-                            </div>
+                            <FileUpload
+                                label="SSN"
+                                fileName={loadedForm.clientSSNName}
+                                handleFileChange={handleImageChange}
+                                handleAddFile={handleAddFile}
+                                deleteFile={deleteFile}
+                                field="clientSSN"
+                                nameField="clientSSNName"
+                                buttonText="Add SSN"
+                            />
                             {/* Birth Certificate */}
-                            <div className="space-y-[24px]">
-                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                    Birth Certificate
-                                </label>
-                                {loadedForm.clientBCName && (
-                                    <div className="flex justify-between">
-                                        <p> {loadedForm.clientBCName} </p>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                deleteFile(
-                                                    'clientBC',
-                                                    'clientBCName',
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="space-y-[24px]">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleAddFile(fileInputRefBC)
-                                        }
-                                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
-                                    >
-                                        + Add birth certificate
-                                    </button>
-                                    <input
-                                        ref={fileInputRefBC}
-                                        type="file"
-                                        onChange={(e) =>
-                                            handleImageChange(
-                                                e,
-                                                'clientBC',
-                                                'clientBCName',
-                                            )
-                                        }
-                                        className="hidden"
-                                    />
-                                </div>
-                            </div>
+                            <FileUpload
+                                label="Birth Certificate"
+                                fileName={loadedForm.clientBCName}
+                                handleFileChange={handleImageChange}
+                                handleAddFile={handleAddFile}
+                                deleteFile={deleteFile}
+                                field="clientBC"
+                                nameField="clientBCName"
+                                buttonText="Add birth certificate"
+                            />
                             {/* Other Files */}
-                            <div className="space-y-[24px]">
-                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                    Other
-                                </label>
-                                {loadedForm.otherFilesName && (
-                                    <div className="flex justify-between">
-                                        <p> {loadedForm.otherFilesName} </p>
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                deleteFile(
-                                                    'otherFiles',
-                                                    'otherFilesName',
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
-                                <div className="space-y-[24px]">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleAddFile(fileInputRefO)
-                                        }
-                                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
-                                    >
-                                        + Add other
-                                    </button>
-                                    <input
-                                        ref={fileInputRefO}
-                                        type="file"
-                                        onChange={(e) =>
-                                            handleImageChange(
-                                                e,
-                                                'otherFiles',
-                                                'otherFilesName',
-                                            )
-                                        }
-                                        className="hidden"
-                                    />
-                                </div>
-                            </div>
+                            <FileUpload
+                                label="Other Files"
+                                fileName={loadedForm.otherFilesName}
+                                handleFileChange={handleImageChange}
+                                handleAddFile={handleAddFile}
+                                deleteFile={deleteFile}
+                                field="otherFiles"
+                                nameField="otherFilesName"
+                                buttonText="Add other files"
+                            />
                         </div>
                         {/* Notes */}
                         <div>
