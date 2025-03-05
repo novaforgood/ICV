@@ -1,9 +1,16 @@
 'use client'
 
+import { storage } from '@/data/firebase'
 import { ServicesSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+    deleteObject,
+    getDownloadURL,
+    ref,
+    uploadBytes,
+} from 'firebase/storage'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../_lib/useIntakeFormStore'
@@ -72,6 +79,7 @@ const HEALTH_WELLNESS = [
 
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
+    const [image, setImage] = useState<File | null>(null)
     type ServiceType = TypeOf<typeof ServicesSchema>
 
     const {
@@ -88,6 +96,46 @@ const Page = (props: Props) => {
     })
 
     const router = useRouter()
+
+    const handleImageChange = async (
+        e: React.ChangeEvent<HTMLInputElement>,
+        field: string,
+    ) => {
+        console.log('in image func!')
+        // was a file selected and is it in the input field?
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0]
+
+            // get the old image URL if it exists (from zustand)
+            const oldImageUrl = loadedForm?.[field as keyof typeof loadedForm]
+
+            // if there's an old image, delete it from Firebase Storage
+            if (oldImageUrl) {
+                const oldImageRef = ref(storage, oldImageUrl as string) // ref to the old image
+                try {
+                    await deleteObject(oldImageRef)
+                    console.log('Old image deleted successfully')
+                } catch (error) {
+                    console.error('Error deleting old image:', error)
+                }
+            }
+
+            // uploading new image
+            const storageRef = ref(storage, `${file.name}`)
+            try {
+                const snapshot = await uploadBytes(storageRef, file)
+                // retrieve download URL from firebase storage
+                const downloadURL = await getDownloadURL(snapshot.ref)
+
+                console.log('Uploaded file URL:', downloadURL)
+
+                // stores image URL in zustand for specified field
+                updateForm({ [field]: downloadURL })
+            } catch (error) {
+                console.error('Error uploading file:', error)
+            }
+        }
+    }
 
     useEffect(() => {
         reset(loadedForm)
@@ -264,6 +312,22 @@ const Page = (props: Props) => {
                         </div>
 
                         {/* ADDITIONAL FEATURES */}
+                        {/* Image */}
+                        <div>
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Image
+                            </label>
+                            <div>
+                                <input
+                                    type="file"
+                                    onChange={(e) =>
+                                        handleImageChange(e, 'clientImage')
+                                    }
+                                    className="w-[80%] rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
                         {/* Notes */}
                         <div>
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
