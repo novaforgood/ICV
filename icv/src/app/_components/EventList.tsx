@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-table'
 import React, { useMemo } from 'react'
 import useSWR from 'swr'
-import useClientNames from '../hooks/useClientNames'
+import useClientNames from '../_hooks/useClientNames'
 
 // SWR fetcher function
 const fetchEvents = async (): Promise<CaseEventType[]> => {
@@ -27,7 +27,9 @@ const EventsTable: React.FC = () => {
             {
                 accessorKey: 'clientId', // Use clientId to access client names
                 header: 'Client Name',
-                cell: ({ row }: any) => clientNames.get(String(row.original.clientId)) || 'Loading...', // Use clientNames map
+                cell: ({ row }: any) =>
+                    clientNames.get(String(row.original.clientId)) ||
+                    'Loading...', // Use clientNames map
             },
             {
                 accessorKey: 'date',
@@ -43,7 +45,7 @@ const EventsTable: React.FC = () => {
                 header: 'Description',
             },
         ],
-        [clientNames]
+        [clientNames],
     )
 
     // Table instance
@@ -56,7 +58,8 @@ const EventsTable: React.FC = () => {
     // Handle loading and error states
     if (isLoading) return <div>Loading...</div>
     if (error) return <div>Error loading data: {error.message}</div>
-    if (clientNamesError) return <div>Error loading client names: {clientNamesError.message}</div>
+    if (clientNamesError)
+        return <div>Error loading client names: {clientNamesError.message}</div>
 
     return (
         <div>
