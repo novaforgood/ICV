@@ -3,6 +3,7 @@ import 'server-only'
 
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import { CaseEventType } from '@/types/event-types'
+import { db } from '@/data/firebase'
 
 import {
     addDoc,
@@ -10,7 +11,6 @@ import {
     deleteDoc,
     doc,
     getDocs,
-    getFirestore,
     query,
     updateDoc,
     where,
@@ -29,7 +29,8 @@ export async function createEvent(event: CaseEventType) {
         const newDoc = await addDoc(eventsCollection, event)
         console.log('Event added with ID: ', newDoc.id)
     } catch (error) {
-        console.error('Error adding event: ', error)
+        console.error('Error updating event:', error)
+        throw new Error('Failed to update event')
     }
 }
 
