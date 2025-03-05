@@ -34,39 +34,20 @@ const Page = (props: Props) => {
 
     return (
         <form
-            className="space-y-[24px]"
-            style={{ padding: '24px' }}
+            className="space-y-4"
+            style={{ padding: '50px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <div className="space-y-[24px]">
-                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
-                    Intake Form
-                </label>
+            <div className="space-y-8">
+                <label className="bold text-2xl">Confirmation</label>
             </div>
-            <div className="flex items-center justify-center">
-                <div className="min-w-[800px] space-y-[60px]">
-                    <div>
-                        <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
-                            Confirmation
-                        </label>
-                    </div>
-                    <div className="flex justify-between">
-                        <button
-                            type="button"
-                            onClick={() => router.push('/intake/services')}
-                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
-                        >
-                            Back
-                        </button>
-                        <button
-                            type="submit"
-                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </div>
-            </div>
+
+            <button
+                type="submit"
+                className="mt-4 rounded bg-blue-500 p-2 text-white"
+            >
+                Submit
+            </button>
         </form>
     )
 }
