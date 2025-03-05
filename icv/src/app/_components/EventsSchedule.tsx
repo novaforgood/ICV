@@ -18,7 +18,7 @@ const EventsSchedule: React.FC = () => {
   const { data: events, error, isLoading } = useSWR("events", fetchEvents)
 
   // State to track selected day (YYYY-MM-DD string)
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(() => format(new Date(), "yyyy-MM-dd"))
 
   // State to track the start of the current week view.
   // Initialized so that the week view starts 3 days before today.
@@ -120,7 +120,8 @@ const EventsSchedule: React.FC = () => {
       </Card>
 
       {/* Event Cards */}
-      <div className="space-y-4">
+      {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
+      <div className="grid bottom-0 flex-col space-y-4 overflow-auto max-h-80 p-1">
         {filteredEvents.length === 0 ? (
           <p>No events for this day.</p>
         ) : (
@@ -139,7 +140,7 @@ const EventsSchedule: React.FC = () => {
             return (
               <Card
                 key={String(event.id)}
-                className="flex h-[81px] py-[12px] px-[24px] justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
+                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
               >
                 <div className="text-sm text-gray-500">
                   <span>{format(startTime, "p")}</span>

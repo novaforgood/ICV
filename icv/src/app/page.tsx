@@ -22,6 +22,10 @@ export default function Home() {
             <div className="flex-1">
                 <h1 className="text-6xl font-bold">Hello, Akhilesh</h1>
 
+                <EventsSchedule  />
+            </div>
+            <div className="flex w-1/3 flex-col gap-6">
+
                 <div className="mt-8 flex flex-row justify-between">
                     <h2 className="text-3xl font-semibold">ICV's Numbers</h2>
                     <Select defaultValue="week">
@@ -63,23 +67,23 @@ export default function Home() {
                         </p>
                     </Card>
                 </div>
-                <EventsSchedule  />
-            </div>
-            <div className="flex w-1/3 flex-col gap-6">
-                <Button
-                    className="w-full"
-                    onClick={() => {
-                        router.push('/intake')
-                    }}
-                >
-                    New Client
-                </Button>
                 <h1 className="text-2xl font-semibold">Recent Clients</h1>
 
                 <Card>
                     <h1 className="text-xl font-bold">Jimin Kim</h1>
                     <p>lorem ipsum</p>
                 </Card>
+
+                <div className="mt-auto">
+                    <Button
+                        className="w-full mt-6"
+                        onClick={() => {
+                            router.push('/intake')
+                        }}
+                    >
+                        New Client
+                    </Button>
+                </div>
             </div>
         </div>
     )
