@@ -7,7 +7,11 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../_lib/useIntakeFormStore'
-import { CheckboxListWithOther } from '../components/MakeOptions'
+import {
+    CheckboxList,
+    CheckboxListWithOther,
+    RadioChoice,
+} from '../components/MakeOptions'
 
 interface Props {}
 
@@ -20,15 +24,19 @@ const PUBLIC_SERVICES = [
     'Unemployment Benefits',
 ]
 
-const ETHNICITY = [
-    'White',
-    'Black or African American',
-    'Hispanic, Latino, or Spanish Origin',
-    'Asian',
-    'Native American',
-    'Middle Eastern',
-    'Hawaiian or Pacific Islander',
+const EDUSTATUS = [
+    'Middle school',
+    'High school',
+    'GED',
+    'Community college',
+    'University',
+    'Masters/PhD',
 ]
+
+const MENTALHEALTH = ['Schizophrenia', 'Bipolar', 'Depression', 'Anxiety']
+const SUBSTANCES = ['Meth', 'Cocaine', 'Marijuana', 'Alcohol', 'None']
+
+const YESNO = ['Yes', 'No']
 
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
@@ -49,8 +57,18 @@ const Page = (props: Props) => {
 
     const router = useRouter()
     const selectedServices = watch('publicServices') ?? []
-    const selectedEthnicities = Array.isArray(watch('ethnicity'))
-        ? (watch('ethnicity') ?? [])
+    const selectedEduStat = Array.isArray(watch('educationStatus'))
+        ? (watch('educationStatus') ?? [])
+        : []
+    const selectedCPS = watch('cps') ?? ''
+    const selectedProbation = watch('probation') ?? ''
+    const selectedFoster = watch('fosterYouth') ?? ''
+    const selectedOffender = watch('sexOffender') ?? ''
+    const selectedMH = Array.isArray(watch('mentalHealth'))
+        ? (watch('mentalHealth') ?? [])
+        : []
+    const selectedSub = Array.isArray(watch('substanceAbuse'))
+        ? (watch('substanceAbuse') ?? [])
         : []
 
     useEffect(() => {
@@ -64,8 +82,8 @@ const Page = (props: Props) => {
                 publicServices: data.publicServices?.filter(
                     (service): service is string => !!service,
                 ),
-                ethnicity: data.ethnicity?.filter(
-                    (eth): eth is string => !!eth,
+                educationStatus: data.educationStatus?.filter(
+                    (edu): edu is string => !!edu,
                 ),
             })
         }).unsubscribe
@@ -98,87 +116,236 @@ const Page = (props: Props) => {
                         Background
                     </label>
                     <div className="space-y-[8px]">
-                        {/* Demographics */}
                         <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                            Ethnicity
+                            Education
                         </label>
                         <div className="flex flex-col space-y-[8px]">
-                            <CheckboxListWithOther
-                                options={ETHNICITY}
-                                selectedValues={selectedEthnicities}
-                                onChange={(updatedEthnicities) =>
-                                    setValue('ethnicity', updatedEthnicities)
+                            <CheckboxList
+                                options={EDUSTATUS}
+                                selectedValues={selectedEduStat.filter(
+                                    (edu): edu is string => !!edu,
+                                )}
+                                onChange={(updatedEduStat) =>
+                                    setValue('educationStatus', updatedEduStat)
                                 }
-                                name="ethnicity"
-                                otherLabel="Other"
-                                otherPlaceholder="Specify other ethnicity"
+                                name="eduStat"
                             />
                         </div>
                     </div>
+                    <div className="space-y-[12px]">
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Open case with CPS?
+                            </label>
+                            <div className="flex flex-col space-y-[8px]">
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedCPS}
+                                    onChange={(updatedCPS) =>
+                                        setValue('cps', updatedCPS)
+                                    }
+                                    name="cps"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Notes
+                            </label>
+                            <input
+                                {...register('cpsNotes')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-[12px]">
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Open case with probation?
+                            </label>
+                            <div className="flex flex-col space-y-[8px]">
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedProbation}
+                                    onChange={(updatedProbation) =>
+                                        setValue('probation', updatedProbation)
+                                    }
+                                    name="probation"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Notes
+                            </label>
+                            <input
+                                {...register('probationNotes')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-[12px]">
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Foster youth?
+                            </label>
+                            <div className="flex flex-col space-y-[8px]">
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedFoster}
+                                    onChange={(updatedFoster) =>
+                                        setValue('fosterYouth', updatedFoster)
+                                    }
+                                    name="foster"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Notes
+                            </label>
+                            <input
+                                {...register('fosterNotes')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-[12px]">
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Sex offender?
+                            </label>
+                            <div className="flex flex-col space-y-[8px]">
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedOffender}
+                                    onChange={(updatedOffender) =>
+                                        setValue('sexOffender', updatedOffender)
+                                    }
+                                    name="sexOffender"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Notes
+                            </label>
+                            <input
+                                {...register('sexOffNotes')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
+                        </div>
+                    </div>
+
                     {/* Health Information */}
-                    <div className="space-y-[8px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Mental Health History
-                        </label>
-                        <div>
-                            <textarea
-                                {...register('mentalHealth')}
+                    <div className="space-y-[12px]">
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                                Mental Health
+                            </label>
+                            <div>
+                                <CheckboxList
+                                    options={MENTALHEALTH}
+                                    selectedValues={selectedMH.filter(
+                                        (mh): mh is string => !!mh,
+                                    )}
+                                    onChange={(updatedMH) =>
+                                        setValue('mentalHealth', updatedMH)
+                                    }
+                                    name="mentalHealth"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Notes
+                            </label>
+                            <input
+                                {...register('mentalHealthNotes')}
+                                type="text"
                                 placeholder="Text"
-                                className="w-[80%] rounded border p-2"
+                                className="w-full rounded border p-2"
                             />
                         </div>
                     </div>
-                    <div className="space-y-[8px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Disabilities
-                        </label>
-                        <div>
-                            <textarea
-                                {...register('disabilities')}
+
+                    <div className="space-y-[12px]">
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                                Medical History
+                            </label>
+                        </div>
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Notes
+                            </label>
+                            <input
+                                {...register('medicalHistory')}
+                                type="text"
                                 placeholder="Text"
-                                className="w-[80%] rounded border p-2"
+                                className="w-full rounded border p-2"
                             />
                         </div>
                     </div>
-                    <div className="space-y-[8px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Substance Abuse History
-                        </label>
-                        <div>
-                            <textarea
-                                {...register('substanceAbuse')}
-                                placeholder="Text"
-                                className="w-[80%] rounded border p-2"
-                            />
+
+                    <div className="space-y-[12px]">
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                                Substance Abuse
+                            </label>
+                            <div>
+                                <CheckboxList
+                                    options={SUBSTANCES}
+                                    selectedValues={selectedSub.filter(
+                                        (sub): sub is string => !!sub,
+                                    )}
+                                    onChange={(updatedSub) =>
+                                        setValue('substanceAbuse', updatedSub)
+                                    }
+                                    name="substanceAbuse"
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="space-y-[8px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Sexual Offense History
-                        </label>
-                        <div>
-                            <textarea
-                                {...register('sexualOffenses')}
+                        <div className="space-y-[8px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Notes
+                            </label>
+                            <input
+                                {...register('substanceNotes')}
+                                type="text"
                                 placeholder="Text"
-                                className="w-[80%] rounded border p-2"
+                                className="w-full rounded border p-2"
                             />
                         </div>
                     </div>
                     {/* Public Services */}
                     <div className="space-y-[8px]">
-                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                            Public Services
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Public Services?
                         </label>
                         <div className="flex flex-col space-y-[8px]">
                             <CheckboxListWithOther
                                 options={PUBLIC_SERVICES}
-                                selectedValues={selectedServices}
+                                selectedValues={selectedServices.filter(
+                                    (service): service is string => !!service,
+                                )}
                                 onChange={(updatedServices) =>
                                     setValue('publicServices', updatedServices)
                                 }
                                 name="services"
                                 otherLabel="Other"
-                                otherPlaceholder="Specify other service"
+                                otherPlaceholder="Other"
                             />
                         </div>
                     </div>
