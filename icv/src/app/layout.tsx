@@ -1,7 +1,6 @@
 // import AuthSetup from './components/AuthSetup'
 
 import type { Metadata } from 'next'
-import Navbar from './_components/Navbar'
 import './globals.css'
 // import AuthSetup from './components/AuthSetup'
 import 'material-symbols/outlined.css'
@@ -28,8 +27,7 @@ export default function RootLayout({
         <html lang="en">
             <body className={`${epilogFont.variable} antialiased`}>
                 <AuthSetup />
-                <Navbar />
-                <div className="pl-64">{children}</div>
+                {children}
             </body>
         </html>
     )
