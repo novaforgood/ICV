@@ -19,7 +19,10 @@ export function middleware(request: NextRequest) {
         // Use a 307 temporary redirect to preserve the request method
         return NextResponse.redirect(new URL('/login', request.url), { status: 307 })
     }
-
+    if(request.nextUrl.pathname === '/login'){//TODO: this login redirect doesnt work gang idk why, so I redirected in AuthSetup instead. 
+        console.log("user loggedin, redirecting to home page")
+        return NextResponse.redirect(new URL('/', request.url), { status: 307 })
+    }
     console.log("Token found, allowing request to proceed")
     return NextResponse.next()
 }
@@ -36,6 +39,6 @@ export const config = {
          * - _next/image (image optimization files)
          * - favicon.ico (favicon file)
          */
-        '/((?!login|api|_next/static|_next/image|favicon.ico).*)'
+        '/((?!login|api|_next/static|_next/image|favicon.ico|public).*)'
     ]
 }

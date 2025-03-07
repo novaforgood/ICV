@@ -4,11 +4,14 @@ import { auth } from '@/data/firebase'
 import { setCookie } from 'cookies-next'
 import { getIdToken, onAuthStateChanged } from 'firebase/auth'
 import { useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 
 interface Props {}
 
 const AuthSetup = (props: Props) => {
     console.log('AuthSetup')
+    const router = useRouter()
+    const pathname = usePathname()
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -20,6 +23,11 @@ const AuthSetup = (props: Props) => {
                 await setCookie('idToken', idToken, {
                     maxAge: 60 * 60 * 24 * 7,
                 })
+
+                // Redirect logged-in users away from login page
+                if (pathname === '/login') {
+                    router.push('/')
+                }
             } else {
                 console.log('User is signed out')
                 await setCookie('idToken', '', {
