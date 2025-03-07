@@ -93,6 +93,9 @@ const Page = (props: Props) => {
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
+            <button type="button" onClick={() => router.push('/')}>
+                {'<'} Back to dashboard
+            </button>
             <div className="space-y-[24px]">
                 <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
                     Intake Form

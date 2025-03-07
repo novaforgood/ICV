@@ -65,19 +65,26 @@ export const ClientIntakeSchema = z.object({
             spouseFirstName: z.string().optional(),
             spouseLastName: z.string().optional(),
             spouseDOB: z.string().optional(),
-            spouseAge: z.string().optional(),
+            spouseIncome: z.string().optional(),
+            spouseGender: z.string().optional(),
         }),
     ).optional(),
-    children: z.array(
+    dependent: z.array(
         z.object({
-            name: z.string().optional(),
-            age: z.string().optional(),
+            firstName: z.string().optional(),
+            lastName: z.string().optional(),
+            dob: z.string().optional(),
+            income: z.string().optional(),
+            gender: z.string().optional(),
+            publicServices: z.array(z.string().optional()).optional()
         }),
     ).optional(),
 
     pets: z.array(
         z.object({
-            breed: Pets.optional()
+           species: z.string().optional(),
+           size: z.string().optional(),
+           purpose: z.array(z.string().optional())
         })
     ).optional(),
 
@@ -220,6 +227,6 @@ export const ProfileSchema = ClientIntakeSchema.pick({
 export const FamilySchema = ClientIntakeSchema.pick({
     familySize: true,
     spouse: true,
-    children: true,
+    dependent: true,
     pets: true,
 })

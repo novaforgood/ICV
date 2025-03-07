@@ -38,7 +38,7 @@ export const CheckboxListWithOther = ({
                                     : undefined,
                             )
                         }}
-                        id={option}
+                        id={`${name}-${option}`}
                     />
                     <label htmlFor={option}>{option}</label>
                 </div>
@@ -127,7 +127,7 @@ export const CheckboxList = ({
                                     : undefined,
                             )
                         }}
-                        id={option}
+                        id={`${name}-${option}`}
                     />
                     <label htmlFor={option}>{option}</label>
                 </div>
@@ -166,7 +166,7 @@ export const RadioWithOther = ({
                         value={option}
                         checked={selectedValue === option}
                         onChange={() => onChange(option)}
-                        id={option}
+                        id={`${name}-${option}`}
                         name={name}
                     />
                     <label htmlFor={option}>{option}</label>
@@ -227,7 +227,7 @@ export const RadioChoice = ({
                         value={option}
                         checked={selectedValue === option}
                         onChange={() => onChange(option)}
-                        id={option}
+                        id={`${name}-${option}`}
                         name={name}
                     />
                     <label htmlFor={option}>{option}</label>
