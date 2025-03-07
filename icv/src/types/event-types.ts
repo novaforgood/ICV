@@ -21,7 +21,8 @@ export const ContactType = z.enum([
 // CaseEvent schema
 export const CaseEventSchema = z.object({
     // change string date (chosen from form input) to date, then check validity
-    date: timestampToDateSchema,
+    startTime: timestampToDateSchema,
+    endTime: timestampToDateSchema,
     // check if chosen dropdown is a string of the ContactType array (form input passed as)
     contactType: z.enum(Object.values(ContactType.Values) as [string, ...string[]], {
         message: "Choose a contact type."
@@ -32,6 +33,7 @@ export const CaseEventSchema = z.object({
     duration: z.number().optional(),
     asigneeId: z.string().optional(),
     id: z.string().optional(),
+    clientId: z.string().optional(),
 
 })
 .passthrough(); // lets fields not in schema pass through (clientId, because always collected properly)

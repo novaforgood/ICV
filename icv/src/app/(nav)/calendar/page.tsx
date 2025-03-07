@@ -1,7 +1,11 @@
+import EventCreation from '@/app/_components/EventCreation';
+
 interface Props {}
 
 const page = (props: Props) => {
-    return <div>page</div>
+    return <div>
+        <EventCreation />
+    </div>
 }
 
 export default page
