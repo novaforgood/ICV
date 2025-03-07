@@ -16,8 +16,8 @@ const fetchEvents = async (): Promise<CaseEventType[]> => {
 const EventsSchedule: React.FC = () => {
     const { data: events, error, isLoading } = useSWR('events', fetchEvents)
 
-    // State to track selected day (YYYY-MM-DD string)
-    const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  // State to track selected day (YYYY-MM-DD string)
+  const [selectedDate, setSelectedDate] = useState<string | null>(() => format(new Date(), "yyyy-MM-dd"))
 
     // State to track the start of the current week view.
     // Initialized so that the week view starts 3 days before today.
@@ -125,14 +125,15 @@ const EventsSchedule: React.FC = () => {
                 </div>
             </Card>
 
-            {/* Event Cards */}
-            <div className="space-y-4">
-                {filteredEvents.length === 0 ? (
-                    <p>No events for this day.</p>
-                ) : (
-                    filteredEvents.map((event) => {
-                        const eventDate = new Date(event.date)
-                        if (!isValid(eventDate)) return null
+      {/* Event Cards */}
+      {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
+      <div className="grid bottom-0 flex-col space-y-4 overflow-auto max-h-80 p-1">
+        {filteredEvents.length === 0 ? (
+          <p>No events for this day.</p>
+        ) : (
+          filteredEvents.map((event) => {
+            const eventDate = new Date(event.date)
+            if (!isValid(eventDate)) return null
 
                         const startTime = eventDate.getTime()
                         const endTime = new Date(
@@ -144,36 +145,32 @@ const EventsSchedule: React.FC = () => {
                         const eventAsignee =
                             String(event.assigneeId) || 'Loading...'
 
-                        return (
-                            <Card
-                                key={String(event.id)}
-                                className="flex grid h-[81px] shrink-0 grid-cols-3 items-center justify-between gap-4 self-stretch px-[24px] py-[12px]"
-                            >
-                                <div className="text-sm text-gray-500">
-                                    <span>{format(startTime, 'p')}</span>
-                                    <br />
-                                    <span>{format(endTime, 'p')}</span>
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-bold">
-                                        {eventName}
-                                    </h2>
-                                    <p className="text-gray-600">
-                                        {eventLocation}
-                                    </p>
-                                </div>
-                                <div>
-                                    <h2 className="flex items-center gap-3 text-lg">
-                                        {eventAsignee}
-                                    </h2>
-                                </div>
-                            </Card>
-                        )
-                    })
-                )}
-            </div>
-        </div>
-    )
+            return (
+              <Card
+                key={String(event.id)}
+                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
+              >
+                <div className="text-sm text-gray-500">
+                  <span>{format(startTime, "p")}</span>
+                  <br />
+                  <span>{format(endTime, "p")}</span>
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">{eventName}</h2>
+                  <p className="text-gray-600">{eventLocation}</p>
+                </div>
+                <div>
+                  <h2 className="flex items-center gap-3 text-lg">
+                    {eventAsignee}
+                  </h2>
+                </div>
+              </Card>
+            )
+          })
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default EventsSchedule
