@@ -127,7 +127,7 @@ const EventsSchedule: React.FC = () => {
 
       {/* Event Cards */}
       {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
-      <div className="grid bottom-0 flex-col space-y-4 overflow-auto max-h-80 p-1">
+      <div className="grid bottom-0 flex-col space-y-4 xoverflow-auto max-h-80 overflow-x-visible over">
         {filteredEvents.length === 0 ? (
           <p>No events for this day.</p>
         ) : (
@@ -146,6 +146,7 @@ const EventsSchedule: React.FC = () => {
                             String(event.assigneeId) || 'Loading...'
 
             return (
+                <>
               <Card
                 key={String(event.id)}
                 className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
@@ -165,6 +166,64 @@ const EventsSchedule: React.FC = () => {
                   </h2>
                 </div>
               </Card>
+              <Card
+                key={String(event.id)}
+                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
+              >
+                <div className="text-sm text-gray-500">
+                  <span>{format(startTime, "p")}</span>
+                  <br />
+                  <span>{format(endTime, "p")}</span>
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">{eventName}</h2>
+                  <p className="text-gray-600">{eventLocation}</p>
+                </div>
+                <div>
+                  <h2 className="flex items-center gap-3 text-lg">
+                    {eventAsignee}
+                  </h2>
+                </div>
+              </Card>
+              <Card
+                key={String(event.id)}
+                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
+              >
+                <div className="text-sm text-gray-500">
+                  <span>{format(startTime, "p")}</span>
+                  <br />
+                  <span>{format(endTime, "p")}</span>
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">{eventName}</h2>
+                  <p className="text-gray-600">{eventLocation}</p>
+                </div>
+                <div>
+                  <h2 className="flex items-center gap-3 text-lg">
+                    {eventAsignee}
+                  </h2>
+                </div>
+              </Card>
+              <Card
+                key={String(event.id)}
+                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
+              >
+                <div className="text-sm text-gray-500">
+                  <span>{format(startTime, "p")}</span>
+                  <br />
+                  <span>{format(endTime, "p")}</span>
+                </div>
+                <div>
+                  <h2 className="font-bold text-lg">{eventName}</h2>
+                  <p className="text-gray-600">{eventLocation}</p>
+                </div>
+                <div>
+                  <h2 className="flex items-center gap-3 text-lg">
+                    {eventAsignee}
+                  </h2>
+                </div>
+              </Card>
+              </>
             )
           })
         )}
