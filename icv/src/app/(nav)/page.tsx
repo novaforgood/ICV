@@ -18,15 +18,14 @@ export default function Home() {
     const router = useRouter()
 
     return (
-        <div className="flex flex-row gap-6 p-6 pt-12">
-            <div className="flex-1">
+        <div className="flex h-screen flex-row gap-6 p-6 pt-12">
+            <div className="flex flex-1 flex-col gap-8">
                 <h1 className="text-6xl font-bold">Hello, Akhilesh</h1>
 
-                <EventsSchedule  />
+                <EventsSchedule />
             </div>
             <div className="flex w-1/3 flex-col gap-6">
-
-                <div className="mt-8 flex flex-row justify-between">
+                <div className="flex flex-row justify-between">
                     <h2 className="text-3xl font-semibold">ICV's Numbers</h2>
                     <Select defaultValue="week">
                         <SelectTrigger className="w-48">
@@ -41,28 +40,28 @@ export default function Home() {
                 </div>
 
                 {/* 2 column grid */}
-                <div className="mt-8 grid grid-cols-2 gap-6">
-                    <Card className="flex flex-1 flex-row justify-between">
+                <div className="grid grid-cols-2 gap-6">
+                    <Card className="flex flex-1 flex-row items-center justify-between">
                         <h1 className="text-4xl font-bold">3</h1>
-                        <p className="flex flex-row items-center gap-2">
+                        <p className="flex flex-row items-center gap-2 text-right">
                             check-ins
                         </p>
                     </Card>
-                    <Card className="flex flex-1 flex-row justify-between">
+                    <Card className="flex flex-1 flex-row items-center justify-between">
                         <h1 className="text-4xl font-bold">1</h1>
-                        <p className="flex flex-row items-center gap-2">
+                        <p className="flex flex-row items-center gap-2 text-right">
                             hot meals
                         </p>
                     </Card>
-                    <Card className="flex flex-1 flex-row justify-between">
+                    <Card className="flex flex-1 flex-row items-center justify-between">
                         <h1 className="text-4xl font-bold">2</h1>
-                        <p className="flex flex-row items-center gap-2">
+                        <p className="flex flex-row items-center gap-2 text-right">
                             hygiene kits
                         </p>
                     </Card>
-                    <Card className="flex flex-1 flex-row justify-between">
+                    <Card className="flex flex-1 flex-row items-center justify-between">
                         <h1 className="text-4xl font-bold">1</h1>
-                        <p className="flex flex-row items-center gap-2">
+                        <p className="flex flex-row items-center gap-2 text-right">
                             snack packs
                         </p>
                     </Card>
@@ -76,7 +75,7 @@ export default function Home() {
 
                 <div className="mt-auto">
                     <Button
-                        className="w-full mt-6"
+                        className="mt-6 w-full"
                         onClick={() => {
                             router.push('/intake')
                         }}

@@ -1,6 +1,7 @@
 'use client'
 
 import { getAllEvents } from '@/api/events'
+import Symbol from '@/components/Symbol'
 import { Card } from '@/components/ui/card'
 import { CaseEventType } from '@/types/event-types'
 import { format, isValid } from 'date-fns'
@@ -16,8 +17,10 @@ const fetchEvents = async (): Promise<CaseEventType[]> => {
 const EventsSchedule: React.FC = () => {
     const { data: events, error, isLoading } = useSWR('events', fetchEvents)
 
-  // State to track selected day (YYYY-MM-DD string)
-  const [selectedDate, setSelectedDate] = useState<string | null>(() => format(new Date(), "yyyy-MM-dd"))
+    // State to track selected day (YYYY-MM-DD string)
+    const [selectedDate, setSelectedDate] = useState<string | null>(() =>
+        format(new Date(), 'yyyy-MM-dd'),
+    )
 
     // State to track the start of the current week view.
     // Initialized so that the week view starts 3 days before today.
@@ -53,14 +56,14 @@ const EventsSchedule: React.FC = () => {
     if (error) return <div>Error loading data: {error.message}</div>
 
     return (
-        <div className="flex flex-col gap-6 pt-12">
+        <div className="-m-2 flex flex-1 flex-col gap-6 overflow-hidden p-2 pb-4">
             <h2 className="text-3xl font-semibold">Schedule</h2>
 
             {/* Date Selector */}
-            <Card>
+            <Card className="flex flex-col gap-4">
                 <div className="flex items-center justify-end gap-3 self-stretch">
                     <button
-                        className="h-6 w-6 flex-shrink-0"
+                        className="h-6 w-6 flex-shrink-0 text-sm"
                         onClick={() => {
                             const newWeekStart = new Date(weekStart)
                             newWeekStart.setDate(newWeekStart.getDate() - 7)
@@ -68,7 +71,7 @@ const EventsSchedule: React.FC = () => {
                             setSelectedDate(format(newWeekStart, 'yyyy-MM-dd'))
                         }}
                     >
-                        {'<'}
+                        <Symbol symbol="keyboard_arrow_left" />
                     </button>
                     <div className="text-lg">
                         {`${format(weekDays[0], 'MMM d')} - ${format(
@@ -77,7 +80,7 @@ const EventsSchedule: React.FC = () => {
                         )}`}
                     </div>
                     <button
-                        className="h-6 w-6 flex-shrink-0"
+                        className="h-6 w-6 flex-shrink-0 text-sm"
                         onClick={() => {
                             const newWeekStart = new Date(weekStart)
                             newWeekStart.setDate(newWeekStart.getDate() + 7)
@@ -85,7 +88,7 @@ const EventsSchedule: React.FC = () => {
                             setSelectedDate(format(newWeekStart, 'yyyy-MM-dd'))
                         }}
                     >
-                        {'>'}
+                        <Symbol symbol="keyboard_arrow_right" />
                     </button>
                 </div>
                 <div className="flex items-center justify-between self-stretch px-6">
@@ -125,15 +128,15 @@ const EventsSchedule: React.FC = () => {
                 </div>
             </Card>
 
-      {/* Event Cards */}
-      {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
-      <div className="grid bottom-0 flex-col space-y-4 overflow-auto max-h-80 p-1">
-        {filteredEvents.length === 0 ? (
-          <p>No events for this day.</p>
-        ) : (
-          filteredEvents.map((event) => {
-            const eventDate = new Date(event.date)
-            if (!isValid(eventDate)) return null
+            {/* Event Cards */}
+            {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
+            <div className="bottom-0 -m-2 flex flex-1 flex-col space-y-4 overflow-scroll p-2">
+                {filteredEvents.length === 0 ? (
+                    <p>No events for this day.</p>
+                ) : (
+                    filteredEvents.map((event) => {
+                        const eventDate = new Date(event.date)
+                        if (!isValid(eventDate)) return null
 
                         const startTime = eventDate.getTime()
                         const endTime = new Date(
@@ -145,32 +148,38 @@ const EventsSchedule: React.FC = () => {
                         const eventAsignee =
                             String(event.assigneeId) || 'Loading...'
 
-            return (
-              <Card
-                key={String(event.id)}
-                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
-              >
-                <div className="text-sm text-gray-500">
-                  <span>{format(startTime, "p")}</span>
-                  <br />
-                  <span>{format(endTime, "p")}</span>
-                </div>
-                <div>
-                  <h2 className="font-bold text-lg">{eventName}</h2>
-                  <p className="text-gray-600">{eventLocation}</p>
-                </div>
-                <div>
-                  <h2 className="flex items-center gap-3 text-lg">
-                    {eventAsignee}
-                  </h2>
-                </div>
-              </Card>
-            )
-          })
-        )}
-      </div>
-    </div>
-  )
+                        return (
+                            <>
+                                <Card
+                                    key={String(event.id)}
+                                    className="flex items-center justify-between gap-4"
+                                >
+                                    <div className="text-sm text-gray-500">
+                                        <span>{format(startTime, 'p')}</span>
+                                        <br />
+                                        <span>{format(endTime, 'p')}</span>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-bold">
+                                            {eventName}
+                                        </h2>
+                                        <p className="text-gray-600">
+                                            {eventLocation}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <h2 className="flex items-center gap-3 text-lg">
+                                            {eventAsignee}
+                                        </h2>
+                                    </div>
+                                </Card>
+                            </>
+                        )
+                    })
+                )}
+            </div>
+        </div>
+    )
 }
 
 export default EventsSchedule
