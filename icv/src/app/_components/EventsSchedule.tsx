@@ -146,7 +146,6 @@ const EventsSchedule: React.FC = () => {
                             String(event.assigneeId) || 'Loading...'
 
             return (
-                <>
               <Card
                 key={String(event.id)}
                 className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
@@ -166,64 +165,6 @@ const EventsSchedule: React.FC = () => {
                   </h2>
                 </div>
               </Card>
-              <Card
-                key={String(event.id)}
-                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
-              >
-                <div className="text-sm text-gray-500">
-                  <span>{format(startTime, "p")}</span>
-                  <br />
-                  <span>{format(endTime, "p")}</span>
-                </div>
-                <div>
-                  <h2 className="font-bold text-lg">{eventName}</h2>
-                  <p className="text-gray-600">{eventLocation}</p>
-                </div>
-                <div>
-                  <h2 className="flex items-center gap-3 text-lg">
-                    {eventAsignee}
-                  </h2>
-                </div>
-              </Card>
-              <Card
-                key={String(event.id)}
-                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
-              >
-                <div className="text-sm text-gray-500">
-                  <span>{format(startTime, "p")}</span>
-                  <br />
-                  <span>{format(endTime, "p")}</span>
-                </div>
-                <div>
-                  <h2 className="font-bold text-lg">{eventName}</h2>
-                  <p className="text-gray-600">{eventLocation}</p>
-                </div>
-                <div>
-                  <h2 className="flex items-center gap-3 text-lg">
-                    {eventAsignee}
-                  </h2>
-                </div>
-              </Card>
-              <Card
-                key={String(event.id)}
-                className="flex justify-between items-center shrink-0 self-stretch grid grid-cols-3 gap-4"
-              >
-                <div className="text-sm text-gray-500">
-                  <span>{format(startTime, "p")}</span>
-                  <br />
-                  <span>{format(endTime, "p")}</span>
-                </div>
-                <div>
-                  <h2 className="font-bold text-lg">{eventName}</h2>
-                  <p className="text-gray-600">{eventLocation}</p>
-                </div>
-                <div>
-                  <h2 className="flex items-center gap-3 text-lg">
-                    {eventAsignee}
-                  </h2>
-                </div>
-              </Card>
-              </>
             )
           })
         )}
