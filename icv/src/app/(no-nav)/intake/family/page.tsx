@@ -1,19 +1,18 @@
 'use client'
 
+import { useIntakeFormStore } from '@/app/_lib/useIntakeFormStore'
 import { FamilySchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useIntakeFormStore } from '../../../_lib/useIntakeFormStore'
 import {
     CheckboxList,
     CheckboxListWithOther,
     RadioChoice,
     RadioWithOther,
 } from '../components/MakeOptions'
-
 interface Props {}
 
 const GENDER = ['Male', 'Female', 'Nonbinary']
@@ -77,7 +76,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: FamilyType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/background')
+        router.push('/intake/family/background')
     }
 
     const addSpouse = () => {
@@ -149,14 +148,6 @@ const Page = (props: Props) => {
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <button type="button" onClick={() => router.push('/')}>
-                {'<'} Back to dashboard
-            </button>
-            <div className="space-y-[24px]">
-                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
-                    Intake Form
-                </label>
-            </div>
             <div className="flex min-h-screen items-center justify-center">
                 <div className="min-w-[800px] space-y-[60px]">
                     <div className="space-y-[24px]">

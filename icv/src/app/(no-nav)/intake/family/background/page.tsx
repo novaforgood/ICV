@@ -1,17 +1,17 @@
 'use client'
 
+import { useIntakeFormStore } from '@/app/_lib/useIntakeFormStore'
 import { BackgroundSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useIntakeFormStore } from '../../../_lib/useIntakeFormStore'
 import {
     CheckboxList,
     CheckboxListWithOther,
     RadioChoice,
-} from '../components/MakeOptions'
+} from '../../components/MakeOptions'
 
 interface Props {}
 
@@ -96,7 +96,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: BackgroundInfoType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/services')
+        router.push('/intake/family/background/services')
     }
 
     return (
@@ -105,14 +105,6 @@ const Page = (props: Props) => {
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <button type="button" onClick={() => router.push('/')}>
-                {'<'} Back to dashboard
-            </button>
-            <div className="space-y-[24px]">
-                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
-                    Intake Form
-                </label>
-            </div>
             <div className="flex min-h-screen items-center justify-center">
                 <div className="min-w-[800px] space-y-[48px]">
                     <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">

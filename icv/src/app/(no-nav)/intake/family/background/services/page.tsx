@@ -13,9 +13,9 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useIntakeFormStore } from '../../../_lib/useIntakeFormStore'
-import FileUpload from '../components/FileUpload'
-import { CheckboxList } from '../components/MakeOptions'
+import { useIntakeFormStore } from '../../../../../_lib/useIntakeFormStore'
+import FileUpload from '../../../components/FileUpload'
+import { CheckboxList } from '../../../components/MakeOptions'
 
 interface Props {}
 
@@ -253,7 +253,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: ServiceType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/confirmation')
+        router.push('/intake/family/background/services/confirmation')
     }
 
     const selectedMentoring = watch('mentoring') ?? []
@@ -272,14 +272,6 @@ const Page = (props: Props) => {
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <button type="button" onClick={() => router.push('/')}>
-                {'<'} Back to dashboard
-            </button>
-            <div className="space-y-[24px]">
-                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
-                    Intake Form
-                </label>
-            </div>
             <div className="flex min-h-screen items-center justify-center">
                 <div className="min-w-[800px] space-y-[60px]">
                     <div className="space-y-[60px]">
@@ -389,11 +381,12 @@ const Page = (props: Props) => {
                                 name="referral"
                             />
                         </div>
-                        {/* ADDITIONAL FEATURES */}
-                        <div className="space-y-[32px]">
+                        <div className="space-y-[24px]">
+                            <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                Profile Picture
+                            </label>
                             {/* Image */}
                             <FileUpload
-                                label="Image"
                                 fileName={loadedForm.clientImageName?.filter(
                                     (name): name is string =>
                                         name !== undefined,
@@ -405,102 +398,137 @@ const Page = (props: Props) => {
                                 nameField="clientImageName"
                                 buttonText="Add image"
                             />
+                        </div>
+                        {/* ADDITIONAL FEATURES */}
+                        <div className="space-y-[32px]">
+                            <div className="space-y-[24px]">
+                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                    Documents
+                                </label>
+                            </div>
                             {/* ID */}
-                            <FileUpload
-                                label="ID"
-                                fileName={loadedForm.clientIDName?.filter(
-                                    (name): name is string =>
-                                        name !== undefined,
-                                )}
-                                handleFileChange={handleImageChange}
-                                handleAddFile={handleAddFile}
-                                deleteFile={deleteFile}
-                                field="clientID"
-                                nameField="clientIDName"
-                                buttonText="Add ID"
-                            />
+                            <div className="space-y-[4px]">
+                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                    ID
+                                </label>
+                                <FileUpload
+                                    fileName={loadedForm.clientIDName?.filter(
+                                        (name): name is string =>
+                                            name !== undefined,
+                                    )}
+                                    handleFileChange={handleImageChange}
+                                    handleAddFile={handleAddFile}
+                                    deleteFile={deleteFile}
+                                    field="clientID"
+                                    nameField="clientIDName"
+                                    buttonText="Add ID"
+                                />
+                            </div>
                             {/* Passport */}
-                            <FileUpload
-                                label="Passport"
-                                fileName={loadedForm.clientPassportName?.filter(
-                                    (name): name is string =>
-                                        name !== undefined,
-                                )}
-                                handleFileChange={handleImageChange}
-                                handleAddFile={handleAddFile}
-                                deleteFile={deleteFile}
-                                field="clientPassport"
-                                nameField="clientPassportName"
-                                buttonText="Add passport"
-                            />
-                            {/* MediCal */}
-                            <FileUpload
-                                label="MediCal"
-                                fileName={loadedForm.clientMedName?.filter(
-                                    (name): name is string =>
-                                        name !== undefined,
-                                )}
-                                handleFileChange={handleImageChange}
-                                handleAddFile={handleAddFile}
-                                deleteFile={deleteFile}
-                                field="clientMed"
-                                nameField="clientMedName"
-                                buttonText="Add MediCal"
-                            />
+                            <div className="space-y-[4px]">
+                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                    Passport
+                                </label>
+                                <FileUpload
+                                    fileName={loadedForm.clientPassportName?.filter(
+                                        (name): name is string =>
+                                            name !== undefined,
+                                    )}
+                                    handleFileChange={handleImageChange}
+                                    handleAddFile={handleAddFile}
+                                    deleteFile={deleteFile}
+                                    field="clientPassport"
+                                    nameField="clientPassportName"
+                                    buttonText="Add passport"
+                                />
+                            </div>
 
-                            {/* SSN */}
-                            <FileUpload
-                                label="SSN"
-                                fileName={loadedForm.clientSSNName?.filter(
-                                    (name): name is string =>
-                                        name !== undefined,
-                                )}
-                                handleFileChange={handleImageChange}
-                                handleAddFile={handleAddFile}
-                                deleteFile={deleteFile}
-                                field="clientSSN"
-                                nameField="clientSSNName"
-                                buttonText="Add SSN"
-                            />
-                            {/* Birth Certificate */}
-                            <FileUpload
-                                label="Birth Certificate"
-                                fileName={loadedForm.clientBCName?.filter(
-                                    (name): name is string =>
-                                        name !== undefined,
-                                )}
-                                handleFileChange={handleImageChange}
-                                handleAddFile={handleAddFile}
-                                deleteFile={deleteFile}
-                                field="clientBC"
-                                nameField="clientBCName"
-                                buttonText="Add birth certificate"
-                            />
-                            {/* Other Files */}
-                            <FileUpload
-                                label="Other Files"
-                                fileName={loadedForm.otherFilesName?.filter(
-                                    (name): name is string =>
-                                        name !== undefined,
-                                )}
-                                handleFileChange={handleImageChange}
-                                handleAddFile={handleAddFile}
-                                deleteFile={deleteFile}
-                                field="otherFiles"
-                                nameField="otherFilesName"
-                                buttonText="Add other files"
-                            />
+                            <div className="space-y-[4px]">
+                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                    MediCal
+                                </label>
+                                {/* MediCal */}
+                                <FileUpload
+                                    fileName={loadedForm.clientMedName?.filter(
+                                        (name): name is string =>
+                                            name !== undefined,
+                                    )}
+                                    handleFileChange={handleImageChange}
+                                    handleAddFile={handleAddFile}
+                                    deleteFile={deleteFile}
+                                    field="clientMed"
+                                    nameField="clientMedName"
+                                    buttonText="Add MediCal"
+                                />
+                            </div>
+
+                            <div className="space-y-[4px]">
+                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                    SSN
+                                </label>
+                                {/* SSN */}
+                                <FileUpload
+                                    fileName={loadedForm.clientSSNName?.filter(
+                                        (name): name is string =>
+                                            name !== undefined,
+                                    )}
+                                    handleFileChange={handleImageChange}
+                                    handleAddFile={handleAddFile}
+                                    deleteFile={deleteFile}
+                                    field="clientSSN"
+                                    nameField="clientSSNName"
+                                    buttonText="Add SSN"
+                                />
+                            </div>
+
+                            <div className="space-y-[4px]">
+                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                    Birth certificate
+                                </label>
+                                {/* Birth Certificate */}
+                                <FileUpload
+                                    fileName={loadedForm.clientBCName?.filter(
+                                        (name): name is string =>
+                                            name !== undefined,
+                                    )}
+                                    handleFileChange={handleImageChange}
+                                    handleAddFile={handleAddFile}
+                                    deleteFile={deleteFile}
+                                    field="clientBC"
+                                    nameField="clientBCName"
+                                    buttonText="Add birth certificate"
+                                />
+                            </div>
+
+                            <div className="space-y-[4px]">
+                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                    Other
+                                </label>
+                                {/* Other Files */}
+                                <FileUpload
+                                    fileName={loadedForm.otherFilesName?.filter(
+                                        (name): name is string =>
+                                            name !== undefined,
+                                    )}
+                                    handleFileChange={handleImageChange}
+                                    handleAddFile={handleAddFile}
+                                    deleteFile={deleteFile}
+                                    field="otherFiles"
+                                    nameField="otherFilesName"
+                                    buttonText="Add other files"
+                                />
+                            </div>
                         </div>
                         {/* Notes */}
-                        <div>
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                        <div className="space-y-[24px]">
+                            <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
                                 Additional Notes
                             </label>
                             <div>
                                 <textarea
                                     {...register('notes')}
                                     placeholder="Text"
-                                    className="w-[80%] rounded border p-2"
+                                    className="w-full rounded border p-2"
                                 />
                             </div>
                         </div>
@@ -508,7 +536,7 @@ const Page = (props: Props) => {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    router.push('/intake/background')
+                                    router.push('/intake/family/background')
                                 }
                                 className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                             >

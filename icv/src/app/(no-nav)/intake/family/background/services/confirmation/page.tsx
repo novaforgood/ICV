@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useIntakeFormStore } from '../../../_lib/useIntakeFormStore'
+import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
 
 interface Props {}
 
@@ -38,14 +38,6 @@ const Page = (props: Props) => {
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <button type="button" onClick={() => router.push('/')}>
-                {'<'} Back to dashboard
-            </button>
-            <div className="space-y-[24px]">
-                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
-                    Intake Form
-                </label>
-            </div>
             <div className="flex items-center justify-center">
                 <div className="min-w-[800px] space-y-[60px]">
                     <div>
@@ -56,7 +48,11 @@ const Page = (props: Props) => {
                     <div className="flex justify-between">
                         <button
                             type="button"
-                            onClick={() => router.push('/intake/services')}
+                            onClick={() =>
+                                router.push(
+                                    '/intake/family/background/services',
+                                )
+                            }
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                         >
                             Back

@@ -1,7 +1,6 @@
 import { useRef } from 'react'
 
 interface FileUploadProps {
-    label: string
     fileName?: string[]
     handleFileChange: (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -21,7 +20,6 @@ interface FileUploadProps {
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({
-    label,
     fileName = [],
     handleFileChange,
     handleAddFile,
@@ -31,12 +29,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
     buttonText,
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null!)
+    const dynamicButtonText = fileName.length > 0 ? 'Reupload' : buttonText
 
     return (
         <div className="space-y-[24px]">
-            <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                {label}
-            </label>
             {fileName && Array.isArray(fileName) && fileName.length > 0 && (
                 <div className="flex flex-col space-y-2">
                     {fileName.map((name, index) => (
@@ -60,7 +56,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     onClick={() => handleAddFile(fileInputRef)}
                     className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
                 >
-                    + {buttonText}
+                    + {dynamicButtonText}
                 </button>
                 <input
                     ref={fileInputRef}
