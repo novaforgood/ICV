@@ -197,8 +197,38 @@ const Page = (props: Props) => {
         }
     }
 
+    const resetFiles = async (field: string, nameField: string) => {
+        const oldImageUrls = loadedForm?.[field as keyof typeof loadedForm]
+
+        if (oldImageUrls && Array.isArray(oldImageUrls)) {
+            await Promise.all(
+                oldImageUrls.map(async (url) => {
+                    const oldImageRef = ref(storage, url as string)
+                    try {
+                        await deleteObject(oldImageRef)
+                        console.log(`Deleted old image: ${url}`)
+                        const updatedUrls = loadedForm?.[
+                            field as keyof typeof loadedForm
+                        ] as string[]
+                        const updatedNames = loadedForm?.[
+                            nameField as keyof typeof loadedForm
+                        ] as string[]
+
+                        updatedUrls.shift() // Remove the first element
+                        updatedNames.shift() // Remove the first element
+
+                        // Update the form state with the remaining items
+                        updateForm({ [field]: updatedUrls })
+                        updateForm({ [nameField]: updatedNames })
+                    } catch (error) {
+                        console.error(`Error deleting old image ${url}:`, error)
+                    }
+                }),
+            )
+        }
+    }
+
     const deleteFile = async (
-        index: number,
         fileName: string,
         field: string,
         nameField: string,
@@ -383,6 +413,50 @@ const Page = (props: Props) => {
                         </div>
                         <div className="space-y-[24px]">
                             <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                Kits
+                            </label>
+                            <div className="space-y-[8px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Hygiene Kit
+                                </label>
+                                <div>
+                                    <input
+                                        {...register('hygieneKit')}
+                                        type="text"
+                                        placeholder="Text"
+                                        className="w-[30%] rounded border p-2"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-[8px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Hot meal
+                                </label>
+                                <div>
+                                    <input
+                                        {...register('hotMeal')}
+                                        type="text"
+                                        placeholder="Text"
+                                        className="w-[30%] rounded border p-2"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-[8px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Snack pack
+                                </label>
+                                <div>
+                                    <input
+                                        {...register('snackPack')}
+                                        type="text"
+                                        placeholder="Text"
+                                        className="w-[30%] rounded border p-2"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="space-y-[24px]">
+                            <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
                                 Profile Picture
                             </label>
                             {/* Image */}
@@ -394,6 +468,7 @@ const Page = (props: Props) => {
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
+                                resetFiles={resetFiles}
                                 field="clientImage"
                                 nameField="clientImageName"
                                 buttonText="Add image"
@@ -419,6 +494,7 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
+                                    resetFiles={resetFiles}
                                     field="clientID"
                                     nameField="clientIDName"
                                     buttonText="Add ID"
@@ -437,6 +513,7 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
+                                    resetFiles={resetFiles}
                                     field="clientPassport"
                                     nameField="clientPassportName"
                                     buttonText="Add passport"
@@ -456,6 +533,7 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
+                                    resetFiles={resetFiles}
                                     field="clientMed"
                                     nameField="clientMedName"
                                     buttonText="Add MediCal"
@@ -475,6 +553,7 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
+                                    resetFiles={resetFiles}
                                     field="clientSSN"
                                     nameField="clientSSNName"
                                     buttonText="Add SSN"
@@ -494,6 +573,7 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
+                                    resetFiles={resetFiles}
                                     field="clientBC"
                                     nameField="clientBCName"
                                     buttonText="Add birth certificate"
@@ -513,6 +593,7 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
+                                    resetFiles={resetFiles}
                                     field="otherFiles"
                                     nameField="otherFilesName"
                                     buttonText="Add other files"

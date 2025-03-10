@@ -42,8 +42,53 @@ const Page = (props: Props) => {
                 <div className="min-w-[800px] space-y-[60px]">
                     <div>
                         <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
-                            Confirmation
+                            Review
                         </label>
+                    </div>
+                    <div>
+                        <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
+                            Client Profile
+                        </label>
+                        <div>
+                            <div>
+                                <label>
+                                    <strong>Name</strong>
+                                </label>
+                                <div>
+                                    <label>{loadedForm.firstName}</label>
+                                    <label>
+                                        {loadedForm.lastName ?? 'Last Name'}
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label>
+                                    <strong>Gender</strong>
+                                </label>
+                                <div>
+                                    <label>{loadedForm.gender}</label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label>
+                                    <strong>DOB</strong>
+                                </label>
+                                <div>
+                                    <label>{loadedForm.dateOfBirth}</label>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label>
+                                    <strong>Referral Source</strong>
+                                </label>
+                                <div>
+                                    <label>{loadedForm.referralSource}</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="flex justify-between">
                         <button

@@ -146,6 +146,11 @@ export const ClientIntakeSchema = z.object({
     clientBCName: z.array(z.string().optional(),).optional(),
     otherFilesName: z.array(z.string().optional(),).optional(),
 
+    // kits
+    hygieneKit: z.string().optional(),
+    hotMeal: z.string().optional(),
+    snackPack: z.string().optional(),
+
 }) 
 
 export const BackgroundSchema = ClientIntakeSchema.pick({
@@ -188,6 +193,9 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     clientBCName: true,
     otherFilesName: true,
     notes: true,
+    hygieneKit: true,
+    hotMeal: true,
+    snackPack: true,
 })
 
 export const ProfileSchema = ClientIntakeSchema.pick({

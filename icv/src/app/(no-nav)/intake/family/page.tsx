@@ -175,8 +175,17 @@ const Page = (props: Props) => {
                         {watch('spouse')?.map((spouse, index) => (
                             <div
                                 key={index}
-                                className="mt-[24px] space-y-[24px]"
+                                className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
                             >
+                                <div className="flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => removeSpouse(index)}
+                                    >
+                                        Remove x
+                                    </button>
+                                </div>
+
                                 <div className="grid grid-cols-2 gap-[12px]">
                                     <div className="flex flex-col space-y-[4px]">
                                         <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
@@ -258,16 +267,6 @@ const Page = (props: Props) => {
                                         otherPlaceholder="Other"
                                     />
                                 </div>
-
-                                <div className="flex justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() => removeSpouse(index)}
-                                        className="flex-end h-[52px] w-[200px] rounded-[5px] bg-[#27262A] px-4 py-2 text-white"
-                                    >
-                                        - Remove Spouse {index + 1}
-                                    </button>
-                                </div>
                             </div>
                         ))}
                         <button
@@ -287,8 +286,17 @@ const Page = (props: Props) => {
                         {watch('dependent')?.map((dependent, index) => (
                             <div
                                 key={index}
-                                className="mt-[24px] space-y-[24px]"
+                                className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
                             >
+                                <div className="flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => removeChild(index)}
+                                    >
+                                        Remove x
+                                    </button>
+                                </div>
+
                                 <div className="grid grid-cols-2 gap-[12px]">
                                     {/* First Name and Last Name on the same line */}
                                     <div className="flex flex-col space-y-[4px]">
@@ -398,16 +406,6 @@ const Page = (props: Props) => {
                                         />
                                     </div>
                                 </div>
-
-                                <div className="flex justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() => removeChild(index)}
-                                        className="h-[52px] w-[225px] rounded-[5px] bg-[#27262A] px-4 py-2 text-white"
-                                    >
-                                        - Remove dependent {index + 1}
-                                    </button>
-                                </div>
                             </div>
                         ))}
                         <button
@@ -426,10 +424,22 @@ const Page = (props: Props) => {
                         </label>
 
                         {watch('pets')?.map((pet, index) => (
-                            <div key={index} className="mt-4 space-y-[24px]">
+                            <div
+                                key={index}
+                                className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
+                            >
+                                <div className="flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => removePet(index)}
+                                    >
+                                        Remove x
+                                    </button>
+                                </div>
+
                                 <div className="flex flex-col space-y-[4px]">
                                     <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                        Breed
+                                        Species
                                     </label>
                                     <input
                                         {...register(`pets.${index}.species`)}
@@ -475,15 +485,6 @@ const Page = (props: Props) => {
                                         }
                                         name={`pets.${index}.purpose`}
                                     />
-                                </div>
-                                <div className="flex justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() => removePet(index)}
-                                        className="h-[52px] w-[200px] rounded-[5px] bg-[#27262A] px-4 py-2 text-white"
-                                    >
-                                        - Remove Pet {index + 1}
-                                    </button>
                                 </div>
                             </div>
                         ))}

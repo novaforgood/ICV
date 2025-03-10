@@ -8,12 +8,8 @@ interface FileUploadProps {
         nameField: string,
     ) => void
     handleAddFile: (ref: React.RefObject<HTMLInputElement>) => void
-    deleteFile: (
-        index: number,
-        fileName: string,
-        fileType: string,
-        nameType: string,
-    ) => void
+    deleteFile: (fileName: string, fileType: string, nameType: string) => void
+    resetFiles: (field: string, nameField: string) => void // Reset all files
     field: string
     nameField: string
     buttonText: string
@@ -24,6 +20,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     handleFileChange,
     handleAddFile,
     deleteFile,
+    resetFiles,
     field,
     nameField,
     buttonText,
@@ -41,7 +38,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             <button
                                 type="button"
                                 onClick={() =>
-                                    deleteFile(index, name, field, nameField)
+                                    deleteFile(name, field, nameField)
                                 }
                             >
                                 Delete
@@ -66,6 +63,18 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     className="hidden" // Hide the actual file input
                 />
             </div>
+            {/* Reset Button */}
+            {fileName.length > 0 && (
+                <div className="mt-4">
+                    <button
+                        type="button"
+                        onClick={() => resetFiles(field, nameField)}
+                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-red-500 px-[12px] py-[16px] text-white"
+                    >
+                        Reset
+                    </button>
+                </div>
+            )}
         </div>
     )
 }
