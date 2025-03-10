@@ -9,7 +9,6 @@ interface FileUploadProps {
     ) => void
     handleAddFile: (ref: React.RefObject<HTMLInputElement>) => void
     deleteFile: (fileName: string, fileType: string, nameType: string) => void
-    resetFiles: (field: string, nameField: string) => void // Reset all files
     field: string
     nameField: string
     buttonText: string
@@ -20,7 +19,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
     handleFileChange,
     handleAddFile,
     deleteFile,
-    resetFiles,
     field,
     nameField,
     buttonText,
@@ -41,38 +39,28 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                     deleteFile(name, field, nameField)
                                 }
                             >
-                                Delete
+                                x
                             </button>
                         </div>
                     ))}
                 </div>
             )}
-            <div className="space-y-[24px]">
-                <button
-                    type="button"
-                    onClick={() => handleAddFile(fileInputRef)}
-                    className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
-                >
-                    + {dynamicButtonText}
-                </button>
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    onChange={(e) => handleFileChange(e, field, nameField)}
-                    className="hidden" // Hide the actual file input
-                />
-            </div>
-            {/* Reset Button */}
-            {fileName.length > 0 && (
-                <div className="mt-4">
+            {fileName && fileName.length === 0 && (
+                <div className="space-y-[24px]">
                     <button
                         type="button"
-                        onClick={() => resetFiles(field, nameField)}
-                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-red-500 px-[12px] py-[16px] text-white"
+                        onClick={() => handleAddFile(fileInputRef)}
+                        className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white"
                     >
-                        Reset
+                        + {buttonText}
                     </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        onChange={(e) => handleFileChange(e, field, nameField)}
+                        className="hidden" // Hide the actual file input
+                    />
                 </div>
             )}
         </div>
@@ -80,3 +68,36 @@ const FileUpload: React.FC<FileUploadProps> = ({
 }
 
 export default FileUpload
+
+interface ResetProps {
+    fileName?: string[]
+    resetFiles: (field: string, nameType: string) => void
+    field: string
+    nameField: string
+}
+
+export const ResetButton: React.FC<ResetProps> = ({
+    fileName = [],
+    resetFiles,
+    field,
+    nameField,
+}) => {
+    return (
+        <div>
+            <button
+                type="button"
+                onClick={() =>
+                    fileName?.length > 0 && resetFiles(field, nameField)
+                }
+                className={`flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] px-[12px] py-[16px] ${
+                    fileName?.length > 0
+                        ? 'cursor-pointer'
+                        : 'cursor-not-allowed text-gray-300'
+                }`}
+                disabled={!fileName?.length}
+            >
+                Reset ↻
+            </button>
+        </div>
+    )
+}

@@ -14,7 +14,7 @@ import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../_lib/useIntakeFormStore'
-import FileUpload from '../../../components/FileUpload'
+import FileUpload, { ResetButton } from '../../../components/FileUpload'
 import { CheckboxList } from '../../../components/MakeOptions'
 
 interface Props {}
@@ -225,6 +225,8 @@ const Page = (props: Props) => {
                     }
                 }),
             )
+            updateForm({ [field]: [] })
+            updateForm({ [nameField]: [] })
         }
     }
 
@@ -456,9 +458,21 @@ const Page = (props: Props) => {
                             </div>
                         </div>
                         <div className="space-y-[24px]">
-                            <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                Profile Picture
-                            </label>
+                            <div className="flex items-center justify-between">
+                                <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                    Profile Picture
+                                </label>
+                                <ResetButton
+                                    fileName={loadedForm.clientImageName?.filter(
+                                        (name): name is string =>
+                                            name !== undefined,
+                                    )}
+                                    field="clientImage"
+                                    nameField="clientImageName"
+                                    resetFiles={resetFiles}
+                                />
+                            </div>
+
                             {/* Image */}
                             <FileUpload
                                 fileName={loadedForm.clientImageName?.filter(
@@ -468,7 +482,6 @@ const Page = (props: Props) => {
                                 handleFileChange={handleImageChange}
                                 handleAddFile={handleAddFile}
                                 deleteFile={deleteFile}
-                                resetFiles={resetFiles}
                                 field="clientImage"
                                 nameField="clientImageName"
                                 buttonText="Add image"
@@ -483,9 +496,21 @@ const Page = (props: Props) => {
                             </div>
                             {/* ID */}
                             <div className="space-y-[4px]">
-                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
-                                    ID
-                                </label>
+                                <div className="flex items-center justify-between">
+                                    <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                        ID
+                                    </label>
+                                    {/* Reset Button */}
+                                    <ResetButton
+                                        fileName={loadedForm.clientIDName?.filter(
+                                            (name): name is string =>
+                                                name !== undefined,
+                                        )}
+                                        field="clientID"
+                                        nameField="clientIDName"
+                                        resetFiles={resetFiles}
+                                    />
+                                </div>
                                 <FileUpload
                                     fileName={loadedForm.clientIDName?.filter(
                                         (name): name is string =>
@@ -494,7 +519,6 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
-                                    resetFiles={resetFiles}
                                     field="clientID"
                                     nameField="clientIDName"
                                     buttonText="Add ID"
@@ -502,9 +526,21 @@ const Page = (props: Props) => {
                             </div>
                             {/* Passport */}
                             <div className="space-y-[4px]">
-                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
-                                    Passport
-                                </label>
+                                <div className="flex items-center justify-between">
+                                    <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                        Passport
+                                    </label>
+                                    {/* Reset Button */}
+                                    <ResetButton
+                                        fileName={loadedForm.clientPassportName?.filter(
+                                            (name): name is string =>
+                                                name !== undefined,
+                                        )}
+                                        field="clientPassport"
+                                        nameField="clientPassportName"
+                                        resetFiles={resetFiles}
+                                    />
+                                </div>
                                 <FileUpload
                                     fileName={loadedForm.clientPassportName?.filter(
                                         (name): name is string =>
@@ -513,7 +549,6 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
-                                    resetFiles={resetFiles}
                                     field="clientPassport"
                                     nameField="clientPassportName"
                                     buttonText="Add passport"
@@ -521,9 +556,21 @@ const Page = (props: Props) => {
                             </div>
 
                             <div className="space-y-[4px]">
-                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
-                                    MediCal
-                                </label>
+                                <div className="flex items-center justify-between">
+                                    <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                        MediCal
+                                    </label>
+                                    {/* Reset Button */}
+                                    <ResetButton
+                                        fileName={loadedForm.clientMed?.filter(
+                                            (name): name is string =>
+                                                name !== undefined,
+                                        )}
+                                        field="clientMed"
+                                        nameField="clientMedName"
+                                        resetFiles={resetFiles}
+                                    />
+                                </div>
                                 {/* MediCal */}
                                 <FileUpload
                                     fileName={loadedForm.clientMedName?.filter(
@@ -533,7 +580,6 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
-                                    resetFiles={resetFiles}
                                     field="clientMed"
                                     nameField="clientMedName"
                                     buttonText="Add MediCal"
@@ -541,9 +587,21 @@ const Page = (props: Props) => {
                             </div>
 
                             <div className="space-y-[4px]">
-                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
-                                    SSN
-                                </label>
+                                <div className="flex items-center justify-between">
+                                    <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                        SSN
+                                    </label>
+                                    {/* Reset Button */}
+                                    <ResetButton
+                                        fileName={loadedForm.clientSSNName?.filter(
+                                            (name): name is string =>
+                                                name !== undefined,
+                                        )}
+                                        field="clientSSN"
+                                        nameField="clientSSNName"
+                                        resetFiles={resetFiles}
+                                    />
+                                </div>
                                 {/* SSN */}
                                 <FileUpload
                                     fileName={loadedForm.clientSSNName?.filter(
@@ -553,7 +611,6 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
-                                    resetFiles={resetFiles}
                                     field="clientSSN"
                                     nameField="clientSSNName"
                                     buttonText="Add SSN"
@@ -561,9 +618,21 @@ const Page = (props: Props) => {
                             </div>
 
                             <div className="space-y-[4px]">
-                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
-                                    Birth certificate
-                                </label>
+                                <div className="flex items-center justify-between">
+                                    <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                        Birth certificate
+                                    </label>
+                                    {/* Reset Button */}
+                                    <ResetButton
+                                        fileName={loadedForm.clientBCName?.filter(
+                                            (name): name is string =>
+                                                name !== undefined,
+                                        )}
+                                        field="clientBC"
+                                        nameField="clientBCName"
+                                        resetFiles={resetFiles}
+                                    />
+                                </div>
                                 {/* Birth Certificate */}
                                 <FileUpload
                                     fileName={loadedForm.clientBCName?.filter(
@@ -573,7 +642,6 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
-                                    resetFiles={resetFiles}
                                     field="clientBC"
                                     nameField="clientBCName"
                                     buttonText="Add birth certificate"
@@ -581,9 +649,21 @@ const Page = (props: Props) => {
                             </div>
 
                             <div className="space-y-[4px]">
-                                <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
-                                    Other
-                                </label>
+                                <div className="flex items-center justify-between">
+                                    <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
+                                        Other
+                                    </label>
+                                    {/* Reset Button */}
+                                    <ResetButton
+                                        fileName={loadedForm.otherFilesName?.filter(
+                                            (name): name is string =>
+                                                name !== undefined,
+                                        )}
+                                        field="otherFiles"
+                                        nameField="otherFilesName"
+                                        resetFiles={resetFiles}
+                                    />
+                                </div>
                                 {/* Other Files */}
                                 <FileUpload
                                     fileName={loadedForm.otherFilesName?.filter(
@@ -593,7 +673,6 @@ const Page = (props: Props) => {
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
                                     deleteFile={deleteFile}
-                                    resetFiles={resetFiles}
                                     field="otherFiles"
                                     nameField="otherFilesName"
                                     buttonText="Add other files"
