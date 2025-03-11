@@ -1,3 +1,6 @@
+'use server'
+import 'server-only'
+
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import { NewClient } from '@/types/client-types'
 import { collection, getDoc, getDocs, getFirestore, doc } from 'firebase/firestore'

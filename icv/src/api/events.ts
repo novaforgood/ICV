@@ -49,3 +49,21 @@ export async function getEventsbyClientId(clientId: string) {
     })    
     return events
 }
+
+export async function createEvent(event: CaseEventType) {
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
+    const ssrdb = getFirestore(firebaseServerApp)
+
+    try {
+        const eventsCollection = collection(ssrdb, 'events')
+        const newDoc = await addDoc(eventsCollection, event)
+        console.log('Event added with ID: ', newDoc.id)
+    } catch (error) {
+        console.error('Error updating event:', error)
+        throw new Error('Failed to update event')
+    }
+}
