@@ -69,12 +69,12 @@ const Page = () => {
                                 </label>
                                 <div>{loadedForm.clientCode}</div>
                             </div>
-                            <div className="flex flex-col space-y-1">
+                            {/* <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Assessing Staff
                                 </label>
                                 <div>*Staff Name*</div>
-                            </div>
+                            </div> */}
                         </div>
                         {/* Program and Case Manager to be implemented later */}
                         {/* <div className="grid grid-cols-2 gap-x-5 gap-y-3">
@@ -138,8 +138,7 @@ const Page = () => {
                                                                     loadedForm.gender
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        gender
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -158,8 +157,7 @@ const Page = () => {
                                                                     loadedForm.dateOfBirth
                                                                 ) : (
                                                                     <p>
-                                                                        No date
-                                                                        of birth
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -174,9 +172,7 @@ const Page = () => {
                                                                     loadedForm.referralSource
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        referral
-                                                                        source
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -200,7 +196,7 @@ const Page = () => {
                                                                     loadedForm.email
                                                                 ) : (
                                                                     <p>
-                                                                        No email
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -215,8 +211,7 @@ const Page = () => {
                                                                     loadedForm.phoneNumber
                                                                 ) : (
                                                                     <p>
-                                                                        No phone
-                                                                        number
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -240,9 +235,7 @@ const Page = () => {
                                                                     loadedForm.placeOrigin
                                                                 ) : (
                                                                     <p>
-                                                                        No place
-                                                                        of
-                                                                        origin
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -257,9 +250,7 @@ const Page = () => {
                                                                     loadedForm.citizenship
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        citizenship
-                                                                        status
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -283,7 +274,7 @@ const Page = () => {
                                                                     loadedForm.email
                                                                 ) : (
                                                                     <p>
-                                                                        No email
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -298,9 +289,7 @@ const Page = () => {
                                                                     loadedForm.streetAddress
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        street
-                                                                        Address
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}{' '}
@@ -330,9 +319,7 @@ const Page = () => {
                                                                     loadedForm.housingSituation
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        housing
-                                                                        situation
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -378,8 +365,7 @@ const Page = () => {
                                                                         </ul>
                                                                     ) : (
                                                                         <p>
-                                                                            No
-                                                                            ethnicity
+                                                                            None
                                                                             provided.
                                                                         </p>
                                                                     )}
@@ -394,8 +380,7 @@ const Page = () => {
                                                                         `$${loadedForm.income} ${loadedForm.aptNumber ? `Apt. ${loadedForm.aptNumber}` : ''}`
                                                                     ) : (
                                                                         <p>
-                                                                            No
-                                                                            income
+                                                                            None
                                                                             provided.
                                                                         </p>
                                                                     )}
@@ -413,9 +398,7 @@ const Page = () => {
                                                                         loadedForm.employed
                                                                     ) : (
                                                                         <p>
-                                                                            No
-                                                                            employment
-                                                                            status
+                                                                            None
                                                                             provided.
                                                                         </p>
                                                                     )}
@@ -441,9 +424,7 @@ const Page = () => {
                                                                     loadedForm.familySize
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        family
-                                                                        size
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -492,8 +473,7 @@ const Page = () => {
                                                                             <div>
                                                                                 {spouse.spouseGender || (
                                                                                     <p>
-                                                                                        No
-                                                                                        gender
+                                                                                        None
                                                                                         provided.
                                                                                     </p>
                                                                                 )}
@@ -512,10 +492,7 @@ const Page = () => {
                                                                             <div>
                                                                                 {spouse.spouseDOB || (
                                                                                     <p>
-                                                                                        No
-                                                                                        date
-                                                                                        of
-                                                                                        birth
+                                                                                        None
                                                                                         provided.
                                                                                     </p>
                                                                                 )}
@@ -531,8 +508,7 @@ const Page = () => {
                                                                                     `$${spouse.spouseIncome.toLocaleString()}`
                                                                                 ) : (
                                                                                     <p>
-                                                                                        No
-                                                                                        income
+                                                                                        None
                                                                                         provided.
                                                                                     </p>
                                                                                 )}
@@ -543,17 +519,13 @@ const Page = () => {
                                                             ),
                                                         )
                                                     ) : (
-                                                        <p>
-                                                            No spouse
-                                                            information
-                                                            available.
-                                                        </p>
+                                                        <p>None provided.</p>
                                                     )}
                                                 </div>
 
                                                 <div className="space-y-[24px]">
                                                     <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Dependent
+                                                        Dependents
                                                     </label>
                                                     {loadedForm.dependent
                                                         ?.length ? ( // Optional chaining used here
@@ -594,8 +566,7 @@ const Page = () => {
                                                                                     `$${child.income.toLocaleString()}`
                                                                                 ) : (
                                                                                     <p>
-                                                                                        No
-                                                                                        income
+                                                                                        None
                                                                                         provided.
                                                                                     </p>
                                                                                 )}
@@ -614,10 +585,7 @@ const Page = () => {
                                                                             <div>
                                                                                 {child.dob || (
                                                                                     <p>
-                                                                                        No
-                                                                                        date
-                                                                                        of
-                                                                                        birth
+                                                                                        None
                                                                                         provided.
                                                                                     </p>
                                                                                 )}
@@ -630,8 +598,7 @@ const Page = () => {
                                                                             <div>
                                                                                 {child.gender || (
                                                                                     <p>
-                                                                                        No
-                                                                                        gender
+                                                                                        None
                                                                                         provided.
                                                                                     </p>
                                                                                 )}
@@ -669,10 +636,7 @@ const Page = () => {
                                                                                 )
                                                                             ) : (
                                                                                 <p>
-                                                                                    No
-                                                                                    public
-                                                                                    services
-                                                                                    information
+                                                                                    None
                                                                                     provided.
                                                                                 </p>
                                                                             )}
@@ -682,11 +646,98 @@ const Page = () => {
                                                             ),
                                                         )
                                                     ) : (
-                                                        <p>
-                                                            No dependent
-                                                            information
-                                                            available.
-                                                        </p>
+                                                        <p>None provided.</p>
+                                                    )}
+                                                </div>
+
+                                                <div className="space-y-[24px]">
+                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                                        Pets
+                                                    </label>
+                                                    {loadedForm.pets?.length ? ( // Optional chaining used here
+                                                        loadedForm.pets.map(
+                                                            (pet, index) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className="space-y-4 pb-4"
+                                                                >
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                        Pet{' '}
+                                                                        {index +
+                                                                            1}
+                                                                        :
+                                                                    </label>
+                                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                        {/* First Row: Name & Gender */}
+                                                                        <div className="flex flex-col space-y-1">
+                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                                Species
+                                                                            </label>
+                                                                            <div>
+                                                                                {pet.species || (
+                                                                                    <p>
+                                                                                        None
+                                                                                        provided.
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex flex-col space-y-1">
+                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                                Size
+                                                                            </label>
+                                                                            <div>
+                                                                                {pet.size || (
+                                                                                    <p>
+                                                                                        None
+                                                                                        provided.
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Second Row: Purpose */}
+                                                                    <div className="space-y-[4px]">
+                                                                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                            Purpose
+                                                                        </label>
+                                                                        <div>
+                                                                            {pet
+                                                                                .purpose
+                                                                                ?.length ? ( // Optional chaining used here
+                                                                                pet.purpose.map(
+                                                                                    (
+                                                                                        purpose,
+                                                                                        index,
+                                                                                    ) => (
+                                                                                        <div
+                                                                                            key={
+                                                                                                index
+                                                                                            }
+                                                                                            className="space-y-4"
+                                                                                        >
+                                                                                            <label>
+                                                                                                {
+                                                                                                    purpose
+                                                                                                }
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    ),
+                                                                                )
+                                                                            ) : (
+                                                                                <p>
+                                                                                    None
+                                                                                    provided.
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        )
+                                                    ) : (
+                                                        <p>None provided.</p>
                                                     )}
                                                 </div>
                                             </div>
@@ -725,10 +776,7 @@ const Page = () => {
                                                                     )
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        public
-                                                                        services
-                                                                        information
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -744,8 +792,7 @@ const Page = () => {
                                                                     loadedForm.probation
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        status
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -765,8 +812,7 @@ const Page = () => {
                                                                     loadedForm.cps
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        status
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -781,8 +827,7 @@ const Page = () => {
                                                                     loadedForm.fosterYouth
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        status
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -823,8 +868,7 @@ const Page = () => {
                                                                     )
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        conditions
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -898,8 +942,7 @@ const Page = () => {
                                                                         )
                                                                     ) : (
                                                                         <p>
-                                                                            No
-                                                                            conditions
+                                                                            None
                                                                             provided.
                                                                         </p>
                                                                     )}
@@ -949,10 +992,7 @@ const Page = () => {
                                                                     )
                                                                 ) : (
                                                                     <p>
-                                                                        No
-                                                                        public
-                                                                        services
-                                                                        information
+                                                                        None
                                                                         provided.
                                                                     </p>
                                                                 )}
@@ -966,90 +1006,45 @@ const Page = () => {
                                         {section == 'Services' && (
                                             <div className="space-y-[40px]">
                                                 <div className="space-y-[24px]">
-                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                        {/* First Row: Name & Gender */}
-                                                        <div className="flex flex-col space-y-1">
+                                                    <div className="grid grid-cols-2 gap-[12px]">
+                                                        <div>
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                                                 Mentoring
                                                             </label>
-                                                            <div>
-                                                                {loadedForm
-                                                                    .mentoring
-                                                                    ?.length ? ( // Optional chaining used here
-                                                                    loadedForm.mentoring.map(
-                                                                        (
-                                                                            mentor,
-                                                                            index,
-                                                                        ) => (
-                                                                            <div
-                                                                                key={
-                                                                                    index
+                                                            {loadedForm
+                                                                .mentoring
+                                                                ?.length ? ( // Optional chaining used here
+                                                                loadedForm.mentoring.map(
+                                                                    (
+                                                                        mentor,
+                                                                        index,
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="space-y-4"
+                                                                        >
+                                                                            <label>
+                                                                                {
+                                                                                    mentor
                                                                                 }
-                                                                                className="space-y-4"
-                                                                            >
-                                                                                <label>
-                                                                                    {
-                                                                                        mentor
-                                                                                    }
-                                                                                </label>
-                                                                            </div>
-                                                                        ),
-                                                                    )
-                                                                ) : (
-                                                                    <p>
-                                                                        No
-                                                                        services
-                                                                        needed.
-                                                                    </p>
-                                                                )}
-                                                            </div>
+                                                                            </label>
+                                                                        </div>
+                                                                    ),
+                                                                )
+                                                            ) : (
+                                                                <p>
+                                                                    No services
+                                                                    needed.
+                                                                </p>
+                                                            )}
                                                         </div>
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Health &
-                                                                Wellness Support
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm
-                                                                    .healthWellness
-                                                                    ?.length ? ( // Optional chaining used here
-                                                                    loadedForm.healthWellness.map(
-                                                                        (
-                                                                            health,
-                                                                            index,
-                                                                        ) => (
-                                                                            <div
-                                                                                key={
-                                                                                    index
-                                                                                }
-                                                                                className="space-y-4"
-                                                                            >
-                                                                                <label>
-                                                                                    {
-                                                                                        health
-                                                                                    }
-                                                                                </label>
-                                                                            </div>
-                                                                        ),
-                                                                    )
-                                                                ) : (
-                                                                    <p>
-                                                                        No
-                                                                        services
-                                                                        needed.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Second Row: DOB & Referral Source */}
-
-                                                    <div className="flex flex-col space-y-1">
-                                                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                            Personal Development
-                                                        </label>
                                                         <div>
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Personal
+                                                                Development
+                                                            </label>
                                                             {loadedForm
                                                                 .personalDev
                                                                 ?.length ? ( // Optional chaining used here
@@ -1079,6 +1074,178 @@ const Page = () => {
                                                                 </p>
                                                             )}
                                                         </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-[12px]">
+                                                        <div>
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Housing
+                                                                Assistance
+                                                            </label>
+                                                            {loadedForm.housing
+                                                                ?.length ? ( // Optional chaining used here
+                                                                loadedForm.housing.map(
+                                                                    (
+                                                                        house,
+                                                                        index,
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="space-y-4"
+                                                                        >
+                                                                            <label>
+                                                                                {
+                                                                                    house
+                                                                                }
+                                                                            </label>
+                                                                        </div>
+                                                                    ),
+                                                                )
+                                                            ) : (
+                                                                <p>
+                                                                    No services
+                                                                    needed.
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Redirection
+                                                                Program
+                                                            </label>
+                                                            {loadedForm
+                                                                .redirection
+                                                                ?.length ? ( // Optional chaining used here
+                                                                loadedForm.redirection.map(
+                                                                    (
+                                                                        dir,
+                                                                        index,
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="space-y-4"
+                                                                        >
+                                                                            <label>
+                                                                                {
+                                                                                    dir
+                                                                                }
+                                                                            </label>
+                                                                        </div>
+                                                                    ),
+                                                                )
+                                                            ) : (
+                                                                <p>
+                                                                    No services
+                                                                    needed.
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-[12px]">
+                                                        <div>
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Education &
+                                                                Training Support
+                                                            </label>
+                                                            {loadedForm
+                                                                .education
+                                                                ?.length ? ( // Optional chaining used here
+                                                                loadedForm.education.map(
+                                                                    (
+                                                                        edu,
+                                                                        index,
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="space-y-4"
+                                                                        >
+                                                                            <label>
+                                                                                {
+                                                                                    edu
+                                                                                }
+                                                                            </label>
+                                                                        </div>
+                                                                    ),
+                                                                )
+                                                            ) : (
+                                                                <p>
+                                                                    No services
+                                                                    needed.
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Health &
+                                                                Wellness Support
+                                                            </label>
+                                                            {loadedForm
+                                                                .healthWellness
+                                                                ?.length ? ( // Optional chaining used here
+                                                                loadedForm.healthWellness.map(
+                                                                    (
+                                                                        health,
+                                                                        index,
+                                                                    ) => (
+                                                                        <div
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="space-y-4"
+                                                                        >
+                                                                            <label>
+                                                                                {
+                                                                                    health
+                                                                                }
+                                                                            </label>
+                                                                        </div>
+                                                                    ),
+                                                                )
+                                                            ) : (
+                                                                <p>
+                                                                    No services
+                                                                    needed.
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                            Referrals/Linkages
+                                                            Services
+                                                        </label>
+                                                        {loadedForm.referral
+                                                            ?.length ? ( // Optional chaining used here
+                                                            loadedForm.referral.map(
+                                                                (
+                                                                    ref,
+                                                                    index,
+                                                                ) => (
+                                                                    <div
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="space-y-4"
+                                                                    >
+                                                                        <label>
+                                                                            {
+                                                                                ref
+                                                                            }
+                                                                        </label>
+                                                                    </div>
+                                                                ),
+                                                            )
+                                                        ) : (
+                                                            <p>
+                                                                No services
+                                                                needed.
+                                                            </p>
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -1152,8 +1319,7 @@ const Page = () => {
                                                                 )
                                                             ) : (
                                                                 <p>
-                                                                    No
-                                                                    picture(s)
+                                                                    No file(s)
                                                                     uploaded.
                                                                 </p>
                                                             )}
@@ -1194,7 +1360,7 @@ const Page = () => {
                                                                 )
                                                             ) : (
                                                                 <p>
-                                                                    No ID(s)
+                                                                    No file(s)
                                                                     uploaded.
                                                                 </p>
                                                             )}
@@ -1229,8 +1395,7 @@ const Page = () => {
                                                                 )
                                                             ) : (
                                                                 <p>
-                                                                    No
-                                                                    passport(s)
+                                                                    No file(s)
                                                                     uploaded.
                                                                 </p>
                                                             )}
@@ -1266,8 +1431,7 @@ const Page = () => {
                                                                 )
                                                             ) : (
                                                                 <p>
-                                                                    No
-                                                                    MediCal(s)
+                                                                    No file(s)
                                                                     uploaded.
                                                                 </p>
                                                             )}
@@ -1303,7 +1467,7 @@ const Page = () => {
                                                                 )
                                                             ) : (
                                                                 <p>
-                                                                    No SSN(s)
+                                                                    No file(s)
                                                                     uploaded.
                                                                 </p>
                                                             )}
@@ -1338,8 +1502,7 @@ const Page = () => {
                                                                 )
                                                             ) : (
                                                                 <p>
-                                                                    No birth
-                                                                    certificate(s)
+                                                                    No file(s)
                                                                     uploaded.
                                                                 </p>
                                                             )}
@@ -1360,9 +1523,8 @@ const Page = () => {
                                                                         loadedForm.notes
                                                                     ) : (
                                                                         <p>
-                                                                            No
-                                                                            additional
-                                                                            notes.
+                                                                            None
+                                                                            provided.
                                                                         </p>
                                                                     )}
                                                                 </div>
