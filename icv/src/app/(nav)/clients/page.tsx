@@ -1,38 +1,14 @@
 'use server'
 
-// 'use client' // Add this line to mark it as a client-side component
-
 import { getAllClients } from '@/api/clients'
-import ClientsTable from '@/app/(nav)/database/_components/ClientsTable'
+import SearchComponent from '@/app/_components/SearchComponent'
 
-const ClientsPage = async () => {
-    // const [clients, setClients] = useState<Client[]>([])
-    // const [loading, setLoading] = useState(true)
-    // const [error, setError] = useState('')
-
-    // useEffect(() => {
-    //     const fetchClients = async () => {
-    //         try {
-    //             const clientsData = await getAllClients()
-    //             setClients(clientsData)
-    //         } catch (err) {
-    //             setError('Failed to load clients')
-    //         } finally {
-    //             setLoading(false)
-    //         }
-    //     }
-
-    //     fetchClients()
-    // }, [])
-
-    // if (loading) return <div>Loading...</div>
-    // if (error) return <div>{error}</div>
-
+export default async function ClientsPage() {
     const clients = await getAllClients()
-
-    return null
-
-    return <ClientsTable clients={clients} />
+    
+    return (
+        <>
+            <SearchComponent clients={clients} />
+        </>
+    )
 }
-
-export default ClientsPage
