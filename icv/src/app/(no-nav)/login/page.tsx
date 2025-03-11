@@ -72,7 +72,7 @@ const page = () => {
                     console.log('Welcome, ', auth.currentUser?.displayName)
                 }
             }
-            alert('Successfully logged in')
+            
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message)
