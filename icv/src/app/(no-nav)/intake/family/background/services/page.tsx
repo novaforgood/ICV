@@ -307,7 +307,7 @@ const Page = (props: Props) => {
             <div className="flex min-h-screen items-center justify-center">
                 <div className="min-w-[800px] space-y-[60px]">
                     <div className="space-y-[60px]">
-                        <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
+                        <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
                             Services
                         </label>
                         <div className="grid grid-cols-2 gap-[12px]">

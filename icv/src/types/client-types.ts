@@ -151,6 +151,12 @@ export const ClientIntakeSchema = z.object({
     hotMeal: z.string().optional(),
     snackPack: z.string().optional(),
 
+    // ----- PAGE 5: CONFIRMATION PAGE ----
+    clientCode: z.string().optional(),
+    //assessingStaff: z.string().optional(),
+    //program: z.string().optional(),
+    // caseManager: z.string().optional(),
+    // permission: z.boolean().optional(),
 }) 
 
 export const BackgroundSchema = ClientIntakeSchema.pick({
