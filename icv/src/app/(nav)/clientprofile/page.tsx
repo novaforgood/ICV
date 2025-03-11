@@ -20,8 +20,8 @@ return(
           
         </div>
         <div className="flex flex-col sticky top-0 w-full pt-8 ">
-          <h1 className='text-5xl font-bold'>Kylie Bach</h1>
-          <p className='text-m text-gray-600 pt-2'>pk2025</p>
+          <h1 className='text-5xl font-bold'>Client: Jimin Kim</h1>
+          <p className='text-m text-gray-600 pt-2'>PK2025</p>
           <p className='text-m text-gray-600'>Housing</p>
        </div>
       </div>

@@ -68,10 +68,10 @@ export default function Home() {
                     </Card>
                 </div>
                 <h1 className="text-2xl font-semibold">Recent Clients</h1>
-                <Link href="@/clientprofile" >
+                <Link href="/clientprofile" >
                 <Card>
                     <h1 className="text-xl font-bold">Jimin Kim</h1>
-                    <p>lorem ipsum</p>
+                    <p>PK2025</p>
                 </Card>
                 </Link>
                 <div className="mt-auto">
