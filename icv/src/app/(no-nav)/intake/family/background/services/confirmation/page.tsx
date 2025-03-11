@@ -1,5 +1,6 @@
 'use client'
 import { createClient } from '@/api/make-cases/make-case'
+import Symbol from '@/components/Symbol'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
@@ -104,7 +105,11 @@ const Page = () => {
                                 >
                                     {section}
                                     <span>
-                                        {openSections[section] ? '˄' : '˅'}
+                                        {openSections[section] ? (
+                                            <Symbol symbol="keyboard_arrow_down" />
+                                        ) : (
+                                            <Symbol symbol="keyboard_arrow_up" />
+                                        )}
                                     </span>
                                 </button>
 
