@@ -11,13 +11,23 @@ import useSWR from 'swr'
 // Fetcher function for events
 export const fetchEvents = async (): Promise<CaseEventType[]> => {
     const events = await getAllEvents()
-    // Convert Firestore timestamps to plain values (milliseconds)
+
+    // Helper function to convert a timestamp to an ISO string
+    const convertTimestamp = (timestamp: any) => {
+        if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
+            return new Date(timestamp.seconds * 1000).toISOString()
+        }
+        return timestamp
+    }
+
+    // Map events and convert timestamp fields to strings
     return events.map((event: any) => ({
-      ...event,
-      startTime: event.startTime?.seconds * 1000 || null,
-      endTime: event.endTime?.seconds * 1000 || null,
+        ...event,
+        date: convertTimestamp(event.date),
+        startTime: convertTimestamp(event.startTime),
+        endTime: convertTimestamp(event.endTime)
     }))
-  }
+}
 
 const EventsSchedule: React.FC = () => {
     const { data: events, error, isLoading } = useSWR('events', fetchEvents)
@@ -48,10 +58,9 @@ const EventsSchedule: React.FC = () => {
     const filteredEvents = useMemo(() => {
         if (!selectedDate || !events) return events || []
         return events.filter((event) => {
-            console.log('time:', event.startTime)
             const eventDate = new Date(event.startTime)
+            console.log('Event Date:', (eventDate))
             if (!isValid(eventDate)) return false
-            console.log('Event Date:', format(eventDate, 'yyyy-MM-dd'))
             return format(eventDate, 'yyyy-MM-dd') === selectedDate
         })
     }, [selectedDate, events])
@@ -133,15 +142,17 @@ const EventsSchedule: React.FC = () => {
                 </div>
             </Card>
 
-      {/* Event Cards */}
-      {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
-      <div className="grid bottom-0 flex-col space-y-4 overflow-auto max-h-80 p-1">
-        {filteredEvents.length === 0 ? (
-          <p>No events for this day.</p>
-        ) : (
-          filteredEvents.map((event) => {
-            const eventDate = new Date(event.startTime)
-            if (!isValid(eventDate)) return null
+            {/* Event Cards */}
+            {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
+            <div className="bottom-0 -m-2 flex flex-1 flex-col space-y-4 overflow-scroll p-2">
+                {filteredEvents.length === 0 ? (
+                    <p className="py-8 text-center text-gray-700">
+                        No events for this day.
+                    </p>
+                ) : (
+                    filteredEvents.map((event) => {
+                        const eventDate = new Date(event.startTime)
+                        if (!isValid(eventDate)) return null
 
                         const startTime = eventDate.getTime()
                         const endTime = new Date(event.endTime).getTime()
