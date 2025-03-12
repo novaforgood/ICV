@@ -65,6 +65,9 @@ importers:
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
+      storage:
+        specifier: ^0.2.0
+        version: 0.2.0
       swr:
         specifier: ^2.3.0
         version: 2.3.0(react@19.0.0)
@@ -2996,6 +2999,10 @@ packages:
 
   stable-hash@0.0.4:
     resolution: {integrity: sha512-LjdcbuBeLcdETCrPn9i8AYAZ1eCtu4ECAWtP7UleOiZ9LzVxRzzUZEoZ8zB24nhkQnDWyET0I+3sWokSDS3E7g==}
+
+  storage@0.2.0:
+    resolution: {integrity: sha512-JslWQU/kNJE/rBfTdlAlZo6r1m5biRszJFqU6W/x5FzUuSHSiCaDXolzwSwvUJOLShHWCjTfeTwuznEGZYlU6Q==}
+    engines: {node: '>=0.10.0'}
 
   stream-events@1.0.5:
     resolution: {integrity: sha512-E1GUzBSgvct8Jsb3v2X15pjzN1tYebtbLaMg+eBOUOAxgbLoSbT2NS91ckc5lJD1KfLjId+jXJRgo0qnV5Nerg==}
@@ -6496,6 +6503,8 @@ snapshots:
   source-map-js@1.2.1: {}
 
   stable-hash@0.0.4: {}
+
+  storage@0.2.0: {}
 
   stream-events@1.0.5:
     dependencies:

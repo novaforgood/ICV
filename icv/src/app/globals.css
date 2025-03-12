@@ -24,10 +24,22 @@
         'opsz' 48; */
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
 @layer base {
     :root {
         --background: 0 0% 100%;
-        --foreground: 252, 5%, 16%;
+        --midground: 255 18% 87%;
+        --foreground: 252 5% 16%;
         --card: 0 0% 100%;
         --card-foreground: 0 0% 3.9%;
         --popover: 0 0% 100%;

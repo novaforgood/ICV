@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
 import EventsSchedule from '../_components/EventsSchedule'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,9 +27,9 @@ export default function Home() {
             </div>
             <div className="flex w-1/3 flex-col gap-6">
                 <div className="flex flex-row justify-between">
-                    <h2 className="text-3xl font-semibold">ICV's Numbers</h2>
+                    <h2 className="text-2xl font-semibold">ICV's Numbers</h2>
                     <Select defaultValue="week">
-                        <SelectTrigger className="w-48">
+                        <SelectTrigger className="w-36">
                             <SelectValue placeholder="Timeframe" />
                         </SelectTrigger>
                         <SelectContent>
@@ -67,12 +68,12 @@ export default function Home() {
                     </Card>
                 </div>
                 <h1 className="text-2xl font-semibold">Recent Clients</h1>
-
+                <Link href="/clientprofile" >
                 <Card>
                     <h1 className="text-xl font-bold">Jimin Kim</h1>
-                    <p>lorem ipsum</p>
+                    <p>PK2025</p>
                 </Card>
-
+                </Link>
                 <div className="mt-auto">
                     <Button
                         className="mt-6 w-full"

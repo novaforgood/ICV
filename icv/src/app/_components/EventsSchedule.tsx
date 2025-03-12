@@ -9,7 +9,7 @@ import React, { useMemo, useState } from 'react'
 import useSWR from 'swr'
 
 // Fetcher function for events
-export const fetchEvents = async (): Promise<CaseEventType[]> => {
+const fetchEvents = async (): Promise<CaseEventType[]> => {
     const events = await getAllEvents()
 
     // Helper function to convert a timestamp to an ISO string
@@ -56,6 +56,7 @@ const EventsSchedule: React.FC = () => {
 
     // Filter events by selected date and ensure event.date is valid
     const filteredEvents = useMemo(() => {
+        console.log('Selected Date:', selectedDate)
         if (!selectedDate || !events) return events || []
         return events.filter((event) => {
             const eventDate = new Date(event.startTime)
@@ -155,7 +156,9 @@ const EventsSchedule: React.FC = () => {
                         if (!isValid(eventDate)) return null
 
                         const startTime = eventDate.getTime()
-                        const endTime = new Date(event.endTime).getTime()
+                        const endTime = new Date(
+                            startTime + (event.duration || 0) * 60 * 60 * 1000,
+                        )
                         const eventName = String(event.name) || 'Loading...'
                         const eventLocation =
                             String(event.location) || 'Loading...'

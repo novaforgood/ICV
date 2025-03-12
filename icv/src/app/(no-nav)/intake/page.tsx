@@ -7,16 +7,35 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../_lib/useIntakeFormStore'
+import {
+    CheckboxListWithOther,
+    RadioChoice,
+    RadioWithOther,
+} from './components/MakeOptions'
 
 interface Props {}
 
+const GENDER = ['Male', 'Female', 'Nonbinary']
+const REFERRAL = [
+    'Police Department',
+    'School liaison',
+    'City of Huntington Park',
+]
+const CITIZEN = ['Citizen', 'Resident', 'Undocumented']
+const HOMELESS = ['Yes', 'No', 'At risk']
+const ETHNICITY = [
+    'White',
+    'Black or African American',
+    'Hispanic, Latino, or Spanish Origin',
+    'Asian',
+    'Native American',
+    'Middle Eastern',
+    'Hawaiian or Pacific Islander',
+]
+const EMPLOYED = ['Yes', 'No']
+
 const Page = (props: Props) => {
-    const {
-        form: loadedForm,
-        progress: loadedProgress,
-        updateForm,
-        updateProgress,
-    } = useIntakeFormStore()
+    const { form: loadedForm, updateForm } = useIntakeFormStore()
     type ProfileType = TypeOf<typeof ProfileSchema>
 
     const {
@@ -40,24 +59,14 @@ const Page = (props: Props) => {
 
     useEffect(() => {
         const unsubscribe = watch((data) => {
-            updateForm(data)
-
-            const isAnyFieldFilled = Object.values(data).some((field) => {
-                if (Array.isArray(field)) {
-                    return field.length > 0
-                }
-                if (typeof field === 'boolean') {
-                    return true
-                }
-                return field?.length > 0 || field !== undefined
-            })
-
-            updateProgress({
-                clientProfile: isAnyFieldFilled ? 'in-progress' : 'not-started',
+            updateForm({
+                ...data,
+                ethnicity: data.ethnicity?.filter(
+                    (eth) => eth !== undefined,
+                ) as string[],
             })
         }).unsubscribe
         console.log(loadedForm)
-        console.log(loadedProgress)
         console.log(errors)
 
         return unsubscribe
@@ -69,56 +78,25 @@ const Page = (props: Props) => {
         router.push('/intake/family')
     }
 
+    const selectedGender = watch('gender') ?? ''
+    const selectedRef = watch('referralSource') ?? ''
+    const selectedCitizen = watch('citizenship') ?? ''
+    const selectedHomeless = watch('homeless') ?? ''
+    const selectedEthnicities = Array.isArray(watch('ethnicity'))
+        ? (watch('ethnicity') ?? [])
+        : []
+    const selectedEmp = watch('employed') ?? ''
+
     return (
         <form
             className="space-y-[24px]"
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(onSubmit)}
         >
-            <div className="space-y-[24px]">
-                <label className="font-['Epilogue'] text-[56px] font-bold leading-[72px] text-neutral-900">
-                    Intake Form
-                </label>
-            </div>
             <div className="flex min-h-screen items-center justify-center">
                 <div className="min-w-[800px] space-y-[60px]">
-                    <div className="grid grid-cols-2 gap-[12px]">
-                        <div>
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Program
-                            </label>
-                            <select
-                                {...register('program')}
-                                defaultValue="Select Program"
-                                className="w-full rounded border p-2"
-                            >
-                                <option value="Homeless Department">
-                                    Homeless Department
-                                </option>
-                                <option value="School Outreach">
-                                    School Outreach
-                                </option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div>
-                            {/* get all registered staff members in program */}
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Assessing Staff
-                            </label>
-                            <select
-                                {...register('assessingStaff')}
-                                defaultValue="Select Staff"
-                                className="w-full rounded border p-2"
-                            >
-                                <option value="Staff 1">Staff 1</option>
-                                <option value="Staff 2">Staff 2</option>
-                                <option value="Staff 3">Staff 3</option>
-                            </select>
-                        </div>
-                    </div>
                     <div>
-                        <label className="font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
+                        <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
                             Client Profile
                         </label>
                     </div>
@@ -153,20 +131,41 @@ const Page = (props: Props) => {
                                         <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                             Gender
                                         </label>
-                                        <select
-                                            {...register('gender')}
-                                            defaultValue="Select Gender"
-                                            className="w-full rounded border p-2"
-                                        >
-                                            <option value="Male">Male</option>
-                                            <option value="Female">
-                                                Female
-                                            </option>
-                                            <option value="Non-Binary">
-                                                Non-Binary
-                                            </option>
-                                            <option value="Other">Other</option>
-                                        </select>
+                                        <div className="flex flex-col space-y-[8px]">
+                                            <RadioWithOther
+                                                options={GENDER}
+                                                selectedValue={selectedGender}
+                                                onChange={(updatedGender) =>
+                                                    setValue(
+                                                        'gender',
+                                                        updatedGender,
+                                                    )
+                                                }
+                                                name="gender"
+                                                otherLabel="Other"
+                                                otherPlaceholder="Other"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col space-y-[4px]">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            Referral Source
+                                        </label>
+                                        <div className="flex flex-col space-y-[8px]">
+                                            <RadioWithOther
+                                                options={REFERRAL}
+                                                selectedValue={selectedRef}
+                                                onChange={(updatedRef) =>
+                                                    setValue(
+                                                        'referralSource',
+                                                        updatedRef,
+                                                    )
+                                                }
+                                                name="referralSource"
+                                                otherLabel="Other"
+                                                otherPlaceholder="Other"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -180,17 +179,6 @@ const Page = (props: Props) => {
                                             {...register('lastName')}
                                             type="text"
                                             placeholder="Last Name"
-                                            className="w-full rounded border p-2"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Client Number
-                                        </label>
-                                        <input
-                                            {...register('clientNumber')}
-                                            type="text"
-                                            placeholder="Text"
                                             className="w-full rounded border p-2"
                                         />
                                     </div>
@@ -230,6 +218,43 @@ const Page = (props: Props) => {
                         </div>
                     </div>
 
+                    {/* Citizenship Information */}
+                    <div className="space-y-[24px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Citizenship
+                        </label>
+                        <div className="space-y-[24px]">
+                            <div>
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Place of Origin
+                                </label>
+                                <input
+                                    {...register('placeOrigin')}
+                                    type="text"
+                                    placeholder="Text"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Citizenship
+                                </label>
+                                <div className="flex flex-col space-y-[8px]">
+                                    <RadioWithOther
+                                        options={CITIZEN}
+                                        selectedValue={selectedCitizen}
+                                        onChange={(updatedCit) =>
+                                            setValue('citizenship', updatedCit)
+                                        }
+                                        name="citizenship"
+                                        otherLabel="Other"
+                                        otherPlaceholder="Other"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Housing Information */}
                     <div className="space-y-[24px]">
                         <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
@@ -238,50 +263,49 @@ const Page = (props: Props) => {
 
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Housing Type
+                                Homeless?
                             </label>
-                            <select
-                                {...register('housingType')}
-                                defaultValue="Select"
-                                className="w-[40%] rounded border p-2"
-                            >
-                                <option value="Not Sure">Not Sure</option>
-                                <option value="What Design">What Design</option>
-                                <option value="Wants Here">Wants Here</option>
-                                <option value="Other">Other</option>
-                            </select>
+                            <div className="flex flex-col space-y-[8px]">
+                                <RadioChoice
+                                    options={HOMELESS}
+                                    selectedValue={selectedHomeless}
+                                    onChange={(updatedHM) =>
+                                        setValue('homeless', updatedHM)
+                                    }
+                                    name="homeless?"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                At Risk
+                                Duration of homelessness
                             </label>
-                            <div className="mt-2 flex flex-col gap-[4px]">
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        {...register('atRisk')}
-                                    />
-                                    Yes
-                                </label>
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={!watch('atRisk')}
-                                        onChange={() =>
-                                            setValue('atRisk', false)
-                                        }
-                                    />
-                                    No
-                                </label>
-                            </div>
+                            <input
+                                {...register('durationHomeless')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
+                        </div>
+
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Housing situation
+                            </label>
+                            <input
+                                {...register('housingSituation')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
                         </div>
 
                         {/* Street Address & Apt No. (Same Row) */}
                         <div className="grid grid-cols-2 gap-[12px]">
                             <div className="flex flex-col space-y-[4px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Street Address
+                                    Street Address/Location of Contact
                                 </label>
                                 <input
                                     {...register('streetAddress')}
@@ -328,6 +352,63 @@ const Page = (props: Props) => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Demographics Information */}
+                    <div className="space-y-[24px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Demographics
+                        </label>
+                        <div className="space-y-[24px]">
+                            <div>
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Ethnicity?
+                                </label>
+                                <div className="flex flex-col space-y-[8px]">
+                                    <CheckboxListWithOther
+                                        options={ETHNICITY}
+                                        selectedValues={selectedEthnicities}
+                                        onChange={(updatedEthnicities) =>
+                                            setValue(
+                                                'ethnicity',
+                                                updatedEthnicities,
+                                            )
+                                        }
+                                        name="ethnicity"
+                                        otherLabel="Other"
+                                        otherPlaceholder="Specify other ethnicity"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Employed
+                                </label>
+                                <RadioChoice
+                                    options={EMPLOYED}
+                                    selectedValue={selectedEmp}
+                                    onChange={(updatedEmp) =>
+                                        setValue('employed', updatedEmp)
+                                    }
+                                    name="employed"
+                                />
+                            </div>
+                            <div className="space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Income
+                                </label>
+                                <div className="flex items-center space-x-[2px]">
+                                    <p className="text-lg">$</p>
+                                    <input
+                                        {...register('income')}
+                                        type="text"
+                                        placeholder="Text"
+                                        className="w-[30%] rounded border p-2"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="flex justify-end">
                         <button
                             type="submit"

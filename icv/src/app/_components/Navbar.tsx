@@ -42,7 +42,7 @@ const Navbar = () => {
             <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
                 <img
                     src={
-                        user?.photoURL || 'https://picsum.photos/seed/meow/200'
+                        user?.photoURL || '/cavediva.jpeg'
                     }
                     alt="logo"
                     className="m-4 h-16 w-16 rounded-full"

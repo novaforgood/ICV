@@ -9,7 +9,7 @@ const page = async (props: Props) => {
     const clients = await getAllClients()
     return (
         <div className="p-6 pt-12">
-            <div className="flex flex-row">
+            <div className="mb-4 flex flex-row">
                 <h1 className="text-6xl font-bold">Client Database</h1>
             </div>
             <ClientsTable clients={clients} />

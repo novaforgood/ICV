@@ -26,35 +26,37 @@ export type NewClient = z.infer<typeof ClientIntakeSchema>
 
 export const ClientIntakeSchema = z.object({
     // ----- PAGE 1: Basic intake information -----
-    // Intake Information
-    // programInfo
-    // staffInfo
-    // dateInfo
 
     // Client Profile
     id: z.string().optional(),
-    program: z.string().optional(),
-    assessingStaff: z.string().optional(),
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     dateOfBirth: z.string().optional(),
-    // age: z.string().optional(),
-    gender: Gender.optional(),
+    gender: z.string().optional(),
+    referralSource: z.string().optional(),
     clientNumber: z.string().optional(),
 
+    // Citizenship
+    placeOrigin: z.string().optional(),
+    citizenship: z.string().optional(),
+
     // Housing
-    housingType: HousingType.optional(),
-    atRisk: z.boolean().optional(),
+    homeless: z.string().optional(),
+    durationHomeless: z.string().optional(),
+    housingSituation: z.string().optional(),
     streetAddress: z.string().optional(),
     aptNumber: z.string().optional(),
     city: z.string().optional(),
-    // state: z.string().optional(),
     zipCode: z.string().optional(),
 
     // Contact Information
     email: z.string().optional(),
-    // areaCode: z.string().optional(),
     phoneNumber: z.string().optional(),
+
+    // Demographics
+    ethnicity: z.array(z.string()).optional(),
+    employed: z.string().optional(),
+    income: z.string().optional(),
 
     // ----- PAGE 2: Family Information -----
     familySize: z.string().optional(),
@@ -63,30 +65,45 @@ export const ClientIntakeSchema = z.object({
             spouseFirstName: z.string().optional(),
             spouseLastName: z.string().optional(),
             spouseDOB: z.string().optional(),
-            spouseAge: z.string().optional(),
+            spouseIncome: z.string().optional(),
+            spouseGender: z.string().optional(),
         }),
     ).optional(),
-    children: z.array(
+    dependent: z.array(
         z.object({
-            name: z.string().optional(),
-            age: z.string().optional(),
+            firstName: z.string().optional(),
+            lastName: z.string().optional(),
+            dob: z.string().optional(),
+            income: z.string().optional(),
+            gender: z.string().optional(),
+            publicServices: z.array(z.string().optional()).optional()
         }),
     ).optional(),
 
     pets: z.array(
         z.object({
-            breed: Pets.optional()
+           species: z.string().optional(),
+           size: z.string().optional(),
+           purpose: z.array(z.string().optional())
         })
     ).optional(),
 
     // ----- PAGE 3: Background Information -----
-    ethnicity: z.array(z.string()).optional(),
-    mentalHealth: z.string().optional(),
-    disabilities: z.string().optional(),
-    substanceAbuse: z.string().optional(),
-    sexualOffenses: z.string().optional(),
-
-    publicServices: z.array(z.string()).optional(),
+    educationStatus: z.array(z.string().optional()).optional(),
+    cps: z.string().optional(),
+    cpsNotes: z.string().optional(),
+    probation: z.string().optional(),
+    probationNotes: z.string().optional(),
+    fosterYouth: z.string().optional(),
+    fosterNotes: z.string().optional(),
+    sexOffender: z.string().optional(),
+    sexOffNotes: z.string().optional(),
+    mentalHealth: z.array(z.string().optional()).optional(),
+    mentalHealthNotes: z.string().optional(),
+    medicalHistory: z.string().optional(),
+    substanceAbuse: z.array(z.string().optional()).optional(),
+    substanceNotes:  z.string().optional(),
+    publicServices: z.array(z.string().optional()).optional(),
 
     // ----- PAGE 4: Services -----
     // Mentoring
@@ -113,18 +130,51 @@ export const ClientIntakeSchema = z.object({
     // Additional Notes
     notes: z.string().optional(),
     
-    // Image Upload - store the URL in Firebase
-    // imageURL: z.string().url().optional()
+    // Image Upload
+    clientImage: z.array(z.string().optional(),).optional(),
+    clientPassport: z.array(z.string().optional(),).optional(),
+    clientMed: z.array(z.string().optional(),).optional(),
+    clientSSN: z.array(z.string().optional(),).optional(),
+    clientBC: z.array(z.string().optional(),).optional(),
+    otherFiles: z.array(z.string().optional(),).optional(),
 
+    clientImageName: z.array(z.string().optional(),).optional(),
+    clientIDName: z.array(z.string().optional(),).optional(),
+    clientPassportName: z.array(z.string().optional(),).optional(),
+    clientMedName: z.array(z.string().optional(),).optional(),
+    clientSSNName: z.array(z.string().optional(),).optional(),
+    clientBCName: z.array(z.string().optional(),).optional(),
+    otherFilesName: z.array(z.string().optional(),).optional(),
+
+    // kits
+    hygieneKit: z.string().optional(),
+    hotMeal: z.string().optional(),
+    snackPack: z.string().optional(),
+
+    // ----- PAGE 5: CONFIRMATION PAGE ----
+    clientCode: z.string().optional(),
+    //assessingStaff: z.string().optional(),
+    //program: z.string().optional(),
+    // caseManager: z.string().optional(),
+    // permission: z.boolean().optional(),
 }) 
 
 export const BackgroundSchema = ClientIntakeSchema.pick({
-    ethnicity: true,
-    publicServices: true,
+    educationStatus: true,
+    cps: true,
+    cpsNotes: true,
+    probation: true,
+    probationNotes: true,
+    fosterYouth: true,
+    fosterNotes: true,
+    sexOffender: true,
+    sexOffNotes: true,
     mentalHealth: true,
-    disabilities: true,
+    mentalHealthNotes: true,
+    medicalHistory: true,
     substanceAbuse: true,
-    sexualOffenses: true,
+    substanceNotes: true,
+    publicServices: true,
 })
 
 export const ServicesSchema = ClientIntakeSchema.pick({
@@ -135,27 +185,45 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     education: true,
     healthWellness: true,
     referral: true,
-    // imageURL: true,
+    clientImage: true,
+    clientPassport: true,
+    clientMed: true,
+    clientSSN: true,
+    clientBC: true,
+    otherFiles: true,
+    clientImageName: true,
+    clientIDName: true,
+    clientPassportName: true,
+    clientMedName: true,
+    clientSSNName: true,
+    clientBCName: true,
+    otherFilesName: true,
     notes: true,
+    hygieneKit: true,
+    hotMeal: true,
+    snackPack: true,
 })
 
 export const ProfileSchema = ClientIntakeSchema.pick({
-    program: true,
-    assessingStaff: true,
     firstName:true,
     lastName: true,
     dateOfBirth: true,
     // age: true,
     gender: true,
+    referralSource: true,
     clientNumber: true,
 
+    // Citizenship
+    placeOrigin: true,
+    citizenship: true,
+
     // Housing
-    housingType: true,
-    atRisk: true,
+    homeless: true,
+    durationHomeless: true,
+    housingSituation: true,
     streetAddress: true,
     aptNumber:true,
     city: true,
-    // state: true,
     zipCode: true,
 
     // Contact Information
@@ -163,11 +231,16 @@ export const ProfileSchema = ClientIntakeSchema.pick({
     // areaCode: true,
     phoneNumber: true,
 
+    // Demographics
+    ethnicity: true,
+    employed: true,
+    income: true,
+
 })
 
 export const FamilySchema = ClientIntakeSchema.pick({
     familySize: true,
     spouse: true,
-    children: true,
+    dependent: true,
     pets: true,
 })
