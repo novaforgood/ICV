@@ -11,7 +11,22 @@ import useSWR from 'swr'
 // Fetcher function for events
 const fetchEvents = async (): Promise<CaseEventType[]> => {
     const events = await getAllEvents()
-    return events
+
+    // Helper function to convert a timestamp to an ISO string
+    const convertTimestamp = (timestamp: any) => {
+        if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
+            return new Date(timestamp.seconds * 1000).toISOString()
+        }
+        return timestamp
+    }
+
+    // Map events and convert timestamp fields to strings
+    return events.map((event: any) => ({
+        ...event,
+        date: convertTimestamp(event.date),
+        startTime: convertTimestamp(event.startTime),
+        endTime: convertTimestamp(event.endTime)
+    }))
 }
 
 const EventsSchedule: React.FC = () => {
@@ -44,9 +59,9 @@ const EventsSchedule: React.FC = () => {
         console.log('Selected Date:', selectedDate)
         if (!selectedDate || !events) return events || []
         return events.filter((event) => {
-            const eventDate = new Date(event.date)
+            const eventDate = new Date(event.startTime)
+            console.log('Event Date:', (eventDate))
             if (!isValid(eventDate)) return false
-            console.log('Event Date:', format(eventDate, 'yyyy-MM-dd'))
             return format(eventDate, 'yyyy-MM-dd') === selectedDate
         })
     }, [selectedDate, events])
@@ -137,7 +152,7 @@ const EventsSchedule: React.FC = () => {
                     </p>
                 ) : (
                     filteredEvents.map((event) => {
-                        const eventDate = new Date(event.date)
+                        const eventDate = new Date(event.startTime)
                         if (!isValid(eventDate)) return null
 
                         const startTime = eventDate.getTime()
