@@ -132,7 +132,9 @@ const EventsSchedule: React.FC = () => {
             {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
             <div className="bottom-0 -m-2 flex flex-1 flex-col space-y-4 overflow-scroll p-2">
                 {filteredEvents.length === 0 ? (
-                    <p>No events for this day.</p>
+                    <p className="py-8 text-center text-gray-700">
+                        No events for this day.
+                    </p>
                 ) : (
                     filteredEvents.map((event) => {
                         const eventDate = new Date(event.date)

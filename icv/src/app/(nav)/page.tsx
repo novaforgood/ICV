@@ -26,9 +26,9 @@ export default function Home() {
             </div>
             <div className="flex w-1/3 flex-col gap-6">
                 <div className="flex flex-row justify-between">
-                    <h2 className="text-3xl font-semibold">ICV's Numbers</h2>
+                    <h2 className="text-2xl font-semibold">ICV's Numbers</h2>
                     <Select defaultValue="week">
-                        <SelectTrigger className="w-48">
+                        <SelectTrigger className="w-36">
                             <SelectValue placeholder="Timeframe" />
                         </SelectTrigger>
                         <SelectContent>
