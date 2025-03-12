@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
 import EventsSchedule from '../_components/EventsSchedule'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,12 +68,12 @@ export default function Home() {
                     </Card>
                 </div>
                 <h1 className="text-2xl font-semibold">Recent Clients</h1>
-
+                <Link href="/clientprofile" >
                 <Card>
                     <h1 className="text-xl font-bold">Jimin Kim</h1>
-                    <p>lorem ipsum</p>
+                    <p>PK2025</p>
                 </Card>
-
+                </Link>
                 <div className="mt-auto">
                     <Button
                         className="mt-6 w-full"
