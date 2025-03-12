@@ -156,9 +156,7 @@ const EventsSchedule: React.FC = () => {
                         if (!isValid(eventDate)) return null
 
                         const startTime = eventDate.getTime()
-                        const endTime = new Date(
-                            startTime + (event.duration || 0) * 60 * 60 * 1000,
-                        )
+                        const endTime = new Date(event.endTime).getTime()
                         const eventName = String(event.name) || 'Loading...'
                         const eventLocation =
                             String(event.location) || 'Loading...'
