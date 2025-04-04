@@ -38,8 +38,12 @@ const page = async ({
                             <h1 className="text-5xl font-bold">
                                 {client.firstName} {client.lastName}
                             </h1>
-                            <p className="text-m pt-2 text-gray-600">PK2025</p>
-                            <p className="text-m text-gray-600">Housing</p>
+                            <p className="text-m pt-2 text-gray-600">
+                                {client.clientCode}
+                            </p>
+                            <p className="text-m text-gray-600">
+                                Homeless Department
+                            </p>
                         </div>
                     </div>
                     <ProfileNav />
