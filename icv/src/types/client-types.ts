@@ -1,11 +1,36 @@
 import { date, z } from 'zod'
 import { timestampToDateSchema} from './misc-types'
 
-export const Gender = z.enum(['Male', 'Female', 'Non-Binary', 'Other'])
-export const Program = z.enum(['Homeless Department', 'School Outreach', 'Other'])
-export const HousingType = z.enum(['Not Sure', 'What Design', 'Wants Here', 'Other'])
-export const Pets = z.enum(['Dog', 'Cat', 'Bird', "Hamster", 'Rabbit', 'Reptile', 'Other'])
-export const Ethnicity = z.enum([
+// export const Gender = z.enum(['Male', 'Female', 'Non-Binary', 'Other'])
+// export const Program = z.enum(['Homeless Department', 'School Outreach', 'Other'])
+// export const HousingType = z.enum(['Not Sure', 'What Design', 'Wants Here', 'Other'])
+// export const Pets = z.enum(['Dog', 'Cat', 'Bird', "Hamster", 'Rabbit', 'Reptile', 'Other'])
+// export const Ethnicity = z.enum([
+//     'White',
+//     'Black or African American',
+//     'Hispanic, Latino, or Spanish Origin',
+//     'Asian',
+//     'Native American',
+//     'Middle Eastern',
+//     'Hawaiian or Pacific Islander',
+//     'Other',
+// ])
+
+// export type Gender = z.infer<typeof Gender>
+// export type HousingType = z.infer<typeof HousingType>
+// export type Ethnicity = z.infer<typeof Ethnicity>
+// export type Pets = z.infer<typeof Pets>
+// export type Program = z.infer<typeof Program>
+
+export const GENDER = ['Male', 'Female', 'Nonbinary']
+export const REFERRAL = [
+    'Police Department',
+    'School liaison',
+    'City of Huntington Park',
+]
+export const CITIZEN = ['Citizen', 'Resident', 'Undocumented']
+export const HOMELESS = ['Yes', 'No', 'At risk']
+export const ETHNICITY = [
     'White',
     'Black or African American',
     'Hispanic, Latino, or Spanish Origin',
@@ -13,14 +38,81 @@ export const Ethnicity = z.enum([
     'Native American',
     'Middle Eastern',
     'Hawaiian or Pacific Islander',
-    'Other',
-])
+]
+export const PUBLIC_SERVICES = [
+    'General Relief',
+    'CalFresh (Food Stamps/EBT)',
+    'CalWorks',
+    'SSI',
+    'SSA',
+    'Unemployment Benefits',
+]
+export const PETSIZE = ['Small', 'Medium', 'Large']
+export const PETPURPOSE = ['Emotional support animal', 'Service animal']
+export const EDUSTATUS = [
+    'Middle school',
+    'High school',
+    'GED',
+    'Community college',
+    'University',
+    'Masters/PhD',
+]
+export const MENTALHEALTH = ['Schizophrenia', 'Bipolar', 'Depression', 'Anxiety']
+export const SUBSTANCES = ['Meth', 'Cocaine', 'Marijuana', 'Alcohol', 'None']
+export const YESNO = ['Yes', 'No']
+export const MENTORING = [
+    'Problem Solving/Decision Making',
+    'Goal Setting',
+    'Academic Support',
+    'Group Mentoring',
+    'Conflict Resolution',
+    'Rumor Control Intervention',
+]
+export const HOUSING = [
+    'Emergency Shelter',
+    'Hotel Voucher',
+    'Shared Living',
+    'Independent Living',
+    'Management Companies',
+    'Transportation',
+]
+export const EDUTRAIN = [
+    'Independent Studies',
+    'Charter Schools',
+    'Adult School/GED',
+    'Vocational Training School',
+    'Financial Aid/College Support',
+]
 
-export type Gender = z.infer<typeof Gender>
-export type HousingType = z.infer<typeof HousingType>
-export type Ethnicity = z.infer<typeof Ethnicity>
-export type Pets = z.infer<typeof Pets>
-export type Program = z.infer<typeof Program>
+export const REFERRALSERVICE = [
+    'Legal Assistance/Food Pantry',
+    'DV Crisis Support',
+    'Reentry Services',
+    'Immigration Services',
+    'Financial Literacy',
+    'Anger Management',
+    'Financial Assistance Programs (SNAP/Cal/Works)',
+]
+export const PERSONAL_DEV = [
+    'Job Readiness',
+    'Employment Assistance',
+    'Career Development',
+    'Creativity & Personal Expression',
+]
+export const REDIRECTION = [
+    'Emergency Shelter',
+    'Human Trafficking Resources',
+    'Personal Development',
+    'Domestic Violence Resources',
+    'Transportation',
+    'Informal Case Management',
+]
+export const HEALTH_WELLNESS = [
+    'Mental Health',
+    'Medical Services',
+    'Substance Abuse Treatment',
+    'Basic Needs Support',
+]
 
 export type NewClient = z.infer<typeof ClientIntakeSchema>
 

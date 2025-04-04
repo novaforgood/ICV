@@ -1,7 +1,14 @@
 'use client'
 
 import { useIntakeFormStore } from '@/app/_lib/useIntakeFormStore'
-import { BackgroundSchema } from '@/types/client-types'
+import {
+    BackgroundSchema,
+    EDUSTATUS,
+    MENTALHEALTH,
+    PUBLIC_SERVICES,
+    SUBSTANCES,
+    YESNO,
+} from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -14,29 +21,6 @@ import {
 } from '../../components/MakeOptions'
 
 interface Props {}
-
-const PUBLIC_SERVICES = [
-    'General Relief',
-    'CalFresh (Food Stamps/EBT)',
-    'CalWorks',
-    'SSI',
-    'SSA',
-    'Unemployment Benefits',
-]
-
-const EDUSTATUS = [
-    'Middle school',
-    'High school',
-    'GED',
-    'Community college',
-    'University',
-    'Masters/PhD',
-]
-
-const MENTALHEALTH = ['Schizophrenia', 'Bipolar', 'Depression', 'Anxiety']
-const SUBSTANCES = ['Meth', 'Cocaine', 'Marijuana', 'Alcohol', 'None']
-
-const YESNO = ['Yes', 'No']
 
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()

@@ -1,6 +1,14 @@
 'use client'
 
-import { ProfileSchema } from '@/types/client-types'
+import {
+    CITIZEN,
+    ETHNICITY,
+    GENDER,
+    HOMELESS,
+    ProfileSchema,
+    REFERRAL,
+    YESNO,
+} from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -14,25 +22,6 @@ import {
 } from './components/MakeOptions'
 
 interface Props {}
-
-const GENDER = ['Male', 'Female', 'Nonbinary']
-const REFERRAL = [
-    'Police Department',
-    'School liaison',
-    'City of Huntington Park',
-]
-const CITIZEN = ['Citizen', 'Resident', 'Undocumented']
-const HOMELESS = ['Yes', 'No', 'At risk']
-const ETHNICITY = [
-    'White',
-    'Black or African American',
-    'Hispanic, Latino, or Spanish Origin',
-    'Asian',
-    'Native American',
-    'Middle Eastern',
-    'Hawaiian or Pacific Islander',
-]
-const EMPLOYED = ['Yes', 'No']
 
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
@@ -384,7 +373,7 @@ const Page = (props: Props) => {
                                     Employed
                                 </label>
                                 <RadioChoice
-                                    options={EMPLOYED}
+                                    options={YESNO}
                                     selectedValue={selectedEmp}
                                     onChange={(updatedEmp) =>
                                         setValue('employed', updatedEmp)
