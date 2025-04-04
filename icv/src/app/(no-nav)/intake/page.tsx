@@ -11,7 +11,7 @@ import {
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../_lib/useIntakeFormStore'
@@ -61,6 +61,34 @@ const Page = (props: Props) => {
         return unsubscribe
     }, [watch, loadedForm])
 
+    useEffect(() => {
+        const dobValue = loadedForm.dateOfBirth
+
+        if (dobValue) {
+            const age = calculateAge(dobValue) // Calculate age from dateOfBirth string
+            setValue('age', age) // Update the 'age' field in react-hook-form
+        }
+    }, [loadedForm.dateOfBirth, setValue]) // Dependency array ensures this runs when dateOfBirth changes
+
+    // Function to calculate age from dateOfBirth string
+    const calculateAge = (dobString: string): number | undefined => {
+        if (!dobString) return undefined
+
+        const dob = new Date(dobString)
+        const now = new Date()
+
+        let age = now.getFullYear() - dob.getFullYear()
+        const monthDiff = now.getMonth() - dob.getMonth()
+        if (
+            monthDiff < 0 ||
+            (monthDiff === 0 && now.getDate() < dob.getDate())
+        ) {
+            age--
+        }
+
+        return age
+    }
+
     const onSubmit = (data: ProfileType) => {
         console.log('in submit...', data)
         updateForm(data)
@@ -75,6 +103,8 @@ const Page = (props: Props) => {
         ? (watch('ethnicity') ?? [])
         : []
     const selectedEmp = watch('employed') ?? ''
+
+    const [DOB, setDOB] = useState<string>(loadedForm.dateOfBirth || '')
 
     return (
         <form
