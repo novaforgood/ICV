@@ -6,7 +6,7 @@ import {
     GENDER,
     HOMELESS,
     ProfileSchema,
-    REFERRAL,
+    REFERRALSOURCE,
     YESNO,
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -89,89 +89,77 @@ const Page = (props: Props) => {
                             Client Profile
                         </label>
                     </div>
-                    <div className="space-y-[24px]">
-                        <div className="space-y-[24px]">
-                            <div className="grid grid-cols-2 gap-[12px]">
-                                {/* Left Column */}
-                                <div className="space-y-[24px]">
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            First Name
-                                        </label>
-                                        <input
-                                            {...register('firstName')}
-                                            type="text"
-                                            placeholder="First Name"
-                                            className="w-full rounded border p-2"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Date of Birth
-                                        </label>
-                                        <input
-                                            {...register('dateOfBirth')}
-                                            type="date"
-                                            placeholder="MM/DD/YYYY"
-                                            className="w-full rounded border p-2"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Gender
-                                        </label>
-                                        <div className="flex flex-col space-y-[8px]">
-                                            <RadioWithOther
-                                                options={GENDER}
-                                                selectedValue={selectedGender}
-                                                onChange={(updatedGender) =>
-                                                    setValue(
-                                                        'gender',
-                                                        updatedGender,
-                                                    )
-                                                }
-                                                name="gender"
-                                                otherLabel="Other"
-                                                otherPlaceholder="Other"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Referral Source
-                                        </label>
-                                        <div className="flex flex-col space-y-[8px]">
-                                            <RadioWithOther
-                                                options={REFERRAL}
-                                                selectedValue={selectedRef}
-                                                onChange={(updatedRef) =>
-                                                    setValue(
-                                                        'referralSource',
-                                                        updatedRef,
-                                                    )
-                                                }
-                                                name="referralSource"
-                                                otherLabel="Other"
-                                                otherPlaceholder="Other"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
 
-                                {/* Right Column */}
-                                <div className="space-y-[24px]">
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Last Name
-                                        </label>
-                                        <input
-                                            {...register('lastName')}
-                                            type="text"
-                                            placeholder="Last Name"
-                                            className="w-full rounded border p-2"
-                                        />
-                                    </div>
-                                </div>
+                    {/* Basic Information */}
+                    <div className="space-y-[24px]">
+                        <div className="grid grid-cols-2 gap-[12px]">
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    First Name
+                                </label>
+                                <input
+                                    {...register('firstName')}
+                                    type="text"
+                                    placeholder="Text"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Last Name
+                                </label>
+                                <input
+                                    {...register('lastName')}
+                                    type="text"
+                                    placeholder="Text"
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Date of Birth
+                            </label>
+                            <input
+                                {...register('dateOfBirth')}
+                                type="date"
+                                placeholder="MM/DD/YYYY"
+                                className="w-[50%] rounded border p-2"
+                            />
+                        </div>
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Gender
+                            </label>
+                            <div className="flex flex-col space-y-[8px]">
+                                <RadioWithOther
+                                    options={GENDER}
+                                    selectedValue={selectedGender}
+                                    onChange={(updatedGender) =>
+                                        setValue('gender', updatedGender)
+                                    }
+                                    name="gender"
+                                    otherLabel="Other"
+                                    otherPlaceholder="Other"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Referral Source
+                            </label>
+                            <div className="flex flex-col space-y-[8px]">
+                                <RadioWithOther
+                                    options={REFERRALSOURCE}
+                                    selectedValue={selectedRef}
+                                    onChange={(updatedRef) =>
+                                        setValue('referralSource', updatedRef)
+                                    }
+                                    name="referralSource"
+                                    otherLabel="Other"
+                                    otherPlaceholder="Other"
+                                />
                             </div>
                         </div>
                     </div>

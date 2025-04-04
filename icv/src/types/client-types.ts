@@ -23,7 +23,7 @@ import { timestampToDateSchema} from './misc-types'
 // export type Program = z.infer<typeof Program>
 
 export const GENDER = ['Male', 'Female', 'Nonbinary']
-export const REFERRAL = [
+export const REFERRALSOURCE = [
     'Police Department',
     'School liaison',
     'City of Huntington Park',
