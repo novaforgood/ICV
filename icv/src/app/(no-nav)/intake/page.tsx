@@ -277,7 +277,7 @@ const Page = (props: Props) => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col space-y-[4px]">
+                        {/* <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                 Duration of homelessness
                             </label>
@@ -287,7 +287,7 @@ const Page = (props: Props) => {
                                 placeholder="Text"
                                 className="w-full rounded border p-2"
                             />
-                        </div>
+                        </div> */}
 
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">

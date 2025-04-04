@@ -414,50 +414,6 @@ const Page = (props: Props) => {
                             />
                         </div>
                         <div className="space-y-[24px]">
-                            <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                Kits
-                            </label>
-                            <div className="space-y-[8px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Hygiene Kit
-                                </label>
-                                <div>
-                                    <input
-                                        {...register('hygieneKit')}
-                                        type="text"
-                                        placeholder="Text"
-                                        className="w-[30%] rounded border p-2"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-[8px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Hot meal
-                                </label>
-                                <div>
-                                    <input
-                                        {...register('hotMeal')}
-                                        type="text"
-                                        placeholder="Text"
-                                        className="w-[30%] rounded border p-2"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-[8px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Snack pack
-                                </label>
-                                <div>
-                                    <input
-                                        {...register('snackPack')}
-                                        type="text"
-                                        placeholder="Text"
-                                        className="w-[30%] rounded border p-2"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="space-y-[24px]">
                             <div className="flex items-center justify-between">
                                 <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
                                     Profile Picture

@@ -42,7 +42,7 @@ export const ClientIntakeSchema = z.object({
 
     // Housing
     homeless: z.string().optional(),
-    durationHomeless: z.string().optional(),
+    // durationHomeless: z.string().optional(),
     housingSituation: z.string().optional(),
     streetAddress: z.string().optional(),
     aptNumber: z.string().optional(),
@@ -146,11 +146,6 @@ export const ClientIntakeSchema = z.object({
     clientBCName: z.array(z.string().optional(),).optional(),
     otherFilesName: z.array(z.string().optional(),).optional(),
 
-    // kits
-    hygieneKit: z.string().optional(),
-    hotMeal: z.string().optional(),
-    snackPack: z.string().optional(),
-
     // ----- PAGE 5: CONFIRMATION PAGE ----
     clientCode: z.string().optional(),
     //assessingStaff: z.string().optional(),
@@ -199,9 +194,6 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     clientBCName: true,
     otherFilesName: true,
     notes: true,
-    hygieneKit: true,
-    hotMeal: true,
-    snackPack: true,
 })
 
 export const ProfileSchema = ClientIntakeSchema.pick({
@@ -219,7 +211,7 @@ export const ProfileSchema = ClientIntakeSchema.pick({
 
     // Housing
     homeless: true,
-    durationHomeless: true,
+    // durationHomeless: true,
     housingSituation: true,
     streetAddress: true,
     aptNumber:true,

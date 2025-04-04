@@ -1,6 +1,7 @@
 'use client'
 import { createClient } from '@/api/make-cases/make-case'
 import Symbol from '@/components/Symbol'
+import { useUser } from '@/hooks/useUser'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
@@ -28,6 +29,7 @@ const Page = () => {
     }, [loadedForm.firstName, loadedForm.lastName, loadedForm.gender])
 
     const router = useRouter()
+    const { user } = useUser()
 
     const onSubmit = (data: ClientType) => {
         console.log('in submit...', data)
@@ -70,20 +72,20 @@ const Page = () => {
                                 </label>
                                 <div>{loadedForm.clientCode}</div>
                             </div>
-                            {/* <div className="flex flex-col space-y-1">
+                            <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Assessing Staff
                                 </label>
-                                <div>*Staff Name*</div>
-                            </div> */}
+                                <div>{user?.displayName}</div>
+                            </div>
                         </div>
                         {/* Program and Case Manager to be implemented later */}
-                        {/* <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                             <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Program
                                 </label>
-                                <div>{loadedForm.program}</div>
+                                <div>Homeless Outreach</div>
                             </div>
                             <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
@@ -91,7 +93,7 @@ const Page = () => {
                                 </label>
                                 <div>*Options to be implemented*</div>
                             </div>
-                        </div> */}
+                        </div>
                     </div>
                     {/* all dropdown sections */}
                     {['Client Profile', 'Family', 'Background', 'Services'].map(
@@ -126,12 +128,21 @@ const Page = () => {
                                                                 Name
                                                             </label>
                                                             <div>
-                                                                {
-                                                                    loadedForm.firstName
-                                                                }{' '}
-                                                                {
-                                                                    loadedForm.lastName
-                                                                }
+                                                                {loadedForm.firstName ? (
+                                                                    <p>
+                                                                        {
+                                                                            loadedForm.firstName
+                                                                        }{' '}
+                                                                        {
+                                                                            loadedForm.lastName
+                                                                        }
+                                                                    </p>
+                                                                ) : (
+                                                                    <p>
+                                                                        None
+                                                                        provided.
+                                                                    </p>
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-col space-y-1">
@@ -1251,45 +1262,6 @@ const Page = () => {
                                                                 needed.
                                                             </p>
                                                         )}
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-[24px]">
-                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Kits
-                                                    </label>
-                                                    <div className="space-y-[24px]">
-                                                        {/* Row: */}
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Hygiene kit
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.hygieneKit ? (
-                                                                    loadedForm.hygieneKit
-                                                                ) : (
-                                                                    <p>
-                                                                        None
-                                                                        needed.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Snack pack
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.snackPack ? (
-                                                                    loadedForm.snackPack
-                                                                ) : (
-                                                                    <p>
-                                                                        None
-                                                                        needed.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
                                                     </div>
                                                 </div>
 
