@@ -1,10 +1,10 @@
-import EventCreation from '@/app/_components/EventCreation';
+import ScheduledCheckInCreation from '@/app/_components/ScheduledCheckInCreation';
 
 interface Props {}
 
 const page = (props: Props) => {
     return <div>
-        <EventCreation />
+        <ScheduledCheckInCreation />
     </div>
 }
 
