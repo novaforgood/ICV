@@ -61,18 +61,10 @@ const Page = (props: Props) => {
         return unsubscribe
     }, [watch, loadedForm])
 
-    useEffect(() => {
-        const dobValue = loadedForm.dateOfBirth
-
-        if (dobValue) {
-            const age = calculateAge(dobValue) // Calculate age from dateOfBirth string
-            setValue('age', age) // Update the 'age' field in react-hook-form
-        }
-    }, [loadedForm.dateOfBirth, setValue]) // Dependency array ensures this runs when dateOfBirth changes
-
-    // Function to calculate age from dateOfBirth string
-    const calculateAge = (dobString: string): number | undefined => {
-        if (!dobString) return undefined
+    const calculateAgeAndRange = (
+        dobString: string,
+    ): { age: number | undefined; ageRange: string | undefined } => {
+        if (!dobString) return { age: undefined, ageRange: undefined }
 
         const dob = new Date(dobString)
         const now = new Date()
@@ -86,8 +78,33 @@ const Page = (props: Props) => {
             age--
         }
 
-        return age
+        const ageRange =
+            age >= 16 && age <= 30
+                ? 'Age: 16-30'
+                : age >= 31 && age <= 40
+                  ? 'Age: 31-40'
+                  : age >= 41 && age <= 70
+                    ? 'Age: 41-70'
+                    : undefined
+
+        return { age, ageRange }
     }
+
+    // updates age and age range when date of birth is changed
+    useEffect(() => {
+        const dobValue = loadedForm.dateOfBirth
+
+        if (dobValue) {
+            const { age, ageRange } = calculateAgeAndRange(dobValue)
+
+            if (age !== undefined) {
+                setValue('age', age) // Only set 'age' if it's calculated
+            }
+            if (ageRange) {
+                setValue('ageRange', ageRange) // Only set 'ageRange' if it's calculated
+            }
+        }
+    }, [loadedForm.dateOfBirth, setValue])
 
     const onSubmit = (data: ProfileType) => {
         console.log('in submit...', data)
