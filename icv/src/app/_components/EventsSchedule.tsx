@@ -1,16 +1,16 @@
 'use client'
 
-import { getAllEvents } from '@/api/events'
+import { getAllEvents, getScheduledEvents } from '@/api/events'
 import Symbol from '@/components/Symbol'
 import { Card } from '@/components/ui/card'
-import { ScheduledCheckInType } from '@/types/event-types'
+import { CheckInType } from '@/types/event-types'
 import { format, isValid } from 'date-fns'
 import React, { useMemo, useState } from 'react'
 import useSWR from 'swr'
 
 // Fetcher function for events
-const fetchEvents = async (): Promise<ScheduledCheckInType[]> => {
-    const events = await getAllEvents()
+const fetchEvents = async (): Promise<CheckInType[]> => {
+    const events = await getScheduledEvents()
     return events
 }
 

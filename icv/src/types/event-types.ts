@@ -11,24 +11,25 @@ export const CheckInCategory = z.enum([
 ])
 
 // CaseEvent schema
-export const ScheduledCheckInSchema = z.object({
+export const CheckInSchema = z.object({
     // change string date (chosen from form input) to date, then check validity
     startTime: timestampToDateSchema,
-    endTime: timestampToDateSchema,
+    endTime: timestampToDateSchema.optional(),
     // check if chosen dropdown is a string of the ContactType array (form input passed as)
     category: z.enum(Object.values(CheckInCategory.Values) as [string, ...string[]], {
         message: "Choose check-in category."
     }).optional(),
     description: z.string().optional(),
-    name : z.string(),
+    name : z.string().optional(),
     location: z.string().optional(),
     asigneeId: z.string().optional(),
     clientId: z.string().optional(),
     id: z.string().optional(),
+    scheduled: z.boolean(),
 
 })
 .passthrough(); // lets fields not in schema pass through (clientId, because always collected properly)
 
 // Types for enums and main schema
-export type ScheduledCheckInType = z.infer<typeof ScheduledCheckInSchema>
+export type CheckInType = z.infer<typeof CheckInSchema>
 export type CheckInCategoryType = z.infer<typeof CheckInCategory>;

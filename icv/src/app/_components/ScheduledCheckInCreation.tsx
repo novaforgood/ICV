@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import useSWR from 'swr'
-import { ScheduledCheckInType } from '@/types/event-types'
+import { CheckInType } from '@/types/event-types'
 import { createScheduledCheckIn } from '@/api/events'
 import { Card } from '@/components/ui/card'
 import { getAllClients } from '@/api/clients'
@@ -70,16 +70,23 @@ const ScheduledCheckInCreation: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (!date || isNaN(new Date(date).getTime())) {
+            alert('Please select a valid date.');
+            return;
+        }
+
         const startDateTime = new Date(`${date}T${startTime}`)
         const endDateTime = new Date(`${date}T${endTime}`)
-        const newEvent: ScheduledCheckInType & { clientId?: string } = {
+        const newEvent: CheckInType & { clientId?: string } = {
             name,
             startTime: startDateTime,
             endTime: endDateTime,
             assigneeId, // current user's uid from Firebase Auth
             location,
             clientId: selectedClientId,
-            category: category
+            category: category,
+            scheduled: true,
         }
 
         createScheduledCheckIn(newEvent)
@@ -106,7 +113,7 @@ const ScheduledCheckInCreation: React.FC = () => {
     return (
         <Card className="flex w-96 p-12 pt-12 pb-6 flex-col justify-start items-center fixed right-0 top-0 h-full">
             <h2 className="self-stretch text-left font-semibold text-[28px] leading-[40px] pb-10">
-                Schedule Check-in
+                Schedule Check-In
             </h2>
             <form onSubmit={handleSubmit} className="w-full">
                 {/* Check-in Name */}
