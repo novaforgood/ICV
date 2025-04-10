@@ -1,14 +1,14 @@
 import { getClientById } from '@/api/make-cases/make-case'
 import Image from 'next/image'
-import ProfileNav from '../../clientprofile/profilenav'
+import ProfileNav from './components/profilenav'
 
-const page = async ({
+export default async function ClientLayout({
     params,
+    children
 }: {
-    params: {
-        clientId: string
-    }
-}) => {
+    params: {clientId: string}
+    children: React.ReactNode
+})  {
     const { clientId } = await params
     const client = await getClientById(clientId)
     // const events = await getEventsbyClientId(clientId)
@@ -50,45 +50,9 @@ const page = async ({
                 </div>
 
                 <div className="ml-8 p-10">
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
-                    <p className="text-5xl"> bruhhhhfrwfjonahrwgbhah</p>
+                    <p className="text-5xl"> client landing/bio page</p>
                 </div>
             </div>
         </div>
     )
 }
-
-export default page

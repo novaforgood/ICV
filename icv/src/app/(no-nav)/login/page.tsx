@@ -1,5 +1,5 @@
 'use client'
-import { auth } from '@/data/firebase'
+import { auth, clientDb } from '@/data/firebase'
 import { setCookie } from 'cookies-next'
 import {
     createUserWithEmailAndPassword,
@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth'
 import { useState } from 'react'
 import Image from 'next/image'
+import { doc, setDoc } from 'firebase/firestore'
 
 const page = () => {
     const [email, setEmail] = useState('')
@@ -51,6 +52,13 @@ const page = () => {
                     displayName: `${firstname} ${lastname}`,
                 })
                 console.log('user name stored: ', auth.currentUser?.displayName)
+                //add username and email to collection to allow display on clinet form "case manager" box
+                await setDoc(doc(clientDb, "users", `${firstname}`),{
+                    name: `${firstname} ${lastname}`,
+                    email: `${email}`
+                })
+                console.log('user stored in collections')
+                
             } else {
                 const usercred = await signInWithEmailAndPassword(
                     auth,
