@@ -18,33 +18,62 @@ export default function layout({
                 </div>
 
                 <div className="ml-6 mt-6 space-y-[24px]">
-                    <div className="mx-auto flex w-[90%] justify-between px-10">
-                        <div className="absolute left-[200px] right-[160px] top-[95px] z-[-1] h-[2px] bg-[#27262A]" />
-                        <ProgressCircle
-                            title="Cllient Profile"
-                            goTo="/intake"
-                            num="1"
-                        />
-                        <ProgressCircle
-                            title="Family"
-                            goTo="/intake/family"
-                            num="2"
-                        />
-                        <ProgressCircle
-                            title="Background"
-                            goTo="/intake/family/background"
-                            num="3"
-                        />
-                        <ProgressCircle
-                            title="Services"
-                            goTo="/intake/family/background/services"
-                            num="4"
-                        />
-                        <ProgressCircle
-                            title="Review"
-                            goTo="/intake/family/background/services/confirmation"
-                            num="5"
-                        />
+                    <div className="mx-auto flex w-[95%] items-center justify-between px-10">
+                        <div className="w-[100px]">
+                            <ProgressCircle
+                                title="Profile"
+                                goTo="/intake"
+                                num="1"
+                            />
+                        </div>
+
+                        <div className="relative flex-1">
+                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        </div>
+
+                        <div className="w-[100px]">
+                            <ProgressCircle
+                                title="Family"
+                                goTo="/intake/family"
+                                num="2"
+                            />
+                        </div>
+
+                        <div className="relative flex-1">
+                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        </div>
+
+                        <div className="w-[100px]">
+                            <ProgressCircle
+                                title="Background"
+                                goTo="/intake/family/background"
+                                num="3"
+                            />
+                        </div>
+
+                        <div className="relative flex-1">
+                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        </div>
+
+                        <div className="w-[100px]">
+                            <ProgressCircle
+                                title="Services"
+                                goTo="/intake/family/background/services"
+                                num="4"
+                            />
+                        </div>
+
+                        <div className="relative flex-1">
+                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        </div>
+
+                        <div className="w-[100px]">
+                            <ProgressCircle
+                                title="Review"
+                                goTo="/intake/family/background/services/confirmation"
+                                num="5"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
