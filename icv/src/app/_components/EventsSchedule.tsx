@@ -1,32 +1,17 @@
 'use client'
 
-import { getAllEvents } from '@/api/events'
+import { getAllEvents, getScheduledEvents } from '@/api/events'
 import Symbol from '@/components/Symbol'
 import { Card } from '@/components/ui/card'
-import { CaseEventType } from '@/types/event-types'
+import { CheckInType } from '@/types/event-types'
 import { format, isValid } from 'date-fns'
 import React, { useMemo, useState } from 'react'
 import useSWR from 'swr'
 
 // Fetcher function for events
-const fetchEvents = async (): Promise<CaseEventType[]> => {
-    const events = await getAllEvents()
-
-    // Helper function to convert a timestamp to an ISO string
-    const convertTimestamp = (timestamp: any) => {
-        if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
-            return new Date(timestamp.seconds * 1000).toISOString()
-        }
-        return timestamp
-    }
-
-    // Map events and convert timestamp fields to strings
-    return events.map((event: any) => ({
-        ...event,
-        date: convertTimestamp(event.date),
-        startTime: convertTimestamp(event.startTime),
-        endTime: convertTimestamp(event.endTime)
-    }))
+const fetchEvents = async (): Promise<CheckInType[]> => {
+    const events = await getScheduledEvents()
+    return events
 }
 
 const EventsSchedule: React.FC = () => {
@@ -144,7 +129,6 @@ const EventsSchedule: React.FC = () => {
             </Card>
 
             {/* Event Cards */}
-            {/* <div className="fixed flex-col space-y-4 bottom-0 max-h-60 overflow-auto bg-gray-100 border-t border-gray-300 p-4 shadow-lg"> */}
             <div className="bottom-0 -m-2 flex flex-1 flex-col space-y-4 overflow-scroll p-2">
                 {filteredEvents.length === 0 ? (
                     <p className="py-8 text-center text-gray-700">
@@ -157,38 +141,28 @@ const EventsSchedule: React.FC = () => {
 
                         const startTime = eventDate.getTime()
                         const endTime = new Date(event.endTime).getTime()
-                        const eventName = String(event.name) || 'Loading...'
-                        const eventLocation =
-                            String(event.location) || 'Loading...'
-                        const eventAsignee =
-                            String(event.assigneeId) || 'Loading...'
+                        const eventName = String(event.name) || 'unnamed check-in'
+                        const eventLocation = String(event.location) || ''
+                        const eventAsignee = String(event.assigneeId) || ''
 
                         return (
-                            <>
-                                <Card
-                                    key={String(event.id)}
-                                    className="flex items-center justify-between gap-4"
-                                >
-                                    <div className="text-sm text-gray-500">
-                                        <span>{format(startTime, 'p')}</span>
-                                        <br />
-                                        <span>{format(endTime, 'p')}</span>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-lg font-bold">
-                                            {eventName}
-                                        </h2>
-                                        <p className="text-gray-600">
-                                            {eventLocation}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <h2 className="flex items-center gap-3 text-lg">
-                                            {eventAsignee}
-                                        </h2>
-                                    </div>
-                                </Card>
-                            </>
+                            <Card
+                                key={String(event.id)}
+                                className="flex items-center justify-between gap-4 min-h-[100px]"
+                            >
+                                <div className="text-sm text-gray-500 text-center w-[80px]">
+                                    <span>{format(startTime, 'p')}</span>
+                                    <br />
+                                    <span>{format(endTime, 'p')}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h2 className="text-lg font-bold truncate">{eventName}</h2>
+                                    <p className="text-gray-600 truncate">{eventLocation}</p>
+                                </div>
+                                <div className="w-[100px] text-center">
+                                    <h2 className="text-lg">{eventAsignee || '-'}</h2>
+                                </div>
+                            </Card>
                         )
                     })
                 )}
