@@ -1,28 +1,30 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { auth } from '@/lib/firebase'
+import { auth } from '@/data/firebase'
 import { getCookie } from 'cookies-next'
+import { useEffect, useState } from 'react'
 
 export default function AuthDebugger() {
     const [authState, setAuthState] = useState({
         isLoggedIn: false,
         user: null,
         cookie: null,
-        loading: true
+        loading: true,
     })
 
     useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
             const cookie = getCookie('idToken')
             setAuthState({
                 isLoggedIn: !!user,
-                user: user ? { 
-                    uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName
-                } : null,
+                user: user
+                    ? {
+                          uid: user.uid,
+                          email: user.email,
+                          displayName: user.displayName,
+                      }
+                    : null,
                 cookie: cookie || 'none',
-                loading: false
+                loading: false,
             })
         })
 
@@ -32,7 +34,7 @@ export default function AuthDebugger() {
     if (authState.loading) return <div>Loading auth state...</div>
 
     return (
-        <div className="p-4 border rounded bg-gray-50 my-4 text-sm">
+        <div className="my-4 rounded border bg-gray-50 p-4 text-sm">
             <h3 className="font-bold">Auth Debug Info</h3>
             <p>Logged in: {authState.isLoggedIn ? 'Yes' : 'No'}</p>
             <p>Cookie exists: {authState.cookie !== 'none' ? 'Yes' : 'No'}</p>
@@ -45,4 +47,4 @@ export default function AuthDebugger() {
             )}
         </div>
     )
-} 
+}

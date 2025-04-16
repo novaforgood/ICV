@@ -50,18 +50,18 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
     }),
     columnHelper.accessor('mentalHealth', {
         header: () => <div>Mental Health</div>,
-        cell: (info) => (
-            <div className="no-scrollbar flex max-w-40 gap-1 overflow-scroll">
-                {info.getValue()?.map((mh: string) => (
-                    <div
-                        key={mh}
-                        className="mr-1 rounded-full bg-gray-100 px-2 py-1 text-xs"
-                    >
-                        {mh}
-                    </div>
-                ))}
-            </div>
-        ),
+        // cell: (info) => (
+        //     <div className="no-scrollbar flex max-w-40 gap-1 overflow-scroll">
+        //         {info.getValue()?.map((mh: string) => (
+        //             <div
+        //                 key={mh}
+        //                 className="mr-1 rounded-full bg-gray-100 px-2 py-1 text-xs"
+        //             >
+        //                 {mh}
+        //             </div>
+        //         ))}
+        //     </div>
+        // ),
     }),
     columnHelper.accessor('pets', {
         header: () => <div>No. Pets</div>,
@@ -77,7 +77,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
     }),
     columnHelper.accessor('educationStatus', {
         header: () => <div>Education</div>,
-        cell: (info) => <div>{info.getValue()?.join(', ') || 'N/A'}</div>,
+        // cell: (info) => <div>{info?.getValue()?.join(', ') || 'N/A'}</div>,
     }),
     columnHelper.accessor('cps', {
         header: () => <div>CPS Case</div>,
@@ -97,7 +97,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
     }),
     columnHelper.accessor('substanceAbuse', {
         header: () => <div>Substance Abuse</div>,
-        cell: (info) => <div>{info.getValue()?.join(', ') || 'N/A'}</div>,
+        // cell: (info) => <div>{info.getValue()?.join(', ') || 'N/A'}</div>,
     }),
     // columnHelper.accessor('program', {
     //     header: () => <div>Program</div>,
@@ -116,6 +116,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
     }),
     columnHelper.accessor('ethnicity', {
         header: () => <div>Ethnicity</div>,
-        cell: (info) => <div>{info.getValue()?.join(', ') || 'N/A'}</div>,
+        // cell: (info) => <div>{info.getValue()?.join(', ') || 'N/A'}</div>,
     }),
 ]

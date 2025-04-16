@@ -22,7 +22,7 @@
     "firebase-admin": "^13.1.0",
     "lucide-react": "^0.476.0",
     "material-symbols": "^0.28.2",
-    "next": "15.1.5",
+    "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
