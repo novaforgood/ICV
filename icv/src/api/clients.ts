@@ -25,22 +25,25 @@ export async function getAllClients(): Promise<NewClient[]> {
     return clientsList
 }
 
-export async function getAllUsers():  Promise<Users[]> {
-    const { firebaseServerApp, currentUser } =
-        await getAuthenticatedAppForUser()
-    if (!currentUser) {
-        throw new Error('User not found')
-    }
-    const ssrdb = getFirestore(firebaseServerApp)
+// export async function getAllUsers():  Promise<Users[]> {
+//     const { firebaseServerApp, currentUser } =
+//         await getAuthenticatedAppForUser()
+//     if (!currentUser) {
+//         throw new Error('User not found')
+//     }
+//     const ssrdb = getFirestore(firebaseServerApp)
 
-    const userCollection = collection(ssrdb, 'users')
-    const usersSnapshot = await getDocs(userCollection)
-    const userList = usersSnapshot.docs.map((doc) => {
-        const data = doc.data() as Users
-        return data
-    })
-    return userList
-}
+//     const userCollection = collection(ssrdb, 'users')
+//     const usersSnapshot = await getDocs(userCollection)
+//     const userList = usersSnapshot.docs.map((doc) => {
+//         const data = doc.data() as Users
+//         return {
+//             id: doc.id,
+//             ...data
+//         }
+//     })
+//     return userList
+// }
 
 export async function getClientById(id: string) {
     const { firebaseServerApp, currentUser } =

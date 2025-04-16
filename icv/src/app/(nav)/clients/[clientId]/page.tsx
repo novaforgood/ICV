@@ -2,19 +2,7 @@ import { getClientById } from '@/api/make-cases/make-case'
 import Image from 'next/image'
 import ProfileNav from './components/profilenav'
 
-export default async function ClientLayout({
-    params,
-    children
-}: {
-    params: {clientId: string}
-    children: React.ReactNode
-})  {
-    const { clientId } = await params
-    const client = await getClientById(clientId)
-    // const events = await getEventsbyClientId(clientId)
-    const events = {}
-
-    // console.log('client', client)
+export default function clientProfilePage(){
 
     return (
         <div>
