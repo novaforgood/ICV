@@ -1,6 +1,6 @@
-'use client'
 
-import { useRouter } from "next/navigation"
+
+
 import ProfileNav from "./components/profilenav"
 import Image from 'next/image'
 import { getClientById } from '@/api/make-cases/make-case'
@@ -12,7 +12,6 @@ export default async function layout({
     params: {clientId: string}
     children: React.ReactNode
 }>) {
-    const router = useRouter()
     const { clientId } = params
     const client = await getClientById(clientId)
     return (
@@ -33,15 +32,12 @@ export default async function layout({
                     <h1 className="text-5xl font-bold">
                         {client.firstName} {client.lastName}
                     </h1>
-                    <p className="text-m pt-2 text-gray-600">
+                    <p className="text-m pt-2 text-black">
                         {client.clientCode}
-                    </p>
-                    <p className="text-m text-gray-600">
-                        Homeless Department
                     </p>
                 </div>
             </div>
-            <ProfileNav />
+            <ProfileNav/>
         </div>
          {/* Page content go here */}
       <main className="p-6">{children}</main>
