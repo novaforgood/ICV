@@ -19,6 +19,8 @@ import {
     increment
 } from 'firebase/firestore'
 import { get } from 'http'
+import { utcToZonedTime, format } from 'date-fns-tz';
+const timeZone = 'America/Los_Angeles';
 
 export async function getAllEvents() {
     const { firebaseServerApp, currentUser } =
@@ -73,33 +75,60 @@ export async function getEventsbyClientId(clientId: string) {
     return events
 }
 
+// Helper function to convert a Firebase timestamp or ISO string into a Date object
+function parseTimestamp(timestamp: any) {
+    if (typeof timestamp === 'object') {
+        //if firebase timpestamp
+        return timestamp.toDate();
+    } else if (typeof timestamp === 'string') {
+        // ISO string case
+        return new Date(timestamp + ' GMT-0800'); // Convert to PST
+    }
+}
+  
 export async function getScheduledEvents(): Promise<CheckInType[]> {
     // Retrieve all events using the existing API function
     const events = await getAllEvents();
-    
+
     // Filter events to only those where the scheduled field is true
     const scheduledEvents = events.filter((event) => event.scheduled === true);
-    
-    return scheduledEvents;
+
+    // Parse the timestamp fields into Date objects, if necessary
+    const parsedEvents = scheduledEvents.map((event) => ({
+        ...event,
+        startTime: parseTimestamp(event.startTime),
+        endTime: event.endTime ? parseTimestamp(event.endTime) : undefined,
+    }));
+
+return parsedEvents;
 }
 
-export async function createScheduledCheckIn(event: CheckInType) {
-    const { firebaseServerApp, currentUser } =
-        await getAuthenticatedAppForUser()
+export async function createCheckIn(event: CheckInType) {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
     if (!currentUser) {
-        throw new Error('User not found')
+        throw new Error('User not found');
     }
-    const ssrdb = getFirestore(firebaseServerApp)
+    const ssrdb = getFirestore(firebaseServerApp);
 
     try {
-        const eventsCollection = collection(ssrdb, 'events')
-        const newDoc = await addDoc(eventsCollection, event)
-        console.log('Event added with ID: ', newDoc.id)
+        const eventsCollection = collection(ssrdb, 'events');
+        const eventPayload = {
+            ...event,
+            // Convert and format startTime in PST
+            startTime: event.startTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }),
+            // Convert endTime to ISO string in PST only if provided
+            endTime: event.endTime ? event.endTime.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }) : undefined,
 
-        await incrementCheckInCount(event.category, event.startTime)
+        };
+        const newDoc = await addDoc(eventsCollection, eventPayload);
+        console.log('Event added with ID:', newDoc.id);
+
+        await incrementCheckInCount(event.category, new Date(event.startTime));
+
+        return newDoc.id;
     } catch (error) {
-        console.error('Error adding check in:', error)
-        throw new Error('Failed to add check in')
+        console.error('Error adding check in:', error);
+        throw new Error('Failed to add check in');
     }
 }
 
@@ -157,5 +186,23 @@ export async function getCheckInCount(checkInCategory: CheckInCategoryType, date
     } catch (error) {
         console.error('Error getting check-in count:', error)
         throw new Error('Failed to get check-in count')
+    }
+}
+
+export async function updateCaseNotes(eventId: string, newCaseNotes: string): Promise<void> {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+    if (!currentUser) {
+        throw new Error('User not found');
+    }
+    const ssrdb = getFirestore(firebaseServerApp);
+    try {
+        const eventDocRef = doc(ssrdb, 'events', eventId);
+        await updateDoc(eventDocRef, {
+            caseNotes: newCaseNotes
+        });
+        console.log(`Case notes updated for event ID: ${eventId}`);
+    } catch (error) {
+        console.error('Error updating case notes:', error);
+        throw new Error('Failed to update case notes');
     }
 }
