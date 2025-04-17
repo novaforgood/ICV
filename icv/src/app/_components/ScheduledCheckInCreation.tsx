@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import useSWR from 'swr'
 import { CheckInType } from '@/types/event-types'
-import { createScheduledCheckIn } from '@/api/events'
+import { createCheckIn } from '@/api/events'
 import { Card } from '@/components/ui/card'
 import { getAllClients } from '@/api/clients'
 import { CheckInCategory } from '@/types/event-types'
@@ -17,7 +17,7 @@ const ScheduledCheckInCreation: React.FC = () => {
     const [endTime, setEndTime] = useState('')
     const [location, setLocation] = useState('')
     const [name, setName] = useState('')
-    const [category, setCategory] = useState('')
+    const [category, setCategory] = useState(CheckInCategory.Values.Other) // Default to 'Other' category
 
     // assigneeId now comes from Firebase Authentication
     const [assigneeId, setAssigneeId] = useState('')
@@ -89,7 +89,7 @@ const ScheduledCheckInCreation: React.FC = () => {
             scheduled: true,
         }
 
-        createScheduledCheckIn(newEvent)
+        createCheckIn(newEvent)
             .then(response => {
                 console.log('Event created successfully:', response)
                 alert('Event created successfully!')
