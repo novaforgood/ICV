@@ -1,33 +1,16 @@
 import { date, z } from 'zod'
 import { timestampToDateSchema} from './misc-types'
 
-// export const Gender = z.enum(['Male', 'Female', 'Non-Binary', 'Other'])
-// export const Program = z.enum(['Homeless Department', 'School Outreach', 'Other'])
-// export const HousingType = z.enum(['Not Sure', 'What Design', 'Wants Here', 'Other'])
-// export const Pets = z.enum(['Dog', 'Cat', 'Bird', "Hamster", 'Rabbit', 'Reptile', 'Other'])
-// export const Ethnicity = z.enum([
-//     'White',
-//     'Black or African American',
-//     'Hispanic, Latino, or Spanish Origin',
-//     'Asian',
-//     'Native American',
-//     'Middle Eastern',
-//     'Hawaiian or Pacific Islander',
-//     'Other',
-// ])
-
-// export type Gender = z.infer<typeof Gender>
-// export type HousingType = z.infer<typeof HousingType>
-// export type Ethnicity = z.infer<typeof Ethnicity>
-// export type Pets = z.infer<typeof Pets>
-// export type Program = z.infer<typeof Program>
-
 export const GENDER = ['Male', 'Female', 'Nonbinary']
-export const REFERRALSOURCE = [
+export const CONTACTSOURCE = [
+    'Outreach',
     'Police Department',
-    'School liaison',
     'City of Huntington Park',
+    'Community',
+    'Service Provider',
+    'School liaison',
 ]
+export const SERVICESELECT = ['Recipient', 'Not a recipient']
 export const CITIZEN = ['Citizen', 'Resident', 'Undocumented']
 export const HOMELESS = ['Yes', 'No', 'At risk']
 export const ETHNICITY = [
@@ -113,6 +96,11 @@ export const HEALTH_WELLNESS = [
     'Substance Abuse Treatment',
     'Basic Needs Support',
 ]
+export const EMPLOYMENT = [
+    'Full-time',
+    'Part-time',
+    'Unemployed',
+]
 
 export type NewClient = z.infer<typeof ClientIntakeSchema>
 
@@ -127,7 +115,7 @@ export const ClientIntakeSchema = z.object({
     age: z.number().optional(),
     ageRange: z.string().optional(),
     gender: z.string().optional(),
-    referralSource: z.string().optional(),
+    contactSource: z.string().optional(),
     clientNumber: z.string().optional(),
 
     // Citizenship
@@ -136,8 +124,8 @@ export const ClientIntakeSchema = z.object({
 
     // Housing
     homeless: z.string().optional(),
-    // durationHomeless: z.string().optional(),
-    housingSituation: z.string().optional(),
+    sheltered: z.string().optional(),
+    housingNotes: z.string().optional(),
     streetAddress: z.string().optional(),
     aptNumber: z.string().optional(),
     city: z.string().optional(),
@@ -149,10 +137,37 @@ export const ClientIntakeSchema = z.object({
 
     // Demographics
     ethnicity: z.array(z.string()).optional(),
-    employed: z.string().optional(),
-    income: z.string().optional(),
 
-    // ----- PAGE 2: Family Information -----
+    // ----- PAGE 2: Background Information -----
+    employment: z.string().optional(),
+    employmentIncome: z.string().optional(),
+
+    educationStatus: z.array(z.string().optional()).optional(),
+    mentalHealthConditions: z.string().optional(),
+    medicalConditions: z.string().optional(),
+    substanceAbuse: z.string().optional(),
+    fosterYouth: z.string().optional(),
+    openProbation: z.string().optional(),
+    openCPS: z.string().optional(),
+    sexOffender: z.string().optional(),
+    historyNotes: z.string().optional(),
+
+    generalRelief: z.string().optional(),
+    generalReliefAid: z.string().optional(),
+    calFresh: z.string().optional(),
+    calFreshAid: z.string().optional(),
+    calWorks: z.string().optional(),
+    calWorksAid: z.string().optional(),
+    ssi:z.string().optional(),
+    ssiAid: z.string().optional(),
+    ssa: z.string().optional(),
+    ssaAid: z.string().optional(),
+    unemployment: z.string().optional(),
+    unemploymentAid: z.string().optional(),
+    otherService: z.string().optional(),
+    otherServiceAid: z.string().optional(),
+
+    // ----- PAGE 3: Family Information -----
     familySize: z.string().optional(),
     spouse: z.array(
         z.object({
@@ -181,23 +196,6 @@ export const ClientIntakeSchema = z.object({
            purpose: z.array(z.string().optional())
         })
     ).optional(),
-
-    // ----- PAGE 3: Background Information -----
-    educationStatus: z.array(z.string().optional()).optional(),
-    cps: z.string().optional(),
-    cpsNotes: z.string().optional(),
-    probation: z.string().optional(),
-    probationNotes: z.string().optional(),
-    fosterYouth: z.string().optional(),
-    fosterNotes: z.string().optional(),
-    sexOffender: z.string().optional(),
-    sexOffNotes: z.string().optional(),
-    mentalHealth: z.array(z.string().optional()).optional(),
-    mentalHealthNotes: z.string().optional(),
-    medicalHistory: z.string().optional(),
-    substanceAbuse: z.array(z.string().optional()).optional(),
-    substanceNotes:  z.string().optional(),
-    publicServices: z.array(z.string().optional()).optional(),
 
     // ----- PAGE 4: Services -----
     // Mentoring
@@ -249,21 +247,33 @@ export const ClientIntakeSchema = z.object({
 }) 
 
 export const BackgroundSchema = ClientIntakeSchema.pick({
+    employment: true,
+    employmentIncome: true,
     educationStatus: true,
-    cps: true,
-    cpsNotes: true,
-    probation: true,
-    probationNotes: true,
-    fosterYouth: true,
-    fosterNotes: true,
-    sexOffender: true,
-    sexOffNotes: true,
-    mentalHealth: true,
-    mentalHealthNotes: true,
-    medicalHistory: true,
-    substanceAbuse: true,
-    substanceNotes: true,
-    publicServices: true,
+    mentalHealthConditions: true,
+    medicalConditions: true,
+    substanceAbuse:true,
+    fosterYouth:true,
+    openProbation: true,
+    openCPS:true,
+    sexOffender:true,
+    historyNotes:true,
+
+    // Public Services
+    generalRelief: true,
+    generalReliefAid: true,
+    calFresh: true,
+    calFreshAid: true,
+    calWorks: true,
+    calWorksAid: true,
+    ssi: true,
+    ssiAid: true,
+    ssa: true,
+    ssaAid: true,
+    unemployment: true,
+    unemploymentAid: true,
+    otherService: true,
+    otherServiceAid: true,
 })
 
 export const ServicesSchema = ClientIntakeSchema.pick({
@@ -297,7 +307,7 @@ export const ProfileSchema = ClientIntakeSchema.pick({
     age: true,
     ageRange: true,
     gender: true,
-    referralSource: true,
+    contactSource: true,
     clientNumber: true,
 
     // Citizenship
@@ -306,8 +316,8 @@ export const ProfileSchema = ClientIntakeSchema.pick({
 
     // Housing
     homeless: true,
-    // durationHomeless: true,
-    housingSituation: true,
+    sheltered: true,
+    housingNotes: true,
     streetAddress: true,
     aptNumber:true,
     city: true,
@@ -320,8 +330,6 @@ export const ProfileSchema = ClientIntakeSchema.pick({
 
     // Demographics
     ethnicity: true,
-    employed: true,
-    income: true,
 
 })
 

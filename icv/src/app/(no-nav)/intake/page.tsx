@@ -2,11 +2,11 @@
 
 import {
     CITIZEN,
+    CONTACTSOURCE,
     ETHNICITY,
     GENDER,
     HOMELESS,
     ProfileSchema,
-    REFERRALSOURCE,
     YESNO,
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -113,13 +113,13 @@ const Page = (props: Props) => {
     }
 
     const selectedGender = watch('gender') ?? ''
-    const selectedRef = watch('referralSource') ?? ''
+    const selectedRef = watch('contactSource') ?? ''
     const selectedCitizen = watch('citizenship') ?? ''
     const selectedHomeless = watch('homeless') ?? ''
     const selectedEthnicities = Array.isArray(watch('ethnicity'))
         ? (watch('ethnicity') ?? [])
         : []
-    const selectedEmp = watch('employed') ?? ''
+    const selectedSheltered = watch('sheltered') ?? ''
 
     const [DOB, setDOB] = useState<string>(loadedForm.dateOfBirth || '')
 
@@ -198,12 +198,12 @@ const Page = (props: Props) => {
                             </label>
                             <div className="flex flex-col space-y-[8px]">
                                 <RadioWithOther
-                                    options={REFERRALSOURCE}
+                                    options={CONTACTSOURCE}
                                     selectedValue={selectedRef}
                                     onChange={(updatedRef) =>
-                                        setValue('referralSource', updatedRef)
+                                        setValue('contactSource', updatedRef)
                                     }
-                                    name="referralSource"
+                                    name="contactSource"
                                     otherLabel="Other"
                                     otherPlaceholder="Other"
                                 />
@@ -261,7 +261,7 @@ const Page = (props: Props) => {
                             </div>
                             <div className="flex flex-col space-y-[4px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Citizenship
+                                    Citizenship Status
                                 </label>
                                 <div className="flex flex-col space-y-[8px]">
                                     <RadioWithOther
@@ -279,6 +279,30 @@ const Page = (props: Props) => {
                         </div>
                     </div>
 
+                    {/* Ethnicity Information */}
+                    <div className="space-y-[24px]">
+                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            Ethnicity
+                        </label>
+                        <div className="space-y-[24px]">
+                            <div className="flex flex-col space-y-[8px]">
+                                <CheckboxListWithOther
+                                    options={ETHNICITY}
+                                    selectedValues={selectedEthnicities}
+                                    onChange={(updatedEthnicities) =>
+                                        setValue(
+                                            'ethnicity',
+                                            updatedEthnicities,
+                                        )
+                                    }
+                                    name="ethnicity"
+                                    otherLabel="Other"
+                                    otherPlaceholder="Specify other ethnicity"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Housing Information */}
                     <div className="space-y-[24px]">
                         <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
@@ -287,7 +311,7 @@ const Page = (props: Props) => {
 
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Homeless?
+                                Homeless
                             </label>
                             <div className="flex flex-col space-y-[8px]">
                                 <RadioChoice
@@ -301,27 +325,17 @@ const Page = (props: Props) => {
                             </div>
                         </div>
 
-                        {/* <div className="flex flex-col space-y-[4px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Duration of homelessness
-                            </label>
-                            <input
-                                {...register('durationHomeless')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div> */}
-
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Housing situation
+                                Sheltered
                             </label>
-                            <input
-                                {...register('housingSituation')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
+                            <RadioChoice
+                                options={YESNO}
+                                selectedValue={selectedSheltered}
+                                onChange={(updatedSheltered) =>
+                                    setValue('sheltered', updatedSheltered)
+                                }
+                                name="cps"
                             />
                         </div>
 
@@ -375,61 +389,16 @@ const Page = (props: Props) => {
                                 />
                             </div>
                         </div>
-                    </div>
-
-                    {/* Demographics Information */}
-                    <div className="space-y-[24px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Demographics
-                        </label>
-                        <div className="space-y-[24px]">
-                            <div>
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Ethnicity?
-                                </label>
-                                <div className="flex flex-col space-y-[8px]">
-                                    <CheckboxListWithOther
-                                        options={ETHNICITY}
-                                        selectedValues={selectedEthnicities}
-                                        onChange={(updatedEthnicities) =>
-                                            setValue(
-                                                'ethnicity',
-                                                updatedEthnicities,
-                                            )
-                                        }
-                                        name="ethnicity"
-                                        otherLabel="Other"
-                                        otherPlaceholder="Specify other ethnicity"
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex flex-col space-y-[4px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Employed
-                                </label>
-                                <RadioChoice
-                                    options={YESNO}
-                                    selectedValue={selectedEmp}
-                                    onChange={(updatedEmp) =>
-                                        setValue('employed', updatedEmp)
-                                    }
-                                    name="employed"
-                                />
-                            </div>
-                            <div className="space-y-[4px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Income
-                                </label>
-                                <div className="flex items-center space-x-[2px]">
-                                    <p className="text-lg">$</p>
-                                    <input
-                                        {...register('income')}
-                                        type="text"
-                                        placeholder="Text"
-                                        className="w-[30%] rounded border p-2"
-                                    />
-                                </div>
-                            </div>
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Housing Notes
+                            </label>
+                            <input
+                                {...register('housingNotes')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-full rounded border p-2"
+                            />
                         </div>
                     </div>
 

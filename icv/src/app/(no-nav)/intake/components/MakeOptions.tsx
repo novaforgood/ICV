@@ -1,3 +1,5 @@
+import { SERVICESELECT } from '@/types/client-types'
+
 export const CheckboxListWithOther = ({
     options,
     selectedValues,
@@ -234,5 +236,55 @@ export const RadioChoice = ({
                 </div>
             ))}
         </>
+    )
+}
+
+type ServicesWithIncomeProps = {
+    selected: string
+    serviceTitle: string
+    incomeFieldName: string
+    serviceFieldName: string
+    setValue: (field: string, value: string | undefined) => void
+    register: (field: string) => { [key: string]: any }
+}
+
+export const ServicesWithIncome = ({
+    selected,
+    serviceTitle,
+    incomeFieldName,
+    serviceFieldName,
+    setValue,
+    register,
+}: ServicesWithIncomeProps) => {
+    return (
+        <div className="grid grid-cols-2 gap-[12px]">
+            <div className="flex flex-col space-y-[4px]">
+                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                    {serviceTitle}
+                </label>
+                <RadioChoice
+                    options={SERVICESELECT}
+                    selectedValue={selected}
+                    onChange={(updatedChoice) =>
+                        setValue(serviceFieldName, updatedChoice)
+                    }
+                    name={`${serviceFieldName}-${serviceTitle}`}
+                />
+            </div>
+            <div className="flex flex-col space-y-[4px]">
+                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                    Aid
+                </label>
+                <div className="flex items-center rounded border p-2">
+                    <span className="mr-1 text-neutral-900">$</span>
+                    <input
+                        {...register(incomeFieldName)}
+                        type="text"
+                        placeholder="Text"
+                        className="w-full outline-none"
+                    />
+                </div>
+            </div>
+        </div>
     )
 }
