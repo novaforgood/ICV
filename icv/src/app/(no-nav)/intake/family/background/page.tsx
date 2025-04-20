@@ -75,10 +75,11 @@ const Page = (props: Props) => {
                 return 0
             }
 
-            const num = parseFloat(value)
-            if (isNaN(num) || value != num.toString()) {
+            const cleanedValue = String(value).replace(/,/g, '')
+            const num = parseFloat(cleanedValue)
+            if (isNaN(num) || cleanedValue != num.toString()) {
                 warnings.push(
-                    `${value} is not a valid number for ${label}. Remove any non-number text with the exception of decimals.`,
+                    `${value} is not a valid number for ${label}. Remove any non-number text with the exception of decimal values and commas.`,
                 )
                 return 0
             }
