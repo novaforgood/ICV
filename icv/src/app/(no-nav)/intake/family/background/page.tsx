@@ -9,7 +9,7 @@ import {
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import {
@@ -48,27 +48,10 @@ const Page = (props: Props) => {
     const selectedEduStat = Array.isArray(watch('educationStatus'))
         ? (watch('educationStatus') ?? [])
         : []
-    // const selectedCPS = watch('cps') ?? ''
-    // const selectedProbation = watch('probation') ?? ''
-    // const selectedFoster = watch('fosterYouth') ?? ''
-    // const selectedOffender = watch('sexOffender') ?? ''
-    // const selectedMH = Array.isArray(watch('mentalHealth'))
-    //     ? (watch('mentalHealth') ?? [])
-    //     : []
     const selectedSub = Array.isArray(watch('substanceAbuse'))
         ? (watch('substanceAbuse') ?? [])
         : []
     const selectedEmployment = watch('employment') ?? ''
-
-    // mentalHealthConditions: true,
-    // medicalConditions: true,
-    // substanceAbuse:true,
-    // fosterYouth:true,
-    // openProbation: true,
-    // openCPS:true,
-    // sexOffender:true,
-    // historyNotes:true,
-
     const selectedMentalCondition = watch('mentalHealthConditions') ?? ''
     const selectedMedicalCondition = watch('medicalConditions') ?? ''
     const selectedSubstance = watch('substanceAbuse') ?? ''
@@ -76,11 +59,54 @@ const Page = (props: Props) => {
     const selectedOpenProbation = watch('openProbation') ?? ''
     const selectedOpenCPS = watch('openCPS') ?? ''
     const selectedSO = watch('sexOffender') ?? ''
-    const selectedHistoryNotes = watch('historyNotes') ?? ''
+
+    const [invalidIncome, setInvalidIncome] = useState<string[]>([])
 
     useEffect(() => {
         reset(loadedForm)
     }, [loadedForm, reset])
+
+    useEffect(() => {
+        const warnings: string[] = []
+
+        const parseIncome = (label: string, value: any) => {
+            console.log('value', value)
+            if (value === undefined || value === '') {
+                return 0
+            }
+
+            const num = parseFloat(value)
+            if (isNaN(num) || value != num.toString()) {
+                warnings.push(
+                    `${value} is not a valid number for ${label}. Remove any non-number text with the exception of decimals.`,
+                )
+                return 0
+            }
+
+            return num
+        }
+        const totalSum =
+            parseIncome('Employment Income', loadedForm.employmentIncome) +
+            parseIncome('General Relief Aid', loadedForm.generalReliefAid) +
+            parseIncome('CalFresh Aid', loadedForm.calFreshAid) +
+            parseIncome('CalWorks Aid', loadedForm.calWorksAid) +
+            parseIncome('SSI Aid', loadedForm.ssiAid) +
+            parseIncome('SSA Aid', loadedForm.ssaAid) +
+            parseIncome('Unemployment Aid', loadedForm.unemploymentAid) +
+            parseIncome('Other Aid', loadedForm.otherServiceAid)
+
+        setInvalidIncome(warnings)
+        updateForm({ totalIncome: totalSum.toString() })
+    }, [
+        loadedForm.employmentIncome,
+        loadedForm.generalReliefAid,
+        loadedForm.calFreshAid,
+        loadedForm.calWorksAid,
+        loadedForm.ssiAid,
+        loadedForm.ssaAid,
+        loadedForm.unemploymentAid,
+        loadedForm.otherServiceAid,
+    ])
 
     useEffect(() => {
         const unsubscribe = watch((data) => {
@@ -91,7 +117,7 @@ const Page = (props: Props) => {
                 ),
             })
         }).unsubscribe
-        console.log(loadedForm)
+        // console.log(loadedForm)
         console.log(errors)
 
         return unsubscribe
@@ -281,228 +307,71 @@ const Page = (props: Props) => {
                                     }
                                 }
                             />
-                            <ServicesWithIncome
-                                selected={selectedOtherService}
-                                serviceTitle="Other"
-                                incomeFieldName="otherServiceAid"
-                                serviceFieldName="otherService"
-                                setValue={(field, value) =>
-                                    setValue(
-                                        field as keyof BackgroundInfoType,
-                                        value,
-                                    )
-                                }
-                                register={
-                                    register as (field: string) => {
-                                        [key: string]: any
-                                    }
-                                }
-                            />
+                            <div className="space-y-[8px]">
+                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                    Other
+                                </label>
+                                <div className="grid grid-cols-2 gap-[12px]">
+                                    <div className="flex flex-col space-y-[4px]">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            Name
+                                        </label>
+                                        <input
+                                            {...register('otherService')}
+                                            type="text"
+                                            placeholder="Text"
+                                            className="w-full rounded border p-2"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col space-y-[4px]">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            Aid
+                                        </label>
+                                        <div className="flex items-center rounded border p-2">
+                                            <span className="mr-1 text-neutral-900">
+                                                $
+                                            </span>
+                                            <input
+                                                {...register('otherServiceAid')}
+                                                type="text"
+                                                placeholder="Text"
+                                                className="w-full outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* <div className="space-y-[12px]">
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Open case with CPS?
-                            </label>
-                            <div className="flex flex-col space-y-[8px]">
-                                <RadioChoice
-                                    options={YESNO}
-                                    selectedValue={selectedCPS}
-                                    onChange={(updatedCPS) =>
-                                        setValue('cps', updatedCPS)
-                                    }
-                                    name="cps"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Notes
-                            </label>
-                            <input
-                                {...register('cpsNotes')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                    </div> */}
-
-                    {/* <div className="space-y-[12px]">
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Open case with probation?
-                            </label>
-                            <div className="flex flex-col space-y-[8px]">
-                                <RadioChoice
-                                    options={YESNO}
-                                    selectedValue={selectedProbation}
-                                    onChange={(updatedProbation) =>
-                                        setValue('probation', updatedProbation)
-                                    }
-                                    name="probation"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Notes
-                            </label>
-                            <input
-                                {...register('probationNotes')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                    </div> */}
-
-                    {/* <div className="space-y-[12px]">
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Foster youth?
-                            </label>
-                            <div className="flex flex-col space-y-[8px]">
-                                <RadioChoice
-                                    options={YESNO}
-                                    selectedValue={selectedFoster}
-                                    onChange={(updatedFoster) =>
-                                        setValue('fosterYouth', updatedFoster)
-                                    }
-                                    name="foster"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Notes
-                            </label>
-                            <input
-                                {...register('fosterNotes')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                    </div> */}
-
-                    {/* <div className="space-y-[12px]">
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Sex offender?
-                            </label>
-                            <div className="flex flex-col space-y-[8px]">
-                                <RadioChoice
-                                    options={YESNO}
-                                    selectedValue={selectedOffender}
-                                    onChange={(updatedOffender) =>
-                                        setValue('sexOffender', updatedOffender)
-                                    }
-                                    name="sexOffender"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Notes
-                            </label>
-                            <input
-                                {...register('sexOffNotes')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                    </div> */}
-
-                    {/* Health Information */}
-                    {/* <div className="space-y-[12px]">
-                        <div className="space-y-[8px]">
+                    <div className="flex grid grid-cols-2 items-center gap-[12px]">
+                        <div>
                             <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                                Mental Health
+                                Total Income
                             </label>
-                            <div>
-                                <CheckboxList
-                                    options={MENTALHEALTH}
-                                    selectedValues={selectedMH.filter(
-                                        (mh): mh is string => !!mh,
-                                    )}
-                                    onChange={(updatedMH) =>
-                                        setValue('mentalHealth', updatedMH)
-                                    }
-                                    name="mentalHealth"
-                                />
-                            </div>
                         </div>
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Notes
-                            </label>
+                        <div className="flex items-center rounded border p-2">
+                            <span className="mr-1 text-neutral-900">$</span>
                             <input
-                                {...register('mentalHealthNotes')}
+                                {...register('totalIncome')}
                                 type="text"
                                 placeholder="Text"
-                                className="w-full rounded border p-2"
+                                className="w-full outline-none"
                             />
                         </div>
-                    </div> */}
-
-                    {/* <div className="space-y-[12px]">
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                                Medical History
-                            </label>
+                    </div>
+                    {invalidIncome.length > 0 && (
+                        <div style={{ color: 'red', marginTop: '1rem' }}>
+                            {invalidIncome.map((msg, index) => (
+                                <div key={index}>{msg}</div>
+                            ))}
                         </div>
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Notes
-                            </label>
-                            <input
-                                {...register('medicalHistory')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                    </div> */}
-
-                    {/* <div className="space-y-[12px]">
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                                Substance Abuse
-                            </label>
-                            <div>
-                                <RadioChoice
-                                    options={YESNO}
-                                    selectedValues={selectedSub.filter(
-                                        (sub): sub is string => !!sub,
-                                    )}
-                                    onChange={(updatedSub) =>
-                                        setValue('substanceAbuse', updatedSub)
-                                    }
-                                    name="substanceAbuse"
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Notes
-                            </label>
-                            <input
-                                {...register('substanceNotes')}
-                                type="text"
-                                placeholder="Text"
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
-                    </div> */}
+                    )}
 
                     <div className="space-y-[24px]">
                         <div className="space-y-[20px]">
                             <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                                Public Services
+                                History
                             </label>
                             <div className="flex flex-col space-y-[4px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
@@ -534,6 +403,85 @@ const Page = (props: Props) => {
                                         )
                                     }
                                     name="mentalHealthConditions"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Substance abuse
+                                </label>
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedSubstance}
+                                    onChange={(updatedSub) =>
+                                        setValue('substanceAbuse', updatedSub)
+                                    }
+                                    name="substanceAbuse"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Foster youth
+                                </label>
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedFosterYouth}
+                                    onChange={(updatedFoster) =>
+                                        setValue('fosterYouth', updatedFoster)
+                                    }
+                                    name="fosterYouth"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Open probation case
+                                </label>
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedOpenProbation}
+                                    onChange={(updatedProbation) =>
+                                        setValue(
+                                            'openProbation',
+                                            updatedProbation,
+                                        )
+                                    }
+                                    name="openProbation"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Open CPS case
+                                </label>
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedOpenCPS}
+                                    onChange={(updatedCPS) =>
+                                        setValue('openCPS', updatedCPS)
+                                    }
+                                    name="openCPSCase"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Sex offender
+                                </label>
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={selectedSO}
+                                    onChange={(updatedSO) =>
+                                        setValue('sexOffender', updatedSO)
+                                    }
+                                    name="sexOffender"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Notes on History
+                                </label>
+                                <input
+                                    {...register('historyNotes')}
+                                    type="text"
+                                    placeholder="Text"
+                                    className="w-full rounded border p-2"
                                 />
                             </div>
                         </div>

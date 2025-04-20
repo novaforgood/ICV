@@ -167,6 +167,8 @@ export const ClientIntakeSchema = z.object({
     otherService: z.string().optional(),
     otherServiceAid: z.string().optional(),
 
+    totalIncome: z.string().optional(),
+
     // ----- PAGE 3: Family Information -----
     familySize: z.string().optional(),
     spouse: z.array(
@@ -274,6 +276,8 @@ export const BackgroundSchema = ClientIntakeSchema.pick({
     unemploymentAid: true,
     otherService: true,
     otherServiceAid: true,
+
+    totalIncome: true,
 })
 
 export const ServicesSchema = ClientIntakeSchema.pick({
