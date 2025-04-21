@@ -1,5 +1,4 @@
-import { date, z } from 'zod'
-import { timestampToDateSchema} from './misc-types'
+import { z } from 'zod'
 
 // export const Gender = z.enum(['Male', 'Female', 'Non-Binary', 'Other'])
 // export const Program = z.enum(['Homeless Department', 'School Outreach', 'Other'])
@@ -123,6 +122,7 @@ export const ClientIntakeSchema = z.object({
     id: z.string().optional(),
     firstName: z.string().optional(),
     lastName: z.string().optional(),
+    fullNameLower: z.string().optional(),
     dateOfBirth: z.string().optional(),
     age: z.number().optional(),
     ageRange: z.string().optional(),
@@ -242,9 +242,9 @@ export const ClientIntakeSchema = z.object({
 
     // ----- PAGE 5: CONFIRMATION PAGE ----
     clientCode: z.string().optional(),
-    //assessingStaff: z.string().optional(),
+    assessingStaff: z.string().optional(),
     //program: z.string().optional(),
-    // caseManager: z.string().optional(),
+    caseManager: z.string().optional(),
     // permission: z.boolean().optional(),
 }) 
 
