@@ -1,7 +1,13 @@
 'use client'
 
 import { useIntakeFormStore } from '@/app/_lib/useIntakeFormStore'
-import { FamilySchema } from '@/types/client-types'
+import {
+    FamilySchema,
+    GENDER,
+    PETPURPOSE,
+    PETSIZE,
+    PUBLIC_SERVICES,
+} from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -14,18 +20,6 @@ import {
     RadioWithOther,
 } from '../components/MakeOptions'
 interface Props {}
-
-const GENDER = ['Male', 'Female', 'Nonbinary']
-const PUBLIC_SERVICES = [
-    'General Relief',
-    'CalFresh (Food Stamps/EBT)',
-    'CalWorks',
-    'SSI',
-    'SSA',
-    'Unemployment Benefits',
-]
-const PETSIZE = ['Small', 'Medium', 'Large']
-const PURPOSE = ['Emotional support animal', 'Service animal']
 
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
@@ -471,7 +465,7 @@ const Page = (props: Props) => {
                                         Purpose
                                     </label>
                                     <CheckboxList
-                                        options={PURPOSE}
+                                        options={PETPURPOSE}
                                         selectedValues={(
                                             watch(`pets.${index}.purpose`) ?? []
                                         ).filter(
