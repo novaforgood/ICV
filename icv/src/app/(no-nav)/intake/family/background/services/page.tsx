@@ -1,7 +1,16 @@
 'use client'
 
 import { storage } from '@/data/firebase'
-import { ServicesSchema } from '@/types/client-types'
+import {
+    EDUTRAIN,
+    HEALTH_WELLNESS,
+    HOUSING,
+    MENTORING,
+    PERSONAL_DEV,
+    REDIRECTION,
+    REFERRALSERVICE,
+    ServicesSchema,
+} from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
     deleteObject,
@@ -18,65 +27,6 @@ import FileUpload, { ResetButton } from '../../../components/FileUpload'
 import { CheckboxList } from '../../../components/MakeOptions'
 
 interface Props {}
-
-const MENTORING = [
-    'Problem Solving/Decision Making',
-    'Goal Setting',
-    'Academic Support',
-    'Group Mentoring',
-    'Conflict Resolution',
-    'Rumor Control Intervention',
-]
-
-const HOUSING = [
-    'Emergency Shelter',
-    'Hotel Voucher',
-    'Shared Living',
-    'Independent Living',
-    'Management Companies',
-    'Transportation',
-]
-
-const EDUTRAIN = [
-    'Independent Studies',
-    'Charter Schools',
-    'Adult School/GED',
-    'Vocational Training School',
-    'Financial Aid/College Support',
-]
-
-const REFERRAL = [
-    'Legal Assistance/Food Pantry',
-    'DV Crisis Support',
-    'Reentry Services',
-    'Immigration Services',
-    'Financial Literacy',
-    'Anger Management',
-    'Financial Assistance Programs (SNAP/Cal/Works)',
-]
-
-const PERSONAL_DEV = [
-    'Job Readiness',
-    'Employment Assistance',
-    'Career Development',
-    'Creativity & Personal Expression',
-]
-
-const REDIRECTION = [
-    'Emergency Shelter',
-    'Human Trafficking Resources',
-    'Personal Development',
-    'Domestic Violence Resources',
-    'Transportation',
-    'Informal Case Management',
-]
-
-const HEALTH_WELLNESS = [
-    'Mental Health',
-    'Medical Services',
-    'Substance Abuse Treatment',
-    'Basic Needs Support',
-]
 
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
@@ -405,57 +355,13 @@ const Page = (props: Props) => {
                                 Referrals/Linkages Services
                             </label>
                             <CheckboxList
-                                options={REFERRAL}
+                                options={REFERRALSERVICE}
                                 selectedValues={selectedReferral}
                                 onChange={(updatedReferral) =>
                                     setValue('referral', updatedReferral)
                                 }
                                 name="referral"
                             />
-                        </div>
-                        <div className="space-y-[24px]">
-                            <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                Kits
-                            </label>
-                            <div className="space-y-[8px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Hygiene Kit
-                                </label>
-                                <div>
-                                    <input
-                                        {...register('hygieneKit')}
-                                        type="text"
-                                        placeholder="Text"
-                                        className="w-[30%] rounded border p-2"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-[8px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Hot meal
-                                </label>
-                                <div>
-                                    <input
-                                        {...register('hotMeal')}
-                                        type="text"
-                                        placeholder="Text"
-                                        className="w-[30%] rounded border p-2"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-[8px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Snack pack
-                                </label>
-                                <div>
-                                    <input
-                                        {...register('snackPack')}
-                                        type="text"
-                                        placeholder="Text"
-                                        className="w-[30%] rounded border p-2"
-                                    />
-                                </div>
-                            </div>
                         </div>
                         <div className="space-y-[24px]">
                             <div className="flex items-center justify-between">

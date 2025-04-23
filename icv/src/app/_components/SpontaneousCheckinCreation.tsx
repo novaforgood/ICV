@@ -3,6 +3,8 @@ import useSWR from 'swr'
 import { CheckInType, CheckInCategory } from '@/types/event-types'
 import { createCheckIn, updateCaseNotes } from '@/api/events'
 import { getAllClients } from '@/api/clients'
+import { Card } from '@/components/ui/card'
+import { CheckInCategory, CheckInType } from '@/types/event-types'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
@@ -57,7 +59,7 @@ const MultiStepCheckIn = () => {
   const [caseNotes, setCaseNotes] = useState('')
   const [checkInID, setcheckInID] = useState('')
 
-  const { data: clients } = useSWR('clients', getAllClients)
+    const { data: clients } = useSWR('clients', getAllClients)
 
   const filteredClients = clients
     ? clients.filter((client: any) => {
@@ -68,13 +70,13 @@ const MultiStepCheckIn = () => {
 
   const selectedClient = clients?.find((client: any) => client.id === selectedClientId) || null
 
-  useEffect(() => {
-    const auth = getAuth()
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user?.displayName) setAssigneeId(user.displayName)
-    })
-    return () => unsubscribe()
-  }, [])
+    useEffect(() => {
+        const auth = getAuth()
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user?.displayName) setAssigneeId(user.displayName)
+        })
+        return () => unsubscribe()
+    }, [])
 
   const handleSubmit = async () => {
     const newEvent: CheckInType & { clientId?: string } = {
@@ -105,32 +107,32 @@ const MultiStepCheckIn = () => {
     }
   }
 
-  const ChooseClient = () => (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Choose A Client</h2>
-      <input
-        type="text"
-        value={clientSearch}
-        onChange={(e) => setClientSearch(e.target.value)}
-        placeholder="Search by name"
-        className="w-full p-2 border border-gray-300 rounded mb-2"
-      />
-      <ul className="max-h-48 overflow-y-auto">
-        {filteredClients.map((client: any) => (
-          <li
-            key={client.id}
-            onClick={() => {
-              setSelectedClientId(client.id)
-              setStep(Step.ChooseCheckInType)
-            }}
-            className="p-2 cursor-pointer hover:bg-gray-200"
-          >
-            {client.firstName} {client.lastName}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
+    const ChooseClient = () => (
+        <div>
+            <h2 className="mb-4 text-xl font-bold">Choose A Client</h2>
+            <input
+                type="text"
+                value={clientSearch}
+                onChange={(e) => setClientSearch(e.target.value)}
+                placeholder="Search by name"
+                className="mb-2 w-full rounded border border-gray-300 p-2"
+            />
+            <ul className="max-h-48 overflow-y-auto">
+                {filteredClients.map((client: any) => (
+                    <li
+                        key={client.id}
+                        onClick={() => {
+                            setSelectedClientId(client.id)
+                            setStep(Step.ChooseCheckInType)
+                        }}
+                        className="cursor-pointer p-2 hover:bg-gray-200"
+                    >
+                        {client.firstName} {client.lastName}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    )
 
   const ChooseCheckInType = () => (
     <form
@@ -200,10 +202,10 @@ const MultiStepCheckIn = () => {
 }
 
 const SpontaneousCheckInModal: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
 
-  const openModal = () => setIsOpen(true)
-  const closeModal = () => setIsOpen(false)
+    const openModal = () => setIsOpen(true)
+    const closeModal = () => setIsOpen(false)
 
   return (
     <>
