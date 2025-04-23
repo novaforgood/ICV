@@ -10,7 +10,7 @@ import {
 import { format, set } from 'date-fns';
 import Symbol from '../../components/Symbol';
 import { Card } from '@/components/ui/card';
-import { incrementCheckInCount, getCheckInCount } from '@/api/events'; // Adjust the import path as necessary
+import { incrementCheckInCount, getCheckInCountYear, getCheckInCountMonth, getCheckInCountDay } from '@/api/events'; // Adjust the import path as necessary
 import { CheckInCategory } from '@/types/event-types'; // Adjust the import path as necessary
 import { Check } from 'lucide-react';
 
@@ -30,9 +30,7 @@ const months = [
 ];
 
 const CheckInCounter: React.FC = () => {
-    const [selectedMonth, setSelectedMonth] = useState<string>(
-        format(new Date(), 'MMMM')
-    );
+    const [timeFrame, setTimeFrame] = useState<string>('day');
 
     // States for each item count
     const [hygieneKits, setHygieneKits] = useState<number>(0);
@@ -53,44 +51,68 @@ const CheckInCounter: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        const monthIndex = months.findIndex((m) => m === selectedMonth);
-        if (monthIndex === -1) {
-          throw new Error('Invalid month');
+    const handleDecrement = (item: 'hygieneKits' | 'hotMeals' | 'snackPacks') => {
+        if (item === 'hygieneKits' && hygieneKits > 0) {
+            setHygieneKits(prev => Math.max(0, prev - 1));
+            incrementCheckInCount(CheckInCategory.enum["Hygiene Kit"], new Date(), -1);
+        } else if (item === 'hotMeals' && hotMeals > 0) {
+            setHotMeals(prev => Math.max(0, prev - 1));
+            incrementCheckInCount(CheckInCategory.enum["Hot Meal"], new Date(), -1);
+        } else if (item === 'snackPacks' && snackPacks > 0) {
+            setSnackPacks(prev => Math.max(0, prev - 1));
+            incrementCheckInCount(CheckInCategory.enum["Snack Pack"], new Date(), -1);
         }
-        const year = new Date().getFullYear();
-        // Creates a date at noon on the 1st day of the given month
-        const monthDate =  new Date(year, monthIndex, 1, 12, 0, 0);
+    };
 
-        getCheckInCount(CheckInCategory.enum["Hygiene Kit"], monthDate).then((count) => {
-            setHygieneKits(count);
-        }).catch((error) => {
-            console.error('Error fetching hygiene kits count:', error);
-        });
+    useEffect(() => {
+        const date = new Date();
+        console.log('time frame '+ timeFrame);
 
-        getCheckInCount(CheckInCategory.enum["Hot Meal"], monthDate).then((count) => {
-            setHotMeals(count);
-        }).catch((error) => {
-            console.error('Error fetching hot meals count:', error);
-        });
+        try {
+            if (timeFrame === 'day') {
+                getCheckInCountDay(CheckInCategory.enum["Hygiene Kit"], date).then((count) => {
+                    setHygieneKits(count);
+                })    
+                getCheckInCountDay(CheckInCategory.enum["Hot Meal"], date).then((count) => {
+                    setHotMeals(count);
+                })   
+                getCheckInCountDay(CheckInCategory.enum["Snack Pack"], date).then((count) => {
+                    setSnackPacks(count);
+                })   
+            } else if (timeFrame === 'month') {
+                getCheckInCountMonth(CheckInCategory.enum["Hygiene Kit"], date).then((count) => {
+                    setHygieneKits(count);
+                })    
+                getCheckInCountMonth(CheckInCategory.enum["Hot Meal"], date).then((count) => {
+                    setHotMeals(count);
+                })   
+                getCheckInCountMonth(CheckInCategory.enum["Snack Pack"], date).then((count) => {
+                    setSnackPacks(count);
+                })   
+            } else if (timeFrame === 'year'){
+                getCheckInCountYear(CheckInCategory.enum["Hygiene Kit"], date).then((count) => {
+                    setHygieneKits(count);
+                })    
+                getCheckInCountYear(CheckInCategory.enum["Hot Meal"], date).then((count) => {
+                    setHotMeals(count);
+                })   
+                getCheckInCountYear(CheckInCategory.enum["Snack Pack"], date).then((count) => {
+                    setSnackPacks(count);
+                })   
+            }
+        } catch (error) {
+            console.error('Error fetching check-in counts:', error);
+        }
 
-        getCheckInCount(CheckInCategory.enum["Snack Pack"], monthDate).then((count) => {
-            setSnackPacks(count);
-        }).catch((error) => {
-            console.error('Error fetching snack packs count:', error);
-        });
-        console.log(`Selected month is: ${selectedMonth}`);
-
-    }, [selectedMonth]);
+    }, [timeFrame]);
 
     return (
         <div>
-            {/* Header and dropdown in flex container */}
             <div className="flex items-center gap-10 mb-4">
                 <h2 className="text-2xl font-semibold">Check-Ins</h2>
-                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <Select value={timeFrame} onValueChange={setTimeFrame}>
                     <SelectTrigger className="flex justify-between items-center bg-white w-40 rounded-md border border-gray-300 px-3 py-2">
-                        <SelectValue>{selectedMonth || 'Month'}</SelectValue>
+                        <SelectValue>{timeFrame.charAt(0).toUpperCase() + timeFrame.slice(1)}</SelectValue>
                         <Symbol symbol="arrow_drop_down" className="ml-2" />
                     </SelectTrigger>
                     <SelectContent
@@ -99,15 +121,24 @@ const CheckInCounter: React.FC = () => {
                         sideOffset={4}
                     >
                         <SelectViewport>
-                            {months.map((month) => (
-                                <SelectItem
-                                    key={month}
-                                    value={month}
-                                    className="px-3 py-2 hover:bg-blue-100 focus:bg-blue-100"
-                                >
-                                    {month}
-                                </SelectItem>
-                            ))}
+                            <SelectItem
+                                value="day"
+                                className="px-3 py-2 hover:bg-blue-100 focus:bg-blue-100"
+                            >
+                                Day
+                            </SelectItem>
+                            <SelectItem
+                                value="month"
+                                className="px-3 py-2 hover:bg-blue-100 focus:bg-blue-100"
+                            >
+                                Month
+                            </SelectItem>
+                            <SelectItem
+                                value="year"
+                                className="px-3 py-2 hover:bg-blue-100 focus:bg-blue-100"
+                            >
+                                Year
+                            </SelectItem>
                         </SelectViewport>
                     </SelectContent>
                 </Select>
@@ -126,12 +157,20 @@ const CheckInCounter: React.FC = () => {
                         <p className="text-gray-600">Hygiene Kits</p>
                         <h1 className="text-4xl font-bold">{hygieneKits}</h1>
                     </div>
-                    <button
+                    <div className="flex items-center space-x-1">
+                        <button
+                        onClick={() => handleDecrement('hygieneKits')}
+                        className="bg-background border-foreground text-foreground w-6 h-6 flex items-center justify-center rounded-full"
+                        >
+                        -
+                        </button>
+                        <button
                         onClick={() => handleIncrement('hygieneKits')}
                         className="bg-background border-foreground text-foreground w-6 h-6 flex items-center justify-center rounded-full"
-                    >
+                        >
                         +
-                    </button>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Hot Meals Card */}
@@ -140,12 +179,20 @@ const CheckInCounter: React.FC = () => {
                         <p className="text-gray-600">Hot Meals</p>
                         <h1 className="text-4xl font-bold">{hotMeals}</h1>
                     </div>
-                    <button
+                    <div className="flex items-center space-x-1">
+                        <button
+                        onClick={() => handleDecrement('hotMeals')}
+                        className="bg-background border-foreground text-foreground w-6 h-6 flex items-center justify-center rounded-full"
+                        >
+                        -
+                        </button>
+                        <button
                         onClick={() => handleIncrement('hotMeals')}
                         className="bg-background border-foreground text-foreground w-6 h-6 flex items-center justify-center rounded-full"
-                    >
+                        >
                         +
-                    </button>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Snack Packs Card */}
@@ -154,12 +201,20 @@ const CheckInCounter: React.FC = () => {
                         <p className="text-gray-600">Snack Packs</p>
                         <h1 className="text-4xl font-bold">{snackPacks}</h1>
                     </div>
-                    <button
+                    <div className="flex items-center space-x-1">
+                        <button
+                        onClick={() => handleDecrement('snackPacks')}
+                        className="bg-background border-foreground text-foreground w-6 h-6 flex items-center justify-center rounded-full"
+                        >
+                        -
+                        </button>
+                        <button
                         onClick={() => handleIncrement('snackPacks')}
                         className="bg-background border-foreground text-foreground w-6 h-6 flex items-center justify-center rounded-full"
-                    >
+                        >
                         +
-                    </button>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
