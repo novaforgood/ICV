@@ -14,12 +14,12 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import { useIntakeFormStore } from '../../_lib/useIntakeFormStore'
 import {
     CheckboxListWithOther,
     RadioChoice,
     RadioWithOther,
-} from './components/MakeOptions'
+} from '../../_components/MakeOptions'
+import { useIntakeFormStore } from '../../_lib/useIntakeFormStore'
 
 interface Props {}
 

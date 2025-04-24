@@ -105,6 +105,12 @@ export const WAIVER = [
     'I give my permission',
 ]
 
+export const MARITALSTATUS = [
+    'Single',
+    'Married',
+    'Divorced',
+]
+
 export type NewClient = z.infer<typeof ClientIntakeSchema>
 
 export const ClientIntakeSchema = z.object({
@@ -174,15 +180,15 @@ export const ClientIntakeSchema = z.object({
 
     // ----- PAGE 3: Family Information -----
     familySize: z.string().optional(),
-    spouse: z.array(
-        z.object({
+    maritalStatus: z.string().optional(),
+    spouseClientStatus: z.string().optional(),
+    spouse: z.object({
             spouseFirstName: z.string().optional(),
             spouseLastName: z.string().optional(),
             spouseDOB: z.string().optional(),
             spouseIncome: z.string().optional(),
             spouseGender: z.string().optional(),
-        }),
-    ).optional(),
+        }).optional(),
     dependent: z.array(
         z.object({
             firstName: z.string().optional(),
@@ -193,6 +199,8 @@ export const ClientIntakeSchema = z.object({
             publicServices: z.array(z.string().optional()).optional()
         }),
     ).optional(),
+    familyMembersServiced: z.string().optional(),
+    headOfHousehold: z.string().optional(),
 
     pets: z.array(
         z.object({
@@ -349,8 +357,12 @@ export const ProfileSchema = ClientIntakeSchema.pick({
 export const FamilySchema = ClientIntakeSchema.pick({
     familySize: true,
     spouse: true,
+    maritalStatus: true,
+    spouseClientStatus: true,
     dependent: true,
     pets: true,
+    familyMembersServiced: true,
+    headOfHousehold: true,
 })
 
 export const ConfirmationSchema = ClientIntakeSchema.pick({
