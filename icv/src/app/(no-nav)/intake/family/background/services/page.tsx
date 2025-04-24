@@ -19,7 +19,7 @@ import {
     uploadBytes,
 } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../_lib/useIntakeFormStore'
@@ -30,7 +30,6 @@ interface Props {}
 
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
-    const fileInputRef = useRef<HTMLInputElement | null>(null)
     type ServiceType = TypeOf<typeof ServicesSchema>
 
     const {

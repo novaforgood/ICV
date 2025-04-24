@@ -101,6 +101,9 @@ export const EMPLOYMENT = [
     'Part-time',
     'Unemployed',
 ]
+export const WAIVER = [
+    'I give my permission',
+]
 
 export type NewClient = z.infer<typeof ClientIntakeSchema>
 
@@ -242,10 +245,16 @@ export const ClientIntakeSchema = z.object({
 
     // ----- PAGE 5: CONFIRMATION PAGE ----
     clientCode: z.string().optional(),
-    //assessingStaff: z.string().optional(),
+    assessingStaff: z.string().optional(),
     //program: z.string().optional(),
     // caseManager: z.string().optional(),
     // permission: z.boolean().optional(),
+
+    // ----- WAIVER -----
+    acknowledgement: z.boolean().optional(),
+    // signatureURI: z.string().optional(),
+    // signatureDate: z.string().optional(),
+    // signatureTime: z.string().optional(),
 }) 
 
 export const BackgroundSchema = ClientIntakeSchema.pick({
@@ -342,4 +351,13 @@ export const FamilySchema = ClientIntakeSchema.pick({
     spouse: true,
     dependent: true,
     pets: true,
+})
+
+export const ConfirmationSchema = ClientIntakeSchema.pick({
+    assessingStaff: true,
+    clientCode: true,
+})
+
+export const WaiverSchema = ClientIntakeSchema.pick({
+    acknowledgement: true,
 })
