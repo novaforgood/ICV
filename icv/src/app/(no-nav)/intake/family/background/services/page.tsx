@@ -22,9 +22,9 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
+import FileUpload, { ResetButton } from '../../../../../_components/FileUpload'
+import { CheckboxList } from '../../../../../_components/MakeOptions'
 import { useIntakeFormStore } from '../../../../../_lib/useIntakeFormStore'
-import FileUpload, { ResetButton } from '../../../components/FileUpload'
-import { CheckboxList } from '../../../components/MakeOptions'
 
 interface Props {}
 

@@ -4,9 +4,11 @@ import { useIntakeFormStore } from '@/app/_lib/useIntakeFormStore'
 import {
     FamilySchema,
     GENDER,
+    MARITALSTATUS,
     PETPURPOSE,
     PETSIZE,
     PUBLIC_SERVICES,
+    YESNO,
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
@@ -18,7 +20,7 @@ import {
     CheckboxListWithOther,
     RadioChoice,
     RadioWithOther,
-} from '../components/MakeOptions'
+} from '../../../_components/MakeOptions'
 interface Props {}
 
 const Page = (props: Props) => {
@@ -49,7 +51,6 @@ const Page = (props: Props) => {
         const unsubscribe = watch((data) => {
             updateForm({
                 ...data,
-                spouse: data.spouse?.filter((spouse) => spouse !== undefined),
                 dependent: data.dependent?.filter(
                     (child) => child !== undefined,
                 ),
@@ -67,30 +68,54 @@ const Page = (props: Props) => {
         return unsubscribe
     }, [watch, loadedForm])
 
+    useEffect(() => {
+        // number of family members serviced always includes the client themselves
+        const familyNum = parseInt(loadedForm.familySize ?? '1') || 1
+        console.log('FamilySize as an int', familyNum)
+
+        // default for if a client is not the head of household, and has spouse who is
+        let servicedVal = '1'
+
+        if (loadedForm.headOfHousehold === 'No') {
+            // if a client is not head of household but has a non-ICV client spouse
+            servicedVal = loadedForm.spouseClientStatus === 'Yes' ? '1' : '2'
+        } else if (familyNum === 1) {
+            servicedVal = '1'
+        } else if (loadedForm.spouseClientStatus === 'Yes') {
+            servicedVal = (familyNum - 1).toString()
+        } else {
+            servicedVal = familyNum.toString()
+        }
+        updateForm({ familyMembersServiced: servicedVal })
+        console.log('Serviced', servicedVal)
+
+        // if user filled out spouse info but switches to yes, ICV client, remove spouse info
+        if (loadedForm.spouseClientStatus === 'Yes' && loadedForm.spouse) {
+            removeSpouse()
+        }
+    }, [
+        loadedForm.spouseClientStatus,
+        loadedForm.familySize,
+        loadedForm.headOfHousehold,
+    ])
+
     const onSubmit = (data: FamilyType) => {
         console.log('in submit...', data)
         updateForm(data)
         router.push('/intake/family/background')
     }
 
-    const addSpouse = () => {
-        const currentSpouse = getValues('spouse') || []
-        const newSpouse = {
-            spouseFirstName: '',
-            spouseLastName: '',
-            spouseDOB: '',
-            spouseIncome: '',
-        }
-        setValue('spouse', [...currentSpouse, newSpouse])
-    }
+    // Function to clear spouse information
+    const removeSpouse = () => {
+        console.log('Remove in progress!')
 
-    // Function to remove a child
-    const removeSpouse = (index: number) => {
-        const currentSpouse = getValues('spouse')
-        if (currentSpouse) {
-            currentSpouse.splice(index, 1)
-        }
-        setValue('spouse', [...(currentSpouse || [])])
+        setValue('spouse.spouseFirstName', '')
+        setValue('spouse.spouseLastName', '')
+        setValue('spouse.spouseDOB', '')
+        setValue('spouse.spouseIncome', '')
+        setValue('spouse.spouseGender', '')
+
+        setValue('spouse', undefined)
     }
 
     // Function to add a child
@@ -149,34 +174,51 @@ const Page = (props: Props) => {
                             Family
                         </label>
                     </div>
-                    <div className="flex flex-col">
-                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                            Family Size
-                        </label>
-                        <input
-                            {...register('familySize')}
-                            type="text"
-                            placeholder="Text"
-                            className="w-[50%] rounded border p-2"
-                        />
-                    </div>
 
                     {/* Spouse Section */}
                     <div className="flex flex-col space-y-[24px]">
                         <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
                             Spouse
                         </label>
-                        {watch('spouse')?.map((spouse, index) => (
-                            <div
-                                key={index}
-                                className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
-                            >
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Marital Status
+                            </label>
+                            <RadioWithOther
+                                options={MARITALSTATUS}
+                                selectedValue={watch(`maritalStatus`) ?? ''}
+                                onChange={(updatedGender) =>
+                                    setValue(`maritalStatus`, updatedGender)
+                                }
+                                name={`maritalStatus`}
+                                otherLabel="Other"
+                                otherPlaceholder="Other"
+                            />
+                        </div>
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                If married, is spouse an ICV client?
+                            </label>
+                            <RadioChoice
+                                options={YESNO}
+                                selectedValue={
+                                    watch(`spouseClientStatus`) ?? ''
+                                }
+                                onChange={(updatedStat) =>
+                                    setValue(`spouseClientStatus`, updatedStat)
+                                }
+                                name={`spouseClientStatus`}
+                            />
+                        </div>
+
+                        {loadedForm.spouseClientStatus === 'No' ? (
+                            <div className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
                                 <div className="flex justify-end">
                                     <button
                                         type="button"
-                                        onClick={() => removeSpouse(index)}
+                                        onClick={() => removeSpouse()}
                                     >
-                                        Remove x
+                                        Clear x
                                     </button>
                                 </div>
 
@@ -187,7 +229,7 @@ const Page = (props: Props) => {
                                         </label>
                                         <input
                                             {...register(
-                                                `spouse.${index}.spouseFirstName`,
+                                                `spouse.spouseFirstName`,
                                             )}
                                             type="text"
                                             placeholder="First Name"
@@ -200,7 +242,7 @@ const Page = (props: Props) => {
                                         </label>
                                         <input
                                             {...register(
-                                                `spouse.${index}.spouseLastName`,
+                                                `spouse.spouseLastName`,
                                             )}
                                             type="text"
                                             placeholder="Last Name"
@@ -215,9 +257,7 @@ const Page = (props: Props) => {
                                             Date of Birth
                                         </label>
                                         <input
-                                            {...register(
-                                                `spouse.${index}.spouseDOB`,
-                                            )}
+                                            {...register(`spouse.spouseDOB`)}
                                             type="date"
                                             className="w-full rounded border p-2"
                                         />
@@ -230,7 +270,7 @@ const Page = (props: Props) => {
                                             <p className="text-lg">$</p>
                                             <input
                                                 {...register(
-                                                    `spouse.${index}.spouseIncome`,
+                                                    `spouse.spouseIncome`,
                                                 )}
                                                 type="text"
                                                 placeholder="Text"
@@ -246,37 +286,54 @@ const Page = (props: Props) => {
                                     <RadioWithOther
                                         options={GENDER}
                                         selectedValue={
-                                            watch(
-                                                `spouse.${index}.spouseGender`,
-                                            ) ?? ''
+                                            watch(`spouse.spouseGender`) ?? ''
                                         }
                                         onChange={(updatedGender) =>
                                             setValue(
-                                                `spouse.${index}.spouseGender`,
+                                                `spouse.spouseGender`,
                                                 updatedGender,
                                             )
                                         }
-                                        name={`spouse.${index}.spouseGender`}
+                                        name={`spouse.spouseGender`}
                                         otherLabel="Other"
                                         otherPlaceholder="Other"
                                     />
                                 </div>
                             </div>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={addSpouse}
-                            className="h-[52px] w-[150px] rounded-[5px] bg-[#27262A] px-4 py-2 text-white"
-                        >
-                            + Add Spouse
-                        </button>
+                        ) : (
+                            <></>
+                        )}
                     </div>
 
                     {/* Dependent Section */}
                     <div className="flex flex-col space-y-[24px]">
                         <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Dependent
+                            Dependents
                         </label>
+                        <div className="flex flex-col">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Head of household
+                            </label>
+                            <RadioChoice
+                                options={YESNO}
+                                selectedValue={watch(`headOfHousehold`) ?? ''}
+                                onChange={(updatedStat) =>
+                                    setValue(`headOfHousehold`, updatedStat)
+                                }
+                                name={`headOfHousehold`}
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Family Size
+                            </label>
+                            <input
+                                {...register('familySize')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-[50%] rounded border p-2"
+                            />
+                        </div>
                         {watch('dependent')?.map((dependent, index) => (
                             <div
                                 key={index}

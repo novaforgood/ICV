@@ -16,7 +16,7 @@ import {
     CheckboxList,
     RadioChoice,
     ServicesWithIncome,
-} from '../../components/MakeOptions'
+} from '../../../../_components/MakeOptions'
 
 interface Props {}
 
