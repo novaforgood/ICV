@@ -43,11 +43,18 @@ const Page = () => {
         return unsubscribe
     }, [watch, loadedForm])
 
-    const onSubmit = (data: ClientType) => {
+    const onSubmit = async (data: ClientType) => {
         console.log('in submit...', data)
-        createClient({ ...loadedForm, ...data })
+        const newClientID = await createClient({ ...loadedForm, ...data })
         clearForm()
-        router.push('/intake')
+        if (newClientID) {
+            clearForm()
+            router.push(
+                `/intake/background/family/services/confirmation/waiver/completedProfile?clientID=${newClientID}`,
+            )
+        } else {
+            console.error('Failed to create client')
+        }
     }
 
     return (

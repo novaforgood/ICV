@@ -10,7 +10,7 @@ import {
     YESNO,
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
@@ -24,6 +24,9 @@ import { useIntakeFormStore } from '../../_lib/useIntakeFormStore'
 interface Props {}
 
 const Page = (props: Props) => {
+    const searchParams = useSearchParams()
+    const spouseID = searchParams?.get('spouseID') || undefined
+
     const { form: loadedForm, updateForm } = useIntakeFormStore()
     type ProfileType = TypeOf<typeof ProfileSchema>
 
@@ -45,6 +48,13 @@ const Page = (props: Props) => {
     useEffect(() => {
         reset(loadedForm)
     }, [loadedForm, reset])
+
+    useEffect(() => {
+        {
+            spouseID && setValue('associatedSpouseID', spouseID)
+        }
+        console.log(spouseID)
+    }, [spouseID])
 
     useEffect(() => {
         const unsubscribe = watch((data) => {

@@ -261,6 +261,8 @@ export const ClientIntakeSchema = z.object({
     // signatureURI: z.string().optional(),
     // signatureDate: z.string().optional(),
     // signatureTime: z.string().optional(),
+
+    associatedSpouseID: z.string().optional(),
 }) 
 
 export const BackgroundSchema = ClientIntakeSchema.pick({
@@ -349,6 +351,8 @@ export const ProfileSchema = ClientIntakeSchema.pick({
 
     // Demographics
     ethnicity: true,
+
+    associatedSpouseID: true,
 
 })
 
