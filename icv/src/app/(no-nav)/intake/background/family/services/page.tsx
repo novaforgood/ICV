@@ -234,7 +234,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: ServiceType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/family/background/services/confirmation')
+        router.push('/intake/background/family/services/confirmation')
     }
 
     const selectedMentoring = watch('mentoring') ?? []
@@ -601,7 +601,7 @@ const Page = (props: Props) => {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    router.push('/intake/family/background')
+                                    router.push('/intake/background/family')
                                 }
                                 className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                             >

@@ -33,8 +33,8 @@ export default function layout({
 
                         <div className="w-[100px]">
                             <ProgressCircle
-                                title="Family"
-                                goTo="/intake/family"
+                                title="Background"
+                                goTo="/intake/background"
                                 num="2"
                             />
                         </div>
@@ -45,9 +45,9 @@ export default function layout({
 
                         <div className="w-[100px]">
                             <ProgressCircle
-                                title="Background"
-                                goTo="/intake/family/background"
-                                num="3"
+                                title="Family"
+                                goTo="/intake/background/family"
+                                num="2"
                             />
                         </div>
 
@@ -58,7 +58,7 @@ export default function layout({
                         <div className="w-[100px]">
                             <ProgressCircle
                                 title="Services"
-                                goTo="/intake/family/background/services"
+                                goTo="/intake/background/family/services"
                                 num="4"
                             />
                         </div>
@@ -70,7 +70,7 @@ export default function layout({
                         <div className="w-[100px]">
                             <ProgressCircle
                                 title="Review"
-                                goTo="/intake/family/background/services/confirmation"
+                                goTo="/intake/background/family/services/confirmation"
                                 num="5"
                             />
                         </div>
@@ -82,7 +82,7 @@ export default function layout({
                         <div className="w-[100px]">
                             <ProgressCircle
                                 title="Waiver"
-                                goTo="/intake/family/background/services/confirmation/waiver"
+                                goTo="/intake/background/family/services/confirmation/waiver"
                                 num="6"
                             />
                         </div>

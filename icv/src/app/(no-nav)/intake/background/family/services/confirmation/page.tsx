@@ -1450,7 +1450,7 @@ const Page = () => {
                             type="button"
                             onClick={() =>
                                 router.push(
-                                    '/intake/family/background/services',
+                                    '/intake/background/family/services',
                                 )
                             }
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
@@ -1461,7 +1461,7 @@ const Page = () => {
                             type="button"
                             onClick={() =>
                                 router.push(
-                                    '/intake/family/background/services/confirmation/waiver',
+                                    '/intake/background/family/services/confirmation/waiver',
                                 )
                             }
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"

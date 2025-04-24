@@ -20,7 +20,7 @@ import {
     CheckboxListWithOther,
     RadioChoice,
     RadioWithOther,
-} from '../../../_components/MakeOptions'
+} from '../../../../_components/MakeOptions'
 interface Props {}
 
 const Page = (props: Props) => {
@@ -102,7 +102,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: FamilyType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/family/background')
+        router.push('/intake/background/family/services')
     }
 
     // Function to clear spouse information
@@ -550,7 +550,7 @@ const Page = (props: Props) => {
                     <div className="flex justify-between">
                         <button
                             type="button"
-                            onClick={() => router.push('/intake')}
+                            onClick={() => router.push('/intake/background')}
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                         >
                             Back
