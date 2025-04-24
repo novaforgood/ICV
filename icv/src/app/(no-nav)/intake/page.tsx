@@ -109,7 +109,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: ProfileType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/family')
+        router.push('/intake/background')
     }
 
     const selectedGender = watch('gender') ?? ''

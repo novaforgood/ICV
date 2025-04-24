@@ -16,7 +16,7 @@ import {
     CheckboxList,
     RadioChoice,
     ServicesWithIncome,
-} from '../../../../_components/MakeOptions'
+} from '../../../_components/MakeOptions'
 
 interface Props {}
 
@@ -127,7 +127,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: BackgroundInfoType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/family/background/services')
+        router.push('/intake/background/family')
     }
 
     return (
@@ -491,7 +491,7 @@ const Page = (props: Props) => {
                     <div className="flex justify-between">
                         <button
                             type="button"
-                            onClick={() => router.push('/intake/family')}
+                            onClick={() => router.push('/intake')}
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                         >
                             Back

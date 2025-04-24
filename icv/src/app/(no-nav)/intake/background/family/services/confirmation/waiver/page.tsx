@@ -87,7 +87,11 @@ const Page = () => {
                     <div className="flex justify-between">
                         <button
                             type="button"
-                            onClick={() => router.push('/intake/family')}
+                            onClick={() =>
+                                router.push(
+                                    '/intake/background/family/services/confirmation',
+                                )
+                            }
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                         >
                             Back
