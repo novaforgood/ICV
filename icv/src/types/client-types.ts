@@ -33,12 +33,10 @@ export const PUBLIC_SERVICES = [
 export const PETSIZE = ['Small', 'Medium', 'Large']
 export const PETPURPOSE = ['Emotional support animal', 'Service animal']
 export const EDUSTATUS = [
-    'Middle school',
     'High school',
     'GED',
     'Community college',
     'University',
-    'Masters/PhD',
 ]
 export const MENTALHEALTH = ['Schizophrenia', 'Bipolar', 'Depression', 'Anxiety']
 export const SUBSTANCES = ['Meth', 'Cocaine', 'Marijuana', 'Alcohol', 'None']
@@ -57,7 +55,7 @@ export const HOUSING = [
     'Shared Living',
     'Independent Living',
     'Management Companies',
-    'Transportation',
+    'Rental/Moving Assistance',
 ]
 export const EDUTRAIN = [
     'Independent Studies',
@@ -73,7 +71,7 @@ export const REFERRALSERVICE = [
     'Reentry Services',
     'Immigration Services',
     'Financial Literacy',
-    'Anger Management',
+    'Continued Education',
     'Financial Assistance Programs (SNAP/Cal/Works)',
 ]
 export const PERSONAL_DEV = [
