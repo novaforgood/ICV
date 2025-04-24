@@ -74,6 +74,18 @@ export default function layout({
                                 num="5"
                             />
                         </div>
+
+                        <div className="relative flex-1">
+                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        </div>
+
+                        <div className="w-[100px]">
+                            <ProgressCircle
+                                title="Waiver"
+                                goTo="/intake/family/background/services/confirmation/waiver"
+                                num="6"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

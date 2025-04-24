@@ -11,7 +11,7 @@ import {
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../_lib/useIntakeFormStore'
@@ -120,8 +120,6 @@ const Page = (props: Props) => {
         ? (watch('ethnicity') ?? [])
         : []
     const selectedSheltered = watch('sheltered') ?? ''
-
-    const [DOB, setDOB] = useState<string>(loadedForm.dateOfBirth || '')
 
     return (
         <form

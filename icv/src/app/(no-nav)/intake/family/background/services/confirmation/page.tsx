@@ -1,8 +1,7 @@
 'use client'
-import { createClient } from '@/api/make-cases/make-case'
 import Symbol from '@/components/Symbol'
 import { useUser } from '@/hooks/useUser'
-import { ClientIntakeSchema } from '@/types/client-types'
+import { ConfirmationSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -21,9 +20,10 @@ const collectRef = collection(clientDb, 'users')
 const querySnapshot = await getDocs(collectRef)
 const users = querySnapshot.docs.map(doc => String(doc.data().name))
 const Page = () => {
-    const { form: loadedForm, updateForm, clearForm } = useIntakeFormStore()
-    type ClientType = TypeOf<typeof ClientIntakeSchema>
+    const { form: loadedForm, updateForm } = useIntakeFormStore()
+    type ConfirmType = TypeOf<typeof ConfirmationSchema>
 
+    const {} = useForm<ConfirmType>({
     const [selectedUser, setSelectedUser] = useState<string | undefined>()
 
     const handleSelect = (selected: string) => {
@@ -36,7 +36,7 @@ const Page = () => {
         formState: { errors },
     } = useForm<ClientType>({
         mode: 'onChange',
-        resolver: zodResolver(ClientIntakeSchema),
+        resolver: zodResolver(ConfirmationSchema),
         defaultValues: loadedForm,
     })
 
@@ -48,12 +48,13 @@ const Page = () => {
     const router = useRouter()
     const { user } = useUser()
 
-    const onSubmit = (data: ClientType) => {
-        console.log('in submit...', data)
-        createClient(data)
-        clearForm()
-        router.push('/intake')
-    }
+    // wait until after render (in case rendering occurs before user is async loaded)
+    useEffect(() => {
+        if (user?.displayName) {
+            const assessor = user.displayName
+            updateForm({ assessingStaff: assessor })
+        }
+    }, [user])
 
     // tracks which sections are open/closed
     const [openSections, setOpenSections] = useState<Record<string, boolean>>(
@@ -69,11 +70,7 @@ const Page = () => {
     }
 
     return (
-        <form
-            className="space-y-[24px]"
-            style={{ padding: '24px' }}
-            onSubmit={handleSubmit(onSubmit)}
-        >
+        <form className="space-y-[24px]" style={{ padding: '24px' }}>
             <div className="flex items-center justify-center">
                 <div className="min-w-[800px] space-y-[40px]">
                     <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
@@ -93,7 +90,7 @@ const Page = () => {
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Assessing Staff
                                 </label>
-                                <div>{user?.displayName}</div>
+                                <div>{loadedForm.assessingStaff}</div>
                             </div>
                         </div>
                         {/* Program and Case Manager to be implemented later */}
@@ -1502,10 +1499,15 @@ const Page = () => {
                             Back
                         </button>
                         <button
-                            type="submit"
+                            type="button"
+                            onClick={() =>
+                                router.push(
+                                    '/intake/family/background/services/confirmation/waiver',
+                                )
+                            }
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                         >
-                            Submit
+                            Continue
                         </button>
                     </div>
                 </div>
