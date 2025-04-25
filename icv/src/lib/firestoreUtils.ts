@@ -10,21 +10,21 @@ import { clientDb } from "@/data/firebase";
  * @returns {Promise<Array>} - Array of matching documents
  */
 
-const collectionName = "clie"
+const collectionName = "clients"
 
 
 export const searchByKeyword = async (searchTerm: string) => {
   try {
-    const clientsRef = collection(clientDb, "clients");
+    const clientsRef = collection(clientDb, collectionName);
     
     // Convert search term to lowercase for case-insensitive search
     const searchTermLower = searchTerm.toLowerCase();
     
-    // Query for documents where firstName starts with the search term
+    // Query for documents where fullNameLower contains the search term
     const q = query(
       clientsRef,
-      where("firstName", ">=", searchTermLower),
-      where("firstName", "<", searchTermLower + "\uf8ff")
+      where("fullNameLower", ">=", searchTermLower),
+      where("fullNameLower", "<", searchTermLower + "\uf8ff")
     );
     
     const querySnapshot = await getDocs(q);
@@ -32,10 +32,7 @@ export const searchByKeyword = async (searchTerm: string) => {
     
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      // Double check if the firstName actually starts with our search term (case-insensitive)
-      if (data.firstName?.toLowerCase().startsWith(searchTermLower)) {
-        results.push({ id: doc.id, ...data } as NewClient);
-      }
+      results.push({ id: doc.id, ...data } as NewClient);
     });
     
     return results;
