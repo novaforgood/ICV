@@ -13,8 +13,8 @@ export const CheckInCategory = z.enum([
 // CaseEvent schema
 export const CheckInSchema = z.object({
     // change string date (chosen from form input) to date, then check validity
-    startTime: z.date(),
-    endTime: z.date().optional(),
+    startTime: z.string(),
+    endTime: z.string().optional(),
     // check if chosen dropdown is a string of the ContactType array (form input passed as)
     category: z.enum(Object.values(CheckInCategory.Values) as [string, ...string[]], {
         message: "Choose check-in category."
