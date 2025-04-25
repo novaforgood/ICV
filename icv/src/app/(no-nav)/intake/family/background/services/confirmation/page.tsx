@@ -10,6 +10,8 @@ import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
 
+// TRAVIS IS TRIPPINGGGGGGGG
+
 const Page = () => {
     const { form: loadedForm, updateForm, clearForm } = useIntakeFormStore()
     type ClientType = TypeOf<typeof ClientIntakeSchema>
@@ -181,11 +183,11 @@ const Page = () => {
                                                         </div>
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Referral Source
+                                                                Contact Source
                                                             </label>
                                                             <div>
-                                                                {loadedForm.referralSource ? (
-                                                                    loadedForm.referralSource
+                                                                {loadedForm.contactSource ? (
+                                                                    loadedForm.contactSource
                                                                 ) : (
                                                                     <p>
                                                                         None
@@ -327,12 +329,11 @@ const Page = () => {
                                                         {/* Row: */}
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Housing
-                                                                Situation
+                                                                Housing Notes
                                                             </label>
                                                             <div>
-                                                                {loadedForm.housingSituation ? (
-                                                                    loadedForm.housingSituation
+                                                                {loadedForm.housingNotes ? (
+                                                                    loadedForm.housingNotes
                                                                 ) : (
                                                                     <p>
                                                                         None
@@ -389,11 +390,11 @@ const Page = () => {
                                                             </div>
                                                             <div className="flex flex-col space-y-1">
                                                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                    Income
+                                                                    Total Income
                                                                 </label>
                                                                 <div>
-                                                                    {loadedForm.income ? (
-                                                                        `$${loadedForm.income} ${loadedForm.aptNumber ? `Apt. ${loadedForm.aptNumber}` : ''}`
+                                                                    {loadedForm.totalIncome ? (
+                                                                        `$${loadedForm.totalIncome} ${loadedForm.aptNumber ? `Apt. ${loadedForm.aptNumber}` : ''}`
                                                                     ) : (
                                                                         <p>
                                                                             None
@@ -410,8 +411,8 @@ const Page = () => {
                                                                     Employed?
                                                                 </label>
                                                                 <div>
-                                                                    {loadedForm.employed ? (
-                                                                        loadedForm.employed
+                                                                    {loadedForm.employment ? (
+                                                                        loadedForm.employment
                                                                     ) : (
                                                                         <p>
                                                                             None
@@ -804,8 +805,8 @@ const Page = () => {
                                                                 probation?
                                                             </label>
                                                             <div>
-                                                                {loadedForm.probation ? (
-                                                                    loadedForm.probation
+                                                                {loadedForm.openProbation ? (
+                                                                    loadedForm.openProbation
                                                                 ) : (
                                                                     <p>
                                                                         None
@@ -824,8 +825,8 @@ const Page = () => {
                                                                 CPS?
                                                             </label>
                                                             <div>
-                                                                {loadedForm.cps ? (
-                                                                    loadedForm.cps
+                                                                {loadedForm.openCPS ? (
+                                                                    loadedForm.openCPS
                                                                 ) : (
                                                                     <p>
                                                                         None
@@ -860,44 +861,12 @@ const Page = () => {
                                                         {/* Row: */}
                                                         <div className="flex flex-col space-y-1">
                                                             <div>
-                                                                {loadedForm
-                                                                    .mentalHealth
-                                                                    ?.length ? ( // Optional chaining used here
-                                                                    loadedForm.mentalHealth.map(
-                                                                        (
-                                                                            health,
-                                                                            index,
-                                                                        ) => (
-                                                                            <div
-                                                                                key={
-                                                                                    index
-                                                                                }
-                                                                                className="space-y-4"
-                                                                            >
-                                                                                <label>
-                                                                                    {
-                                                                                        health
-                                                                                    }
-                                                                                </label>
-                                                                            </div>
-                                                                        ),
-                                                                    )
+                                                                {loadedForm.mentalHealthConditions ? (
+                                                                    loadedForm.mentalHealthConditions
                                                                 ) : (
                                                                     <p>
                                                                         None
                                                                         provided.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-1">
-                                                            <div>
-                                                                {loadedForm.mentalHealthNotes ? (
-                                                                    loadedForm.mentalHealthNotes
-                                                                ) : (
-                                                                    <p>
-                                                                        No
-                                                                        notes.
                                                                     </p>
                                                                 )}
                                                             </div>
@@ -914,8 +883,8 @@ const Page = () => {
                                                         <div className="flex flex-col space-y-1">
                                                             <div>
                                                                 <div>
-                                                                    {loadedForm.medicalHistory ? (
-                                                                        loadedForm.medicalHistory
+                                                                    {loadedForm.medicalConditions ? (
+                                                                        loadedForm.medicalConditions
                                                                     ) : (
                                                                         <p>
                                                                             No
@@ -934,28 +903,8 @@ const Page = () => {
                                                         <div className="space-y-[24px]">
                                                             <div className="flex flex-col space-y-1">
                                                                 <div>
-                                                                    {loadedForm
-                                                                        .substanceAbuse
-                                                                        ?.length ? ( // Optional chaining used here
-                                                                        loadedForm.substanceAbuse.map(
-                                                                            (
-                                                                                health,
-                                                                                index,
-                                                                            ) => (
-                                                                                <div
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                    className="space-y-4"
-                                                                                >
-                                                                                    <label>
-                                                                                        {
-                                                                                            health
-                                                                                        }
-                                                                                    </label>
-                                                                                </div>
-                                                                            ),
-                                                                        )
+                                                                    {loadedForm.substanceAbuse ? (
+                                                                        loadedForm.substanceAbuse
                                                                     ) : (
                                                                         <p>
                                                                             None
@@ -964,22 +913,9 @@ const Page = () => {
                                                                     )}
                                                                 </div>
                                                             </div>
-
-                                                            <div className="space-y-[24px]">
-                                                                <div>
-                                                                    {loadedForm.substanceNotes ? (
-                                                                        loadedForm.substanceNotes
-                                                                    ) : (
-                                                                        <p>
-                                                                            No
-                                                                            notes.
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            </div>
                                                         </div>
 
-                                                        <div className="space-y-[24px]">
+                                                        {/* <div className="space-y-[24px]">
                                                             <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
                                                                 Public Services
                                                             </label>
@@ -1013,7 +949,7 @@ const Page = () => {
                                                                     </p>
                                                                 )}
                                                             </div>
-                                                        </div>
+                                                        </div> */}
                                                     </div>
                                                 </div>
                                             </div>
