@@ -49,9 +49,7 @@ const Page = () => {
         clearForm()
         if (newClientID) {
             clearForm()
-            router.push(
-                `/intake/background/family/services/confirmation/waiver/completedProfile?clientID=${newClientID}`,
-            )
+            router.push(`/completedProfile?clientID=${newClientID}`)
         } else {
             console.error('Failed to create client')
         }

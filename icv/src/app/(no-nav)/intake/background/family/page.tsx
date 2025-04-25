@@ -12,7 +12,7 @@ import {
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import {
@@ -26,6 +26,7 @@ interface Props {}
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
     type FamilyType = TypeOf<typeof FamilySchema>
+    const [warnings, setWarnings] = useState<string[]>([])
 
     const {
         register,
@@ -69,8 +70,29 @@ const Page = (props: Props) => {
     }, [watch, loadedForm])
 
     useEffect(() => {
+        const errors: string[] = []
         // number of family members serviced always includes the client themselves
-        const familyNum = parseInt(loadedForm.familySize ?? '1') || 1
+        const parseFamSize = (value: any) => {
+            console.log('value', value)
+            if (value === undefined || value === '') {
+                setWarnings([])
+                return 1
+            }
+            const num = Number(value)
+            console.log('NUM', num)
+            if (isNaN(num)) {
+                errors.push(`Enter a valid family size.`)
+                console.log('ERRORS', errors)
+                setWarnings(errors)
+                return 0
+            }
+
+            setWarnings(errors)
+            console.log('ERRRORS', errors)
+            return num
+        }
+
+        const familyNum = parseFamSize(loadedForm.familySize)
         console.log('FamilySize as an int', familyNum)
 
         // default for if a client is not the head of household, and has spouse who is
@@ -333,6 +355,15 @@ const Page = (props: Props) => {
                                 placeholder="Text"
                                 className="w-[50%] rounded border p-2"
                             />
+                            {warnings.length > 0 && (
+                                <div
+                                    style={{ color: 'red', marginTop: '1rem' }}
+                                >
+                                    {warnings.map((msg, index) => (
+                                        <div key={index}>{msg}</div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         {watch('dependent')?.map((dependent, index) => (
                             <div
@@ -462,7 +493,11 @@ const Page = (props: Props) => {
                         <button
                             type="button"
                             onClick={addChild}
-                            className="h-[52px] w-[200px] rounded-[5px] bg-[#27262A] px-4 py-2 text-white"
+                            disabled={
+                                loadedForm.familySize === undefined ||
+                                loadedForm.familySize === ''
+                            }
+                            className="h-[52px] w-[200px] rounded-[5px] bg-[#27262A] px-4 py-2 text-white disabled:cursor-not-allowed disabled:bg-gray-400"
                         >
                             + Add dependent
                         </button>
