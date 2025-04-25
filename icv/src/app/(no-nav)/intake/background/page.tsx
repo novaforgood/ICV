@@ -48,9 +48,6 @@ const Page = (props: Props) => {
     const selectedEduStat = Array.isArray(watch('educationStatus'))
         ? (watch('educationStatus') ?? [])
         : []
-    const selectedSub = Array.isArray(watch('substanceAbuse'))
-        ? (watch('substanceAbuse') ?? [])
-        : []
     const selectedEmployment = watch('employment') ?? ''
     const selectedMentalCondition = watch('mentalHealthConditions') ?? ''
     const selectedMedicalCondition = watch('medicalConditions') ?? ''
@@ -78,9 +75,7 @@ const Page = (props: Props) => {
             const cleanedValue = String(value).replace(/,/g, '')
             const num = parseFloat(cleanedValue)
             if (isNaN(num) || cleanedValue != num.toString()) {
-                warnings.push(
-                    `${value} is not a valid number for ${label}. Remove any non-number text with the exception of decimal values and commas.`,
-                )
+                warnings.push(`${value} is not a valid income for ${label}.`)
                 return 0
             }
 
