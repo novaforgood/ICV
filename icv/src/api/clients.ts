@@ -10,7 +10,6 @@ interface ClientWithLastCheckin extends NewClient {
     lastCheckinDate?: string;
 }
 import  {UserSchema, Users} from '@/types/user-types'
-import { collection, getDoc, getDocs, getFirestore, doc } from 'firebase/firestore'
 import { User } from 'firebase/auth'
 
 export async function getAllClients(): Promise<NewClient[]> {
