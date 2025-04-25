@@ -9,13 +9,28 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
+import Dropdown from 'react-dropdown'
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
+import { clientDb } from '@/data/firebase'
 
-// TRAVIS IS TRIPPINGGGGGGGG
 
+
+// JIMIN IS TRIPPINGGGGGGGG
+
+const collectRef = collection(clientDb, 'users')
+const querySnapshot = await getDocs(collectRef)
+const users = querySnapshot.docs.map(doc => String(doc.data().name))
 const Page = () => {
     const { form: loadedForm, updateForm, clearForm } = useIntakeFormStore()
     type ClientType = TypeOf<typeof ClientIntakeSchema>
 
+    const [selectedUser, setSelectedUser] = useState<string | undefined>()
+
+    const handleSelect = (selected: string) => {
+        setSelectedUser(selected);
+        console.log("Selected user:", selected);
+        console.log("available users:", users);
+    }
     const {
         handleSubmit,
         formState: { errors },
@@ -93,8 +108,28 @@ const Page = () => {
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Case Manager
                                 </label>
-                                <div>*Options to be implemented*</div>
-                            </div>
+                                <div className="relative">
+                                    <Dropdown
+                                        className="font-extrabold text-underline"
+                                        options={users} // Assuming `users` is already an array of strings
+                                        onChange={(option) => handleSelect(option.value)}
+                                        placeholder="Select a user"
+                                        controlClassName="flex items-center justify-between border border-gray-300 rounded-md px-4 py-2"
+                                        arrowClosed={<></>} // Remove default arrow
+                                        arrowOpen={<></>} // Remove default arrow
+                                    />
+                                    <Symbol
+                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                                        symbol="keyboard_arrow_down"
+                                        // onClick={(e) => {
+                                        //     // Prevent default behavior and trigger dropdown click
+                                        //     e.stopPropagation();
+                                        //     const dropdown = document.querySelector('.Dropdown-control');
+                                        //     dropdown?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+                                        // }}
+                                    />
+                                </div>
+                                                            </div>
                         </div>
                     </div>
                     {/* all dropdown sections */}
