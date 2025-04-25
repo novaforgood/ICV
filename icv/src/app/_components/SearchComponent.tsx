@@ -5,9 +5,8 @@ import { useUser } from '@/hooks/useUser'
 import { getClientByCaseManager } from '@/api/clients'
 import type { NewClient } from '@/types/client-types'
 import { searchByKeyword } from '@/lib/firestoreUtils'
-import { Card } from '@/components/ui/card'
 import Link from 'next/link'
-import Image from 'next/image'
+import ClientCard from '@/app/_components/ClientCard'
 
 // Extended client type with lastCheckinDate
 interface ClientWithLastCheckin extends NewClient {
@@ -24,15 +23,6 @@ const SearchComponent = () => {
     const [isLoadingManagerClients, setIsLoadingManagerClients] = useState(false)
     const [managerClientsError, setManagerClientsError] = useState<string | null>(null)
     // Format date helper function
-    const formatDate = (dateString: string | undefined) => {
-        if (!dateString) return 'No check-in'
-        const date = new Date(dateString)
-        return date.toLocaleDateString('en-US', {
-            month: '2-digit',
-            day: '2-digit',
-            year: '2-digit'
-        })
-    }
 
     // console.log(managerClients)
 
@@ -77,12 +67,14 @@ const SearchComponent = () => {
             }
         }
 
+
         const debounceTimer = setTimeout(performSearch, 300)
         return () => clearTimeout(debounceTimer)
-    }, [searchTerm])
+    }, [searchTerm, managerClients])
 
     return (
         <div className="w-full max-w-6xl mx-auto p-4">
+            <h1 className="mb-4 mt-6 w-full text-6xl font-bold max-w-6xl mx-auto">My Clients</h1>
             <div className="mb-8 flex items-center gap-4">
                 <div className="bg-midground flex flex-1 flex-row items-center gap-2 rounded px-4 py-2 text-black">
                     <svg
@@ -142,61 +134,13 @@ const SearchComponent = () => {
                             <div className="text-center text-gray-500">Loading assigned clients...</div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {managerClients.slice(0, 4).map((client) => (
+                                {managerClients.map((client) => (
                                     <Link
                                         key={client.id}
                                         href={`/clients/${client.id}`}
                                         className="text-lg font-medium text-blue-600 hover:text-blue-800"
                                     >
-                                        <Card className="flex min-h-24 w-full bg-white p-4 hover:bg-gray-50">
-                                            <div className="flex w-full items-start gap-3">
-                                                {client.clientImage?.[0] ? (
-                                                    <Image
-                                                        src={client.clientImage[0]}
-                                                        alt={`${client.firstName} ${client.lastName}`}
-                                                        className="h-16 w-16 rounded-full object-cover"
-                                                        width={64}
-                                                        height={64}
-                                                    />
-                                                ) : (
-                                                    <svg
-                                                        viewBox="0 0 24 24"
-                                                        fill="currentColor"
-                                                        className="h-16 w-16 flex-shrink-0 text-gray-300"
-                                                    >
-                                                        <path
-                                                            fillRule="evenodd"
-                                                            d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                                                            clipRule="evenodd"
-                                                        />
-                                                    </svg>
-                                                )}
-                                                <div className="flex min-w-0 flex-1 flex-col">
-                                                    <div className="flex items-start justify-between">
-                                                        <div>
-                                                            <div className="text-base font-large text-gray-900">
-                                                                {client.firstName} {client.lastName}
-                                                            </div>
-                                                            <div className="mt-0.5 text-sm text-black">
-                                                                <div className="self-stretch justify-start text-black text-sm font-normal font-['Epilogue'] leading-none">
-                                                                    {client.clientCode || client.id}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="mt-2 flex flex-row items-center justify-between text-xs text-gray-500">
-                                                        <span className="text-gray-400">
-                                                            Last checked
-                                                        </span>
-                                                        <div className="flex justify-end text-gray-400">
-                                                            <span className="ml-2">
-                                                                {formatDate(client.lastCheckinDate)}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Card>
+                                        <ClientCard client={client} showLastCheckin={true} />
                                     </Link>
                                 ))}
                             </div>
@@ -214,53 +158,7 @@ const SearchComponent = () => {
                                     href={`/clients/${client.id}`}
                                     className="text-lg font-medium text-blue-600 hover:text-blue-800"
                                 >
-                                    <Card className="flex min-h-24 w-full bg-white p-4 hover:bg-gray-50">
-                                        <div className="flex w-full items-start gap-3">
-                                            {client.clientImage?.[0] ? (
-                                                <Image
-                                                    src={client.clientImage[0]}
-                                                    alt={`${client.firstName} ${client.lastName}`}
-                                                    className="h-16 w-16 rounded-full object-cover"
-                                                    width={64}
-                                                    height={64}
-                                                />
-                                            ) : (
-                                                <svg
-                                                    viewBox="0 0 24 24"
-                                                    fill="currentColor"
-                                                    className="h-16 w-16 flex-shrink-0 text-gray-300"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            )}
-                                            <div className="flex min-w-0 flex-1 flex-col">
-                                                <div className="flex items-start justify-between">
-                                                    <div>
-                                                        <div className="text-base font-medium text-gray-900">
-                                                            {client.firstName} {client.lastName}
-                                                        </div>
-                                                        <div className="mt-0.5 text-sm text-gray-500">
-                                                            {client.clientCode || client.id}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="mt-2 flex flex-row items-center justify-between text-sm text-gray-500">
-                                                    <span className="text-gray-400">
-                                                        Last check-in
-                                                    </span>
-                                                    <div className="flex justify-end">
-                                                        <span className="ml-2">
-                                                            {formatDate(client.lastCheckinDate)}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card>
+                                    <ClientCard client={client} showLastCheckin={true} />
                                 </Link>
                             ))}
                         </div>
