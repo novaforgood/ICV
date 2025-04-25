@@ -70,6 +70,12 @@ const Page = (props: Props) => {
     }, [watch, loadedForm])
 
     useEffect(() => {
+        if (loadedForm.maritalStatus != 'Married' && loadedForm.spouse) {
+            removeSpouse()
+        }
+    }, [loadedForm.maritalStatus])
+
+    useEffect(() => {
         const errors: string[] = []
         // number of family members serviced always includes the client themselves
         const parseFamSize = (value: any) => {
@@ -217,23 +223,29 @@ const Page = (props: Props) => {
                                 otherPlaceholder="Other"
                             />
                         </div>
-                        <div className="flex flex-col space-y-[4px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                If married, is spouse an ICV client?
-                            </label>
-                            <RadioChoice
-                                options={YESNO}
-                                selectedValue={
-                                    watch(`spouseClientStatus`) ?? ''
-                                }
-                                onChange={(updatedStat) =>
-                                    setValue(`spouseClientStatus`, updatedStat)
-                                }
-                                name={`spouseClientStatus`}
-                            />
-                        </div>
+                        {loadedForm.maritalStatus === 'Married' && (
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    If married, is spouse an ICV client?
+                                </label>
+                                <RadioChoice
+                                    options={YESNO}
+                                    selectedValue={
+                                        watch(`spouseClientStatus`) ?? ''
+                                    }
+                                    onChange={(updatedStat) =>
+                                        setValue(
+                                            `spouseClientStatus`,
+                                            updatedStat,
+                                        )
+                                    }
+                                    name={`spouseClientStatus`}
+                                />
+                            </div>
+                        )}
 
-                        {loadedForm.spouseClientStatus === 'No' ? (
+                        {loadedForm.maritalStatus === 'Married' &&
+                        loadedForm.spouseClientStatus === 'No' ? (
                             <div className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
                                 <div className="flex justify-end">
                                     <button
