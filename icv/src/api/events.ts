@@ -61,7 +61,7 @@ function parseTimestamp(timestamp: any) {
     if (typeof timestamp === 'object') {
         return timestamp.toDate();
     } else if (typeof timestamp === 'string') {
-        return new Date(timestamp + ' GMT-0800'); // Convert to PST
+        return new Date(timestamp); // Parse the ISO string directly
     }
 }
   

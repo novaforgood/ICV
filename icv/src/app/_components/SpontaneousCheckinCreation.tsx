@@ -86,7 +86,7 @@ const MultiStepCheckIn = () => {
 
   const handleSubmit = async () => {
     const newEvent: CheckInType & { clientId?: string } = {
-      startTime: new Date().toISOString(),
+      startTime: new Date().toLocaleString('en-US'),
       assigneeId,
       clientId: selectedClientId,
       category: category,
