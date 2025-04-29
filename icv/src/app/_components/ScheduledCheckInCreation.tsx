@@ -76,8 +76,8 @@ const ScheduledCheckInCreation: React.FC = () => {
             return;
         }
 
-        const startDateTime = new Date(`${date}T${startTime}`)
-        const endDateTime = new Date(`${date}T${endTime}`)
+        const startDateTime = new Date(`${date}T${startTime}`).toISOString()
+        const endDateTime = new Date(`${date}T${endTime}`).toISOString()
         const newEvent: CheckInType & { clientId?: string } = {
             name,
             startTime: startDateTime,
@@ -173,7 +173,7 @@ const ScheduledCheckInCreation: React.FC = () => {
                         className="w-full p-2 border border-gray-300 rounded"
                     />
                 </div>
-                {/* Dropdown for Check-in Category */}
+                {/* Dropdown for Check-in Category
                 <div className="form-group mb-4">
                     <label htmlFor="checkInType" className="block mb-2">Check-in Category</label>
                     <select
@@ -189,7 +189,7 @@ const ScheduledCheckInCreation: React.FC = () => {
                             </option>
                         ))}
                     </select>
-                </div>
+                </div> */}
                 {/* Client Search / Selection */}
                 <div className="form-group mb-4">
                     <label htmlFor="clientSearch" className="block mb-2">Client</label>
