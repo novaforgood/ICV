@@ -106,26 +106,18 @@ const Page = () => {
                                 </label>
                                 <div className="relative">
                                     <Dropdown
-                                        className="font-extrabold text-underline"
-                                        options={users} // Assuming `users` is already an array of strings
+                                        className="w-full"
+                                        options={users} 
                                         onChange={(option) => handleSelect(option.value)}
                                         placeholder="Select a user"
-                                        controlClassName="flex items-center justify-between border border-gray-300 rounded-md px-4 py-2"
-                                        arrowClosed={<></>} // Remove default arrow
-                                        arrowOpen={<></>} // Remove default arrow
+                                        controlClassName="flex items-center justify-between border border-black-300 rounded-md px-4 py-2 bg-white w-full hover:border-neutral-400"
+                                        menuClassName="absolute w-full mt-1 border border-gray-300 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto"
+                                        placeholderClassName="text-gray-500"
+                                        arrowClosed={<Symbol symbol="keyboard_arrow_down" className="text-neutral-900" />}
+                                        arrowOpen={<Symbol symbol="keyboard_arrow_up" className="text-neutral-900" />}
                                     />
-                                    <Symbol
-                                        className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                                        symbol="keyboard_arrow_down"
-                                        // onClick={(e) => {
-                                        //     // Prevent default behavior and trigger dropdown click
-                                        //     e.stopPropagation();
-                                        //     const dropdown = document.querySelector('.Dropdown-control');
-                                        //     dropdown?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-                                        // }}
-                                    />
+                                </div> 
                                 </div>
-                                                            </div>
                         </div>
                     </div>
                     {/* all dropdown sections */}
