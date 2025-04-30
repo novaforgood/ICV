@@ -32,13 +32,6 @@ export async function createClient(client: NewClient) {
         console.error('Error creating client:', error)
         throw error
     }
-    const ssrdb = getFirestore(firebaseServerApp)
-
-    console.log('asdfsdafdsfafdsasdfclient', client)
-    const clientsCollection = collection(ssrdb, 'clients')
-    const newDoc = await addDoc(clientsCollection, client)
-    console.log('Case added with ID: ', newDoc.id)
-    return newDoc.id
 }
 
 export async function getAllClients() {
