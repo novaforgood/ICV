@@ -19,18 +19,17 @@ import {
     uploadBytes,
 } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
+import FileUpload, { ResetButton } from '../../../../../_components/FileUpload'
+import { CheckboxList } from '../../../../../_components/MakeOptions'
 import { useIntakeFormStore } from '../../../../../_lib/useIntakeFormStore'
-import FileUpload, { ResetButton } from '../../../components/FileUpload'
-import { CheckboxList } from '../../../components/MakeOptions'
 
 interface Props {}
 
 const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
-    const fileInputRef = useRef<HTMLInputElement | null>(null)
     type ServiceType = TypeOf<typeof ServicesSchema>
 
     const {
@@ -235,7 +234,7 @@ const Page = (props: Props) => {
     const onSubmit = (data: ServiceType) => {
         console.log('in submit...', data)
         updateForm(data)
-        router.push('/intake/family/background/services/confirmation')
+        router.push('/intake/background/family/services/confirmation')
     }
 
     const selectedMentoring = watch('mentoring') ?? []
@@ -602,7 +601,7 @@ const Page = (props: Props) => {
                             <button
                                 type="button"
                                 onClick={() =>
-                                    router.push('/intake/family/background')
+                                    router.push('/intake/background/family')
                                 }
                                 className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                             >

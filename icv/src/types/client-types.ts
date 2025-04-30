@@ -1,5 +1,4 @@
-import { date, z } from 'zod'
-import { timestampToDateSchema} from './misc-types'
+import { z } from 'zod'
 
 export const GENDER = ['Male', 'Female', 'Nonbinary']
 export const CONTACTSOURCE = [
@@ -33,12 +32,10 @@ export const PUBLIC_SERVICES = [
 export const PETSIZE = ['Small', 'Medium', 'Large']
 export const PETPURPOSE = ['Emotional support animal', 'Service animal']
 export const EDUSTATUS = [
-    'Middle school',
     'High school',
     'GED',
     'Community college',
     'University',
-    'Masters/PhD',
 ]
 export const MENTALHEALTH = ['Schizophrenia', 'Bipolar', 'Depression', 'Anxiety']
 export const SUBSTANCES = ['Meth', 'Cocaine', 'Marijuana', 'Alcohol', 'None']
@@ -57,7 +54,7 @@ export const HOUSING = [
     'Shared Living',
     'Independent Living',
     'Management Companies',
-    'Transportation',
+    'Rental/Moving Assistance',
 ]
 export const EDUTRAIN = [
     'Independent Studies',
@@ -73,7 +70,7 @@ export const REFERRALSERVICE = [
     'Reentry Services',
     'Immigration Services',
     'Financial Literacy',
-    'Anger Management',
+    'Continued Education',
     'Financial Assistance Programs (SNAP/Cal/Works)',
 ]
 export const PERSONAL_DEV = [
@@ -101,6 +98,15 @@ export const EMPLOYMENT = [
     'Part-time',
     'Unemployed',
 ]
+export const WAIVER = [
+    'I give my permission',
+]
+
+export const MARITALSTATUS = [
+    'Single',
+    'Married',
+    'Divorced',
+]
 
 export type NewClient = z.infer<typeof ClientIntakeSchema>
 
@@ -111,6 +117,7 @@ export const ClientIntakeSchema = z.object({
     id: z.string().optional(),
     firstName: z.string().optional(),
     lastName: z.string().optional(),
+    fullNameLower: z.string().optional(),
     dateOfBirth: z.string().optional(),
     age: z.number().optional(),
     ageRange: z.string().optional(),
@@ -171,15 +178,15 @@ export const ClientIntakeSchema = z.object({
 
     // ----- PAGE 3: Family Information -----
     familySize: z.string().optional(),
-    spouse: z.array(
-        z.object({
+    maritalStatus: z.string().optional(),
+    spouseClientStatus: z.string().optional(),
+    spouse: z.object({
             spouseFirstName: z.string().optional(),
             spouseLastName: z.string().optional(),
             spouseDOB: z.string().optional(),
             spouseIncome: z.string().optional(),
             spouseGender: z.string().optional(),
-        }),
-    ).optional(),
+        }).optional(),
     dependent: z.array(
         z.object({
             firstName: z.string().optional(),
@@ -190,6 +197,8 @@ export const ClientIntakeSchema = z.object({
             publicServices: z.array(z.string().optional()).optional()
         }),
     ).optional(),
+    familyMembersServiced: z.string().optional(),
+    headOfHousehold: z.string().optional(),
 
     pets: z.array(
         z.object({
@@ -242,10 +251,18 @@ export const ClientIntakeSchema = z.object({
 
     // ----- PAGE 5: CONFIRMATION PAGE ----
     clientCode: z.string().optional(),
-    //assessingStaff: z.string().optional(),
+    assessingStaff: z.string().optional(),
     //program: z.string().optional(),
-    // caseManager: z.string().optional(),
+    caseManager: z.string().optional(),
     // permission: z.boolean().optional(),
+
+    // ----- WAIVER -----
+    acknowledgement: z.boolean().optional(),
+    // signatureURI: z.string().optional(),
+    // signatureDate: z.string().optional(),
+    // signatureTime: z.string().optional(),
+
+    associatedSpouseID: z.string().optional(),
 }) 
 
 export const BackgroundSchema = ClientIntakeSchema.pick({
@@ -335,11 +352,26 @@ export const ProfileSchema = ClientIntakeSchema.pick({
     // Demographics
     ethnicity: true,
 
+    associatedSpouseID: true,
+
 })
 
 export const FamilySchema = ClientIntakeSchema.pick({
     familySize: true,
     spouse: true,
+    maritalStatus: true,
+    spouseClientStatus: true,
     dependent: true,
     pets: true,
+    familyMembersServiced: true,
+    headOfHousehold: true,
+})
+
+export const ConfirmationSchema = ClientIntakeSchema.pick({
+    assessingStaff: true,
+    clientCode: true,
+})
+
+export const WaiverSchema = ClientIntakeSchema.pick({
+    acknowledgement: true,
 })
