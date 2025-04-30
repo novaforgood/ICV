@@ -16,9 +16,12 @@ import { clientDb } from '@/data/firebase'
 
 // JIMIN IS TRIPPINGGGGGGGG
 
+//collecting users document from database in string array
 const collectRef = collection(clientDb, 'users')
 const querySnapshot = await getDocs(collectRef)
 const users = querySnapshot.docs.map(doc => String(doc.data().name))
+
+
 const Page = () => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
     type ConfirmType = TypeOf<typeof ConfirmationSchema>
@@ -92,7 +95,7 @@ const Page = () => {
                                 <div>{loadedForm.assessingStaff}</div>
                             </div>
                         </div>
-                        {/* Program and Case Manager to be implemented later */}
+                        {/* Program and Case Manager to be implemented now thanks to Travis the goatttt*/}
                         <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                             <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
@@ -106,12 +109,12 @@ const Page = () => {
                                 </label>
                                 <div className="relative">
                                     <Dropdown
-                                        className="w-full"
+                                        className="w-full border-black"
                                         options={users} 
                                         onChange={(option) => handleSelect(option.value)}
                                         placeholder="Select a user"
                                         controlClassName="flex items-center justify-between border border-black-300 rounded-md px-4 py-2 bg-white w-full hover:border-neutral-400"
-                                        menuClassName="absolute w-full mt-1 border border-gray-300 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto"
+                                        menuClassName="dropdown-menu absolute w-full mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400"
                                         placeholderClassName="text-gray-500"
                                         arrowClosed={<Symbol symbol="keyboard_arrow_down" className="text-neutral-900" />}
                                         arrowOpen={<Symbol symbol="keyboard_arrow_up" className="text-neutral-900" />}
