@@ -44,8 +44,8 @@ const EventsSchedule: React.FC = () => {
         console.log('Selected Date:', selectedDate)
         if (!selectedDate || !events) return events || []
         return events.filter((event) => {
-            const eventDate = new Date(event.startTime)
-            console.log('Event Date:', (eventDate))
+            const eventDate = event.startTime
+            console.log('Event name: ', event.name, 'Event Date:', event.startTime)
             if (!isValid(eventDate)) return false
             return format(eventDate, 'yyyy-MM-dd') === selectedDate
         })
@@ -140,7 +140,7 @@ const EventsSchedule: React.FC = () => {
                         if (!isValid(eventDate)) return null
 
                         const startTime = eventDate.getTime()
-                        const endTime = new Date(event.endTime).getTime()
+                        const endTime = event.endTime ? new Date(event.endTime).getTime() : null
                         const eventName = String(event.name) || 'unnamed check-in'
                         const eventLocation = String(event.location) || ''
                         const eventAsignee = String(event.assigneeId) || ''
@@ -153,7 +153,7 @@ const EventsSchedule: React.FC = () => {
                                 <div className="text-sm text-gray-500 text-center w-[80px]">
                                     <span>{format(startTime, 'p')}</span>
                                     <br />
-                                    <span>{format(endTime, 'p')}</span>
+                                    <span>{endTime && format(endTime, 'p')}</span>
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <h2 className="text-lg font-bold truncate">{eventName}</h2>
