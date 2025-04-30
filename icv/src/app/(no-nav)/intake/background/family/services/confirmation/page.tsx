@@ -8,14 +8,32 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
+import Dropdown from 'react-dropdown'
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
+import { clientDb } from '@/data/firebase'
 
-// TRAVIS IS TRIPPINGGGGGGGG
 
+
+// JIMIN IS TRIPPINGGGGGGGG
+
+const collectRef = collection(clientDb, 'users')
+const querySnapshot = await getDocs(collectRef)
+const users = querySnapshot.docs.map(doc => String(doc.data().name))
 const Page = () => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
     type ConfirmType = TypeOf<typeof ConfirmationSchema>
 
-    const {} = useForm<ConfirmType>({
+    const [selectedUser, setSelectedUser] = useState<string | undefined>()
+
+    const handleSelect = (selected: string) => {
+        setSelectedUser(selected);
+        console.log("Selected user:", selected);
+        console.log("available users:", users);
+    }
+    const {
+        handleSubmit,
+        formState: { errors },
+    } = useForm<ClientType>({
         mode: 'onChange',
         resolver: zodResolver(ConfirmationSchema),
         defaultValues: loadedForm,
@@ -86,8 +104,20 @@ const Page = () => {
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Case Manager
                                 </label>
-                                <div>*Options to be implemented*</div>
-                            </div>
+                                <div className="relative">
+                                    <Dropdown
+                                        className="w-full"
+                                        options={users} 
+                                        onChange={(option) => handleSelect(option.value)}
+                                        placeholder="Select a user"
+                                        controlClassName="flex items-center justify-between border border-black-300 rounded-md px-4 py-2 bg-white w-full hover:border-neutral-400"
+                                        menuClassName="absolute w-full mt-1 border border-gray-300 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto"
+                                        placeholderClassName="text-gray-500"
+                                        arrowClosed={<Symbol symbol="keyboard_arrow_down" className="text-neutral-900" />}
+                                        arrowOpen={<Symbol symbol="keyboard_arrow_up" className="text-neutral-900" />}
+                                    />
+                                </div> 
+                                </div>
                         </div>
                     </div>
                     {/* all dropdown sections */}
