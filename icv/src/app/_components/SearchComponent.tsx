@@ -1,222 +1,289 @@
 'use client'
 
-import { Card } from '@/components/ui/card'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-} from '@/components/ui/select'
-import { NewClient } from '@/types/client-types'
-import { SelectValue } from '@radix-ui/react-select'
+import { getClientByCaseManager } from '@/api/clients'
+import ClientCard from '@/app/_components/ClientCard'
+import FilterPanel from '@/app/_components/FilterPanel'
+import { useUser } from '@/hooks/useUser'
+import { searchByKeyword } from '@/lib/firestoreUtils'
+import type { NewClient } from '@/types/client-types'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { searchByKeyword } from '../../lib/firestoreUtils'
 
-interface SearchComponentProps {
-    clients: NewClient[]
+// Extended client type with lastCheckinDate
+interface ClientWithLastCheckin extends NewClient {
+    lastCheckinDate?: string
 }
 
-const SearchComponent = ({ clients }: SearchComponentProps) => {
+const SearchComponent = () => {
+    const { user } = useUser()
     const [searchTerm, setSearchTerm] = useState('')
-    const [results, setResults] = useState<NewClient[]>([])
+    const [results, setResults] = useState<ClientWithLastCheckin[]>([])
     const [loading, setLoading] = useState(false)
     const [initialPage, setInitialPage] = useState(true)
-    const [filters, setFilters] = useState({
-        program: 'All Programs',
+    const [managerClients, setManagerClients] = useState<
+        ClientWithLastCheckin[]
+    >([])
+    const [isLoadingManagerClients, setIsLoadingManagerClients] =
+        useState(false)
+    const [managerClientsError, setManagerClientsError] = useState<
+        string | null
+    >(null)
+    const [sortBy, setSortBy] = useState<'asc' | 'desc' | null>(null)
+    const [sortedClients, setSortedClients] = useState<ClientWithLastCheckin[]>(
+        [],
+    )
+    const [isFilterOpen, setIsFilterOpen] = useState(false)
+    const [filters, setFilters] = useState<{
+        selectedDates: string[]
+        dateType: string
+    }>({
+        selectedDates: [],
+        dateType: 'Month',
     })
 
-    // Set initial results
-    useEffect(() => {
-        setResults(clients)
-    }, [clients])
+    // console.log(managerClients)
 
-    // Debounced search effect
+    useEffect(() => {
+        const fetchManagerClients = async () => {
+            if (!user?.uid) return
+
+            setIsLoadingManagerClients(true)
+            setManagerClientsError(null)
+            try {
+                const clients = await getClientByCaseManager()
+                setManagerClients(clients as ClientWithLastCheckin[])
+            } catch (err) {
+                console.error('Error fetching manager clients:', err)
+                setManagerClientsError('Failed to load assigned clients')
+            } finally {
+                setIsLoadingManagerClients(false)
+            }
+        }
+
+        fetchManagerClients()
+    }, [user?.uid])
+
     useEffect(() => {
         const performSearch = async () => {
-            if (searchTerm.trim() === '') {
-                if (!initialPage) {
-                    setResults(clients)
-                }
+            if (!searchTerm.trim()) {
+                setResults([])
+                setInitialPage(true)
                 return
             }
 
             setLoading(true)
+            setInitialPage(false)
             try {
-                let data: NewClient[] = await searchByKeyword(searchTerm)
-                setResults(data)
-                setInitialPage(false)
-            } catch (error) {
-                console.error('Search error:', error)
+                const searchResults = await searchByKeyword(searchTerm)
+                setResults(searchResults as ClientWithLastCheckin[])
+            } catch (err) {
+                console.error('Error searching clients:', err)
             } finally {
                 setLoading(false)
             }
         }
 
-        const timer = setTimeout(() => {
-            performSearch()
-        }, 500)
+        const debounceTimer = setTimeout(performSearch, 300)
+        return () => clearTimeout(debounceTimer)
+    }, [searchTerm, managerClients])
 
-        return () => clearTimeout(timer)
-    }, [searchTerm, initialPage])
+    useEffect(() => {
+        const sorted = [...managerClients].sort((a, b) => {
+            const dateA = a.lastCheckinDate
+                ? new Date(a.lastCheckinDate).getTime()
+                : 0
+            const dateB = b.lastCheckinDate
+                ? new Date(b.lastCheckinDate).getTime()
+                : 0
+            return dateB - dateA // Default to newest first
+        })
+        setSortedClients(sorted)
+    }, [managerClients])
 
-    const filteredResults = results.filter((user) => {
-        if (filters.program === 'All Programs') return true
-        if (filters.program && user.program !== filters.program) return false
-        return true
+    useEffect(() => {
+        if (sortBy === 'asc') {
+            setSortedClients((prev) => [...prev].reverse())
+        } else if (sortBy === 'desc') {
+            setSortedClients((prev) => [...prev].reverse())
+        }
+    }, [sortBy])
+
+    // Filter the clients based on selected dates
+    const filteredClients = sortedClients.filter((client) => {
+        if (filters.selectedDates.length === 0) return true
+
+        const clientDate = new Date(client.lastCheckinDate || '')
+        if (isNaN(clientDate.getTime())) return false
+
+        switch (filters.dateType) {
+            case 'Month':
+                const month = clientDate.toLocaleString('default', {
+                    month: 'long',
+                })
+                return filters.selectedDates.includes(month)
+            case 'Quarter':
+                const quarter = Math.floor(clientDate.getMonth() / 3) + 1
+                return filters.selectedDates.includes(`Q${quarter}`)
+            case 'Year':
+            case 'Fiscal Year':
+                const year = clientDate.getFullYear().toString()
+                return filters.selectedDates.includes(year)
+            default:
+                return true
+        }
     })
 
     return (
-        <>
-            {/* Search Input and Filters */}
-
-            <div className="flex w-full items-center gap-x-4">
-                {/* Search Input */}
-                <div className="flex-1">
-                    <div className="bg-midground flex w-full flex-row items-center gap-2 rounded px-4 py-2 text-black">
-                        <svg
-                            className="h-4 w-4 flex-shrink-0 -translate-y-[1px] text-gray-700"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                        </svg>
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search..."
-                            className="w-full bg-transparent text-base outline-none placeholder:text-gray-700"
+        <div className="mx-auto w-full max-w-6xl p-4">
+            <h1 className="mx-auto mb-4 mt-6 w-full max-w-6xl text-6xl font-bold">
+                My Clients
+            </h1>
+            <div className="mb-8 flex items-center gap-4">
+                <div className="flex flex-1 flex-row items-center gap-2 rounded bg-midground px-4 py-2 text-black">
+                    <svg
+                        className="h-4 w-4 flex-shrink-0 -translate-y-[1px] text-gray-700"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         />
-                    </div>
+                    </svg>
+                    <input
+                        type="text"
+                        placeholder="Search clients..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full bg-transparent text-base outline-none placeholder:text-gray-700"
+                    />
                 </div>
-
-                {/* program Filter Dropdown */}
-                <Select
-                    value={filters.program}
-                    onValueChange={(e) =>
-                        setFilters({ ...filters, program: e.valueOf() })
-                    }
+                <button
+                    className="flex w-[170px] items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    onClick={() => {
+                        setSortBy((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                    }}
                 >
-                    <SelectTrigger className="w-64">
-                        <SelectValue placeholder="All Programs" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="All Programs">
-                            All Programs
-                        </SelectItem>
-                        <SelectItem value="Homeless Department">
-                            Homeless Department
-                        </SelectItem>
-                        <SelectItem value="School Outreach">
-                            School Outreach
-                        </SelectItem>
-                        <SelectItem value="No Program">No Program</SelectItem>
-                    </SelectContent>
-                </Select>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="h-4 w-4"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
+                        />
+                    </svg>
+                    {sortBy === 'asc' ? 'Sort by newest' : 'Sort by oldest'}
+                </button>
+                <button
+                    className="flex w-[200px] items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsFilterOpen(true)}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="h-4 w-4"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                        />
+                    </svg>
+                    Filter intake date
+                </button>
             </div>
 
-            {/* Loading State */}
-            {/* {loading && (
+            {isFilterOpen && (
+                <FilterPanel
+                    currentFilters={filters}
+                    onClose={() => {
+                        setIsFilterOpen(false)
+                        console.log('closed without applying filters')
+                    }}
+                    onFilter={(newFilters) => {
+                        setFilters(newFilters)
+                        setIsFilterOpen(false)
+                        console.log('applied filters:', newFilters)
+                    }}
+                />
+            )}
+
+            {loading && (
                 <div className="mt-4 w-full text-center text-gray-500">
                     Searching...
                 </div>
-            )} */}
+            )}
+            {managerClientsError && (
+                <div className="mb-4 text-center text-red-500">
+                    {managerClientsError}
+                </div>
+            )}
 
-            {/* Results */}
-            <div className="mt-4 w-full">
-                {filteredResults.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-4">
-                        {filteredResults.map((user) => (
-                            <Link
-                                key={user.id}
-                                href={`/clients/${user.id}`}
-                                className="text-lg font-medium text-blue-600 hover:text-blue-800"
-                            >
-                                <Card className="flex min-h-24 w-full bg-white p-4 hover:bg-gray-50">
-                                    <div className="flex w-full items-start gap-3">
-                                        <img
-                                            src={
-                                                user.clientImage?.[0] ||
-                                                '/cavediva.jpeg'
-                                            }
-                                            alt="client"
-                                            className="h-16 w-16 rounded-full"
+            <div className="grid gap-4">
+                {initialPage ? (
+                    <div className="mb-4">
+                        {isLoadingManagerClients ? (
+                            <div className="text-center text-gray-500">
+                                Loading assigned clients...
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                                {filteredClients.map((client) => (
+                                    <Link
+                                        key={`${client.id}-${client.firstName}-${client.dateOfBirth}`}
+                                        href={`/clients/${client.id}`}
+                                        className="text-lg font-medium text-blue-600 hover:text-blue-800"
+                                    >
+                                        <ClientCard
+                                            client={client}
+                                            showLastCheckin={true}
                                         />
-                                        {/* {user.clientImage?.length &&
-                                        user.clientImage[0] ? (
-                                        ) : (
-                                            <svg
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                                className="h-10 w-10 flex-shrink-0 text-gray-300"
-                                            >
-                                                <path
-                                                    fillRule="evenodd"
-                                                    d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                                                    clipRule="evenodd"
-                                                />
-                                            </svg>
-                                        )} */}
-                                        <div className="flex min-w-0 flex-1 flex-col">
-                                            <div className="flex items-start justify-between">
-                                                <div>
-                                                    <div className="text-base font-medium text-gray-900">
-                                                        {user.firstName}{' '}
-                                                        {user.lastName}
-                                                    </div>
-                                                    <div className="mt-0.5 text-sm text-gray-500">
-                                                        {user.clientCode ||
-                                                            user.id}
-                                                    </div>
-                                                </div>
-                                                <span className="flex max-w-24 items-center justify-center rounded-full bg-gray-900 px-3 py-1 text-xs text-white">
-                                                    {truncateText(
-                                                        user.program ||
-                                                            'Housing',
-                                                        7,
-                                                    )}
-                                                </span>
-                                            </div>
-                                            <div className="mt-2 flex flex-row items-center justify-between text-sm text-gray-500">
-                                                <span className="text-gray-400">
-                                                    Last check-in
-                                                </span>
-
-                                                <div className="flex justify-end">
-                                                    {/* TODO: Add last check-in date */}
-                                                    <span className="ml-2">
-                                                        02/13/25
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card>
-                            </Link>
-                        ))}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    !loading && (
-                        <div className="text-center text-gray-500">
-                            {searchTerm.trim() ? 'No results found' : ''}
+                    <div>
+                        <h2 className="mb-4 font-['Epilogue'] text-3xl font-semibold text-black">
+                            Search Results
+                        </h2>
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {results.map((client) => (
+                                <Link
+                                    key={`${client.id}-${client.firstName}-${client.dateOfBirth}`}
+                                    href={`/clients/${client.id}`}
+                                    className="text-lg font-medium text-blue-600 hover:text-blue-800"
+                                >
+                                    <ClientCard
+                                        client={client}
+                                        showLastCheckin={true}
+                                    />
+                                </Link>
+                            ))}
                         </div>
-                    )
+                    </div>
                 )}
             </div>
-        </>
+        </div>
     )
 }
 
-function truncateText(text: string, length: number) {
-    return text.length > length ? text.slice(0, length) + '...' : text
-}
+// function truncateText(text: string, length: number) {
+//     return text.length > length ? text.slice(0, length) + '...' : text
+// }
 
 export default SearchComponent

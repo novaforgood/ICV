@@ -6,11 +6,12 @@ import { CheckInCategory, CheckInType } from '@/types/event-types'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
+import ClientCard from './ClientCard'
 import { Cat } from 'lucide-react'
 
 const enum Step {
   ChooseClient,
-  ChooseCheckInType,
+  ConfirmClient,
   Complete,
   CaseNotes
 }
@@ -57,7 +58,14 @@ const MultiStepCheckIn = () => {
   const [caseNotes, setCaseNotes] = useState('')
   const [checkInID, setcheckInID] = useState('')
 
-    const { data: clients } = useSWR('clients', getAllClients)
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // After changes, put the focus back on the input
+    inputRef.current?.focus();
+  }, [clientSearch]);
+
+  const { data: clients } = useSWR('clients', getAllClients)
 
   const filteredClients = clients
     ? clients.filter((client: any) => {
@@ -78,7 +86,7 @@ const MultiStepCheckIn = () => {
 
   const handleSubmit = async () => {
     const newEvent: CheckInType & { clientId?: string } = {
-      startTime: new Date(),
+      startTime: new Date().toLocaleString('en-US'),
       assigneeId,
       clientId: selectedClientId,
       category: category,
@@ -105,53 +113,47 @@ const MultiStepCheckIn = () => {
     }
   }
 
-    const ChooseClient = () => (
-        <div>
-            <h2 className="mb-4 text-xl font-bold">Choose A Client</h2>
-            <input
-                type="text"
-                value={clientSearch}
-                onChange={(e) => setClientSearch(e.target.value)}
-                placeholder="Search by name"
-                className="mb-2 w-full rounded border border-gray-300 p-2"
-            />
-            <ul className="max-h-48 overflow-y-auto">
-                {filteredClients.map((client: any) => (
-                    <li
-                        key={client.id}
-                        onClick={() => {
-                            setSelectedClientId(client.id)
-                            setStep(Step.ChooseCheckInType)
-                        }}
-                        className="cursor-pointer p-2 hover:bg-gray-200"
-                    >
-                        {client.firstName} {client.lastName}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    )
+const ChooseClient = React.memo(() => (
+  <div>
+    <h2 className="mb-4 text-xl font-bold">Choose A Client</h2>
+    <input
+      ref={inputRef}
+      type="text"
+      value={clientSearch}
+      onChange={(e) => setClientSearch(e.target.value)}
+      placeholder="Search by name"
+      className="mb-2 w-full rounded border border-gray-300 p-2"
+    />
+    <ul className="max-h-48 overflow-y-auto">
+      {filteredClients.map((client: any) => (
+        <li
+          key={client.id}
+          onClick={() => {
+            setSelectedClientId(client.id);
+            setStep(Step.ConfirmClient);
+          }}
+          className="cursor-pointer p-2 hover:bg-gray-200"
+        >
+          {client.firstName} {client.lastName}
+        </li>
+      ))}
+    </ul>
+  </div>
+));
 
-  const ChooseCheckInType = () => (
+  const ConfirmClient = () => (
     <form
       onSubmit={(e) => {
         e.preventDefault()
         handleSubmit()
       }}
     >
-      <h2 className="text-xl font-bold mb-4">Wellness Check</h2>
+      <h2 className="text-xl font-bold mb-4">Submit Check-In</h2>
 
-      <select
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className="w-full p-2 border rounded mb-2"
-      >
-        {Object.values(CheckInCategory.Values).map((cat) => (
-          <option key={cat} value={cat}>
-            {cat}
-          </option>
-        ))}
-      </select>
+      <ClientCard
+        client={selectedClient}
+      ></ClientCard>
+
       <button type="submit" className="w-full bg-foreground text-white p-2 rounded">
         Submit
       </button>
@@ -176,8 +178,8 @@ const MultiStepCheckIn = () => {
     switch (step) {
       case Step.ChooseClient:
         return <ChooseClient />
-      case Step.ChooseCheckInType:
-        return <ChooseCheckInType />
+      case Step.ConfirmClient:
+        return <ConfirmClient />
       case Step.Complete:
         return <Complete />
       case Step.CaseNotes:

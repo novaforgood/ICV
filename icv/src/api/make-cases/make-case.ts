@@ -16,16 +16,21 @@ import {
 } from 'firebase/firestore'
 
 export async function createClient(client: NewClient) {
-    // verify that the client object is valid
-    // let results = ClientSchema.optional().safeParse(client)
-    // if (results.success === false) {
+    try {
+        const { firebaseServerApp, currentUser } =
+            await getAuthenticatedAppForUser()
+        if (!currentUser) {
+            throw new Error('User not found')
+        }
+        const ssrdb = getFirestore(firebaseServerApp)
 
-    //     throw new Error('Client object is invalid ' + JSON.stringify(results))
-    // }
-    const { firebaseServerApp, currentUser } =
-        await getAuthenticatedAppForUser()
-    if (!currentUser) {
-        throw new Error('User not found')
+        const clientsCollection = collection(ssrdb, 'clients')
+        const newDoc = await addDoc(clientsCollection, client)
+        console.log('Case added with ID: ', newDoc.id)
+        return newDoc.id
+    } catch (error) {
+        console.error('Error creating client:', error)
+        throw error
     }
     const ssrdb = getFirestore(firebaseServerApp)
 
