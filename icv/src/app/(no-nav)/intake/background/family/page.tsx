@@ -26,7 +26,12 @@ const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
     type FamilyType = TypeOf<typeof FamilySchema>
     const [warnings, setWarnings] = useState<string[]>([])
-    const [invalidIncome, setInvalidIncome] = useState<string[]>([])
+    type IncomeWarning = {
+        message: string
+        depIndex: number
+    }
+
+    const [invalidIncome, setInvalidIncome] = useState<IncomeWarning[]>([])
 
     const {
         register,
@@ -128,7 +133,7 @@ const Page = (props: Props) => {
     ])
 
     useEffect(() => {
-        const warnings: string[] = []
+        const warnings: { message: string; depIndex: number }[] = []
 
         const parseIncome = (label: string, value: any, depIndex: number) => {
             if (value === undefined || value === '') return 0
@@ -137,9 +142,11 @@ const Page = (props: Props) => {
             const num = parseFloat(cleaned)
 
             if (isNaN(num) || cleaned !== num.toString()) {
-                warnings.push(
-                    `Dependent ${depIndex + 1}: "${value}" is not a valid income for ${label}.`,
-                )
+                warnings.push({
+                    depIndex,
+                    message: `"${value}" is not a valid income for ${label}.`,
+                })
+
                 return 0
             }
 
@@ -179,8 +186,7 @@ const Page = (props: Props) => {
             JSON.stringify(updatedDependents)
 
         if (shouldUpdate) {
-            setInvalidIncome(warnings)
-            updateForm({ ...loadedForm, dependent: updatedDependents })
+            updateForm({ dependent: updatedDependents })
         }
     }, [loadedForm.dependent])
 
@@ -717,9 +723,11 @@ const Page = (props: Props) => {
                                         }}
                                     >
                                         {invalidIncome
-                                            .filter((msg, i) => i === index)
+                                            .filter(
+                                                (msg) => msg.depIndex === index,
+                                            )
                                             .map((msg, i) => (
-                                                <div key={i}>{msg}</div>
+                                                <div key={i}>{msg.message}</div>
                                             ))}
                                     </div>
                                 )}
