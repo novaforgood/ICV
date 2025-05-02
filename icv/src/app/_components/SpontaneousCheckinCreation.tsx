@@ -91,6 +91,7 @@ const MultiStepCheckIn = () => {
       clientId: selectedClientId,
       category: category,
       scheduled: false,
+      contactCode: 'W',
     }
     console.log('trying to add event:', newEvent);
     try {
