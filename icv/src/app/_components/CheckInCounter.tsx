@@ -175,10 +175,10 @@ const CheckInCounter: React.FC = () => {
             </h2>
             <div className="grid grid-cols-1 gap-4">
                 {/* Hygiene Kits Card */}
-                <div className="flex items-center justify-between mb-4 p-4 rounded-lg shadow-md bg-white">
+                <div className="flex items-center justify-between mb-4 p-4 rounded-lg shadow-md bg-sky">
                     <div>
-                        <p className="text-gray-600">Hygiene Kits</p>
-                        <h1 className="text-4xl font-bold">{hygieneKits[timeFrame]}</h1>
+                        <p className="text-background">Hygiene Kits</p>
+                        <h1 className="text-4xl font-bold text-background">{hygieneKits[timeFrame]}</h1>
                     </div>
                     <div className="flex items-center space-x-1">
                         {hygieneKits['day'] > 0 && (
@@ -199,10 +199,10 @@ const CheckInCounter: React.FC = () => {
                 </div>
 
                 {/* Hot Meals Card */}
-                <div className="flex items-center justify-between mb-4 p-4 rounded-lg shadow-md bg-white">
+                <div className="flex items-center justify-between mb-4 p-4 rounded-lg shadow-md bg-blue">
                     <div>
-                        <p className="text-gray-600">Hot Meals</p>
-                        <h1 className="text-4xl font-bold">{hotMeals[timeFrame]}</h1>
+                        <p className="text-background">Hot Meals</p>
+                        <h1 className="text-4xl font-bold text-background">{hotMeals[timeFrame]}</h1>
                     </div>
                     <div className="flex items-center space-x-1">
                         {hotMeals['day'] > 0 && (
@@ -223,10 +223,10 @@ const CheckInCounter: React.FC = () => {
                 </div>
 
                 {/* Snack Packs Card */}
-                <div className="flex items-center justify-between mb-4 p-4 rounded-lg shadow-md bg-white">
+                <div className="flex items-center justify-between mb-4 p-4 rounded-lg shadow-md bg-navy">
                     <div>
-                        <p className="text-gray-600">Snack Packs</p>
-                        <h1 className="text-4xl font-bold">{snackPacks[timeFrame]}</h1>
+                        <p className="text-background">Snack Packs</p>
+                        <h1 className="text-4xl font-bold text-background">{snackPacks[timeFrame]}</h1>
                     </div>
                     <div className="flex items-center space-x-1">
                         {snackPacks['day'] > 0 && (
