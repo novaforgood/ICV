@@ -39,11 +39,6 @@ const Page = () => {
         defaultValues: loadedForm,
     })
 
-    // useEffect(() => {
-    //     const calculatedCode = `${loadedForm.firstName?.[0]?.toUpperCase() ?? 'N'}${loadedForm.gender?.[0]?.toUpperCase() ?? 'X'}${loadedForm.lastName?.[0]?.toUpperCase() ?? 'N'}${new Date().getFullYear()}`
-    //     updateForm({ clientCode: calculatedCode })
-    // }, [loadedForm.firstName, loadedForm.lastName, loadedForm.gender])
-
     const router = useRouter()
     const { user } = useUser()
 
@@ -79,27 +74,14 @@ const Page = () => {
                     <div className="space-y-[24px]">
                         <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                             {/* First Row: Name & Gender */}
-                            <div className="flex flex-col space-y-1">
-                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                    Client Code
-                                </label>
-                                <div>{loadedForm.clientCode}</div>
-                            </div>
+
                             <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Assessing Staff
                                 </label>
                                 <div>{loadedForm.assessingStaff}</div>
                             </div>
-                        </div>
-                        {/* Program and Case Manager to be implemented now thanks to Travis the goatttt*/}
-                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                            <div className="flex flex-col space-y-1">
-                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                    Program
-                                </label>
-                                <div>Homeless Outreach</div>
-                            </div>
+
                             <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Case Manager
@@ -133,7 +115,7 @@ const Page = () => {
                         </div>
                     </div>
                     {/* all dropdown sections */}
-                    {['Client Profile', 'Family', 'Background', 'Services'].map(
+                    {['Client Profile', 'Background', 'Family', 'Services'].map(
                         (section) => (
                             <div key={section}>
                                 {/* Dropdown Button */}
@@ -164,20 +146,19 @@ const Page = () => {
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                                                 Name
                                                             </label>
-                                                            <div>
-                                                                {loadedForm.firstName ? (
+                                                            <div className="flex flex-row space-x-[4px]">
+                                                                {loadedForm.firstName && (
                                                                     <p>
                                                                         {
                                                                             loadedForm.firstName
-                                                                        }{' '}
+                                                                        }
+                                                                    </p>
+                                                                )}
+                                                                {loadedForm.lastName && (
+                                                                    <p>
                                                                         {
                                                                             loadedForm.lastName
                                                                         }
-                                                                    </p>
-                                                                ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
                                                                     </p>
                                                                 )}
                                                             </div>
@@ -190,10 +171,7 @@ const Page = () => {
                                                                 {loadedForm.gender ? (
                                                                     loadedForm.gender
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -203,7 +181,7 @@ const Page = () => {
                                                     <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Date of Birth
+                                                                DOB
                                                             </label>
                                                             <div>
                                                                 {loadedForm.dateOfBirth ? (
@@ -218,18 +196,49 @@ const Page = () => {
                                                         </div>
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Contact Source
+                                                                Age
                                                             </label>
                                                             <div>
-                                                                {loadedForm.contactSource ? (
-                                                                    loadedForm.contactSource
+                                                                {loadedForm.age ? (
+                                                                    loadedForm.age
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Intake Date
+                                                            </label>
+                                                            <div>
+                                                                {
+                                                                    loadedForm.intakeDate
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Client Code
+                                                            </label>
+                                                            <div>
+                                                                {
+                                                                    loadedForm.clientCode
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col space-y-1">
+                                                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                            Contact Source
+                                                        </label>
+                                                        <div>
+                                                            {loadedForm.contactSource ? (
+                                                                loadedForm.contactSource
+                                                            ) : (
+                                                                <p>N/A</p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -248,10 +257,7 @@ const Page = () => {
                                                                 {loadedForm.email ? (
                                                                     loadedForm.email
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -263,10 +269,7 @@ const Page = () => {
                                                                 {loadedForm.phoneNumber ? (
                                                                     loadedForm.phoneNumber
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -287,10 +290,7 @@ const Page = () => {
                                                                 {loadedForm.placeOrigin ? (
                                                                     loadedForm.placeOrigin
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -302,13 +302,42 @@ const Page = () => {
                                                                 {loadedForm.citizenship ? (
                                                                     loadedForm.citizenship
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
                                                         </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-[24px]">
+                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                                        Ethnicity
+                                                    </label>
+                                                    <div>
+                                                        {loadedForm.ethnicity &&
+                                                        loadedForm.ethnicity
+                                                            .length > 0 ? (
+                                                            <ul>
+                                                                {loadedForm.ethnicity.map(
+                                                                    (
+                                                                        item,
+                                                                        index,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        ) : (
+                                                            <p>N/A</p>
+                                                        )}
                                                     </div>
                                                 </div>
 
@@ -320,43 +349,54 @@ const Page = () => {
                                                         {/* Row: */}
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Email Address
+                                                                Homeless
                                                             </label>
                                                             <div>
-                                                                {loadedForm.email ? (
-                                                                    loadedForm.email
+                                                                {loadedForm.homeless ? (
+                                                                    loadedForm.homeless
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Address
+                                                                Sheltered
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.sheltered ? (
+                                                                    loadedForm.sheltered
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Street
+                                                                Address/Point of
+                                                                Contact
                                                             </label>
                                                             <div>
                                                                 {loadedForm.streetAddress ? (
                                                                     loadedForm.streetAddress
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
-                                                                )}{' '}
-                                                                {loadedForm.aptNumber &&
-                                                                    `Apt. ${loadedForm.aptNumber}`}
+                                                                    <p>N/A</p>
+                                                                )}
                                                             </div>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Apartment No.
+                                                            </label>
                                                             <div>
-                                                                {loadedForm.city
-                                                                    ? loadedForm.city
-                                                                    : 'No city provided'}
-                                                                , CA
-                                                                {loadedForm.zipCode
-                                                                    ? `, ${loadedForm.zipCode}`
-                                                                    : ''}
+                                                                {loadedForm.aptNumber ? (
+                                                                    loadedForm.aptNumber
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -364,97 +404,26 @@ const Page = () => {
                                                         {/* Row: */}
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Housing Notes
+                                                                City
                                                             </label>
                                                             <div>
-                                                                {loadedForm.housingNotes ? (
-                                                                    loadedForm.housingNotes
+                                                                {loadedForm.city ? (
+                                                                    loadedForm.city
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-[24px]">
-                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Background
-                                                    </label>
-                                                    <div className="space-y-[24px]">
-                                                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                            {/* Row: */}
-                                                            <div className="flex flex-col space-y-1">
-                                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                    Ethnicity
-                                                                </label>
-                                                                <div>
-                                                                    {loadedForm.ethnicity &&
-                                                                    loadedForm
-                                                                        .ethnicity
-                                                                        .length >
-                                                                        0 ? (
-                                                                        <ul>
-                                                                            {loadedForm.ethnicity.map(
-                                                                                (
-                                                                                    item,
-                                                                                    index,
-                                                                                ) => (
-                                                                                    <li
-                                                                                        key={
-                                                                                            index
-                                                                                        }
-                                                                                    >
-                                                                                        {
-                                                                                            item
-                                                                                        }
-                                                                                    </li>
-                                                                                ),
-                                                                            )}
-                                                                        </ul>
-                                                                    ) : (
-                                                                        <p>
-                                                                            None
-                                                                            provided.
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex flex-col space-y-1">
-                                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                    Total Income
-                                                                </label>
-                                                                <div>
-                                                                    {loadedForm.totalIncome ? (
-                                                                        `$${loadedForm.totalIncome} ${loadedForm.aptNumber ? `Apt. ${loadedForm.aptNumber}` : ''}`
-                                                                    ) : (
-                                                                        <p>
-                                                                            None
-                                                                            provided.
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                            {/* Row: */}
-                                                            <div className="flex flex-col space-y-1">
-                                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                    Employed?
-                                                                </label>
-                                                                <div>
-                                                                    {loadedForm.employment ? (
-                                                                        loadedForm.employment
-                                                                    ) : (
-                                                                        <p>
-                                                                            None
-                                                                            provided.
-                                                                        </p>
-                                                                    )}
-                                                                </div>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Postal/Zip Code
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.zipCode ? (
+                                                                    loadedForm.zipCode
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -663,7 +632,7 @@ const Page = () => {
                                                                             Public
                                                                             Services?
                                                                         </label>
-                                                                        <div>
+                                                                        {/* <div>
                                                                             {child
                                                                                 .publicServices
                                                                                 ?.length ? ( // Optional chaining used here
@@ -692,7 +661,7 @@ const Page = () => {
                                                                                     provided.
                                                                                 </p>
                                                                             )}
-                                                                        </div>
+                                                                        </div> */}
                                                                     </div>
                                                                 </div>
                                                             ),
@@ -797,194 +766,109 @@ const Page = () => {
                                         {section === 'Background' && (
                                             <div className="space-y-[40px]">
                                                 <div className="space-y-[24px]">
-                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                        {/* First Row: Name & Gender */}
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Education
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm
-                                                                    .education
-                                                                    ?.length ? ( // Optional chaining used here
-                                                                    loadedForm.education.map(
-                                                                        (
-                                                                            edu,
-                                                                            index,
-                                                                        ) => (
-                                                                            <div
-                                                                                key={
-                                                                                    index
-                                                                                }
-                                                                                className="space-y-4"
-                                                                            >
-                                                                                <label>
-                                                                                    {
-                                                                                        edu
-                                                                                    }
-                                                                                </label>
-                                                                            </div>
-                                                                        ),
-                                                                    )
-                                                                ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Open case with
-                                                                probation?
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.openProbation ? (
-                                                                    loadedForm.openProbation
-                                                                ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Second Row: DOB & Referral Source */}
-                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Open case with
-                                                                CPS?
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.openCPS ? (
-                                                                    loadedForm.openCPS
-                                                                ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Foster youth?
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.fosterYouth ? (
-                                                                    loadedForm.fosterYouth
-                                                                ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-[24px]">
-                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Mental Health
-                                                    </label>
-                                                    <div className="space-y-[24px]">
-                                                        {/* Row: */}
-                                                        <div className="flex flex-col space-y-1">
-                                                            <div>
-                                                                {loadedForm.mentalHealthConditions ? (
-                                                                    loadedForm.mentalHealthConditions
-                                                                ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-[24px]">
-                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Medical History
-                                                    </label>
-                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                        {/* Row: */}
-                                                        <div className="flex flex-col space-y-1">
-                                                            <div>
-                                                                <div>
-                                                                    {loadedForm.medicalConditions ? (
-                                                                        loadedForm.medicalConditions
-                                                                    ) : (
-                                                                        <p>
-                                                                            No
-                                                                            notes.
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
                                                     <div className="space-y-[24px]">
                                                         <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                            Substance Abuse
+                                                            Education
                                                         </label>
-                                                        <div className="space-y-[24px]">
-                                                            <div className="flex flex-col space-y-1">
-                                                                <div>
-                                                                    {loadedForm.substanceAbuse ? (
-                                                                        loadedForm.substanceAbuse
-                                                                    ) : (
-                                                                        <p>
-                                                                            None
-                                                                            provided.
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* <div className="space-y-[24px]">
-                                                            <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                                Public Services
-                                                            </label>
+                                                        <div className="flex flex-col space-y-1">
                                                             <div>
-                                                                {loadedForm
-                                                                    .publicServices
-                                                                    ?.length ? ( // Optional chaining used here
-                                                                    loadedForm.publicServices.map(
-                                                                        (
-                                                                            service,
-                                                                            index,
-                                                                        ) => (
-                                                                            <div
-                                                                                key={
-                                                                                    index
-                                                                                }
-                                                                                className="space-y-4"
-                                                                            >
-                                                                                <label>
-                                                                                    {
-                                                                                        service
+                                                                {loadedForm.educationStatus &&
+                                                                loadedForm
+                                                                    .educationStatus
+                                                                    .length >
+                                                                    0 ? (
+                                                                    <ul>
+                                                                        {loadedForm.educationStatus.map(
+                                                                            (
+                                                                                item,
+                                                                                index,
+                                                                            ) => (
+                                                                                <li
+                                                                                    key={
+                                                                                        index
                                                                                     }
-                                                                                </label>
-                                                                            </div>
-                                                                        ),
-                                                                    )
+                                                                                >
+                                                                                    {
+                                                                                        item
+                                                                                    }
+                                                                                </li>
+                                                                            ),
+                                                                        )}
+                                                                    </ul>
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
-                                                        </div> */}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-[24px]">
+                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                                        Income
+                                                    </label>
+                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                        {/* Row: */}
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Employment
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.employment ? (
+                                                                    loadedForm.employment
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Income
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.employmentIncome ? (
+                                                                    <span>
+                                                                        $
+                                                                        {
+                                                                            loadedForm.employmentIncome
+                                                                        }
+                                                                    </span>
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                        {/* Row: */}
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Employment
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.employment ? (
+                                                                    loadedForm.employment
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Income
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.employmentIncome ? (
+                                                                    <span>
+                                                                        $
+                                                                        {
+                                                                            loadedForm.employmentIncome
+                                                                        }
+                                                                    </span>
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
