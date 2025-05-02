@@ -593,7 +593,8 @@ const Page = (props: Props) => {
                                 <textarea
                                     {...register('notes')}
                                     placeholder="Text"
-                                    className="w-full rounded border p-2"
+                                    className="min-h-[100px] w-full resize-y overflow-auto rounded border p-2"
+                                    rows={4}
                                 />
                             </div>
                         </div>

@@ -1,26 +1,23 @@
 'use client'
 import Symbol from '@/components/Symbol'
+import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
 import { ConfirmationSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { collection, getDocs } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Dropdown from 'react-dropdown'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
-import Dropdown from 'react-dropdown'
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
-import { clientDb } from '@/data/firebase'
-
-
 
 // JIMIN IS TRIPPINGGGGGGGG
 
 //collecting users document from database in string array
 const collectRef = collection(clientDb, 'users')
 const querySnapshot = await getDocs(collectRef)
-const users = querySnapshot.docs.map(doc => String(doc.data().name))
-
+const users = querySnapshot.docs.map((doc) => String(doc.data().name))
 
 const Page = () => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
@@ -29,23 +26,23 @@ const Page = () => {
     const [selectedUser, setSelectedUser] = useState<string | undefined>()
 
     const handleSelect = (selected: string) => {
-        setSelectedUser(selected);
-        console.log("Selected user:", selected);
-        console.log("available users:", users);
+        setSelectedUser(selected)
+        console.log('Selected user:', selected)
+        console.log('available users:', users)
     }
     const {
         handleSubmit,
         formState: { errors },
-    } = useForm<ClientType>({
+    } = useForm<ConfirmType>({
         mode: 'onChange',
         resolver: zodResolver(ConfirmationSchema),
         defaultValues: loadedForm,
     })
 
-    useEffect(() => {
-        const calculatedCode = `${loadedForm.firstName?.[0]?.toUpperCase() ?? 'N'}${loadedForm.gender?.[0]?.toUpperCase() ?? 'X'}${loadedForm.lastName?.[0]?.toUpperCase() ?? 'N'}${new Date().getFullYear()}`
-        updateForm({ clientCode: calculatedCode })
-    }, [loadedForm.firstName, loadedForm.lastName, loadedForm.gender])
+    // useEffect(() => {
+    //     const calculatedCode = `${loadedForm.firstName?.[0]?.toUpperCase() ?? 'N'}${loadedForm.gender?.[0]?.toUpperCase() ?? 'X'}${loadedForm.lastName?.[0]?.toUpperCase() ?? 'N'}${new Date().getFullYear()}`
+    //     updateForm({ clientCode: calculatedCode })
+    // }, [loadedForm.firstName, loadedForm.lastName, loadedForm.gender])
 
     const router = useRouter()
     const { user } = useUser()
@@ -110,17 +107,29 @@ const Page = () => {
                                 <div className="relative">
                                     <Dropdown
                                         className="w-full border-black"
-                                        options={users} 
-                                        onChange={(option) => handleSelect(option.value)}
+                                        options={users}
+                                        onChange={(option) =>
+                                            handleSelect(option.value)
+                                        }
                                         placeholder="Select a user"
                                         controlClassName="flex items-center justify-between border border-black-300 rounded-md px-4 py-2 bg-white w-full hover:border-neutral-400"
                                         menuClassName="dropdown-menu absolute w-full mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400"
                                         placeholderClassName="text-gray-500"
-                                        arrowClosed={<Symbol symbol="keyboard_arrow_down" className="text-neutral-900" />}
-                                        arrowOpen={<Symbol symbol="keyboard_arrow_up" className="text-neutral-900" />}
+                                        arrowClosed={
+                                            <Symbol
+                                                symbol="keyboard_arrow_down"
+                                                className="text-neutral-900"
+                                            />
+                                        }
+                                        arrowOpen={
+                                            <Symbol
+                                                symbol="keyboard_arrow_up"
+                                                className="text-neutral-900"
+                                            />
+                                        }
                                     />
-                                </div> 
                                 </div>
+                            </div>
                         </div>
                     </div>
                     {/* all dropdown sections */}
