@@ -34,16 +34,16 @@ const Page = () => {
     const {
         handleSubmit,
         formState: { errors },
-    } = useForm<ClientType>({
+    } = useForm<ConfirmType>({
         mode: 'onChange',
         resolver: zodResolver(ConfirmationSchema),
         defaultValues: loadedForm,
     })
 
-    useEffect(() => {
-        const calculatedCode = `${loadedForm.firstName?.[0]?.toUpperCase() ?? 'N'}${loadedForm.gender?.[0]?.toUpperCase() ?? 'X'}${loadedForm.lastName?.[0]?.toUpperCase() ?? 'N'}${new Date().getFullYear()}`
-        updateForm({ clientCode: calculatedCode })
-    }, [loadedForm.firstName, loadedForm.lastName, loadedForm.gender])
+    // useEffect(() => {
+    //     const calculatedCode = `${loadedForm.firstName?.[0]?.toUpperCase() ?? 'N'}${loadedForm.gender?.[0]?.toUpperCase() ?? 'X'}${loadedForm.lastName?.[0]?.toUpperCase() ?? 'N'}${new Date().getFullYear()}`
+    //     updateForm({ clientCode: calculatedCode })
+    // }, [loadedForm.firstName, loadedForm.lastName, loadedForm.gender])
 
     const router = useRouter()
     const { user } = useUser()

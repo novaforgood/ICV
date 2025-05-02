@@ -116,6 +116,16 @@ const Page = (props: Props) => {
         }
     }, [loadedForm.dateOfBirth, setValue])
 
+    useEffect(() => {
+        const calculatedCode = `${loadedForm.firstName?.[0]?.toUpperCase() ?? 'N'}${loadedForm.gender?.[0]?.toUpperCase() ?? 'X'}${loadedForm.lastName?.[0]?.toUpperCase() ?? 'N'}${new Date().getFullYear()}`
+        updateForm({ clientCode: calculatedCode })
+    }, [loadedForm.firstName, loadedForm.lastName, loadedForm.gender])
+
+    useEffect(() => {
+        const today = new Date().toISOString().split('T')[0] // Format: YYYY-MM-DD
+        setValue('intakeDate', today)
+    }, [setValue])
+
     const onSubmit = (data: ProfileType) => {
         console.log('in submit...', data)
         updateForm(data)
@@ -172,16 +182,28 @@ const Page = (props: Props) => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col space-y-[4px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Date of Birth
-                            </label>
-                            <input
-                                {...register('dateOfBirth')}
-                                type="date"
-                                placeholder="MM/DD/YYYY"
-                                className="w-[50%] rounded border p-2"
-                            />
+                        <div className="grid grid-cols-2 gap-[12px]">
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Date of Birth
+                                </label>
+                                <input
+                                    {...register('dateOfBirth')}
+                                    type="date"
+                                    placeholder="MM/DD/YYYY"
+                                    className="rounded border p-2"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Intake Date
+                                </label>
+                                <input
+                                    {...register('intakeDate')}
+                                    type="date"
+                                    className="rounded border p-2"
+                                />
+                            </div>
                         </div>
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
@@ -199,6 +221,17 @@ const Page = (props: Props) => {
                                     otherPlaceholder="Other"
                                 />
                             </div>
+                        </div>
+                        <div className="flex flex-col space-y-[4px]">
+                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                Client Code
+                            </label>
+                            <input
+                                {...register('clientCode')}
+                                type="text"
+                                placeholder="Text"
+                                className="w-[50%] rounded border p-2"
+                            />
                         </div>
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
@@ -348,7 +381,7 @@ const Page = (props: Props) => {
                         </div>
 
                         {/* Street Address & Apt No. (Same Row) */}
-                        <div className="grid grid-cols-2 gap-[12px]">
+                        <div className="grid grid-cols-[3fr_1fr] gap-[12px]">
                             <div className="flex flex-col space-y-[4px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                     Street Address/Location of Contact
@@ -368,7 +401,7 @@ const Page = (props: Props) => {
                                     {...register('aptNumber')}
                                     type="text"
                                     placeholder="Text"
-                                    className="w-[30%] rounded border p-2"
+                                    className="w-full rounded border p-2"
                                 />
                             </div>
                         </div>
@@ -393,7 +426,7 @@ const Page = (props: Props) => {
                                     {...register('zipCode')}
                                     type="text"
                                     placeholder="Zip Code"
-                                    className="w-[60%] rounded border p-2"
+                                    className="w-full rounded border p-2"
                                 />
                             </div>
                         </div>
@@ -401,11 +434,11 @@ const Page = (props: Props) => {
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                 Housing Notes
                             </label>
-                            <input
+                            <textarea
                                 {...register('housingNotes')}
-                                type="text"
                                 placeholder="Text"
-                                className="w-full rounded border p-2"
+                                className="min-h-[100px] w-full resize-y overflow-auto rounded border p-2"
+                                rows={4}
                             />
                         </div>
                     </div>

@@ -113,7 +113,7 @@ const Page = (props: Props) => {
                 ),
             })
         }).unsubscribe
-        // console.log(loadedForm)
+        console.log(loadedForm)
         console.log(errors)
 
         return unsubscribe
@@ -140,7 +140,7 @@ const Page = (props: Props) => {
                     <div className="space-y-[24px]">
                         <div className="space-y-[8px]">
                             <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                                Employment
+                                Education
                             </label>
                         </div>
                         <div className="space-y-[8px]">
@@ -163,179 +163,177 @@ const Page = (props: Props) => {
                                 />
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-[12px]">
-                            <div className="flex flex-col space-y-[4px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Employment
-                                </label>
-                                <RadioChoice
-                                    options={EMPLOYMENT}
-                                    selectedValue={selectedEmployment}
-                                    onChange={(updatedEMP) =>
-                                        setValue('employment', updatedEMP)
-                                    }
-                                    name="employment"
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-[4px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Income
-                                </label>
-                                <div className="flex items-center rounded border p-2">
-                                    <span className="mr-1 text-neutral-900">
-                                        $
-                                    </span>
-                                    <input
-                                        {...register('employmentIncome')}
-                                        type="text"
-                                        placeholder="Text"
-                                        className="w-full outline-none"
-                                    />
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <div className="space-y-[24px]">
-                        <div className="space-y-[20px]">
+                        <div className="space-y-[24px]">
                             <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
                                 Public Services
                             </label>
-                            <ServicesWithIncome
-                                selected={selectedGenRelief}
-                                serviceTitle="General Relief"
-                                incomeFieldName="generalReliefAid"
-                                serviceFieldName="generalRelief"
-                                setValue={(field, value) =>
-                                    setValue(
-                                        field as keyof BackgroundInfoType,
-                                        value,
-                                    )
-                                }
-                                register={
-                                    register as (field: string) => {
-                                        [key: string]: any
-                                    }
-                                }
-                            />
-                            <ServicesWithIncome
-                                selected={selectedCalFresh}
-                                serviceTitle="CalFresh (Food Stamps/EBT)"
-                                incomeFieldName="calFreshAid"
-                                serviceFieldName="calFresh"
-                                setValue={(field, value) =>
-                                    setValue(
-                                        field as keyof BackgroundInfoType,
-                                        value,
-                                    )
-                                }
-                                register={
-                                    register as (field: string) => {
-                                        [key: string]: any
-                                    }
-                                }
-                            />
-                            <ServicesWithIncome
-                                selected={selectedCalWorks}
-                                serviceTitle="CalWorks (Cash Aid)"
-                                incomeFieldName="calWorksAid"
-                                serviceFieldName="calWorks"
-                                setValue={(field, value) =>
-                                    setValue(
-                                        field as keyof BackgroundInfoType,
-                                        value,
-                                    )
-                                }
-                                register={
-                                    register as (field: string) => {
-                                        [key: string]: any
-                                    }
-                                }
-                            />
-                            <ServicesWithIncome
-                                selected={selectedSSI}
-                                serviceTitle="SSI"
-                                incomeFieldName="ssiAid"
-                                serviceFieldName="ssi"
-                                setValue={(field, value) =>
-                                    setValue(
-                                        field as keyof BackgroundInfoType,
-                                        value,
-                                    )
-                                }
-                                register={
-                                    register as (field: string) => {
-                                        [key: string]: any
-                                    }
-                                }
-                            />
-                            <ServicesWithIncome
-                                selected={selectedSSA}
-                                serviceTitle="SSA"
-                                incomeFieldName="ssaAid"
-                                serviceFieldName="ssa"
-                                setValue={(field, value) =>
-                                    setValue(
-                                        field as keyof BackgroundInfoType,
-                                        value,
-                                    )
-                                }
-                                register={
-                                    register as (field: string) => {
-                                        [key: string]: any
-                                    }
-                                }
-                            />
-                            <ServicesWithIncome
-                                selected={selectedUnemployment}
-                                serviceTitle="Unemployment"
-                                incomeFieldName="unemploymentAid"
-                                serviceFieldName="unemployment"
-                                setValue={(field, value) =>
-                                    setValue(
-                                        field as keyof BackgroundInfoType,
-                                        value,
-                                    )
-                                }
-                                register={
-                                    register as (field: string) => {
-                                        [key: string]: any
-                                    }
-                                }
-                            />
-                            <div className="space-y-[8px]">
-                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                    Other
-                                </label>
-                                <div className="grid grid-cols-2 gap-[12px]">
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Name
-                                        </label>
+                            <div className="grid grid-cols-2 gap-[12px]">
+                                <div className="flex flex-col space-y-[4px]">
+                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                        Employment
+                                    </label>
+                                    <RadioChoice
+                                        options={EMPLOYMENT}
+                                        selectedValue={selectedEmployment}
+                                        onChange={(updatedEMP) =>
+                                            setValue('employment', updatedEMP)
+                                        }
+                                        name="employment"
+                                    />
+                                </div>
+                                <div className="flex flex-col space-y-[4px]">
+                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                        Income
+                                    </label>
+                                    <div className="flex items-center rounded border p-2">
+                                        <span className="mr-1 text-neutral-900">
+                                            $
+                                        </span>
                                         <input
-                                            {...register('otherService')}
+                                            {...register('employmentIncome')}
                                             type="text"
                                             placeholder="Text"
-                                            className="w-full rounded border p-2"
+                                            className="w-full outline-none"
                                         />
                                     </div>
-                                    <div className="flex flex-col space-y-[4px]">
+                                </div>
+                            </div>
+
+                            <div className="space-y-[8px]">
+                                <div className="grid grid-cols-2 gap-[12px]">
+                                    <div className="flex flex-col">
+                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                            Service
+                                        </label>
+                                    </div>
+                                    <div className="flex flex-col">
                                         <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                             Aid
                                         </label>
-                                        <div className="flex items-center rounded border p-2">
-                                            <span className="mr-1 text-neutral-900">
-                                                $
-                                            </span>
-                                            <input
-                                                {...register('otherServiceAid')}
-                                                type="text"
-                                                placeholder="Text"
-                                                className="w-full outline-none"
-                                            />
-                                        </div>
                                     </div>
                                 </div>
+                                <ServicesWithIncome
+                                    selected={selectedGenRelief}
+                                    serviceTitle="General Relief"
+                                    incomeFieldName="generalReliefAid"
+                                    serviceFieldName="generalRelief"
+                                    setValue={(field, value) =>
+                                        setValue(
+                                            field as keyof BackgroundInfoType,
+                                            value,
+                                        )
+                                    }
+                                    register={
+                                        register as (field: string) => {
+                                            [key: string]: any
+                                        }
+                                    }
+                                />
+                                <ServicesWithIncome
+                                    selected={selectedCalFresh}
+                                    serviceTitle="CalFresh (Food Stamps/EBT)"
+                                    incomeFieldName="calFreshAid"
+                                    serviceFieldName="calFresh"
+                                    setValue={(field, value) =>
+                                        setValue(
+                                            field as keyof BackgroundInfoType,
+                                            value,
+                                        )
+                                    }
+                                    register={
+                                        register as (field: string) => {
+                                            [key: string]: any
+                                        }
+                                    }
+                                />
+                                <ServicesWithIncome
+                                    selected={selectedCalWorks}
+                                    serviceTitle="CalWorks (Cash Aid)"
+                                    incomeFieldName="calWorksAid"
+                                    serviceFieldName="calWorks"
+                                    setValue={(field, value) =>
+                                        setValue(
+                                            field as keyof BackgroundInfoType,
+                                            value,
+                                        )
+                                    }
+                                    register={
+                                        register as (field: string) => {
+                                            [key: string]: any
+                                        }
+                                    }
+                                />
+                                <ServicesWithIncome
+                                    selected={selectedSSI}
+                                    serviceTitle="SSI"
+                                    incomeFieldName="ssiAid"
+                                    serviceFieldName="ssi"
+                                    setValue={(field, value) =>
+                                        setValue(
+                                            field as keyof BackgroundInfoType,
+                                            value,
+                                        )
+                                    }
+                                    register={
+                                        register as (field: string) => {
+                                            [key: string]: any
+                                        }
+                                    }
+                                />
+                                <ServicesWithIncome
+                                    selected={selectedSSA}
+                                    serviceTitle="SSA"
+                                    incomeFieldName="ssaAid"
+                                    serviceFieldName="ssa"
+                                    setValue={(field, value) =>
+                                        setValue(
+                                            field as keyof BackgroundInfoType,
+                                            value,
+                                        )
+                                    }
+                                    register={
+                                        register as (field: string) => {
+                                            [key: string]: any
+                                        }
+                                    }
+                                />
+                                <ServicesWithIncome
+                                    selected={selectedUnemployment}
+                                    serviceTitle="Unemployment"
+                                    incomeFieldName="unemploymentAid"
+                                    serviceFieldName="unemployment"
+                                    setValue={(field, value) =>
+                                        setValue(
+                                            field as keyof BackgroundInfoType,
+                                            value,
+                                        )
+                                    }
+                                    register={
+                                        register as (field: string) => {
+                                            [key: string]: any
+                                        }
+                                    }
+                                />
+                                <ServicesWithIncome
+                                    selected={selectedOtherService}
+                                    serviceTitle="Other"
+                                    incomeFieldName="otherServiceAid"
+                                    serviceFieldName="otherService"
+                                    setValue={(field, value) =>
+                                        setValue(
+                                            field as keyof BackgroundInfoType,
+                                            value,
+                                        )
+                                    }
+                                    register={
+                                        register as (field: string) => {
+                                            [key: string]: any
+                                        }
+                                    }
+                                />
                             </div>
                         </div>
                     </div>
@@ -473,11 +471,11 @@ const Page = (props: Props) => {
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                     Notes on History
                                 </label>
-                                <input
+                                <textarea
                                     {...register('historyNotes')}
-                                    type="text"
                                     placeholder="Text"
-                                    className="w-full rounded border p-2"
+                                    className="min-h-[100px] w-full resize-y overflow-auto rounded border p-2"
+                                    rows={4}
                                 />
                             </div>
                         </div>
