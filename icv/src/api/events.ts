@@ -85,7 +85,11 @@ export async function createCheckIn(event: CheckInType) {
     try {
         const eventsCollection = collection(ssrdb, 'events');
         const newDoc = await addDoc(eventsCollection, event);
-        await incrementCheckInCount(event.category, new Date(event.startTime));
+        if (event.category && ['Hot Meal', 'Hygiene Kit', 'Snack Pack', 'Other'].includes(event.category)) {
+            await incrementCheckInCount(event.category as CheckInCategoryType, new Date(event.startTime));
+        } else {
+            throw new Error(`Invalid or missing category: ${event.category}`);
+        }
         return newDoc.id;
     } catch (error) {
         console.error('Error adding check in:', error);
@@ -188,7 +192,7 @@ export async function getCheckInCountYear(checkInCategory: CheckInCategoryType, 
     }
 }
 
-export async function getCheckInCountMonth(checkInCategory: ChecknCategoryType, date: Date) {
+export async function getCheckInCountMonth(checkInCategory: CheckInCategoryType, date: Date) {
     const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
     if (!currentUser) {
         throw new Error('User not found');
