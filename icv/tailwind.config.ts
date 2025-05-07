@@ -51,6 +51,9 @@ export default {
                     '4': 'hsl(var(--chart-4))',
                     '5': 'hsl(var(--chart-5))',
                 },
+                sky: '#4EA0C9',
+                blue: '#246F95',
+                navy: '#124158',
             },
             borderRadius: {
                 lg: 'var(--radius)',

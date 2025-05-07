@@ -10,6 +10,22 @@ export const CheckInCategory = z.enum([
     'Other'
 ])
 
+export const ContactType = z.enum([
+    'RI', // ReferralAndIntake
+    'P', // Phone
+    'F', // FaceToFace
+    'TM', // TeamMeeting
+    'IM', // IndividualMeeting
+    'FM', // FamilyMeeting
+    'R', // ReferralToServiceProvider
+    'E', // EmploymentJobReadiness and EventActivityFieldTrip
+    'T', // Transportation
+    'TC', // TrackingCheckUp
+    'A', // Advocacy
+    'W', // WellnessCheck
+    'O', // Other
+])
+
 // CaseEvent schema
 export const CheckInSchema = z.object({
     // change string date (chosen from form input) to date, then check validity
@@ -27,7 +43,9 @@ export const CheckInSchema = z.object({
     id: z.string().optional(),
     scheduled: z.boolean(),
     caseNotes: z.string().optional(),
-
+    contactCode: z.enum(Object.values(ContactType.Values) as [string, ...string[]], {
+        message: "Choose contact code."
+    }).optional(),
 })
 .passthrough(); // lets fields not in schema pass through (clientId, because always collected properly)
 

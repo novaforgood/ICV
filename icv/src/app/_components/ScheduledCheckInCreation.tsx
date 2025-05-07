@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
-import { CheckInType, CheckInCategory } from '@/types/event-types'
+import { CheckInType, CheckInCategory, ContactType } from '@/types/event-types'
 import { createCheckIn } from '@/api/events'
 import { getAllClients } from '@/api/clients'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
@@ -11,13 +11,13 @@ import { Card } from '@/components/ui/card'
 
 const ScheduledCheckInCreation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
 
   const [date, setDate] = useState('')
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [location, setLocation] = useState('')
-  const [name, setName] = useState('')
-  const [category, setCategory] = useState(CheckInCategory.Values.Other)
+  const [contactType, setContactType] = useState('W')
   const [assigneeId, setAssigneeId] = useState('')
   const [clientSearch, setClientSearch] = useState('')
   const [selectedClientId, setSelectedClientId] = useState('')
@@ -36,6 +36,13 @@ const ScheduledCheckInCreation: React.FC = () => {
     if (!clients || !selectedClientId) return null
     return clients.find((client: any) => client.id === selectedClientId)
   }, [clients, selectedClientId])
+
+  const name = useMemo(() => {
+    if (selectedClient) {
+      return (`Check-in with ${(selectedClient.firstName || selectedClient.lastName)?(selectedClient.firstName + ' ' + selectedClient.lastName) : 'Client ' + selectedClient.id}`)
+    }
+    return 'Check-in with Client'
+  }, [selectedClient])    
 
   useEffect(() => {
     const auth = getAuth()
@@ -57,13 +64,19 @@ const ScheduledCheckInCreation: React.FC = () => {
     resetFormDefaults()
   }, [])
 
-  const closeSidebar = () => {
+  const closeModal = () => {
     setIsOpen(false)
+    setShowSuccess(false)
     resetFormDefaults()
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!selectedClient) {
+      alert('Please select a client before scheduling the event.')
+      return
+    }
 
     const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
     const endDateTime = new Date(`${date}T${endTime}`).toLocaleString('en-US')
@@ -75,19 +88,22 @@ const ScheduledCheckInCreation: React.FC = () => {
       assigneeId,
       location,
       clientId: selectedClientId,
-      category,
+      contactCode: contactType,
       scheduled: true,
     }
 
     createCheckIn(newEvent)
       .then(() => {
-        alert('Event created successfully!')
-        mutate('calendar-events')
-        closeSidebar()
-        setName('')
+        setShowSuccess(true)
         setLocation('')
         setClientSearch('')
         setSelectedClientId('')
+        mutate('calendar-events')
+
+        setTimeout(() => {
+          setShowSuccess(false)
+          closeModal()
+        }, 2000)
       })
       .catch((err) => {
         console.error(err)
@@ -104,126 +120,156 @@ const ScheduledCheckInCreation: React.FC = () => {
         Schedule New Event
       </button>
 
-      {isOpen && (
+      {isOpen && showSuccess && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                  <Card className="px-4 py-2 rounded text-center w-fit">
+                    Event created successfully!
+                  </Card>
+                </div>
+      ) }
+
+      {isOpen && !showSuccess && (
         <>
-          {/* Sidebar overlay */}
+          {/* Backdrop */}
           <div
-            className="fixed inset-0 z-40 bg-black bg-opacity-50"
-            onClick={closeSidebar}
+            className="fixed inset-0 z-40 bg-black bg-opacity-50 flex items-center justify-center"
+            onClick={closeModal}
           />
-          <div className="fixed top-0 right-0 z-50 h-full w-[480px] bg-white shadow-lg overflow-y-auto p-6">
-            <button
-              onClick={closeSidebar}
-              className="absolute top-4 right-4 text-xl font-bold text-gray-600 hover:text-black"
+
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div
+              className="relative bg-white w-full max-w-lg mx-4 p-6 rounded-lg shadow-lg"
+              onClick={(e) => e.stopPropagation()}
             >
-              ×
-            </button>
-            <h2 className="text-xl font-semibold mb-6">Schedule Check-In</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block mb-1">Check-in Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-1">Date</label>
-                <input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-              <div className="flex gap-4">
-                <div className="flex-1">
-                  <label className="block mb-1">Start Time</label>
-                  <input
-                    type="time"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block mb-1">End Time</label>
-                  <input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block mb-1">Location</label>
-                <input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block mb-1">Client</label>
-                {selectedClientId && selectedClient ? (
-                  <div className="flex justify-between items-center p-2 bg-gray-200 rounded">
-                    <span>
-                      {selectedClient.firstName} {selectedClient.lastName}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedClientId('')
-                        setClientSearch('')
-                      }}
-                      className="text-gray-600 hover:text-black"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <input
-                      type="text"
-                      placeholder="Search client"
-                      value={clientSearch}
-                      onChange={(e) => setClientSearch(e.target.value)}
-                      className="w-full p-2 border rounded"
-                    />
-                    {clientSearch && (
-                      <ul className="border max-h-40 overflow-y-auto mt-2">
-                        {filteredClients.map((client) => (
-                          <li
-                            key={client.id}
-                            className="p-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => {
-                              setSelectedClientId(client.id)
-                              setClientSearch('')
-                            }}
-                          >
-                            {client.firstName} {client.lastName}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </>
-                )}
-              </div>
               <button
-                type="submit"
-                className="w-full bg-foreground text-white py-2 rounded"
+                onClick={closeModal}
+                className="absolute top-4 right-4 text-xl font-bold text-gray-600 hover:text-black"
               >
-                Schedule
+                ×
               </button>
-            </form>
+
+              <h2 className="text-xl font-semibold mb-6">{name}</h2>
+
+              <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto max-h-[75vh]">
+
+                <div>
+                  <label className="block mb-1">Date</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="block mb-1">Start Time</label>
+                    <input
+                      type="time"
+                      value={startTime}
+                      onChange={(e) => setStartTime(e.target.value)}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block mb-1">End Time</label>
+                    <input
+                      type="time"
+                      value={endTime}
+                      onChange={(e) => setEndTime(e.target.value)}
+                      className="w-full p-2 border rounded"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-1">Client</label>
+                  {selectedClientId && selectedClient ? (
+                    <div className="flex justify-between items-center p-2 bg-gray-200 rounded">
+                      <span>
+                        {selectedClient.firstName} {selectedClient.lastName}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedClientId('')
+                          setClientSearch('')
+                        }}
+                        className="text-gray-600 hover:text-black"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Search client"
+                        value={clientSearch}
+                        onChange={(e) => setClientSearch(e.target.value)}
+                        className="w-full p-2 border rounded"
+                      />
+                      {clientSearch && (
+                        <ul className="border max-h-40 overflow-y-auto mt-2">
+                          {filteredClients.map((client) => (
+                            <li
+                              key={client.id}
+                              className="p-2 cursor-pointer hover:bg-gray-100"
+                              onClick={() => {
+                                setSelectedClientId(client.id)
+                                setClientSearch('')
+                              }}
+                            >
+                              {client.firstName} {client.lastName}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {/* Dropdown for Contact Type */}
+                <div className="form-group mb-4">
+                    <label htmlFor="contactType" className="block mb-2">Select Contact Code</label>
+                    <select
+                        id="category"
+                        value={contactType}
+                        onChange={(e) => setContactType(e.target.value)}
+                        className="w-full p-2 border border-gray-300 rounded"
+                    >
+                        <option value="">Select a contact type</option>
+                        {Object.values(ContactType.Values).map((option) => (
+                            <option key={option} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full bg-foreground text-white py-2 rounded"
+                >
+                  Schedule
+                </button>
+              </form>
+            </div>
           </div>
         </>
       )}
