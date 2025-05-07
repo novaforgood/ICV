@@ -57,7 +57,22 @@ const MultiStepCheckIn = () => {
   const [assigneeId, setAssigneeId] = useState('')
   const [caseNotes, setCaseNotes] = useState('')
   const [checkInID, setcheckInID] = useState('')
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
+  const openModal = () => setIsOpen(true)
+  const closeModal = () => {
+    setIsOpen(false)
+    setStep(Step.ChooseClient)
+    setCategory(CheckInCategory.Values.Other)
+    setClientSearch('')
+    setSelectedClientId('')
+    setName('')
+    setDate('')
+    setAssigneeId('')
+    setCaseNotes('')
+    setcheckInID('')
+  }
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -107,8 +122,13 @@ const MultiStepCheckIn = () => {
 
   const submitCaseNotes = async () => {
     try {
-      await updateCaseNotes(checkInID, caseNotes)
-      alert('Added Case Notes!')
+      await updateCaseNotes(checkInID, caseNotes).then(() => {
+          setShowSuccess(true)
+          setTimeout(() => {
+            setShowSuccess(false)
+            closeModal()
+          }, 2000)
+      })
     } catch (err) {
       console.error('Error updating case notes:', err)
     }
@@ -191,29 +211,18 @@ const ChooseClient = React.memo(() => (
   }
 
   return (
-    <Card className="flex w-full max-w-md p-6 flex-col justify-start items-center">
-      {renderStep()}
-      {step > Step.ChooseClient && step < Step.Complete && (
-        <button onClick={() => setStep((s) => s - 1)} className="mt-4 text-foreground">
-          Back
-        </button>
-      )}
-    </Card>
-  )
-}
-
-const SpontaneousCheckInModal: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false)
-
-    const openModal = () => setIsOpen(true)
-    const closeModal = () => setIsOpen(false)
-
-  return (
     <>
       <button onClick={openModal} className="px-4 py-2 bg-foreground text-white rounded">
         Create Check-In Event
       </button>
-      {isOpen && (
+      {isOpen && showSuccess && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                  <Card className="px-4 py-2 rounded text-center w-fit">
+                    Case note added successfully!
+                  </Card>
+                </div>
+      ) }
+      {isOpen && !showSuccess && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black opacity-50" onClick={closeModal} />
@@ -222,7 +231,14 @@ const SpontaneousCheckInModal: React.FC = () => {
             <button onClick={closeModal} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
               &#x2715;
             </button>
-            <MultiStepCheckIn />
+            <Card className="flex w-full max-w-md p-6 flex-col justify-start items-center">
+              {renderStep()}
+              {step > Step.ChooseClient && step < Step.Complete && (
+                <button onClick={() => setStep((s) => s - 1)} className="mt-4 text-foreground">
+                  Back
+                </button>
+              )}
+            </Card>
           </div>
         </div>
       )}
@@ -230,4 +246,4 @@ const SpontaneousCheckInModal: React.FC = () => {
   )
 }
 
-export default SpontaneousCheckInModal
+export default MultiStepCheckIn
