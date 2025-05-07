@@ -70,11 +70,7 @@ const Page = () => {
                     </div>
                     <div className="flex flex-col space-y-[24px]">
                         <label className="w-[1000px] font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                            what does one put in these kinds of things i dont
-                            know. can you believe i've been doing this intake
-                            form for two whole quarters. and it's STILL NOT
-                            DONE. lowkey is this my skill issue idk... i want to
-                            be freeeeeeeee
+                            waiver content here.
                         </label>
 
                         <div className="flex items-center space-x-2">
