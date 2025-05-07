@@ -842,19 +842,31 @@ const Page = () => {
                                                         {/* Row: */}
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Employment
+                                                                Public Services
                                                             </label>
                                                             <div>
-                                                                {loadedForm.employment ? (
-                                                                    loadedForm.employment
-                                                                ) : (
-                                                                    <p>N/A</p>
+                                                                {loadedForm.generalRelief ==
+                                                                    'Recipient' && (
+                                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                        <div className="flex flex-col space-y-1">
+                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                                General
+                                                                                Relief
+                                                                            </label>
+                                                                            <div>
+                                                                                {
+                                                                                    loadedForm.generalRelief
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex flex-col space-y-1"></div>
+                                                                    </div>
                                                                 )}
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Income
+                                                                Aid
                                                             </label>
                                                             <div>
                                                                 {loadedForm.employmentIncome ? (
