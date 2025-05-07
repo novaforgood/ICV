@@ -210,7 +210,7 @@ const SpontaneousCheckInModal: React.FC = () => {
 
   return (
     <>
-      <button onClick={openModal} className="px-4 py-2 bg-blue-600 text-white rounded">
+      <button onClick={openModal} className="px-4 py-2 bg-foreground text-white rounded">
         Create Check-In Event
       </button>
       {isOpen && (
