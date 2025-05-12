@@ -185,6 +185,7 @@ export const ClientIntakeSchema = z.object({
             spouseFirstName: z.string().optional(),
             spouseLastName: z.string().optional(),
             spouseDOB: z.string().optional(),
+            spouseAge: z.string().optional(),
             spouseIncome: z.string().optional(),
             spouseGender: z.string().optional(),
         }).optional(),
@@ -194,6 +195,7 @@ export const ClientIntakeSchema = z.object({
             lastName: z.string().optional(),
             dob: z.string().optional(),
             income: z.string().optional(),
+            age: z.string().optional(),
             gender: z.string().optional(),
             generalRelief: z.string().optional(),
             generalReliefAid: z.string().optional(),
@@ -246,7 +248,7 @@ export const ClientIntakeSchema = z.object({
     referral: z.array(z.string()).optional(),
     
     // Additional Notes
-    notes: z.string().optional(),
+    additionalNotes: z.string().optional(),
     
     // Image Upload
     clientImage: z.array(z.string().optional(),).optional(),
@@ -333,7 +335,7 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     clientSSNName: true,
     clientBCName: true,
     otherFilesName: true,
-    notes: true,
+    additionalNotes: true,
 })
 
 export const ProfileSchema = ClientIntakeSchema.pick({

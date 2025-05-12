@@ -672,7 +672,7 @@ const Page = () => {
                                                                 $
                                                                 {loadedForm.totalIncome ==
                                                                 ''
-                                                                    ? 0
+                                                                    ? 'N/A'
                                                                     : loadedForm.totalIncome}
                                                             </label>
                                                         </div>
@@ -819,113 +819,172 @@ const Page = () => {
                                         {section == 'Family' && (
                                             <div className="space-y-[40px]">
                                                 <div className="space-y-[24px]">
+                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                                        Spouse
+                                                    </label>
                                                     <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                        {/* First Row: Name & Gender */}
+                                                        {/* ROW */}
                                                         <div className="flex flex-col space-y-1">
                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Family Size
+                                                                Marital Status
                                                             </label>
                                                             <div>
-                                                                {loadedForm.familySize ? (
-                                                                    loadedForm.familySize
+                                                                {loadedForm.maritalStatus ? (
+                                                                    loadedForm.maritalStatus
                                                                 ) : (
-                                                                    <p>
-                                                                        None
-                                                                        provided.
-                                                                    </p>
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {/* ROW */}
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                If married, is
+                                                                spouse an ICV
+                                                                client?
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.spouseClientStatus ? (
+                                                                    loadedForm.spouseClientStatus
+                                                                ) : (
+                                                                    <p>N/A</p>
                                                                 )}
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div className="space-y-[24px]">
-                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Spouse
-                                                    </label>
-                                                    {loadedForm.spouse ? (
-                                                        // Optional chaining used here
-
-                                                        <div className="space-y-4 pb-4">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Spouse
-                                                            </label>
+                                                    {loadedForm.spouse && (
+                                                        <div className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
+                                                            {/* Name + Gender Row */}
                                                             <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                                {/* First Row: Name & Gender */}
                                                                 <div className="flex flex-col space-y-1">
-                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                                                         Name
                                                                     </label>
-                                                                    <div>
-                                                                        {
-                                                                            loadedForm
-                                                                                .spouse
-                                                                                .spouseFirstName
-                                                                        }{' '}
-                                                                        {
-                                                                            loadedForm
-                                                                                .spouse
-                                                                                .spouseLastName
-                                                                        }
+                                                                    <div className="flex flex-row space-x-[4px]">
+                                                                        {loadedForm
+                                                                            .spouse
+                                                                            .spouseFirstName && (
+                                                                            <p>
+                                                                                {
+                                                                                    loadedForm
+                                                                                        .spouse
+                                                                                        .spouseFirstName
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                        {loadedForm
+                                                                            .spouse
+                                                                            .spouseLastName && (
+                                                                            <p>
+                                                                                {
+                                                                                    loadedForm
+                                                                                        .spouse
+                                                                                        .spouseLastName
+                                                                                }
+                                                                            </p>
+                                                                        )}
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex flex-col space-y-1">
-                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                                                         Gender
                                                                     </label>
                                                                     <div>
                                                                         {loadedForm
                                                                             .spouse
-                                                                            .spouseGender || (
+                                                                            .spouseGender ? (
                                                                             <p>
-                                                                                None
-                                                                                provided.
+                                                                                {
+                                                                                    loadedForm
+                                                                                        .spouse
+                                                                                        .spouseGender
+                                                                                }
+                                                                            </p>
+                                                                        ) : (
+                                                                            <p>
+                                                                                N/A
                                                                             </p>
                                                                         )}
                                                                     </div>
                                                                 </div>
                                                             </div>
 
-                                                            {/* Second Row: DOB & Income */}
-                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                            {/* DOB + Age Row */}
+                                                            <div className="grid grid-cols-2 gap-x-5">
                                                                 <div className="flex flex-col space-y-1">
-                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                        Date of
-                                                                        Birth
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                                                        DOB
                                                                     </label>
                                                                     <div>
                                                                         {loadedForm
                                                                             .spouse
-                                                                            .spouseDOB || (
+                                                                            .spouseDOB ? (
                                                                             <p>
-                                                                                None
-                                                                                provided.
+                                                                                {
+                                                                                    loadedForm
+                                                                                        .spouse
+                                                                                        .spouseDOB
+                                                                                }
+                                                                            </p>
+                                                                        ) : (
+                                                                            <p>
+                                                                                N/A
                                                                             </p>
                                                                         )}
                                                                     </div>
                                                                 </div>
                                                                 <div className="flex flex-col space-y-1">
-                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                        Income
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                                                        Age
                                                                     </label>
                                                                     <div>
                                                                         {loadedForm
                                                                             .spouse
-                                                                            .spouseIncome !==
-                                                                        undefined ? (
-                                                                            `$${loadedForm.spouse.spouseIncome.toLocaleString()}`
+                                                                            .spouseAge ? (
+                                                                            <p>
+                                                                                {
+                                                                                    loadedForm
+                                                                                        .spouse
+                                                                                        .spouseAge
+                                                                                }
+                                                                            </p>
                                                                         ) : (
                                                                             <p>
-                                                                                None
-                                                                                provided.
+                                                                                N/A
                                                                             </p>
                                                                         )}
                                                                     </div>
                                                                 </div>
                                                             </div>
+
+                                                            {/* Income Row */}
+                                                            <div className="flex flex-col space-y-1">
+                                                                <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                                                    Income
+                                                                </label>
+                                                                <div>
+                                                                    {loadedForm
+                                                                        .spouse
+                                                                        .spouseIncome ? (
+                                                                        <p>
+                                                                            {
+                                                                                '$'
+                                                                            }
+                                                                            {
+                                                                                loadedForm
+                                                                                    .spouse
+                                                                                    .spouseIncome
+                                                                            }
+                                                                        </p>
+                                                                    ) : (
+                                                                        <p>
+                                                                            N/A
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    ) : (
-                                                        <p>None provided.</p>
                                                     )}
                                                 </div>
 
@@ -933,47 +992,81 @@ const Page = () => {
                                                     <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
                                                         Dependents
                                                     </label>
-                                                    {loadedForm.dependent
-                                                        ?.length ? ( // Optional chaining used here
+                                                    <div className="grid grid-cols-2 gap-x-5">
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                                                Head of
+                                                                Household?
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.headOfHousehold ? (
+                                                                    loadedForm.headOfHousehold
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                                                Family Size
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.familySize ? (
+                                                                    loadedForm.familySize
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {loadedForm.dependent &&
+                                                        loadedForm.dependent
+                                                            .length > 0 &&
                                                         loadedForm.dependent.map(
                                                             (child, index) => (
                                                                 <div
                                                                     key={index}
-                                                                    className="space-y-4 pb-4"
+                                                                    className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
                                                                 >
-                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                    <label className="font-epilogue text-[22px] font-medium leading-[24px] text-[#1A1D20]">
                                                                         Dependent{' '}
                                                                         {index +
                                                                             1}
                                                                         :
                                                                     </label>
                                                                     <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                                        {/* First Row: Name & Income */}
+                                                                        {/* ROW */}
                                                                         <div className="flex flex-col space-y-1">
                                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                                                                 Name
                                                                             </label>
-                                                                            <div>
-                                                                                {
-                                                                                    child.firstName
-                                                                                }{' '}
-                                                                                {
-                                                                                    child.lastName
-                                                                                }
+                                                                            <div className="flex flex-row space-x-[4px]">
+                                                                                {child.firstName && (
+                                                                                    <p>
+                                                                                        {
+                                                                                            child.firstName
+                                                                                        }
+                                                                                    </p>
+                                                                                )}
+                                                                                {child.lastName && (
+                                                                                    <p>
+                                                                                        {
+                                                                                            child.lastName
+                                                                                        }
+                                                                                    </p>
+                                                                                )}
                                                                             </div>
                                                                         </div>
                                                                         <div className="flex flex-col space-y-1">
                                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                                Income
+                                                                                Gender
                                                                             </label>
                                                                             <div>
-                                                                                {child.income !==
-                                                                                undefined ? (
-                                                                                    `$${child.income.toLocaleString()}`
+                                                                                {child.gender ? (
+                                                                                    child.gender
                                                                                 ) : (
                                                                                     <p>
-                                                                                        None
-                                                                                        provided.
+                                                                                        N/A
                                                                                     </p>
                                                                                 )}
                                                                             </div>
@@ -984,76 +1077,233 @@ const Page = () => {
                                                                     <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                                                                         <div className="flex flex-col space-y-1">
                                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                                Date
-                                                                                of
-                                                                                Birth
+                                                                                DOB
                                                                             </label>
                                                                             <div>
-                                                                                {child.dob || (
+                                                                                {child.dob ? (
+                                                                                    child.dob
+                                                                                ) : (
                                                                                     <p>
-                                                                                        None
-                                                                                        provided.
+                                                                                        N/A
                                                                                     </p>
                                                                                 )}
                                                                             </div>
                                                                         </div>
                                                                         <div className="flex flex-col space-y-1">
                                                                             <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                                Gender
+                                                                                Age
                                                                             </label>
                                                                             <div>
-                                                                                {child.gender || (
+                                                                                {child.age ? (
+                                                                                    child.age
+                                                                                ) : (
                                                                                     <p>
-                                                                                        None
-                                                                                        provided.
+                                                                                        N/A
                                                                                     </p>
                                                                                 )}
                                                                             </div>
                                                                         </div>
                                                                     </div>
 
-                                                                    <div className="space-y-[4px]">
-                                                                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                            Public
-                                                                            Services?
-                                                                        </label>
-                                                                        {/* <div>
-                                                                            {child
-                                                                                .publicServices
-                                                                                ?.length ? ( // Optional chaining used here
-                                                                                child.publicServices.map(
-                                                                                    (
-                                                                                        service,
-                                                                                        index,
-                                                                                    ) => (
-                                                                                        <div
-                                                                                            key={
-                                                                                                index
-                                                                                            }
-                                                                                            className="space-y-4"
-                                                                                        >
-                                                                                            <label>
-                                                                                                {
-                                                                                                    service
-                                                                                                }
-                                                                                            </label>
-                                                                                        </div>
-                                                                                    ),
-                                                                                )
-                                                                            ) : (
-                                                                                <p>
-                                                                                    None
-                                                                                    provided.
-                                                                                </p>
-                                                                            )}
-                                                                        </div> */}
+                                                                    {/* Third Row: Income */}
+                                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                        <div className="flex flex-col space-y-1">
+                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                                Income
+                                                                            </label>
+                                                                        </div>
+                                                                        <div className="flex flex-col space-y-1">
+                                                                            <div>
+                                                                                {child.income ? (
+                                                                                    child.income
+                                                                                ) : (
+                                                                                    <p>
+                                                                                        N/A
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* Public Services */}
+                                                                    <div className="space-y-1">
+                                                                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                            {/* Row: */}
+                                                                            <div className="flex flex-col space-y-1">
+                                                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                                    Public
+                                                                                    Services
+                                                                                </label>
+                                                                            </div>
+                                                                            <div className="flex flex-col space-y-1">
+                                                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                                    Aid
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
+                                                                        {child.generalRelief ==
+                                                                            'Recipient' && (
+                                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        General
+                                                                                        Relief
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        $
+                                                                                        {child.generalReliefAid ==
+                                                                                        ''
+                                                                                            ? 0
+                                                                                            : child.generalReliefAid}
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                        {child.calFresh ==
+                                                                            'Recipient' && (
+                                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        CalFresh
+                                                                                        (Food
+                                                                                        Stamps/EBT)
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        $
+                                                                                        {child.calFreshAid ==
+                                                                                        ''
+                                                                                            ? 0
+                                                                                            : child.calFreshAid}
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                        {child.calWorks ==
+                                                                            'Recipient' && (
+                                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        CalWorks
+                                                                                        (Cash
+                                                                                        Aid)
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        $
+                                                                                        {child.calWorksAid ==
+                                                                                        ''
+                                                                                            ? 0
+                                                                                            : child.calWorksAid}
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                        {child.ssi ==
+                                                                            'Recipient' && (
+                                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        SSI
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        $
+                                                                                        {child.ssiAid ==
+                                                                                        ''
+                                                                                            ? 0
+                                                                                            : child.ssiAid}
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                        {child.ssa ==
+                                                                            'Recipient' && (
+                                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        SSA
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        $
+                                                                                        {child.ssaAid ==
+                                                                                        ''
+                                                                                            ? 0
+                                                                                            : child.ssaAid}
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                        {child.unemployment ==
+                                                                            'Recipient' && (
+                                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        Unemployment
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        $
+                                                                                        {child.unemploymentAid ==
+                                                                                        ''
+                                                                                            ? 0
+                                                                                            : child.unemploymentAid}
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                        {child.otherService ==
+                                                                            'Recipient' && (
+                                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        Other
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="flex flex-col space-y-1">
+                                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                        $
+                                                                                        {child.otherServiceAid ==
+                                                                                        ''
+                                                                                            ? 0
+                                                                                            : child.otherServiceAid}
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* Fifth Row: Total Income */}
+                                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                        <div className="flex flex-col space-y-1">
+                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                                Total
+                                                                                Income
+                                                                            </label>
+                                                                        </div>
+                                                                        <div className="flex flex-col space-y-1">
+                                                                            <div>
+                                                                                <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                                    $
+                                                                                    {child.totalIncome ==
+                                                                                    ''
+                                                                                        ? 'N/A'
+                                                                                        : child.totalIncome}
+                                                                                </label>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             ),
-                                                        )
-                                                    ) : (
-                                                        <p>None provided.</p>
-                                                    )}
+                                                        )}
                                                 </div>
 
                                                 <div className="space-y-[24px]">
@@ -1065,9 +1315,9 @@ const Page = () => {
                                                             (pet, index) => (
                                                                 <div
                                                                     key={index}
-                                                                    className="space-y-4 pb-4"
+                                                                    className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
                                                                 >
-                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                    <label className="font-epilogue text-[22px] font-medium leading-[24px] text-[#1A1D20]">
                                                                         Pet{' '}
                                                                         {index +
                                                                             1}
@@ -1082,8 +1332,7 @@ const Page = () => {
                                                                             <div>
                                                                                 {pet.species || (
                                                                                     <p>
-                                                                                        None
-                                                                                        provided.
+                                                                                        N/A
                                                                                     </p>
                                                                                 )}
                                                                             </div>
@@ -1095,8 +1344,7 @@ const Page = () => {
                                                                             <div>
                                                                                 {pet.size || (
                                                                                     <p>
-                                                                                        None
-                                                                                        provided.
+                                                                                        N/A
                                                                                     </p>
                                                                                 )}
                                                                             </div>
@@ -1133,8 +1381,7 @@ const Page = () => {
                                                                                 )
                                                                             ) : (
                                                                                 <p>
-                                                                                    None
-                                                                                    provided.
+                                                                                    N/A
                                                                                 </p>
                                                                             )}
                                                                         </div>
@@ -1143,7 +1390,7 @@ const Page = () => {
                                                             ),
                                                         )
                                                     ) : (
-                                                        <p>None provided.</p>
+                                                        <p>N/A</p>
                                                     )}
                                                 </div>
                                             </div>
@@ -1180,10 +1427,7 @@ const Page = () => {
                                                                     ),
                                                                 )
                                                             ) : (
-                                                                <p>
-                                                                    No services
-                                                                    needed.
-                                                                </p>
+                                                                <p>N/A</p>
                                                             )}
                                                         </div>
                                                         <div>
@@ -1214,10 +1458,7 @@ const Page = () => {
                                                                     ),
                                                                 )
                                                             ) : (
-                                                                <p>
-                                                                    No services
-                                                                    needed.
-                                                                </p>
+                                                                <p>N/A</p>
                                                             )}
                                                         </div>
                                                     </div>
@@ -1249,10 +1490,7 @@ const Page = () => {
                                                                     ),
                                                                 )
                                                             ) : (
-                                                                <p>
-                                                                    No services
-                                                                    needed.
-                                                                </p>
+                                                                <p>N/A</p>
                                                             )}
                                                         </div>
                                                         <div>
@@ -1283,10 +1521,7 @@ const Page = () => {
                                                                     ),
                                                                 )
                                                             ) : (
-                                                                <p>
-                                                                    No services
-                                                                    needed.
-                                                                </p>
+                                                                <p>N/A</p>
                                                             )}
                                                         </div>
                                                     </div>
@@ -1319,10 +1554,7 @@ const Page = () => {
                                                                     ),
                                                                 )
                                                             ) : (
-                                                                <p>
-                                                                    No services
-                                                                    needed.
-                                                                </p>
+                                                                <p>N/A</p>
                                                             )}
                                                         </div>
                                                         <div>
@@ -1353,10 +1585,7 @@ const Page = () => {
                                                                     ),
                                                                 )
                                                             ) : (
-                                                                <p>
-                                                                    No services
-                                                                    needed.
-                                                                </p>
+                                                                <p>N/A</p>
                                                             )}
                                                         </div>
                                                     </div>
@@ -1387,10 +1616,7 @@ const Page = () => {
                                                                 ),
                                                             )
                                                         ) : (
-                                                            <p>
-                                                                No services
-                                                                needed.
-                                                            </p>
+                                                            <p>N/A</p>
                                                         )}
                                                     </div>
                                                 </div>
@@ -1457,7 +1683,16 @@ const Page = () => {
                                                                             }
                                                                             className="space-y-4"
                                                                         >
-                                                                            <label>
+                                                                            <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
+                                                                                <svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    height="24px"
+                                                                                    viewBox="0 -960 960 960"
+                                                                                    width="24px"
+                                                                                    fill="#000000"
+                                                                                >
+                                                                                    <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
+                                                                                </svg>
                                                                                 {
                                                                                     id
                                                                                 }
@@ -1492,7 +1727,16 @@ const Page = () => {
                                                                             }
                                                                             className="space-y-4"
                                                                         >
-                                                                            <label>
+                                                                            <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
+                                                                                <svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    height="24px"
+                                                                                    viewBox="0 -960 960 960"
+                                                                                    width="24px"
+                                                                                    fill="#000000"
+                                                                                >
+                                                                                    <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
+                                                                                </svg>{' '}
                                                                                 {
                                                                                     pass
                                                                                 }
@@ -1528,7 +1772,16 @@ const Page = () => {
                                                                             }
                                                                             className="space-y-4"
                                                                         >
-                                                                            <label>
+                                                                            <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
+                                                                                <svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    height="24px"
+                                                                                    viewBox="0 -960 960 960"
+                                                                                    width="24px"
+                                                                                    fill="#000000"
+                                                                                >
+                                                                                    <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
+                                                                                </svg>{' '}
                                                                                 {
                                                                                     id
                                                                                 }
@@ -1564,7 +1817,16 @@ const Page = () => {
                                                                             }
                                                                             className="space-y-4"
                                                                         >
-                                                                            <label>
+                                                                            <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
+                                                                                <svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    height="24px"
+                                                                                    viewBox="0 -960 960 960"
+                                                                                    width="24px"
+                                                                                    fill="#000000"
+                                                                                >
+                                                                                    <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
+                                                                                </svg>{' '}
                                                                                 {
                                                                                     id
                                                                                 }
@@ -1599,7 +1861,16 @@ const Page = () => {
                                                                             }
                                                                             className="space-y-4"
                                                                         >
-                                                                            <label>
+                                                                            <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
+                                                                                <svg
+                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                    height="24px"
+                                                                                    viewBox="0 -960 960 960"
+                                                                                    width="24px"
+                                                                                    fill="#000000"
+                                                                                >
+                                                                                    <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
+                                                                                </svg>{' '}
                                                                                 {
                                                                                     id
                                                                                 }
@@ -1619,23 +1890,43 @@ const Page = () => {
 
                                                 <div className="space-y-[24px]">
                                                     <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Additional Notes
+                                                        Case Notes
                                                     </label>
-                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                        {/* Row: */}
-                                                        <div className="flex flex-col space-y-1">
-                                                            <div>
-                                                                <div>
-                                                                    {loadedForm.notes ? (
-                                                                        loadedForm.notes
-                                                                    ) : (
-                                                                        <p>
-                                                                            None
-                                                                            provided.
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+
+                                                    <div className="flex flex-col space-y-1">
+                                                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                            Notes on Housing
+                                                        </label>
+                                                        <div>
+                                                            {loadedForm.housingNotes ? (
+                                                                loadedForm.housingNotes
+                                                            ) : (
+                                                                <p>N/A</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col space-y-1">
+                                                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                            Notes on History
+                                                        </label>
+                                                        <div>
+                                                            {loadedForm.historyNotes ? (
+                                                                loadedForm.historyNotes
+                                                            ) : (
+                                                                <p>N/A</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col space-y-1">
+                                                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                            Additional Notes
+                                                        </label>
+                                                        <div>
+                                                            {loadedForm.additionalNotes ? (
+                                                                loadedForm.additionalNotes
+                                                            ) : (
+                                                                <p>N/A</p>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
