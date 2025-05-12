@@ -605,7 +605,7 @@ export const ClientSpouse = ({ data }: ClientProps) => {
             )}
 
             {data.associatedSpouseID && (
-                <div className="relative mt-4 w-full space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
+                <div className="mt-4 w-full space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
                     <button
                         onClick={() =>
                             router.push(`/clients/${data.associatedSpouseID}`)
