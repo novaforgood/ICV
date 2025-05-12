@@ -60,15 +60,16 @@ const Page = () => {
                         >
                             View client profile
                         </button>
-                        {createdClient?.spouseClientStatus === 'Yes' && (
-                            <button
-                                type="submit"
-                                onClick={onSubmit}
-                                className="h-[52px] w-[400px] rounded-[5px] bg-neutral-900 px-[20px] py-[16px] text-white"
-                            >
-                                Create spouse intake form
-                            </button>
-                        )}
+                        {createdClient?.spouseClientStatus === 'Yes' &&
+                            !createdClient?.associatedSpouseID && (
+                                <button
+                                    type="submit"
+                                    onClick={onSubmit}
+                                    className="h-[52px] w-[400px] rounded-[5px] bg-neutral-900 px-[20px] py-[16px] text-white"
+                                >
+                                    Create spouse intake form
+                                </button>
+                            )}
                     </div>
                 </div>
             </div>
