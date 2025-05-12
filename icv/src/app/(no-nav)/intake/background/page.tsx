@@ -396,7 +396,7 @@ const Page = (props: Props) => {
                                             updatedMedCondition,
                                         )
                                     }
-                                    name="mentalHealthConditions"
+                                    name="medicalConditions"
                                 />
                             </div>
                             <div className="flex flex-col space-y-[4px]">

@@ -431,6 +431,391 @@ const Page = () => {
                                             </div>
                                         )}
 
+                                        {section === 'Background' && (
+                                            <div className="space-y-[40px]">
+                                                <div className="space-y-[24px]">
+                                                    <div className="space-y-[24px]">
+                                                        <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                                            Education
+                                                        </label>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <div>
+                                                                {loadedForm.educationStatus &&
+                                                                loadedForm
+                                                                    .educationStatus
+                                                                    .length >
+                                                                    0 ? (
+                                                                    <ul>
+                                                                        {loadedForm.educationStatus.map(
+                                                                            (
+                                                                                item,
+                                                                                index,
+                                                                            ) => (
+                                                                                <li
+                                                                                    key={
+                                                                                        index
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        item
+                                                                                    }
+                                                                                </li>
+                                                                            ),
+                                                                        )}
+                                                                    </ul>
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-[24px]">
+                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                                        Income
+                                                    </label>
+                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                        {/* Row: */}
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Employment
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.employment ? (
+                                                                    loadedForm.employment
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Income
+                                                            </label>
+                                                            <div>
+                                                                {loadedForm.employmentIncome ? (
+                                                                    <span>
+                                                                        $
+                                                                        {
+                                                                            loadedForm.employmentIncome
+                                                                        }
+                                                                    </span>
+                                                                ) : (
+                                                                    <p>N/A</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                            {/* Row: */}
+                                                            <div className="flex flex-col space-y-1">
+                                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                    Public
+                                                                    Services
+                                                                </label>
+                                                            </div>
+                                                            <div className="flex flex-col space-y-1">
+                                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                    Aid
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        {loadedForm.generalRelief ==
+                                                            'Recipient' && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        General
+                                                                        Relief
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        $
+                                                                        {loadedForm.generalReliefAid ==
+                                                                        ''
+                                                                            ? 0
+                                                                            : loadedForm.generalReliefAid}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.calFresh ==
+                                                            'Recipient' && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        CalFresh
+                                                                        (Food
+                                                                        Stamps/EBT)
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        $
+                                                                        {loadedForm.calFreshAid ==
+                                                                        ''
+                                                                            ? 0
+                                                                            : loadedForm.calFreshAid}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.calWorks ==
+                                                            'Recipient' && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        CalWorks
+                                                                        (Cash
+                                                                        Aid)
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        $
+                                                                        {loadedForm.calWorksAid ==
+                                                                        ''
+                                                                            ? 0
+                                                                            : loadedForm.calWorksAid}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.ssi ==
+                                                            'Recipient' && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        SSI
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        $
+                                                                        {loadedForm.ssiAid ==
+                                                                        ''
+                                                                            ? 0
+                                                                            : loadedForm.ssiAid}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.ssa ==
+                                                            'Recipient' && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        SSA
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        $
+                                                                        {loadedForm.ssaAid ==
+                                                                        ''
+                                                                            ? 0
+                                                                            : loadedForm.ssaAid}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.unemployment ==
+                                                            'Recipient' && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Unemployment
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        $
+                                                                        {loadedForm.unemploymentAid ==
+                                                                        ''
+                                                                            ? 0
+                                                                            : loadedForm.unemploymentAid}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.otherService ==
+                                                            'Recipient' && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Other
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        $
+                                                                        {loadedForm.otherServiceAid ==
+                                                                        ''
+                                                                            ? 0
+                                                                            : loadedForm.otherServiceAid}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                        {/* Row: */}
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Total Income
+                                                            </label>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-1">
+                                                            <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                $
+                                                                {loadedForm.totalIncome ==
+                                                                ''
+                                                                    ? 0
+                                                                    : loadedForm.totalIncome}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-[24px]">
+                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
+                                                        History
+                                                    </label>
+                                                    <div className="space-y-1">
+                                                        {loadedForm.mentalHealthConditions && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                {/* Row: */}
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Mental
+                                                                        health
+                                                                        conditions
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        {
+                                                                            loadedForm.mentalHealthConditions
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.medicalConditions && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                {/* Row: */}
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Medical
+                                                                        conditions
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        {
+                                                                            loadedForm.medicalConditions
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.substanceAbuse && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                {/* Row: */}
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Substance
+                                                                        abuse
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        {
+                                                                            loadedForm.substanceAbuse
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.fosterYouth && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                {/* Row: */}
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Foster
+                                                                        youth
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        {
+                                                                            loadedForm.fosterYouth
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.openProbation && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                {/* Row: */}
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Open
+                                                                        probation
+                                                                        case
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        {
+                                                                            loadedForm.openProbation
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.openCPS && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                {/* Row: */}
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Open CPS
+                                                                        case
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        {
+                                                                            loadedForm.openCPS
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {loadedForm.sexOffender && (
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                {/* Row: */}
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        Sex
+                                                                        offender
+                                                                    </label>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                                                                        {
+                                                                            loadedForm.sexOffender
+                                                                        }
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {section == 'Family' && (
                                             <div className="space-y-[40px]">
                                                 <div className="space-y-[24px]">
@@ -760,128 +1145,6 @@ const Page = () => {
                                                     ) : (
                                                         <p>None provided.</p>
                                                     )}
-                                                </div>
-                                            </div>
-                                        )}
-                                        {section === 'Background' && (
-                                            <div className="space-y-[40px]">
-                                                <div className="space-y-[24px]">
-                                                    <div className="space-y-[24px]">
-                                                        <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                            Education
-                                                        </label>
-                                                        <div className="flex flex-col space-y-1">
-                                                            <div>
-                                                                {loadedForm.educationStatus &&
-                                                                loadedForm
-                                                                    .educationStatus
-                                                                    .length >
-                                                                    0 ? (
-                                                                    <ul>
-                                                                        {loadedForm.educationStatus.map(
-                                                                            (
-                                                                                item,
-                                                                                index,
-                                                                            ) => (
-                                                                                <li
-                                                                                    key={
-                                                                                        index
-                                                                                    }
-                                                                                >
-                                                                                    {
-                                                                                        item
-                                                                                    }
-                                                                                </li>
-                                                                            ),
-                                                                        )}
-                                                                    </ul>
-                                                                ) : (
-                                                                    <p>N/A</p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-[24px]">
-                                                    <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Income
-                                                    </label>
-                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                        {/* Row: */}
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Employment
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.employment ? (
-                                                                    loadedForm.employment
-                                                                ) : (
-                                                                    <p>N/A</p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Income
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.employmentIncome ? (
-                                                                    <span>
-                                                                        $
-                                                                        {
-                                                                            loadedForm.employmentIncome
-                                                                        }
-                                                                    </span>
-                                                                ) : (
-                                                                    <p>N/A</p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                        {/* Row: */}
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Public Services
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.generalRelief ==
-                                                                    'Recipient' && (
-                                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                                        <div className="flex flex-col space-y-1">
-                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                                General
-                                                                                Relief
-                                                                            </label>
-                                                                            <div>
-                                                                                {
-                                                                                    loadedForm.generalRelief
-                                                                                }
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="flex flex-col space-y-1"></div>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-1">
-                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                Aid
-                                                            </label>
-                                                            <div>
-                                                                {loadedForm.employmentIncome ? (
-                                                                    <span>
-                                                                        $
-                                                                        {
-                                                                            loadedForm.employmentIncome
-                                                                        }
-                                                                    </span>
-                                                                ) : (
-                                                                    <p>N/A</p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         )}
