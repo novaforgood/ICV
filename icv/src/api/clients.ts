@@ -9,8 +9,7 @@ import { collection, getDoc, getDocs, getFirestore, doc, where, limit, orderBy, 
 interface ClientWithLastCheckin extends NewClient {
     lastCheckinDate?: string;
 }
-import  {UserSchema, Users} from '@/types/user-types'
-import { User } from 'firebase/auth'
+import  {Users} from '@/types/user-types'
 
 export async function getAllClients(): Promise<NewClient[]> {
     const { firebaseServerApp, currentUser } =
@@ -103,9 +102,20 @@ export async function getClientByCaseManager(): Promise<ClientWithLastCheckin[]>
             // If there are events, add the latest endTime to the client object
             if (!eventsSnapshot.empty) {
                 const latestEvent = eventsSnapshot.docs[0].data();
-                // Convert Firestore Timestamp to ISO string
                 const timestamp = latestEvent.endTime;
-                const dateString = timestamp ? timestamp.toDate().toISOString() : null;
+                let dateString = null;
+                
+                if (timestamp) {
+                    if (typeof timestamp === 'string') {
+                        dateString = timestamp;
+                    } else if (timestamp.toDate) {
+                        // Convert Firestore Timestamp to ISO string
+                        dateString = timestamp.toDate().toISOString();
+                    } else if (timestamp.seconds) {
+                        // Handle Firestore Timestamp object directly
+                        dateString = new Date(timestamp.seconds * 1000).toISOString();
+                    }
+                }
                 
                 return {
                     ...client,
@@ -132,3 +142,66 @@ export async function getClientByCaseManager(): Promise<ClientWithLastCheckin[]>
 
     return sortedClients;
 }
+
+export async function getAllClientsByLastCheckinDate(): Promise<ClientWithLastCheckin[]> {
+    const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
+    const ssrdb = getFirestore(firebaseServerApp)
+
+    const clientsCollection = collection(ssrdb, 'clients')
+    const clientsSnapshot = await getDocs(clientsCollection)
+    const clientsList = clientsSnapshot.docs.map((doc) => {
+        const data = doc.data() as NewClient;
+        data.id = doc.id;
+        return data;
+    });
+
+    // Get the latest event date for each client
+    const clientsWithLatestEvents = await Promise.all(
+        clientsList.map(async (client) => {
+            if (!client.id) return client as ClientWithLastCheckin;
+            
+            // Query the events collection for this client
+            const eventsCollection = collection(ssrdb, 'events');
+            const eventsQuery = query(
+                eventsCollection, 
+                where('clientId', '==', client.id),
+                orderBy('endTime', 'desc'),
+                limit(1)
+            );
+            
+            const eventsSnapshot = await getDocs(eventsQuery);
+            
+            // If there are events, add the latest endTime to the client object
+            if (!eventsSnapshot.empty) {
+                const latestEvent = eventsSnapshot.docs[0].data();
+                const timestamp = latestEvent.endTime;
+                let dateString = null;
+                
+                if (timestamp) {
+                    if (typeof timestamp === 'string') {
+                        dateString = timestamp;
+                    } else if (timestamp.toDate) {
+                        // Convert Firestore Timestamp to ISO string
+                        dateString = timestamp.toDate().toISOString();
+                    } else if (timestamp.seconds) {
+                        // Handle Firestore Timestamp object directly
+                        dateString = new Date(timestamp.seconds * 1000).toISOString();
+                    }
+                }
+                
+                return {
+                    ...client,
+                    lastCheckinDate: dateString
+                } as ClientWithLastCheckin;
+            }
+            return client as ClientWithLastCheckin;
+        })
+    );
+
+    return clientsWithLatestEvents;
+}
+
