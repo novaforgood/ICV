@@ -1,25 +1,53 @@
 import { getClientById } from '@/api/make-cases/make-case'
-import Image from 'next/image'
-import ProfileNav from './components/profilenav'
-import { string } from 'zod'
+import {
+    ClientBio,
+    ClientCitizenship,
+    ClientContactInfo,
+    ClientEthnicity,
+    ClientHousing,
+} from '@/app/_components/ClientProfileComponents'
 
 const page = async ({
-    params
+    params,
 }: {
     params: {
         clientId: string
     }
-}) =>{
-    const { clientId }  = await params
+}) => {
+    const { clientId } = await params
     const client = await getClientById(clientId)
     return (
-        <div>
-            {/* Passing clientId and events to ClientEditor */}
-            {/* <EditEvents clientId={clientId} events={events} /> */}
-
-            <div className="flex flex-col items-start">
-                <div className="ml-8 p-10">
-                    <p className="text-5xl"> profile page</p>
+        <div className="flex min-h-screen px-[48px] py-[24px]">
+            <div className="mb-[48px] h-screen w-screen min-w-[800px] space-y-[48px]">
+                <div className="space-y-[24px]">
+                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                        BIO
+                    </label>
+                    <ClientBio data={client} />
+                </div>
+                <div className="space-y-[24px]">
+                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                        CONTACT INFORMATION
+                    </label>
+                    <ClientContactInfo data={client} />
+                </div>
+                <div className="space-y-[24px]">
+                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                        CITIZENSHIP
+                    </label>
+                    <ClientCitizenship data={client} />
+                </div>
+                <div className="space-y-[24px]">
+                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                        ETHNICITY
+                    </label>
+                    <ClientEthnicity data={client} />
+                </div>
+                <div className="space-y-[24px]">
+                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                        HOUSING
+                    </label>
+                    <ClientHousing data={client} />
                 </div>
             </div>
         </div>
