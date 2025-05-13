@@ -124,6 +124,7 @@ export const ClientIntakeSchema = z.object({
     gender: z.string().optional(),
     contactSource: z.string().optional(),
     clientNumber: z.string().optional(),
+    intakeDate: z.string().optional(),
 
     // Citizenship
     placeOrigin: z.string().optional(),
@@ -184,6 +185,7 @@ export const ClientIntakeSchema = z.object({
             spouseFirstName: z.string().optional(),
             spouseLastName: z.string().optional(),
             spouseDOB: z.string().optional(),
+            spouseAge: z.string().optional(),
             spouseIncome: z.string().optional(),
             spouseGender: z.string().optional(),
         }).optional(),
@@ -193,8 +195,23 @@ export const ClientIntakeSchema = z.object({
             lastName: z.string().optional(),
             dob: z.string().optional(),
             income: z.string().optional(),
+            age: z.string().optional(),
             gender: z.string().optional(),
-            publicServices: z.array(z.string().optional()).optional()
+            generalRelief: z.string().optional(),
+            generalReliefAid: z.string().optional(),
+            calFresh: z.string().optional(),
+            calFreshAid: z.string().optional(),
+            calWorks: z.string().optional(),
+            calWorksAid: z.string().optional(),
+            ssi:z.string().optional(),
+            ssiAid: z.string().optional(),
+            ssa: z.string().optional(),
+            ssaAid: z.string().optional(),
+            unemployment: z.string().optional(),
+            unemploymentAid: z.string().optional(),
+            otherService: z.string().optional(),
+            otherServiceAid: z.string().optional(),
+            totalIncome: z.string().optional(),
         }),
     ).optional(),
     familyMembersServiced: z.string().optional(),
@@ -231,7 +248,7 @@ export const ClientIntakeSchema = z.object({
     referral: z.array(z.string()).optional(),
     
     // Additional Notes
-    notes: z.string().optional(),
+    additionalNotes: z.string().optional(),
     
     // Image Upload
     clientImage: z.array(z.string().optional(),).optional(),
@@ -318,7 +335,7 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     clientSSNName: true,
     clientBCName: true,
     otherFilesName: true,
-    notes: true,
+    additionalNotes: true,
 })
 
 export const ProfileSchema = ClientIntakeSchema.pick({
@@ -330,6 +347,8 @@ export const ProfileSchema = ClientIntakeSchema.pick({
     gender: true,
     contactSource: true,
     clientNumber: true,
+    clientCode: true,
+    intakeDate: true,
 
     // Citizenship
     placeOrigin: true,
@@ -369,7 +388,6 @@ export const FamilySchema = ClientIntakeSchema.pick({
 
 export const ConfirmationSchema = ClientIntakeSchema.pick({
     assessingStaff: true,
-    clientCode: true,
 })
 
 export const WaiverSchema = ClientIntakeSchema.pick({

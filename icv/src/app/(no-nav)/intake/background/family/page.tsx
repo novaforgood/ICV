@@ -7,7 +7,6 @@ import {
     MARITALSTATUS,
     PETPURPOSE,
     PETSIZE,
-    PUBLIC_SERVICES,
     YESNO,
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,9 +16,9 @@ import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import {
     CheckboxList,
-    CheckboxListWithOther,
     RadioChoice,
     RadioWithOther,
+    ServicesWithIncome,
 } from '../../../../_components/MakeOptions'
 interface Props {}
 
@@ -27,6 +26,12 @@ const Page = (props: Props) => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
     type FamilyType = TypeOf<typeof FamilySchema>
     const [warnings, setWarnings] = useState<string[]>([])
+    type IncomeWarning = {
+        message: string
+        depIndex: number
+    }
+
+    const [invalidIncome, setInvalidIncome] = useState<IncomeWarning[]>([])
 
     const {
         register,
@@ -74,6 +79,12 @@ const Page = (props: Props) => {
             removeSpouse()
         }
     }, [loadedForm.maritalStatus])
+
+    useEffect(() => {
+        if (loadedForm.headOfHousehold != 'Yes' && loadedForm.dependent) {
+            removeDependents()
+        }
+    }, [loadedForm.headOfHousehold])
 
     useEffect(() => {
         const errors: string[] = []
@@ -127,6 +138,111 @@ const Page = (props: Props) => {
         loadedForm.headOfHousehold,
     ])
 
+    useEffect(() => {
+        const warnings: { message: string; depIndex: number }[] = []
+
+        const parseIncome = (label: string, value: any, depIndex: number) => {
+            if (value === undefined || value === '') return 0
+
+            const cleaned = String(value).replace(/,/g, '')
+            const num = parseFloat(cleaned)
+
+            if (isNaN(num) || cleaned !== num.toString()) {
+                warnings.push({
+                    depIndex,
+                    message: `"${value}" is not a valid income for ${label}.`,
+                })
+
+                return 0
+            }
+
+            return num
+        }
+
+        const updatedDependents = (loadedForm.dependent || []).map(
+            (dep, index) => {
+                const totalSum =
+                    parseIncome('Income', dep.income, index) +
+                    parseIncome(
+                        'General Relief Aid',
+                        dep.generalReliefAid,
+                        index,
+                    ) +
+                    parseIncome('CalFresh Aid', dep.calFreshAid, index) +
+                    parseIncome('CalWorks Aid', dep.calWorksAid, index) +
+                    parseIncome('SSI Aid', dep.ssiAid, index) +
+                    parseIncome('SSA Aid', dep.ssaAid, index) +
+                    parseIncome(
+                        'Unemployment Aid',
+                        dep.unemploymentAid,
+                        index,
+                    ) +
+                    parseIncome('Other Aid', dep.otherServiceAid, index)
+
+                return {
+                    ...dep,
+                    totalIncome: totalSum.toString(),
+                }
+            },
+        )
+        console.log({ updatedDependents })
+        setInvalidIncome(warnings)
+        const shouldUpdate =
+            JSON.stringify(loadedForm.dependent) !==
+            JSON.stringify(updatedDependents)
+
+        if (shouldUpdate) {
+            updateForm({ dependent: updatedDependents })
+        }
+    }, [loadedForm.dependent])
+
+    const calculateAge = (dobString: string): { age: number | undefined } => {
+        if (!dobString) return { age: undefined }
+
+        const dob = new Date(dobString)
+        const now = new Date()
+
+        let age = now.getFullYear() - dob.getFullYear()
+        const monthDiff = now.getMonth() - dob.getMonth()
+        if (
+            monthDiff < 0 ||
+            (monthDiff === 0 && now.getDate() < dob.getDate())
+        ) {
+            age--
+        }
+
+        return { age }
+    }
+
+    useEffect(() => {
+        const dobValue = loadedForm.spouse?.spouseDOB
+
+        if (dobValue) {
+            const { age } = calculateAge(dobValue)
+
+            if (age !== undefined) {
+                setValue('spouse.spouseAge', age.toString()) // Only set 'age' if it's calculated
+            }
+        }
+    }, [loadedForm.spouse?.spouseDOB, setValue])
+
+    useEffect(() => {
+        if (loadedForm.dependent) {
+            loadedForm.dependent.forEach((dep, index) => {
+                const dobValue = dep?.dob
+                if (dobValue) {
+                    const { age } = calculateAge(dobValue)
+                    if (
+                        age !== undefined &&
+                        loadedForm.dependent?.[index]?.age !== age?.toString()
+                    ) {
+                        setValue(`dependent.${index}.age`, age.toString())
+                    }
+                }
+            })
+        }
+    }, [loadedForm.dependent, setValue])
+
     const onSubmit = (data: FamilyType) => {
         console.log('in submit...', data)
         updateForm(data)
@@ -137,13 +253,42 @@ const Page = (props: Props) => {
     const removeSpouse = () => {
         console.log('Remove in progress!')
 
-        setValue('spouse.spouseFirstName', '')
-        setValue('spouse.spouseLastName', '')
-        setValue('spouse.spouseDOB', '')
-        setValue('spouse.spouseIncome', '')
-        setValue('spouse.spouseGender', '')
+        setValue('spouse.spouseFirstName', undefined)
+        setValue('spouse.spouseLastName', undefined)
+        setValue('spouse.spouseDOB', undefined)
+        setValue('spouse.spouseIncome', undefined)
+        setValue('spouse.spouseGender', undefined)
 
         setValue('spouse', undefined)
+    }
+
+    const removeDependents = () => {
+        if (loadedForm.dependent) {
+            loadedForm.dependent.forEach((dep, index) => {
+                setValue(`dependent.${index}.firstName`, undefined)
+                setValue(`dependent.${index}.lastName`, undefined)
+                setValue(`dependent.${index}.dob`, undefined)
+                setValue(`dependent.${index}.income`, undefined)
+                setValue(`dependent.${index}.age`, undefined)
+                setValue(`dependent.${index}.gender`, undefined)
+                setValue(`dependent.${index}.generalRelief`, undefined)
+                setValue(`dependent.${index}.generalReliefAid`, undefined)
+                setValue(`dependent.${index}.calFresh`, undefined)
+                setValue(`dependent.${index}.calFreshAid`, undefined)
+                setValue(`dependent.${index}.calWorks`, undefined)
+                setValue(`dependent.${index}.calWorksAid`, undefined)
+                setValue(`dependent.${index}.ssi`, undefined)
+                setValue(`dependent.${index}.ssiAid`, undefined)
+                setValue(`dependent.${index}.ssa`, undefined)
+                setValue(`dependent.${index}.ssaAid`, undefined)
+                setValue(`dependent.${index}.unemployment`, undefined)
+                setValue(`dependent.${index}.unemploymentAid`, undefined)
+                setValue(`dependent.${index}.otherService`, undefined)
+                setValue(`dependent.${index}.otherServiceAid`, undefined)
+                setValue(`dependent.${index}.totalIncome`, undefined)
+                setValue(`dependent`, undefined)
+            })
+        }
     }
 
     // Function to add a child
@@ -340,6 +485,7 @@ const Page = (props: Props) => {
                     </div>
 
                     {/* Dependent Section */}
+
                     <div className="flex flex-col space-y-[24px]">
                         <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
                             Dependents
@@ -377,142 +523,342 @@ const Page = (props: Props) => {
                                 </div>
                             )}
                         </div>
-                        {watch('dependent')?.map((dependent, index) => (
-                            <div
-                                key={index}
-                                className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
-                            >
-                                <div className="flex justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() => removeChild(index)}
+
+                        {loadedForm.headOfHousehold === 'Yes' && (
+                            <>
+                                {watch('dependent')?.map((dependent, index) => (
+                                    <div
+                                        key={index}
+                                        className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
                                     >
-                                        Remove x
-                                    </button>
-                                </div>
+                                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                            <label className="font-epilogue text-[22px] font-medium leading-[24px] text-[#1A1D20]">
+                                                Dependent {index + 1}:
+                                            </label>
+                                            <div className="flex justify-end">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        removeChild(index)
+                                                    }
+                                                >
+                                                    Remove x
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                <div className="grid grid-cols-2 gap-[12px]">
-                                    {/* First Name and Last Name on the same line */}
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            First Name
-                                        </label>
-                                        <input
-                                            {...register(
-                                                `dependent.${index}.firstName`,
-                                            )}
-                                            type="text"
-                                            placeholder="Text"
-                                            className="w-full rounded border p-2"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Last Name
-                                        </label>
-                                        <input
-                                            {...register(
-                                                `dependent.${index}.lastName`,
-                                            )}
-                                            type="text"
-                                            placeholder="Text"
-                                            className="w-full rounded border p-2"
-                                        />
-                                    </div>
-                                </div>
+                                        <div className="grid grid-cols-2 gap-[12px]">
+                                            {/* First Name and Last Name on the same line */}
+                                            <div className="flex flex-col space-y-[4px]">
+                                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                                    First Name
+                                                </label>
+                                                <input
+                                                    {...register(
+                                                        `dependent.${index}.firstName`,
+                                                    )}
+                                                    type="text"
+                                                    placeholder="Text"
+                                                    className="w-full rounded border p-2"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col space-y-[4px]">
+                                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                                    Last Name
+                                                </label>
+                                                <input
+                                                    {...register(
+                                                        `dependent.${index}.lastName`,
+                                                    )}
+                                                    type="text"
+                                                    placeholder="Text"
+                                                    className="w-full rounded border p-2"
+                                                />
+                                            </div>
+                                        </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Date of Birth
-                                        </label>
-                                        <input
-                                            {...register(
-                                                `dependent.${index}.dob`,
-                                            )}
-                                            type="date"
-                                            className="w-full rounded border p-2"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-[4px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            Income
-                                        </label>
-                                        <div className="flex items-center space-x-[2px]">
-                                            <p className="text-lg">$</p>
+                                        <div className="flex flex-col space-y-[4px]">
+                                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                                Date of Birth
+                                            </label>
                                             <input
                                                 {...register(
-                                                    `dependent.${index}.income`,
+                                                    `dependent.${index}.dob`,
                                                 )}
-                                                type="text"
-                                                placeholder="Text"
-                                                className="w-[30%] rounded border p-2"
+                                                type="date"
+                                                className="w-[50%] rounded border p-2"
                                             />
                                         </div>
+                                        <div className="flex flex-col space-y-[4px]">
+                                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                                Gender
+                                            </label>
+                                            <RadioWithOther
+                                                options={GENDER}
+                                                selectedValue={
+                                                    watch(
+                                                        `dependent.${index}.gender`,
+                                                    ) ?? ''
+                                                }
+                                                onChange={(updatedGender) =>
+                                                    setValue(
+                                                        `dependent.${index}.gender`,
+                                                        updatedGender,
+                                                    )
+                                                }
+                                                name={`dependent.${index}.gender`}
+                                                otherLabel="Other"
+                                                otherPlaceholder="Other"
+                                            />
+                                        </div>
+                                        <div className="align-center grid grid-cols-2 items-center">
+                                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                                Income
+                                            </label>
+                                            <div className="flex items-center space-x-[2px]">
+                                                <p className="text-lg">$</p>
+                                                <input
+                                                    {...register(
+                                                        `dependent.${index}.income`,
+                                                    )}
+                                                    type="text"
+                                                    placeholder="Text"
+                                                    className="w-full rounded border p-2"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-[8px]">
+                                            <div className="grid grid-cols-2 gap-[12px]">
+                                                <div className="flex flex-col">
+                                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                                        Public Services
+                                                    </label>
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                                        Aid
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col space-y-[8px]">
+                                                <ServicesWithIncome
+                                                    selected={
+                                                        watch(
+                                                            `dependent.${index}.generalRelief`,
+                                                        ) ?? ''
+                                                    }
+                                                    serviceTitle="General Relief"
+                                                    incomeFieldName={`dependent.${index}.generalReliefAid`}
+                                                    serviceFieldName={`dependent.${index}.generalRelief`}
+                                                    setValue={(field, value) =>
+                                                        setValue(
+                                                            field as keyof FamilyType,
+                                                            value,
+                                                        )
+                                                    }
+                                                    register={
+                                                        register as (
+                                                            field: string,
+                                                        ) => {
+                                                            [key: string]: any
+                                                        }
+                                                    }
+                                                />
+                                                <ServicesWithIncome
+                                                    selected={
+                                                        watch(
+                                                            `dependent.${index}.calFresh`,
+                                                        ) ?? ''
+                                                    }
+                                                    serviceTitle="CalFresh (Food Stamps/EBT)"
+                                                    incomeFieldName={`dependent.${index}.calFreshAid`}
+                                                    serviceFieldName={`dependent.${index}.calFresh`}
+                                                    setValue={(field, value) =>
+                                                        setValue(
+                                                            field as keyof FamilyType,
+                                                            value,
+                                                        )
+                                                    }
+                                                    register={
+                                                        register as (
+                                                            field: string,
+                                                        ) => {
+                                                            [key: string]: any
+                                                        }
+                                                    }
+                                                />
+                                                <ServicesWithIncome
+                                                    selected={
+                                                        watch(
+                                                            `dependent.${index}.calWorks`,
+                                                        ) ?? ''
+                                                    }
+                                                    serviceTitle="CalWorks (Cash Aid)"
+                                                    incomeFieldName={`dependent.${index}.calWorksAid`}
+                                                    serviceFieldName={`dependent.${index}.calWorks`}
+                                                    setValue={(field, value) =>
+                                                        setValue(
+                                                            field as keyof FamilyType,
+                                                            value,
+                                                        )
+                                                    }
+                                                    register={
+                                                        register as (
+                                                            field: string,
+                                                        ) => {
+                                                            [key: string]: any
+                                                        }
+                                                    }
+                                                />
+                                                <ServicesWithIncome
+                                                    selected={
+                                                        watch(
+                                                            `dependent.${index}.ssi`,
+                                                        ) ?? ''
+                                                    }
+                                                    serviceTitle="SSI"
+                                                    incomeFieldName={`dependent.${index}.ssiAid`}
+                                                    serviceFieldName={`dependent.${index}.ssi`}
+                                                    setValue={(field, value) =>
+                                                        setValue(
+                                                            field as keyof FamilyType,
+                                                            value,
+                                                        )
+                                                    }
+                                                    register={
+                                                        register as (
+                                                            field: string,
+                                                        ) => {
+                                                            [key: string]: any
+                                                        }
+                                                    }
+                                                />
+                                                <ServicesWithIncome
+                                                    selected={
+                                                        watch(
+                                                            `dependent.${index}.ssa`,
+                                                        ) ?? ''
+                                                    }
+                                                    serviceTitle="SSA"
+                                                    incomeFieldName={`dependent.${index}.ssaAid`}
+                                                    serviceFieldName={`dependent.${index}.ssa`}
+                                                    setValue={(field, value) =>
+                                                        setValue(
+                                                            field as keyof FamilyType,
+                                                            value,
+                                                        )
+                                                    }
+                                                    register={
+                                                        register as (
+                                                            field: string,
+                                                        ) => {
+                                                            [key: string]: any
+                                                        }
+                                                    }
+                                                />
+                                                <ServicesWithIncome
+                                                    selected={
+                                                        watch(
+                                                            `dependent.${index}.unemployment`,
+                                                        ) ?? ''
+                                                    }
+                                                    serviceTitle="Unemployment"
+                                                    incomeFieldName={`dependent.${index}.unemploymentAid`}
+                                                    serviceFieldName={`dependent.${index}.unemployment`}
+                                                    setValue={(field, value) =>
+                                                        setValue(
+                                                            field as keyof FamilyType,
+                                                            value,
+                                                        )
+                                                    }
+                                                    register={
+                                                        register as (
+                                                            field: string,
+                                                        ) => {
+                                                            [key: string]: any
+                                                        }
+                                                    }
+                                                />
+                                                <ServicesWithIncome
+                                                    selected={
+                                                        watch(
+                                                            `dependent.${index}.otherService`,
+                                                        ) ?? ''
+                                                    }
+                                                    serviceTitle="Other"
+                                                    incomeFieldName={`dependent.${index}.otherServiceAid`}
+                                                    serviceFieldName={`dependent.${index}.otherService`}
+                                                    setValue={(field, value) =>
+                                                        setValue(
+                                                            field as keyof FamilyType,
+                                                            value,
+                                                        )
+                                                    }
+                                                    register={
+                                                        register as (
+                                                            field: string,
+                                                        ) => {
+                                                            [key: string]: any
+                                                        }
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex grid grid-cols-2 items-center gap-[12px]">
+                                            <div>
+                                                <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                                                    Total Income
+                                                </label>
+                                            </div>
+                                            <div className="flex items-center rounded border p-2">
+                                                <span className="mr-1 text-neutral-900">
+                                                    $
+                                                </span>
+                                                <input
+                                                    {...register(
+                                                        `dependent.${index}.totalIncome`,
+                                                    )}
+                                                    type="text"
+                                                    placeholder="Text"
+                                                    className="w-full outline-none"
+                                                />
+                                            </div>
+                                        </div>
+                                        {invalidIncome.length > 0 && (
+                                            <div
+                                                style={{
+                                                    color: 'red',
+                                                    marginTop: '1rem',
+                                                }}
+                                            >
+                                                {invalidIncome
+                                                    .filter(
+                                                        (msg) =>
+                                                            msg.depIndex ===
+                                                            index,
+                                                    )
+                                                    .map((msg, i) => (
+                                                        <div key={i}>
+                                                            {msg.message}
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                                <div className="flex flex-col space-y-[4px]">
-                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                        Gender
-                                    </label>
-                                    <RadioWithOther
-                                        options={GENDER}
-                                        selectedValue={
-                                            watch(
-                                                `dependent.${index}.gender`,
-                                            ) ?? ''
-                                        }
-                                        onChange={(updatedGender) =>
-                                            setValue(
-                                                `dependent.${index}.gender`,
-                                                updatedGender,
-                                            )
-                                        }
-                                        name={`dependent.${index}.gender`}
-                                        otherLabel="Other"
-                                        otherPlaceholder="Other"
-                                    />
-                                </div>
-                                <div className="flex flex-col space-y-[4px]">
-                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                        Public Services?
-                                    </label>
-                                    <div className="flex flex-col space-y-[8px]">
-                                        <CheckboxListWithOther
-                                            options={PUBLIC_SERVICES}
-                                            selectedValues={(
-                                                watch(
-                                                    `dependent.${index}.publicServices`,
-                                                ) ?? []
-                                            ).filter(
-                                                (service) =>
-                                                    service !== undefined,
-                                            )}
-                                            onChange={(updatedServices) =>
-                                                setValue(
-                                                    `dependent.${index}.publicServices`,
-                                                    updatedServices,
-                                                )
-                                            }
-                                            name="services"
-                                            otherLabel="Other"
-                                            otherPlaceholder="Other"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                        <button
-                            type="button"
-                            onClick={addChild}
-                            disabled={
-                                loadedForm.familySize === undefined ||
-                                loadedForm.familySize === ''
-                            }
-                            className="h-[52px] w-[200px] rounded-[5px] bg-[#27262A] px-4 py-2 text-white disabled:cursor-not-allowed disabled:bg-gray-400"
-                        >
-                            + Add dependent
-                        </button>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={addChild}
+                                    disabled={
+                                        loadedForm.familySize === undefined ||
+                                        loadedForm.familySize === ''
+                                    }
+                                    className="h-[52px] w-[200px] rounded-[5px] bg-[#27262A] px-4 py-2 text-white disabled:cursor-not-allowed disabled:bg-gray-400"
+                                >
+                                    + Add dependent
+                                </button>
+                            </>
+                        )}
                     </div>
 
                     {/* Pets Section */}
@@ -526,13 +872,18 @@ const Page = (props: Props) => {
                                 key={index}
                                 className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
                             >
-                                <div className="flex justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() => removePet(index)}
-                                    >
-                                        Remove x
-                                    </button>
+                                <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                    <label className="font-epilogue text-[22px] font-medium leading-[24px] text-[#1A1D20]">
+                                        Pet {index + 1}:
+                                    </label>
+                                    <div className="flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={() => removePet(index)}
+                                        >
+                                            Remove x
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div className="flex flex-col space-y-[4px]">
