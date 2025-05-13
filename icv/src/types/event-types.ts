@@ -11,19 +11,19 @@ export const CheckInCategory = z.enum([
 ])
 
 export const ContactType = z.enum([
-    'RI', // ReferralAndIntake
-    'P', // Phone
-    'F', // FaceToFace
-    'TM', // TeamMeeting
-    'IM', // IndividualMeeting
-    'FM', // FamilyMeeting
-    'R', // ReferralToServiceProvider
-    'E', // EmploymentJobReadiness and EventActivityFieldTrip
-    'T', // Transportation
-    'TC', // TrackingCheckUp
-    'A', // Advocacy
-    'W', // WellnessCheck
-    'O', // Other
+    'Referral and Intake', // ReferralAndIntake
+    'Phone', // Phone
+    'Face to Face', // FaceToFace
+    'Team Meeting', // TeamMeeting
+    'Individual Meeting', // IndividualMeeting
+    'Family Meeting', // FamilyMeeting
+    'Referral to Service Provider', // ReferralToServiceProvider
+    'Emplyment Job Readiness', // EmploymentJobReadiness and EventActivityFieldTrip
+    'Transportation', // Transportation
+    'Tracking Check Up', // TrackingCheckUp
+    'Advocacy', // Advocacy
+    'Wellness Check', // WellnessCheck
+    'Other', // Other
 ])
 
 // CaseEvent schema
