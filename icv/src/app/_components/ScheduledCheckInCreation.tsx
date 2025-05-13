@@ -9,7 +9,11 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 
-const ScheduledCheckInCreation: React.FC = () => {
+interface ScheduledCheckInCreationProps {
+  onNewEvent: () => void
+}
+
+const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNewEvent}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
 
@@ -20,7 +24,7 @@ const ScheduledCheckInCreation: React.FC = () => {
   const [contactType, setContactType] = useState(ContactType.Values['Wellness Check'])
   const [assigneeId, setAssigneeId] = useState('')
   const [clientSearch, setClientSearch] = useState('')
-  const [selectedClientDocId, setSelectedClientDocId] = useState('')
+  const [selectedClientDocId, setSelectedClientId] = useState('')
 
   const { data: clients } = useSWR('clients', getAllClients)
 
@@ -99,13 +103,15 @@ const ScheduledCheckInCreation: React.FC = () => {
         setShowSuccess(true)
         setLocation('')
         setClientSearch('')
-        setSelectedClientDocId('')
+        setSelectedClientId('')
         mutate('calendar-events')
 
         setTimeout(() => {
           setShowSuccess(false)
           closeModal()
         }, 2000)
+
+        onNewEvent()
       })
       .catch((err) => {
         console.error(err)
@@ -125,7 +131,7 @@ const ScheduledCheckInCreation: React.FC = () => {
       {isOpen && showSuccess && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
                   <Card className="px-4 py-2 rounded text-center w-fit">
-                    Event created successfully!
+                    Check in created successfully!
                   </Card>
                 </div>
       ) }
@@ -209,7 +215,7 @@ const ScheduledCheckInCreation: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setSelectedClientDocId('')
+                          setSelectedClientId('')
                           setClientSearch('')
                         }}
                         className="text-gray-600 hover:text-black"
@@ -233,7 +239,7 @@ const ScheduledCheckInCreation: React.FC = () => {
                               key={client.docId}
                               className="p-2 cursor-pointer hover:bg-gray-100"
                               onClick={() => {
-                                setSelectedClientDocId(client.docId)
+                                setSelectedClientId(client.docId)
                                 setClientSearch('')
                               }}
                             >
