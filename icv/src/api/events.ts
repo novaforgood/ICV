@@ -16,6 +16,7 @@ import {
     getDoc,
     updateDoc,
     setDoc,
+    deleteDoc,
     increment,
     sum,
     getAggregateFromServer,
@@ -77,12 +78,51 @@ export async function createCheckIn(event: CheckInType) {
     try {
         const eventsCollection = collection(ssrdb, 'events');
         const newDoc = await addDoc(eventsCollection, event);
-        await incrementCheckInCount(event.category, new Date(event.startTime));
         return newDoc.id;
     } catch (error) {
         console.error('Error adding check in:', error);
         throw new Error('Failed to add check in', { cause: error });
     }
+}
+
+export async function updateCheckIn(event: CheckInType) {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+    if (!currentUser) {
+        throw new Error('User not found');
+    }
+    const ssrdb = getFirestore(firebaseServerApp);
+
+    if (!event.id) {
+        throw new Error('Event ID is required for update')
+    }
+
+    try {
+        const eventDocRef = doc(ssrdb, 'events', event.id)
+        await updateDoc(eventDocRef, { ...event })
+
+        return event.id
+    } catch (error) {
+        console.error('Error updating check in:', error)
+        throw new Error('Failed to update check in', { cause: error })
+    }
+}
+
+export async function deleteCheckIn(checkInId: string): Promise<void> {
+  const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser()
+  if (!currentUser) {
+    throw new Error('User not found')
+  }
+
+  const db = getFirestore(firebaseServerApp)
+  const docRef = doc(db, 'events', checkInId)
+
+  try {
+    await deleteDoc(docRef)
+    console.log(`Deleted check-in: ${checkInId}`)
+  } catch (error) {
+    console.error('Error deleting check-in:', error)
+    throw new Error('Failed to delete check-in', { cause: error })
+  }
 }
 
 export async function incrementCheckInCount(checkInCategory: CheckInCategoryType, date: Date, count: number = 1) {
