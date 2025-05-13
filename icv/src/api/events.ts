@@ -55,25 +55,17 @@ export async function getEventsbyClientId(clientId: string) {
     })    
     return events
 }
-
-// Helper function to convert a Firebase timestamp or ISO string into a Date object
-function parseTimestamp(timestamp: any) {
-    if (typeof timestamp === 'object') {
-        return timestamp.toDate();
-    } else if (typeof timestamp === 'string') {
-        return new Date(timestamp); // Parse the ISO string directly
-    }
-}
   
 export async function getScheduledEvents(): Promise<CheckInType[]> {
     const events = await getAllEvents();
     const scheduledEvents = events.filter((event) => event.scheduled === true);
-    const parsedEvents = scheduledEvents.map((event) => ({
-        ...event,
-        startTime: parseTimestamp(event.startTime),
-        endTime: event.endTime ? parseTimestamp(event.endTime) : undefined,
-    }));
-    return parsedEvents;
+    return scheduledEvents;
+}
+
+export async function getMyScheduledEvents(assigneeId: string): Promise<CheckInType[]> {
+    const events = await getAllEvents();
+    const scheduledEvents = events.filter((event) => event.scheduled === true && event.assigneeId === assigneeId);
+    return scheduledEvents;
 }
 
 export async function createCheckIn(event: CheckInType) {
