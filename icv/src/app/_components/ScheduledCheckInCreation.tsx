@@ -17,10 +17,10 @@ const ScheduledCheckInCreation: React.FC = () => {
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [location, setLocation] = useState('')
-  const [contactType, setContactType] = useState('W')
+  const [contactType, setContactType] = useState(ContactType.Values['Wellness Check'])
   const [assigneeId, setAssigneeId] = useState('')
   const [clientSearch, setClientSearch] = useState('')
-  const [selectedClientId, setSelectedClientId] = useState('')
+  const [selectedClientDocId, setSelectedClientDocId] = useState('')
 
   const { data: clients } = useSWR('clients', getAllClients)
 
@@ -33,13 +33,13 @@ const ScheduledCheckInCreation: React.FC = () => {
   }, [clients, clientSearch])
 
   const selectedClient = useMemo(() => {
-    if (!clients || !selectedClientId) return null
-    return clients.find((client: any) => client.id === selectedClientId)
-  }, [clients, selectedClientId])
+    if (!clients || !selectedClientDocId) return null
+    return clients.find((client: any) => client.docId === selectedClientDocId)
+  }, [clients, selectedClientDocId])
 
   const name = useMemo(() => {
     if (selectedClient) {
-      return (`Check-in with ${(selectedClient.firstName || selectedClient.lastName)?(selectedClient.firstName + ' ' + selectedClient.lastName) : 'Client ' + selectedClient.id}`)
+      return (`Check-in with ${(selectedClient.firstName || selectedClient.lastName)?(selectedClient.firstName + ' ' + selectedClient.lastName) : 'Client ' + selectedClient.docId}`)
     }
     return 'Check-in with Client'
   }, [selectedClient])    
@@ -87,9 +87,11 @@ const ScheduledCheckInCreation: React.FC = () => {
       endTime: endDateTime,
       assigneeId,
       location,
-      clientId: selectedClientId,
+      clientDocId: selectedClientDocId,
       contactCode: contactType,
       scheduled: true,
+      clientId: selectedClient.id,
+      clientName: selectedClient.firstName + ' ' + selectedClient.lastName
     }
 
     createCheckIn(newEvent)
@@ -97,7 +99,7 @@ const ScheduledCheckInCreation: React.FC = () => {
         setShowSuccess(true)
         setLocation('')
         setClientSearch('')
-        setSelectedClientId('')
+        setSelectedClientDocId('')
         mutate('calendar-events')
 
         setTimeout(() => {
@@ -199,7 +201,7 @@ const ScheduledCheckInCreation: React.FC = () => {
 
                 <div>
                   <label className="block mb-1">Client</label>
-                  {selectedClientId && selectedClient ? (
+                  {selectedClientDocId && selectedClient ? (
                     <div className="flex justify-between items-center p-2 bg-gray-200 rounded">
                       <span>
                         {selectedClient.firstName} {selectedClient.lastName}
@@ -207,7 +209,7 @@ const ScheduledCheckInCreation: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setSelectedClientId('')
+                          setSelectedClientDocId('')
                           setClientSearch('')
                         }}
                         className="text-gray-600 hover:text-black"
@@ -228,10 +230,10 @@ const ScheduledCheckInCreation: React.FC = () => {
                         <ul className="border max-h-40 overflow-y-auto mt-2">
                           {filteredClients.map((client) => (
                             <li
-                              key={client.id}
+                              key={client.docId}
                               className="p-2 cursor-pointer hover:bg-gray-100"
                               onClick={() => {
-                                setSelectedClientId(client.id)
+                                setSelectedClientDocId(client.docId)
                                 setClientSearch('')
                               }}
                             >
