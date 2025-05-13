@@ -30,7 +30,7 @@ export default function Home() {
                 <CheckInCounter />  
 
                 <h1 className="text-2xl font-semibold">Recent Clients</h1>
-                <Link href="/clientprofile" >
+                <Link href="/clients/1n8OcnTxVGsnhTloPySW/checkins" >
                 <Card>
                     <h1 className="text-xl font-bold">Jimin Kim</h1>
                     <p>PK2025</p>

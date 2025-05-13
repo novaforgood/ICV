@@ -7,6 +7,7 @@ import { CheckInType } from '@/types/event-types'
 import { format, isValid } from 'date-fns'
 import React, { useMemo, useState } from 'react'
 import useSWR from 'swr'
+import EventCard from './EventsCard'
 
 // Fetcher function for events
 const fetchEvents = async (): Promise<CheckInType[]> => {
@@ -135,36 +136,12 @@ const EventsSchedule: React.FC = () => {
                         No events for this day.
                     </p>
                 ) : (
-                    filteredEvents.map((event) => {
-                        const eventDate = new Date(event.startTime)
-                        if (!isValid(eventDate)) return null
-
-                        const startTime = eventDate.getTime()
-                        const endTime = event.endTime ? new Date(event.endTime).getTime() : null
-                        const eventName = String(event.name) || 'unnamed check-in'
-                        const eventLocation = String(event.location) || ''
-                        const eventAsignee = String(event.assigneeId) || ''
-
-                        return (
-                            <Card
-                                key={String(event.id)}
-                                className="flex items-center justify-between gap-4 min-h-[100px]"
-                            >
-                                <div className="text-sm text-gray-500 text-center w-[80px]">
-                                    <span>{format(startTime, 'p')}</span>
-                                    <br />
-                                    <span>{endTime && format(endTime, 'p')}</span>
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h2 className="text-lg font-bold truncate">{eventName}</h2>
-                                    <p className="text-gray-600 truncate">{eventLocation}</p>
-                                </div>
-                                <div className="w-[100px] text-center">
-                                    <h2 className="text-lg">{eventAsignee || '-'}</h2>
-                                </div>
-                            </Card>
-                        )
-                    })
+                    filteredEvents.map((event) => (
+                        <EventCard
+                            key={String(event.id)}
+                            event={event}
+                        />
+                    )) 
                 )}
             </div>
         </div>
