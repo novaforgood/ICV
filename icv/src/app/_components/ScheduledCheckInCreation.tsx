@@ -85,6 +85,14 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
     const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
     const endDateTime = new Date(`${date}T${endTime}`).toLocaleString('en-US')
 
+    const startDateTimeObj = new Date(`${date}T${startTime}`)
+    const endDateTimeObj = new Date(`${date}T${endTime}`)
+
+    if (endDateTimeObj <= startDateTimeObj) {
+      alert('End time must be after start time.')
+      return
+    }
+
     const newEvent: CheckInType & { clientId?: string } = {
       name,
       startTime: startDateTime,

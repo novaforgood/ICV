@@ -68,6 +68,14 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
     const endDateTime = new Date(`${date}T${endTime}`).toLocaleString('en-US')
 
+    const startDateTimeObj = new Date(`${date}T${startTime}`)
+    const endDateTimeObj = new Date(`${date}T${endTime}`)
+
+    if (endDateTimeObj <= startDateTimeObj) {
+      alert('End time must be after start time.')
+      return
+    }
+
     const updatedEvent: CheckInType & { clientId?: string } = {
       id: selectedEvent.id,
       startTime: startDateTime,
