@@ -39,13 +39,15 @@ export const CheckInSchema = z.object({
     name : z.string().optional(),
     location: z.string().optional(),
     asigneeId: z.string().optional(),
-    clientId: z.string().optional(),
     id: z.string().optional(),
     scheduled: z.boolean(),
     caseNotes: z.string().optional(),
     contactCode: z.enum(Object.values(ContactType.Values) as [string, ...string[]], {
         message: "Choose contact code."
     }).optional(),
+    clientDocId: z.string().optional(),
+    clientName: z.string().optional(),
+    cliendId: z.string().optional(),
 })
 .passthrough(); // lets fields not in schema pass through (clientId, because always collected properly)
 
