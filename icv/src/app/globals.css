@@ -16,6 +16,15 @@
     }
 } */
 
+
+.dropdown-menu .Dropdown-option {
+    border-bottom: .5px solid #000000;
+    padding: 8px 8px;
+}
+.dropdown-menu .Dropdown-option:last-child {
+    border-bottom: none;
+}
+
 .material-symbols-outlined {
     font-variation-settings:
         'FILL' 0,

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
@@ -23,15 +23,15 @@ import useSWR from 'swr'
 // Localizer setup
 const locales = { 'en-US': enUS }
 const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
+    format,
+    parse,
+    startOfWeek,
+    getDay,
+    locales,
 })
 
 const fetchEvents = async (): Promise<CheckInType[]> => {
-  return await getScheduledEvents()
+    return await getScheduledEvents()
 }
 
 const EventsCalendar: React.FC = () => {

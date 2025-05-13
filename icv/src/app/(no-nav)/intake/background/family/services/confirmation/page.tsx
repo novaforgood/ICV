@@ -1,27 +1,41 @@
 'use client'
-import { createClient } from '@/api/make-cases/make-case'
 import Symbol from '@/components/Symbol'
+import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
-import { ClientIntakeSchema } from '@/types/client-types'
+import { ConfirmationSchema } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { collection, getDocs } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Dropdown from 'react-dropdown'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
 
-// TRAVIS IS TRIPPINGGGGGGGG
+// JIMIN IS TRIPPINGGGGGGGG
+
+//collecting users document from database in string array
+const collectRef = collection(clientDb, 'users')
+const querySnapshot = await getDocs(collectRef)
+const users = querySnapshot.docs.map((doc) => String(doc.data().name))
 
 const Page = () => {
-    const { form: loadedForm, updateForm, clearForm } = useIntakeFormStore()
-    type ClientType = TypeOf<typeof ClientIntakeSchema>
+    const { form: loadedForm, updateForm } = useIntakeFormStore()
+    type ConfirmType = TypeOf<typeof ConfirmationSchema>
 
+    const [selectedUser, setSelectedUser] = useState<string | undefined>()
+
+    const handleSelect = (selected: string) => {
+        setSelectedUser(selected)
+        console.log('Selected user:', selected)
+        console.log('available users:', users)
+    }
     const {
         handleSubmit,
         formState: { errors },
     } = useForm<ClientType>({
         mode: 'onChange',
-        resolver: zodResolver(ClientIntakeSchema),
+        resolver: zodResolver(ConfirmationSchema),
         defaultValues: loadedForm,
     })
 
@@ -33,12 +47,13 @@ const Page = () => {
     const router = useRouter()
     const { user } = useUser()
 
-    const onSubmit = (data: ClientType) => {
-        console.log('in submit...', data)
-        createClient(data)
-        clearForm()
-        router.push('/intake')
-    }
+    // wait until after render (in case rendering occurs before user is async loaded)
+    useEffect(() => {
+        if (user?.displayName) {
+            const assessor = user.displayName
+            updateForm({ assessingStaff: assessor })
+        }
+    }, [user])
 
     // tracks which sections are open/closed
     const [openSections, setOpenSections] = useState<Record<string, boolean>>(
@@ -54,11 +69,7 @@ const Page = () => {
     }
 
     return (
-        <form
-            className="space-y-[24px]"
-            style={{ padding: '24px' }}
-            onSubmit={handleSubmit(onSubmit)}
-        >
+        <form className="space-y-[24px]" style={{ padding: '24px' }}>
             <div className="flex items-center justify-center">
                 <div className="min-w-[800px] space-y-[40px]">
                     <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
@@ -78,10 +89,10 @@ const Page = () => {
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Assessing Staff
                                 </label>
-                                <div>{user?.displayName}</div>
+                                <div>{loadedForm.assessingStaff}</div>
                             </div>
                         </div>
-                        {/* Program and Case Manager to be implemented later */}
+                        {/* Program and Case Manager to be implemented now thanks to Travis the goatttt*/}
                         <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                             <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
@@ -93,7 +104,31 @@ const Page = () => {
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Case Manager
                                 </label>
-                                <div>*Options to be implemented*</div>
+                                <div className="relative">
+                                    <Dropdown
+                                        className="w-full border-black"
+                                        options={users}
+                                        onChange={(option) =>
+                                            handleSelect(option.value)
+                                        }
+                                        placeholder="Select a user"
+                                        controlClassName="flex items-center justify-between border border-black-300 rounded-md px-4 py-2 bg-white w-full hover:border-neutral-400"
+                                        menuClassName="dropdown-menu absolute w-full mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400"
+                                        placeholderClassName="text-gray-500"
+                                        arrowClosed={
+                                            <Symbol
+                                                symbol="keyboard_arrow_down"
+                                                className="text-neutral-900"
+                                            />
+                                        }
+                                        arrowOpen={
+                                            <Symbol
+                                                symbol="keyboard_arrow_up"
+                                                className="text-neutral-900"
+                                            />
+                                        }
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -454,87 +489,87 @@ const Page = () => {
                                                     <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
                                                         Spouse
                                                     </label>
-                                                    {loadedForm.spouse
-                                                        ?.length ? ( // Optional chaining used here
-                                                        loadedForm.spouse.map(
-                                                            (spouse, index) => (
-                                                                <div
-                                                                    key={index}
-                                                                    className="space-y-4 pb-4"
-                                                                >
-                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                        Spouse{' '}
-                                                                        {index +
-                                                                            1}
-                                                                        :
-                                                                    </label>
-                                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                                        {/* First Row: Name & Gender */}
-                                                                        <div className="flex flex-col space-y-1">
-                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                                Name
-                                                                            </label>
-                                                                            <div>
-                                                                                {
-                                                                                    spouse.spouseFirstName
-                                                                                }{' '}
-                                                                                {
-                                                                                    spouse.spouseLastName
-                                                                                }
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="flex flex-col space-y-1">
-                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                                Gender
-                                                                            </label>
-                                                                            <div>
-                                                                                {spouse.spouseGender || (
-                                                                                    <p>
-                                                                                        None
-                                                                                        provided.
-                                                                                    </p>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
+                                                    {loadedForm.spouse ? (
+                                                        // Optional chaining used here
 
-                                                                    {/* Second Row: DOB & Income */}
-                                                                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                                                        <div className="flex flex-col space-y-1">
-                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                                Date
-                                                                                of
-                                                                                Birth
-                                                                            </label>
-                                                                            <div>
-                                                                                {spouse.spouseDOB || (
-                                                                                    <p>
-                                                                                        None
-                                                                                        provided.
-                                                                                    </p>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="flex flex-col space-y-1">
-                                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                                                Income
-                                                                            </label>
-                                                                            <div>
-                                                                                {spouse.spouseIncome !==
-                                                                                undefined ? (
-                                                                                    `$${spouse.spouseIncome.toLocaleString()}`
-                                                                                ) : (
-                                                                                    <p>
-                                                                                        None
-                                                                                        provided.
-                                                                                    </p>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
+                                                        <div className="space-y-4 pb-4">
+                                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                Spouse
+                                                            </label>
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                {/* First Row: Name & Gender */}
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                        Name
+                                                                    </label>
+                                                                    <div>
+                                                                        {
+                                                                            loadedForm
+                                                                                .spouse
+                                                                                .spouseFirstName
+                                                                        }{' '}
+                                                                        {
+                                                                            loadedForm
+                                                                                .spouse
+                                                                                .spouseLastName
+                                                                        }
                                                                     </div>
                                                                 </div>
-                                                            ),
-                                                        )
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                        Gender
+                                                                    </label>
+                                                                    <div>
+                                                                        {loadedForm
+                                                                            .spouse
+                                                                            .spouseGender || (
+                                                                            <p>
+                                                                                None
+                                                                                provided.
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Second Row: DOB & Income */}
+                                                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                        Date of
+                                                                        Birth
+                                                                    </label>
+                                                                    <div>
+                                                                        {loadedForm
+                                                                            .spouse
+                                                                            .spouseDOB || (
+                                                                            <p>
+                                                                                None
+                                                                                provided.
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex flex-col space-y-1">
+                                                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                                                        Income
+                                                                    </label>
+                                                                    <div>
+                                                                        {loadedForm
+                                                                            .spouse
+                                                                            .spouseIncome !==
+                                                                        undefined ? (
+                                                                            `$${loadedForm.spouse.spouseIncome.toLocaleString()}`
+                                                                        ) : (
+                                                                            <p>
+                                                                                None
+                                                                                provided.
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     ) : (
                                                         <p>None provided.</p>
                                                     )}
@@ -1459,7 +1494,7 @@ const Page = () => {
                             type="button"
                             onClick={() =>
                                 router.push(
-                                    '/intake/family/background/services',
+                                    '/intake/background/family/services',
                                 )
                             }
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
@@ -1467,10 +1502,15 @@ const Page = () => {
                             Back
                         </button>
                         <button
-                            type="submit"
+                            type="button"
+                            onClick={() =>
+                                router.push(
+                                    '/intake/background/family/services/confirmation/waiver',
+                                )
+                            }
                             className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
                         >
-                            Submit
+                            Continue
                         </button>
                     </div>
                 </div>
