@@ -45,7 +45,7 @@ const EventsSchedule: React.FC = () => {
         console.log('Selected Date:', selectedDate)
         if (!selectedDate || !events) return events || []
         return events.filter((event) => {
-            const eventDate = event.startTime
+            const eventDate = new Date(event.startTime)
             console.log('Event name: ', event.name, 'Event Date:', event.startTime)
             if (!isValid(eventDate)) return false
             return format(eventDate, 'yyyy-MM-dd') === selectedDate

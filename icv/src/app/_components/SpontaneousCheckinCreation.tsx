@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import useSWR from 'swr'
 import { createCheckIn, updateCaseNotes } from '@/api/events'
 import { getAllClients } from '@/api/clients'
-import { CheckInCategory, CheckInType } from '@/types/event-types'
+import { CheckInCategory, CheckInType, ContactType } from '@/types/event-types'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
@@ -50,7 +50,7 @@ const CaseNotesComponent: React.FC<CaseNotesProps> = React.memo(({ caseNotes, se
 const MultiStepCheckIn = () => {
   const [step, setStep] = useState<Step>(Step.ChooseClient)
   const [clientSearch, setClientSearch] = useState('')
-  const [selectedClientId, setSelectedClientId] = useState('')
+  const [selectedClientDocId, setSelectedClientDocId] = useState('')
   const [name, setName] = useState('')
   const [date, setDate] = useState('')
   const [category, setCategory] = useState(CheckInCategory.Values.Other)
@@ -66,7 +66,7 @@ const MultiStepCheckIn = () => {
     setStep(Step.ChooseClient)
     setCategory(CheckInCategory.Values.Other)
     setClientSearch('')
-    setSelectedClientId('')
+    setSelectedClientDocId('')
     setName('')
     setDate('')
     setAssigneeId('')
@@ -89,7 +89,7 @@ const MultiStepCheckIn = () => {
       })
     : []
 
-  const selectedClient = clients?.find((client: any) => client.id === selectedClientId) || null
+  const selectedClient = clients?.find((client: any) => client.docId === selectedClientDocId) || null
 
     useEffect(() => {
         const auth = getAuth()
@@ -103,10 +103,10 @@ const MultiStepCheckIn = () => {
     const newEvent: CheckInType & { clientId?: string } = {
       startTime: new Date().toLocaleString('en-US'),
       assigneeId,
-      clientId: selectedClientId,
+      clientId: selectedClientDocId,
       category: category,
       scheduled: false,
-      contactCode: 'W',
+      contactCode: ContactType.Values['Wellness Check'],
     }
     console.log('trying to add event:', newEvent);
     try {
@@ -148,9 +148,9 @@ const ChooseClient = React.memo(() => (
     <ul className="max-h-48 overflow-y-auto">
       {filteredClients.map((client: any) => (
         <li
-          key={client.id}
+          key={client.docId}
           onClick={() => {
-            setSelectedClientId(client.id);
+            setSelectedClientDocId(client.docId);
             setStep(Step.ConfirmClient);
           }}
           className="cursor-pointer p-2 hover:bg-gray-200"

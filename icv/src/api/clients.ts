@@ -24,7 +24,7 @@ export async function getAllClients(): Promise<NewClient[]> {
     const clientsSnapshot = await getDocs(clientsCollection)
     const clientsList = clientsSnapshot.docs.map((doc) => {//returns array of client objects by applying arrow function to docs snapshot
         const data = doc.data() as NewClient
-        data.id = doc.id
+        data.docId = doc.id
         return data
     })
     return clientsList
