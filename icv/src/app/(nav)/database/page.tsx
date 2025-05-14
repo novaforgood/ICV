@@ -1,6 +1,7 @@
 'use server'
 
 import { getAllClients } from '@/api/clients'
+import ClientsTable from './_components/ClientsTable'
 
 interface Props {}
 
@@ -11,7 +12,7 @@ const page = async (props: Props) => {
             <div className="mb-4 flex flex-row">
                 <h1 className="text-6xl font-bold">Client Database</h1>
             </div>
-            {/* <ClientsTable clients={clients} /> */}
+            <ClientsTable clients={clients} />
         </div>
     )
 }
