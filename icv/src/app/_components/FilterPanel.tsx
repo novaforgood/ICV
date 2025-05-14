@@ -20,7 +20,7 @@ export default function FilterPanel({ currentFilters, onClose, onFilter }: Filte
     const dateTypeLists = {
         'Month': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         'Quarter': ['Q1', 'Q2', 'Q3', 'Q4'],
-        'Year': ['2024', '2025', '2026', '2027', '2028', '2029', '2030'],
+        'Year': ['2024', '2025', '2026', '2027', '2028', '2029', '2030'], // TODO: pull from the databse from earliest record to this year
         'Fiscal Year': ['2024', '2025', '2026', '2027', '2028', '2029', '2030']
     }
 
@@ -38,11 +38,11 @@ export default function FilterPanel({ currentFilters, onClose, onFilter }: Filte
 
     return (
         <div 
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex z-50 pt-16"
             onClick={onClose}
         >
             <div 
-                className="w-72 bg-white rounded-[5px] shadow-[0px_2px_16px_0px_rgba(0,0,0,0.10)] inline-flex flex-col justify-start items-start overflow-hidden"
+                className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 bg-white rounded-[5px] shadow-[0px_2px_16px_0px_rgba(0,0,0,0.10)] inline-flex flex-col justify-start items-start overflow-auto max-h-[80vh]"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="self-stretch px-3 py-2 bg-white inline-flex justify-between items-center">
@@ -71,13 +71,13 @@ export default function FilterPanel({ currentFilters, onClose, onFilter }: Filte
                 </div>
 
                 {isDropdownOpen && (
-                    <div className="w-full px-3 py-2">
+                    <div className="w-full px-3 py-2 overflow-visible">
                         <div className="w-full bg-white rounded-[5px] shadow-[0px_2px_16px_0px_rgba(0,0,0,0.10)]">
                             {dateTypes.map((type) => (
                                 <div
                                     key={type}
-                                    className={`w-full h-9 px-3 py-2 inline-flex items-center gap-2 cursor-pointer hover:bg-gray-50 ${
-                                        selectedDateType === type ? 'bg-white' : ''
+                                    className={`w-full h-9 px-3 py-2 inline-flex items-center cursor-pointer hover:bg-gray-50 ${
+                                        selectedDateType === type ? 'bg-gray-100' : ''
                                     }`}
                                     onClick={() => {
                                         setSelectedDateType(type)
@@ -85,14 +85,8 @@ export default function FilterPanel({ currentFilters, onClose, onFilter }: Filte
                                         setSelectedDates([])
                                     }}
                                 >
-                                    <div className="size-6 relative overflow-hidden">
-                                        <div className="size-4 left-[3.50px] top-[3.50px] absolute border border-black" />
-                                        {selectedDateType === type && (
-                                            <div className="w-2.5 h-2 left-[7px] top-[8px] absolute bg-black" />
-                                        )}
-                                    </div>
                                     <div className={`justify-center text-base font-normal font-['Epilogue'] leading-none ${
-                                        selectedDateType === type ? 'text-black' : 'text-black'
+                                        selectedDateType === type ? 'font-medium' : 'text-black'
                                     }`}>
                                         {type}
                                     </div>
