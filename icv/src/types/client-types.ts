@@ -252,20 +252,52 @@ export const ClientIntakeSchema = z.object({
     additionalNotes: z.string().optional(),
     
     // Image Upload
-    clientImage: z.array(z.string().optional(),).optional(),
-    clientPassport: z.array(z.string().optional(),).optional(),
-    clientMed: z.array(z.string().optional(),).optional(),
-    clientSSN: z.array(z.string().optional(),).optional(),
-    clientBC: z.array(z.string().optional(),).optional(),
-    otherFiles: z.array(z.string().optional(),).optional(),
+    // clientImage: z.array(z.string().optional(),).optional(),
+    // clientPassport: z.array(z.string().optional(),).optional(),
+    // clientMed: z.array(z.string().optional(),).optional(),
+    // clientSSN: z.array(z.string().optional(),).optional(),
+    // clientBC: z.array(z.string().optional(),).optional(),
+    // otherFiles: z.array(z.string().optional(),).optional(),
 
-    clientImageName: z.array(z.string().optional(),).optional(),
-    clientIDName: z.array(z.string().optional(),).optional(),
-    clientPassportName: z.array(z.string().optional(),).optional(),
-    clientMedName: z.array(z.string().optional(),).optional(),
-    clientSSNName: z.array(z.string().optional(),).optional(),
-    clientBCName: z.array(z.string().optional(),).optional(),
-    otherFilesName: z.array(z.string().optional(),).optional(),
+    // clientImageName: z.array(z.string().optional(),).optional(),
+    // clientIDName: z.array(z.string().optional(),).optional(),
+    // clientPassportName: z.array(z.string().optional(),).optional(),
+    // clientMedName: z.array(z.string().optional(),).optional(),
+    // clientSSNName: z.array(z.string().optional(),).optional(),
+    // clientBCName: z.array(z.string().optional(),).optional(),
+    // otherFilesName: z.array(z.string().optional(),).optional(),
+
+
+    clientPic: z.array(z.object({
+        name: z.string().optional(),
+        uri: z.string(),
+    })),
+    clientIDocs: z.array(z.object({
+        name: z.string().optional(),
+        uri: z.string(),
+    })),
+    clientPassport: z.array(z.object({
+        name: z.string().optional(),
+        uri: z.string(),
+    })),
+    clientMediCal: z.array(z.object({
+        name: z.string().optional(),
+        uri: z.string(),
+    })),
+    clientSSN: z.array(z.object({
+        name: z.string().optional(),
+        uri: z.string(),
+    })),
+    clientBC: z.array(z.object({
+        name: z.string().optional(),
+        uri: z.string(),
+    })),
+    otherFiles: z.array(z.object({
+        name: z.string().optional(),
+        uri: z.string(),
+    })),
+
+
 
     // ----- PAGE 5: CONFIRMATION PAGE ----
     clientCode: z.string().optional(),
@@ -323,19 +355,27 @@ export const ServicesSchema = ClientIntakeSchema.pick({
     education: true,
     healthWellness: true,
     referral: true,
-    clientImage: true,
+    // clientImage: true,
+    // clientPassport: true,
+    // clientMed: true,
+    // clientSSN: true,
+    // clientBC: true,
+    // otherFiles: true,
+    // clientImageName: true,
+    // clientIDName: true,
+    // clientPassportName: true,
+    // clientMedName: true,
+    // clientSSNName: true,
+    // clientBCName: true,
+    // otherFilesName: true,
+
+    clientPic: true,
+    clientIDocs: true,
     clientPassport: true,
-    clientMed: true,
-    clientSSN: true,
-    clientBC: true,
+    clientMediCal:true,
+    clientSSN:true,
+    clientBC:true,
     otherFiles: true,
-    clientImageName: true,
-    clientIDName: true,
-    clientPassportName: true,
-    clientMedName: true,
-    clientSSNName: true,
-    clientBCName: true,
-    otherFilesName: true,
     additionalNotes: true,
 })
 

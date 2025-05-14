@@ -1064,10 +1064,11 @@ export const ClientPic = ({ data }: ClientProps) => {
             <div className="gap-y-[4px]">
                 {/* Row: */}
                 <div>
-                    {data.clientImageName?.length ? ( // Optional chaining used here
-                        data.clientImageName.map((imName, index) => (
+                    {Array.isArray(data.clientPic) &&
+                    data.clientPic.length > 0 ? ( // Optional chaining used here
+                        data.clientPic.map((file, index) => (
                             <div key={index} className="space-y-4">
-                                <label>{imName}</label>
+                                <label>{file.name}</label>
                             </div>
                         ))
                     ) : (
@@ -1087,9 +1088,10 @@ export const ClientDocs = ({ data }: ClientProps) => {
                     ID
                 </label>
                 <div>
-                    {data.clientIDName?.length ? ( // Optional chaining used here
-                        data.clientIDName.map((id, index) => (
-                            <div key={index} className="space-y-4">
+                    {Array.isArray(data.clientIDocs) &&
+                    data.clientIDocs?.length ? ( // Optional chaining used here
+                        data.clientIDocs.map((file, index) => (
+                            <div key={index} className="mt-4 space-y-4">
                                 <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -1100,7 +1102,14 @@ export const ClientDocs = ({ data }: ClientProps) => {
                                     >
                                         <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
                                     </svg>
-                                    {id}
+                                    <a
+                                        href={file.uri}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        {file.name}
+                                    </a>
                                 </label>
                             </div>
                         ))
@@ -1114,9 +1123,10 @@ export const ClientDocs = ({ data }: ClientProps) => {
                     Passport
                 </label>
                 <div>
-                    {data.clientPassportName?.length ? ( // Optional chaining used here
-                        data.clientPassportName.map((pass, index) => (
-                            <div key={index} className="space-y-4">
+                    {Array.isArray(data.clientPassport) &&
+                    data.clientPassport?.length ? ( // Optional chaining used here
+                        data.clientPassport.map((file, index) => (
+                            <div key={index} className="mt-4 space-y-4">
                                 <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -1127,7 +1137,14 @@ export const ClientDocs = ({ data }: ClientProps) => {
                                     >
                                         <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
                                     </svg>{' '}
-                                    {pass}
+                                    <a
+                                        href={file.uri}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        {file.name}
+                                    </a>
                                 </label>
                             </div>
                         ))
@@ -1142,9 +1159,10 @@ export const ClientDocs = ({ data }: ClientProps) => {
                     MediCal
                 </label>
                 <div>
-                    {data.clientMedName?.length ? ( // Optional chaining used here
-                        data.clientMedName.map((id, index) => (
-                            <div key={index} className="space-y-4">
+                    {Array.isArray(data.clientMediCal) &&
+                    data.clientMediCal.length ? ( // Optional chaining used here
+                        data.clientMediCal.map((file, index) => (
+                            <div key={index} className="mt-4 space-y-4">
                                 <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -1155,7 +1173,14 @@ export const ClientDocs = ({ data }: ClientProps) => {
                                     >
                                         <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
                                     </svg>{' '}
-                                    {id}
+                                    <a
+                                        href={file.uri}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        {file.name}
+                                    </a>
                                 </label>
                             </div>
                         ))
@@ -1170,9 +1195,9 @@ export const ClientDocs = ({ data }: ClientProps) => {
                     SSN
                 </label>
                 <div>
-                    {data.clientSSNName?.length ? ( // Optional chaining used here
-                        data.clientSSNName.map((id, index) => (
-                            <div key={index} className="space-y-4">
+                    {Array.isArray(data.clientSSN) && data.clientSSN?.length ? ( // Optional chaining used here
+                        data.clientSSN.map((file, index) => (
+                            <div key={index} className="mt-4 space-y-4">
                                 <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -1183,7 +1208,14 @@ export const ClientDocs = ({ data }: ClientProps) => {
                                     >
                                         <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
                                     </svg>{' '}
-                                    {id}
+                                    <a
+                                        href={file.uri}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        {file.name}
+                                    </a>
                                 </label>
                             </div>
                         ))
@@ -1197,9 +1229,9 @@ export const ClientDocs = ({ data }: ClientProps) => {
                     Birth Certificate
                 </label>
                 <div>
-                    {data.clientBCName?.length ? ( // Optional chaining used here
-                        data.clientBCName.map((id, index) => (
-                            <div key={index} className="space-y-4">
+                    {Array.isArray(data.clientBC) && data.clientBC?.length ? ( // Optional chaining used here
+                        data.clientBC.map((file, index) => (
+                            <div key={index} className="mt-4 space-y-4">
                                 <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -1210,7 +1242,14 @@ export const ClientDocs = ({ data }: ClientProps) => {
                                     >
                                         <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
                                     </svg>{' '}
-                                    {id}
+                                    <a
+                                        href={file.uri}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        {file.name}
+                                    </a>
                                 </label>
                             </div>
                         ))
@@ -1224,9 +1263,10 @@ export const ClientDocs = ({ data }: ClientProps) => {
                     Other
                 </label>
                 <div>
-                    {data.otherFilesName?.length ? ( // Optional chaining used here
-                        data.otherFilesName.map((id, index) => (
-                            <div key={index} className="space-y-4">
+                    {Array.isArray(data.otherFiles) &&
+                    data.otherFiles?.length ? ( // Optional chaining used here
+                        data.otherFiles.map((file, index) => (
+                            <div key={index} className="mt-4 space-y-4">
                                 <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -1237,7 +1277,14 @@ export const ClientDocs = ({ data }: ClientProps) => {
                                     >
                                         <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
                                     </svg>{' '}
-                                    {id}
+                                    <a
+                                        href={file.uri}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline"
+                                    >
+                                        {file.name}
+                                    </a>
                                 </label>
                             </div>
                         ))

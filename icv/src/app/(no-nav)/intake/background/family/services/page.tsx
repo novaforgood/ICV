@@ -50,35 +50,12 @@ const Page = (props: Props) => {
     const handleImageChange = async (
         e: React.ChangeEvent<HTMLInputElement>,
         field: string,
-        name: string,
     ) => {
         console.log('in image func!')
         // was a file selected and is it in the input field?
         if (e.target.files && e.target.files.length > 0) {
             const files = Array.from(e.target.files)
-            const fileNames = files.map((file) => file.name)
 
-            updateForm({ [name]: fileNames })
-
-            const oldImageUrls = loadedForm?.[field as keyof typeof loadedForm]
-
-            if (oldImageUrls && Array.isArray(oldImageUrls)) {
-                // Delete all old images from Firebase Storage
-                await Promise.all(
-                    oldImageUrls.map(async (url) => {
-                        const oldImageRef = ref(storage, url as string)
-                        try {
-                            await deleteObject(oldImageRef)
-                            console.log(`Deleted old image: ${url}`)
-                        } catch (error) {
-                            console.error(
-                                `Error deleting old image ${url}:`,
-                                error,
-                            )
-                        }
-                    }),
-                )
-            }
             // uploading new image
             const uploadPromises = files.map(async (file) => {
                 const storageRef = ref(storage, file.name)
@@ -86,7 +63,7 @@ const Page = (props: Props) => {
                     const snapshot = await uploadBytes(storageRef, file)
                     const downloadURL = await getDownloadURL(snapshot.ref)
                     console.log(`Uploaded file URL: ${downloadURL}`)
-                    return downloadURL
+                    return { name: file.name, url: downloadURL }
                 } catch (error) {
                     console.error(`Error uploading file ${file.name}:`, error)
                     return null
@@ -104,6 +81,10 @@ const Page = (props: Props) => {
     }
 
     useEffect(() => {
+        console.log('in frontend here files', loadedForm.clientIDocs)
+    }, [loadedForm.clientIDocs])
+
+    useEffect(() => {
         reset(loadedForm)
     }, [loadedForm, reset])
 
@@ -112,25 +93,51 @@ const Page = (props: Props) => {
             updateForm({
                 ...data,
                 mentoring: data.mentoring?.filter(
-                    (item): item is string => item !== undefined,
+                    (item): item is string => !!item,
                 ),
                 personalDev: data.personalDev?.filter(
-                    (item): item is string => item !== undefined,
+                    (item): item is string => !!item,
                 ),
-                housing: data.housing?.filter(
-                    (item): item is string => item !== undefined,
-                ),
+                housing: data.housing?.filter((item): item is string => !!item),
                 redirection: data.redirection?.filter(
-                    (item): item is string => item !== undefined,
+                    (item): item is string => !!item,
                 ),
                 education: data.education?.filter(
-                    (item): item is string => item !== undefined,
+                    (item): item is string => !!item,
                 ),
                 healthWellness: data.healthWellness?.filter(
-                    (item): item is string => item !== undefined,
+                    (item): item is string => !!item,
                 ),
                 referral: data.referral?.filter(
-                    (item): item is string => item !== undefined,
+                    (item): item is string => !!item,
+                ),
+                clientPic: data.clientPic?.filter(
+                    (item): item is { uri: string; name?: string } =>
+                        !!item?.uri,
+                ),
+                clientIDocs: data.clientIDocs?.filter(
+                    (item): item is { uri: string; name?: string } =>
+                        !!item?.uri,
+                ),
+                clientPassport: data.clientPassport?.filter(
+                    (item): item is { uri: string; name?: string } =>
+                        !!item?.uri,
+                ),
+                clientMediCal: data.clientMediCal?.filter(
+                    (item): item is { uri: string; name?: string } =>
+                        !!item?.uri,
+                ),
+                clientSSN: data.clientSSN?.filter(
+                    (item): item is { uri: string; name?: string } =>
+                        !!item?.uri,
+                ),
+                clientBC: data.clientBC?.filter(
+                    (item): item is { uri: string; name?: string } =>
+                        !!item?.uri,
+                ),
+                otherFiles: data.otherFiles?.filter(
+                    (item): item is { uri: string; name?: string } =>
+                        !!item?.uri,
                 ),
             })
         }).unsubscribe
@@ -146,91 +153,25 @@ const Page = (props: Props) => {
         }
     }
 
-    const resetFiles = async (field: string, nameField: string) => {
-        const oldImageUrls = loadedForm?.[field as keyof typeof loadedForm]
+    const resetFiles = async (field: string) => {
+        const oldFiles = loadedForm?.[field as keyof typeof loadedForm]
 
-        if (oldImageUrls && Array.isArray(oldImageUrls)) {
+        if (Array.isArray(oldFiles)) {
             await Promise.all(
-                oldImageUrls.map(async (url) => {
-                    const oldImageRef = ref(storage, url as string)
+                (oldFiles as { url: string }[]).map(async (file) => {
+                    const fileRef = ref(storage, file.url)
                     try {
-                        await deleteObject(oldImageRef)
-                        console.log(`Deleted old image: ${url}`)
-                        const updatedUrls = loadedForm?.[
-                            field as keyof typeof loadedForm
-                        ] as string[]
-                        const updatedNames = loadedForm?.[
-                            nameField as keyof typeof loadedForm
-                        ] as string[]
-
-                        updatedUrls.shift() // Remove the first element
-                        updatedNames.shift() // Remove the first element
-
-                        // Update the form state with the remaining items
-                        updateForm({ [field]: updatedUrls })
-                        updateForm({ [nameField]: updatedNames })
+                        await deleteObject(fileRef)
+                        console.log(`Deleted file: ${file.url}`)
                     } catch (error) {
-                        console.error(`Error deleting old image ${url}:`, error)
+                        console.error(`Error deleting file ${file.url}:`, error)
                     }
                 }),
             )
             updateForm({ [field]: [] })
-            updateForm({ [nameField]: [] })
         }
     }
 
-    const deleteFile = async (
-        fileName: string,
-        field: string,
-        nameField: string,
-    ) => {
-        const fileIndex = (
-            loadedForm[nameField as keyof typeof loadedForm] as string[]
-        ).indexOf(fileName)
-        if (fileIndex === -1) {
-            console.log('File name not found.')
-            return
-        }
-
-        // Get the corresponding file URL from fileURLs using the index
-        const fileURL = (
-            loadedForm[field as keyof typeof loadedForm] as string[]
-        )[fileIndex]
-        if (!fileURL) {
-            console.log('No URL found for the given file.')
-            return
-        }
-        const fileRef = ref(storage, fileURL)
-
-        try {
-            console.log(fileURL)
-            console.log(fileName)
-            // Delete the file from Firebase Storage
-            await deleteObject(fileRef)
-            console.log(`File ${fileName} deleted successfully from storage.`)
-
-            const fileIndex = (
-                loadedForm[nameField as keyof typeof loadedForm] as string[]
-            ).indexOf(fileName)
-            if (fileIndex === -1) {
-                console.log('File name not found.')
-                return
-            }
-
-            const updatedFileURLs = (
-                loadedForm[field as keyof typeof loadedForm] as string[]
-            ).filter((_, index) => index !== fileIndex)
-            const updatedFileNames = (
-                loadedForm[nameField as keyof typeof loadedForm] as string[]
-            ).filter((_, index) => index !== fileIndex)
-
-            // Update the Zustand store with the new arrays
-            updateForm({ [field]: updatedFileURLs })
-            updateForm({ [nameField]: updatedFileNames })
-        } catch (error) {
-            console.error('Error deleting file:', error)
-        }
-    }
     const onSubmit = (data: ServiceType) => {
         console.log('in submit...', data)
         updateForm(data)
@@ -368,30 +309,46 @@ const Page = (props: Props) => {
                                     Profile Picture
                                 </label>
                                 <ResetButton
-                                    fileName={loadedForm.clientImageName?.filter(
-                                        (name): name is string =>
-                                            name !== undefined,
-                                    )}
-                                    field="clientImage"
-                                    nameField="clientImageName"
-                                    resetFiles={resetFiles}
+                                        data={{
+                                            ...loadedForm,
+                                            clientPic:
+                                                loadedForm.clientPic ?? [],
+                                            clientIDocs:
+                                                loadedForm.clientIDocs ?? [],
+                                            clientPassport:
+                                                loadedForm.clientPassport ?? [],
+                                            clientMediCal:
+                                                loadedForm.clientMediCal ?? [],
+                                            clientSSN:
+                                                loadedForm.clientSSN ?? [],
+                                            clientBC: loadedForm.clientBC ?? [],
+                                            otherFiles:
+                                                loadedForm.otherFiles ?? [],
+                                        }}
+                                        field="clientPic"
+                                        resetFiles={resetFiles}
+                                    />
+                                </div>
+                                <FileUpload
+                                    data={{
+                                        ...loadedForm,
+                                        clientPic: loadedForm.clientPic ?? [],
+                                        clientIDocs:
+                                            loadedForm.clientIDocs ?? [],
+                                        clientPassport:
+                                            loadedForm.clientPassport ?? [],
+                                        clientMediCal:
+                                            loadedForm.clientMediCal ?? [],
+                                        clientSSN: loadedForm.clientSSN ?? [],
+                                        clientBC: loadedForm.clientBC ?? [],
+                                        otherFiles: loadedForm.otherFiles ?? [],
+                                    }}
+                                    handleFileChange={handleImageChange}
+                                    handleAddFile={handleAddFile}
+                                    field="clientPic"
+                                    buttonText="Add image"
                                 />
                             </div>
-
-                            {/* Image */}
-                            <FileUpload
-                                fileName={loadedForm.clientImageName?.filter(
-                                    (name): name is string =>
-                                        name !== undefined,
-                                )}
-                                handleFileChange={handleImageChange}
-                                handleAddFile={handleAddFile}
-                                deleteFile={deleteFile}
-                                field="clientImage"
-                                nameField="clientImageName"
-                                buttonText="Add image"
-                            />
-                        </div>
                         {/* ADDITIONAL FEATURES */}
                         <div className="space-y-[32px]">
                             <div className="space-y-[24px]">
@@ -407,55 +364,91 @@ const Page = (props: Props) => {
                                     </label>
                                     {/* Reset Button */}
                                     <ResetButton
-                                        fileName={loadedForm.clientIDName?.filter(
-                                            (name): name is string =>
-                                                name !== undefined,
-                                        )}
-                                        field="clientID"
-                                        nameField="clientIDName"
+                                        data={{
+                                            ...loadedForm,
+                                            clientPic:
+                                                loadedForm.clientPic ?? [],
+                                            clientIDocs:
+                                                loadedForm.clientIDocs ?? [],
+                                            clientPassport:
+                                                loadedForm.clientPassport ?? [],
+                                            clientMediCal:
+                                                loadedForm.clientMediCal ?? [],
+                                            clientSSN:
+                                                loadedForm.clientSSN ?? [],
+                                            clientBC: loadedForm.clientBC ?? [],
+                                            otherFiles:
+                                                loadedForm.otherFiles ?? [],
+                                        }}
+                                        field="clientIDocs"
                                         resetFiles={resetFiles}
                                     />
                                 </div>
                                 <FileUpload
-                                    fileName={loadedForm.clientIDName?.filter(
-                                        (name): name is string =>
-                                            name !== undefined,
-                                    )}
+                                    data={{
+                                        ...loadedForm,
+                                        clientPic: loadedForm.clientPic ?? [],
+                                        clientIDocs:
+                                            loadedForm.clientIDocs ?? [],
+                                        clientPassport:
+                                            loadedForm.clientPassport ?? [],
+                                        clientMediCal:
+                                            loadedForm.clientMediCal ?? [],
+                                        clientSSN: loadedForm.clientSSN ?? [],
+                                        clientBC: loadedForm.clientBC ?? [],
+                                        otherFiles: loadedForm.otherFiles ?? [],
+                                    }}
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
-                                    deleteFile={deleteFile}
-                                    field="clientID"
-                                    nameField="clientIDName"
+                                    field="clientIDocs"
                                     buttonText="Add ID"
                                 />
                             </div>
-                            {/* Passport */}
+
                             <div className="space-y-[4px]">
                                 <div className="flex items-center justify-between">
                                     <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
                                         Passport
                                     </label>
-                                    {/* Reset Button */}
+
                                     <ResetButton
-                                        fileName={loadedForm.clientPassportName?.filter(
-                                            (name): name is string =>
-                                                name !== undefined,
-                                        )}
+                                        data={{
+                                            ...loadedForm,
+                                            clientPic:
+                                                loadedForm.clientPic ?? [],
+                                            clientIDocs:
+                                                loadedForm.clientIDocs ?? [],
+                                            clientPassport:
+                                                loadedForm.clientPassport ?? [],
+                                            clientMediCal:
+                                                loadedForm.clientMediCal ?? [],
+                                            clientSSN:
+                                                loadedForm.clientSSN ?? [],
+                                            clientBC: loadedForm.clientBC ?? [],
+                                            otherFiles:
+                                                loadedForm.otherFiles ?? [],
+                                        }}
                                         field="clientPassport"
-                                        nameField="clientPassportName"
                                         resetFiles={resetFiles}
                                     />
                                 </div>
                                 <FileUpload
-                                    fileName={loadedForm.clientPassportName?.filter(
-                                        (name): name is string =>
-                                            name !== undefined,
-                                    )}
+                                    data={{
+                                        ...loadedForm,
+                                        clientPic: loadedForm.clientPic ?? [],
+                                        clientIDocs:
+                                            loadedForm.clientIDocs ?? [],
+                                        clientPassport:
+                                            loadedForm.clientPassport ?? [],
+                                        clientMediCal:
+                                            loadedForm.clientMediCal ?? [],
+                                        clientSSN: loadedForm.clientSSN ?? [],
+                                        clientBC: loadedForm.clientBC ?? [],
+                                        otherFiles: loadedForm.otherFiles ?? [],
+                                    }}
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
-                                    deleteFile={deleteFile}
                                     field="clientPassport"
-                                    nameField="clientPassportName"
                                     buttonText="Add passport"
                                 />
                             </div>
@@ -465,28 +458,45 @@ const Page = (props: Props) => {
                                     <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
                                         MediCal
                                     </label>
-                                    {/* Reset Button */}
+               
                                     <ResetButton
-                                        fileName={loadedForm.clientMed?.filter(
-                                            (name): name is string =>
-                                                name !== undefined,
-                                        )}
-                                        field="clientMed"
-                                        nameField="clientMedName"
+                                        data={{
+                                            ...loadedForm,
+                                            clientPic:
+                                                loadedForm.clientPic ?? [],
+                                            clientIDocs:
+                                                loadedForm.clientIDocs ?? [],
+                                            clientPassport:
+                                                loadedForm.clientPassport ?? [],
+                                            clientMediCal:
+                                                loadedForm.clientMediCal ?? [],
+                                            clientSSN:
+                                                loadedForm.clientSSN ?? [],
+                                            clientBC: loadedForm.clientBC ?? [],
+                                            otherFiles:
+                                                loadedForm.otherFiles ?? [],
+                                        }}
+                                        field="clientMediCal"
                                         resetFiles={resetFiles}
                                     />
                                 </div>
-                                {/* MediCal */}
                                 <FileUpload
-                                    fileName={loadedForm.clientMedName?.filter(
-                                        (name): name is string =>
-                                            name !== undefined,
-                                    )}
+                                    data={{
+                                        ...loadedForm,
+                                        clientPic: loadedForm.clientPic ?? [],
+                                        clientIDocs:
+                                            loadedForm.clientIDocs ?? [],
+                                        clientPassport:
+                                            loadedForm.clientPassport ?? [],
+                                        clientMediCal:
+                                            loadedForm.clientMediCal ?? [],
+                                        clientSSN: loadedForm.clientSSN ?? [],
+                                        clientBC: loadedForm.clientBC ?? [],
+                                        otherFiles: loadedForm.otherFiles ?? [],
+                                    }}
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
-                                    deleteFile={deleteFile}
-                                    field="clientMed"
-                                    nameField="clientMedName"
+                                    field="clientMediCal"
                                     buttonText="Add MediCal"
                                 />
                             </div>
@@ -496,28 +506,44 @@ const Page = (props: Props) => {
                                     <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
                                         SSN
                                     </label>
-                                    {/* Reset Button */}
                                     <ResetButton
-                                        fileName={loadedForm.clientSSNName?.filter(
-                                            (name): name is string =>
-                                                name !== undefined,
-                                        )}
+                                        data={{
+                                            ...loadedForm,
+                                            clientPic:
+                                                loadedForm.clientPic ?? [],
+                                            clientIDocs:
+                                                loadedForm.clientIDocs ?? [],
+                                            clientPassport:
+                                                loadedForm.clientPassport ?? [],
+                                            clientMediCal:
+                                                loadedForm.clientMediCal ?? [],
+                                            clientSSN:
+                                                loadedForm.clientSSN ?? [],
+                                            clientBC: loadedForm.clientBC ?? [],
+                                            otherFiles:
+                                                loadedForm.otherFiles ?? [],
+                                        }}
                                         field="clientSSN"
-                                        nameField="clientSSNName"
                                         resetFiles={resetFiles}
                                     />
                                 </div>
-                                {/* SSN */}
                                 <FileUpload
-                                    fileName={loadedForm.clientSSNName?.filter(
-                                        (name): name is string =>
-                                            name !== undefined,
-                                    )}
+                                    data={{
+                                        ...loadedForm,
+                                        clientPic: loadedForm.clientPic ?? [],
+                                        clientIDocs:
+                                            loadedForm.clientIDocs ?? [],
+                                        clientPassport:
+                                            loadedForm.clientPassport ?? [],
+                                        clientMediCal:
+                                            loadedForm.clientMediCal ?? [],
+                                        clientSSN: loadedForm.clientSSN ?? [],
+                                        clientBC: loadedForm.clientBC ?? [],
+                                        otherFiles: loadedForm.otherFiles ?? [],
+                                    }}
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
-                                    deleteFile={deleteFile}
                                     field="clientSSN"
-                                    nameField="clientSSNName"
                                     buttonText="Add SSN"
                                 />
                             </div>
@@ -527,28 +553,45 @@ const Page = (props: Props) => {
                                     <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
                                         Birth certificate
                                     </label>
-                                    {/* Reset Button */}
+                        
                                     <ResetButton
-                                        fileName={loadedForm.clientBCName?.filter(
-                                            (name): name is string =>
-                                                name !== undefined,
-                                        )}
+                                        data={{
+                                            ...loadedForm,
+                                            clientPic:
+                                                loadedForm.clientPic ?? [],
+                                            clientIDocs:
+                                                loadedForm.clientIDocs ?? [],
+                                            clientPassport:
+                                                loadedForm.clientPassport ?? [],
+                                            clientMediCal:
+                                                loadedForm.clientMediCal ?? [],
+                                            clientSSN:
+                                                loadedForm.clientSSN ?? [],
+                                            clientBC: loadedForm.clientBC ?? [],
+                                            otherFiles:
+                                                loadedForm.otherFiles ?? [],
+                                        }}
                                         field="clientBC"
-                                        nameField="clientBCName"
                                         resetFiles={resetFiles}
                                     />
                                 </div>
-                                {/* Birth Certificate */}
                                 <FileUpload
-                                    fileName={loadedForm.clientBCName?.filter(
-                                        (name): name is string =>
-                                            name !== undefined,
-                                    )}
+                                    data={{
+                                        ...loadedForm,
+                                        clientPic: loadedForm.clientPic ?? [],
+                                        clientIDocs:
+                                            loadedForm.clientIDocs ?? [],
+                                        clientPassport:
+                                            loadedForm.clientPassport ?? [],
+                                        clientMediCal:
+                                            loadedForm.clientMediCal ?? [],
+                                        clientSSN: loadedForm.clientSSN ?? [],
+                                        clientBC: loadedForm.clientBC ?? [],
+                                        otherFiles: loadedForm.otherFiles ?? [],
+                                    }}
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
-                                    deleteFile={deleteFile}
                                     field="clientBC"
-                                    nameField="clientBCName"
                                     buttonText="Add birth certificate"
                                 />
                             </div>
@@ -558,28 +601,45 @@ const Page = (props: Props) => {
                                     <label className="font-epilogue text-[16px] leading-[20px] text-[#000]">
                                         Other
                                     </label>
-                                    {/* Reset Button */}
+                             
                                     <ResetButton
-                                        fileName={loadedForm.otherFilesName?.filter(
-                                            (name): name is string =>
-                                                name !== undefined,
-                                        )}
+                                        data={{
+                                            ...loadedForm,
+                                            clientPic:
+                                                loadedForm.clientPic ?? [],
+                                            clientIDocs:
+                                                loadedForm.clientIDocs ?? [],
+                                            clientPassport:
+                                                loadedForm.clientPassport ?? [],
+                                            clientMediCal:
+                                                loadedForm.clientMediCal ?? [],
+                                            clientSSN:
+                                                loadedForm.clientSSN ?? [],
+                                            clientBC: loadedForm.clientBC ?? [],
+                                            otherFiles:
+                                                loadedForm.otherFiles ?? [],
+                                        }}
                                         field="otherFiles"
-                                        nameField="otherFilesName"
                                         resetFiles={resetFiles}
                                     />
                                 </div>
-                                {/* Other Files */}
                                 <FileUpload
-                                    fileName={loadedForm.otherFilesName?.filter(
-                                        (name): name is string =>
-                                            name !== undefined,
-                                    )}
+                                    data={{
+                                        ...loadedForm,
+                                        clientPic: loadedForm.clientPic ?? [],
+                                        clientIDocs:
+                                            loadedForm.clientIDocs ?? [],
+                                        clientPassport:
+                                            loadedForm.clientPassport ?? [],
+                                        clientMediCal:
+                                            loadedForm.clientMediCal ?? [],
+                                        clientSSN: loadedForm.clientSSN ?? [],
+                                        clientBC: loadedForm.clientBC ?? [],
+                                        otherFiles: loadedForm.otherFiles ?? [],
+                                    }}
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
-                                    deleteFile={deleteFile}
                                     field="otherFiles"
-                                    nameField="otherFilesName"
                                     buttonText="Add other files"
                                 />
                             </div>
@@ -591,7 +651,7 @@ const Page = (props: Props) => {
                             </label>
                             <div>
                                 <textarea
-                                    {...register('notes')}
+                                    {...register('additionalNotes')}
                                     placeholder="Text"
                                     className="min-h-[100px] w-full resize-y overflow-auto rounded border p-2"
                                     rows={4}
