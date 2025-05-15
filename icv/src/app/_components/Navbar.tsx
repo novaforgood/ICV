@@ -71,6 +71,10 @@ const Navbar = () => {
                     <Symbol symbol="database" />
                     Database
                 </NavLink>
+                <NavLink href="/settings">
+                    <Symbol symbol="Settings" />
+                    Settings
+                </NavLink>
             </div>
             <div className="flex-1" />
             <LogoutButton />
