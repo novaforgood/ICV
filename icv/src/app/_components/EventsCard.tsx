@@ -33,6 +33,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, className = '' }) => {
     const eventCategory = String(event.contactCode) || ''
     const colorClass = categoryColors[String(event.contactCode)]
 
+ 
+
     const { user } = useUser()
 
     return (
