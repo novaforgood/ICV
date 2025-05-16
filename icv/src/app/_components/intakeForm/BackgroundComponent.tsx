@@ -146,7 +146,6 @@ export const BackgroundSection: React.FC<Props> = ({
     return (
         <form
             className="space-y-[24px]"
-            style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
             <div className="flex min-h-screen items-center justify-center">
