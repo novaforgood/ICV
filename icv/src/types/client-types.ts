@@ -250,52 +250,35 @@ export const ClientIntakeSchema = z.object({
     
     // Additional Notes
     additionalNotes: z.string().optional(),
-    
-    // Image Upload
-    // clientImage: z.array(z.string().optional(),).optional(),
-    // clientPassport: z.array(z.string().optional(),).optional(),
-    // clientMed: z.array(z.string().optional(),).optional(),
-    // clientSSN: z.array(z.string().optional(),).optional(),
-    // clientBC: z.array(z.string().optional(),).optional(),
-    // otherFiles: z.array(z.string().optional(),).optional(),
-
-    // clientImageName: z.array(z.string().optional(),).optional(),
-    // clientIDName: z.array(z.string().optional(),).optional(),
-    // clientPassportName: z.array(z.string().optional(),).optional(),
-    // clientMedName: z.array(z.string().optional(),).optional(),
-    // clientSSNName: z.array(z.string().optional(),).optional(),
-    // clientBCName: z.array(z.string().optional(),).optional(),
-    // otherFilesName: z.array(z.string().optional(),).optional(),
-
 
     clientPic: z.array(z.object({
         name: z.string().optional(),
-        uri: z.string(),
-    })),
+        uri: z.string().optional(),
+    })).optional(),
     clientIDocs: z.array(z.object({
         name: z.string().optional(),
-        uri: z.string(),
-    })),
+        uri: z.string().optional(),
+    })).optional(),
     clientPassport: z.array(z.object({
         name: z.string().optional(),
-        uri: z.string(),
-    })),
+        uri: z.string().optional(),
+    })).optional(),
     clientMediCal: z.array(z.object({
         name: z.string().optional(),
-        uri: z.string(),
-    })),
+        uri: z.string().optional(),
+    })).optional(),
     clientSSN: z.array(z.object({
         name: z.string().optional(),
-        uri: z.string(),
-    })),
+        uri: z.string().optional(),
+    })).optional(),
     clientBC: z.array(z.object({
         name: z.string().optional(),
-        uri: z.string(),
-    })),
+        uri: z.string().optional(),
+    })).optional(),
     otherFiles: z.array(z.object({
         name: z.string().optional(),
-        uri: z.string(),
-    })),
+        uri: z.string().optional(),
+    })).optional(),
 
 
 
