@@ -1081,6 +1081,14 @@ export const ClientPic = ({ data }: ClientProps) => {
 }
 
 export const ClientDocs = ({ data }: ClientProps) => {
+    // console.log('data', data.clientIDocs)
+    // {
+    //     Array.isArray(data.clientIDocs) && data.clientIDocs.length > 0 // Optional chaining used here
+    //         ? data.clientIDocs.map((file, index) =>
+    //               console.log('HERES INFO ON FILES', file.name, file.uri),
+    //           )
+    //         : console.log('ERROR FILES')
+    // }
     return (
         <div className="space-y-[24px]">
             <div className="flex flex-col space-y-1">
@@ -1088,8 +1096,7 @@ export const ClientDocs = ({ data }: ClientProps) => {
                     ID
                 </label>
                 <div>
-                    {Array.isArray(data.clientIDocs) &&
-                    data.clientIDocs?.length ? ( // Optional chaining used here
+                    {Array.isArray(data.clientIDocs) ? (
                         data.clientIDocs.map((file, index) => (
                             <div key={index} className="mt-4 space-y-4">
                                 <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">

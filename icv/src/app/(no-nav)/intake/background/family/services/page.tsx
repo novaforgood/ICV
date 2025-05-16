@@ -63,7 +63,7 @@ const Page = (props: Props) => {
                     const snapshot = await uploadBytes(storageRef, file)
                     const downloadURL = await getDownloadURL(snapshot.ref)
                     console.log(`Uploaded file URL: ${downloadURL}`)
-                    return { name: file.name, url: downloadURL }
+                    return { name: file.name, uri: downloadURL }
                 } catch (error) {
                     console.error(`Error uploading file ${file.name}:`, error)
                     return null
@@ -158,13 +158,13 @@ const Page = (props: Props) => {
 
         if (Array.isArray(oldFiles)) {
             await Promise.all(
-                (oldFiles as { url: string }[]).map(async (file) => {
-                    const fileRef = ref(storage, file.url)
+                (oldFiles as { uri: string }[]).map(async (file) => {
+                    const fileRef = ref(storage, file.uri)
                     try {
                         await deleteObject(fileRef)
-                        console.log(`Deleted file: ${file.url}`)
+                        console.log(`Deleted file: ${file.uri}`)
                     } catch (error) {
-                        console.error(`Error deleting file ${file.url}:`, error)
+                        console.error(`Error deleting file ${file.uri}:`, error)
                     }
                 }),
             )
