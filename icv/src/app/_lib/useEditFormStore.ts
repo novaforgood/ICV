@@ -9,20 +9,22 @@ export type State = {
  
  export type Actions = {
     updateForm: (form: Partial<NewClient>) => void
+    setForm: (form: Partial<NewClient>) => void
     clearForm: () => void
  }
  
  
- export const useIntakeFormStore = create<State & Actions>()(
+ export const useEditFormStore = create<State & Actions>()(
     persist(
         (set) => ({
             form: {},
+            setForm: (form) => set({ form }),
             updateForm: (form) =>
                 set((state) => ({ form: { ...state.form, ...form } })),
             clearForm: () => set({ form: {} }),
         }),
         {
-            name: 'new-intake-form-storage',
+            name: 'new-edit-form-storage',
         },
     ),
  )
