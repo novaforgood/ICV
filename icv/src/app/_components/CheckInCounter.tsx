@@ -173,7 +173,7 @@ const CheckInCounter: React.FC = () => {
             <h2 className="self-stretch text-[#246f95] text-center font-epilogue text-[40px] not-italic font-bold leading-[56px]">
                 {hygieneKits[timeFrame] + hotMeals[timeFrame] + snackPacks[timeFrame]}
             </h2>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-3 md:grid-cols-1 gap-4">
                 {/* Hygiene Kits Card */}
                 <div className="flex items-center justify-between mb-4 p-4 rounded-lg shadow-md bg-sky">
                     <div>

@@ -11,7 +11,7 @@ export default function layout({
     return (
         <>
             <Navbar />
-            <div className="min-h-screen pl-64">{children}</div>
+            <div className="min-h-screen pl-40 md:pl-64">{children}</div>
         </>
     )
 }

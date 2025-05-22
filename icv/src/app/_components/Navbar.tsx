@@ -38,7 +38,7 @@ const Navbar = () => {
     const { user } = useUser()
 
     return (
-        <div className="fixed left-0 top-0 flex h-full w-64 flex-col items-center gap-4 bg-foreground text-background">
+        <div className="fixed left-0 top-0 flex h-full w-30 md:w-64 flex-col items-center gap-4 bg-foreground text-background">
             <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
                 <img
                     src={

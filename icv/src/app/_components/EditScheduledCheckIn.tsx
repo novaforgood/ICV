@@ -134,54 +134,141 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
 
   return (
     <>
-    {!showUpdateSuccess && !showDeleteSuccess && (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-      <div className="relative bg-white rounded-2xl shadow-lg p-6 w-full max-w-md">
-        <div className="absolute top-4 right-4 flex gap-3 text-gray-600">
-          {!editMode && (
+    {/* event info popup*/}
+    {!showUpdateSuccess && !showDeleteSuccess && !editMode && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+        <div className="relative bg-white rounded-2xl shadow-lg p-6 w-full max-w-md">
+          <div className="absolute top-4 right-4 flex gap-3 text-gray-600">
             <button onClick={() => setEditMode(true)}>
               <span className="material-symbols-outlined">edit</span>
             </button>
+            <button onClick={handleDelete}>
+              <span className="material-symbols-outlined">delete</span>
+            </button>
+            <button onClick={onClose}>
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <h2 className="text-2xl font-semibold">{selectedEvent.clientName}</h2>
+          <p className="text-gray-500 mb-4">{selectedEvent.clientId}</p>
+
+          <div className="flex items-center gap-2 text-gray-800 mb-2">
+            <span className="material-symbols-outlined">calendar_today</span>
+            <p>
+              {new Date(selectedEvent.start).toLocaleString()} –{' '}
+              {new Date(selectedEvent.end).toLocaleTimeString([], {
+                hour: 'numeric',
+                minute: '2-digit',
+              })}
+            </p>
+          </div>
+
+          <span className="inline-block bg-purple-200 text-purple-800 px-3 py-1 rounded-full text-sm font-medium mb-4">
+            {selectedEvent.contactCode}
+          </span>
+
+          <div className="flex items-center gap-2 text-gray-800 mb-2">
+            <span className="material-symbols-outlined">person</span>
+            <p>{selectedEvent.assigneeId}</p>
+          </div>
+
+          {selectedEvent.location && (
+            <div className="flex items-center gap-2 text-gray-800 mb-2">
+              <span className="material-symbols-outlined">location_on</span>
+              <p>{selectedEvent.location}</p>
+            </div>
           )}
-          <button onClick={handleDelete}>
-            <span className="material-symbols-outlined">delete</span>
-          </button>
-          <button onClick={onClose}>
-            <span className="material-symbols-outlined">close</span>
-          </button>
+
+          <div className="flex items-center gap-2 text-blue-700 mt-4 underline cursor-pointer">
+            <span className="material-symbols-outlined">description</span>
+            <p>View case notes</p>
+          </div>
         </div>
-          <div className="py-8">
-        {editMode ? (
-          <form onSubmit={handleSubmit} className="space-y-4">
+      </div>
+    )}
+    {/* editing event */}
+    {!showUpdateSuccess && !showDeleteSuccess && editMode && (
+      <div className="fixed right-0 top-0 h-full w-[400px] bg-white shadow-lg border-l border-gray-200 p-8 z-[100] overflow-y-auto">
+          <div className="absolute top-4 right-4 flex gap-3 text-gray-600">
+
+            <button onClick={onClose}>
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Header */}
+          <div>
+            <h2 className="text-2xl font-bold">{selectedEvent.clientName}</h2>
+            <p className="text-gray-500 text-sm">{selectedEvent.clientId}</p>
+          </div>
+
+          {/* Date */}
+          <div>
+            <label className="block mb-1">Date</label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full border rounded px-4 py-2 block mb-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+
+          {/* Start & End Time */}
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label htmlFor="startTime" className="block mb-1">Start time</label>
+              <input
+                id="startTime"
+                type="time"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+            <div className="flex-1">
+              <label htmlFor="endTime" className="block mb-1">End time</label>
+              <input
+                id="endTime"
+                type="time"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="w-full p-2 border rounded"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Assignee */}
+          <div>
+            <label className="block mb-1">Staff</label>
             <input
-              type="time"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              className="w-full p-2 border rounded"
+              type="text"
+              value={assigneeId}
+              disabled
+              className="w-full border rounded px-4 py-2 border-gray-300 bg-gray-100 block mb-1"
             />
-            <input
-              type="time"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              className="w-full p-2 border rounded"
-            />
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="block mb-1">Location</label>
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="Location"
-              className="w-full p-2 border rounded"
+              className="w-full border rounded px-4 py-2 block mb-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+
+          {/* Contact Code */}
+          <div>
+            <label className="block mb-1">Contact code</label>
             <select
               value={contactType}
               onChange={(e) => setContactType(e.target.value)}
-              className="w-full p-2 border rounded"
+              className="w-full border rounded px-4 py-2 block mb-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {Object.values(ContactType.Values).map((type) => (
                 <option key={type} value={type}>
@@ -189,46 +276,27 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              className="w-full bg-foreground text-white py-2 rounded"
+              className="flex-1 bg-[#4EA0C9] text-white py-2 rounded shadow hover:bg-[#3b8db2] transition"
             >
-              Save Changes
+              Save changes
             </button>
-          </form>
-        ) : (
-          <>
-            <h2 className="text-2xl font-semibold">{selectedEvent.clientName}</h2>
-            <p className="text-gray-500 mb-4">{selectedEvent.clientId}</p>
-            <div className="flex items-center gap-2 text-gray-800 mb-2">
-              <span className="material-symbols-outlined">calendar_today</span>
-              <p>
-                {new Date(selectedEvent.start).toLocaleString()} – {new Date(selectedEvent.end).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
-              </p>
-            </div>
-            <span className="inline-block bg-purple-200 text-purple-800 px-3 py-1 rounded-full text-sm font-medium mb-4">
-              {selectedEvent.contactCode}
-            </span>
-            <div className="flex items-center gap-2 text-gray-800 mb-2">
-              <span className="material-symbols-outlined">person</span>
-              <p>{selectedEvent.assigneeId}</p>
-            </div>
-            {selectedEvent.location && (
-              <div className="flex items-center gap-2 text-gray-800 mb-2">
-                <span className="material-symbols-outlined">location_on</span>
-                <p>{selectedEvent.location}</p>
-              </div>
-            )}
-            <div className="flex items-center gap-2 text-blue-700 mt-4 underline cursor-pointer">
-              <span className="material-symbols-outlined">description</span>
-              <p>View case notes</p>
-            </div>
-          </>
-        )}
+            <button
+              type="button"
+              className="flex-1 bg-black text-white py-2 rounded shadow hover:bg-gray-800 transition"
+            >
+              View case notes
+            </button>
+          </div>
+        </form>
       </div>
-      </div>
-    </div>
     )}
+    {/* event edit success message */}
     {showUpdateSuccess && (
               <div className="fixed inset-0 z-50 flex items-center justify-center">
                 <Card className="px-4 py-2 rounded text-center w-fit">
@@ -236,6 +304,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                 </Card>
               </div>
     ) }
+    {/* delete event success message */}
     {showDeleteSuccess && (
               <div className="fixed inset-0 z-50 flex items-center justify-center">
                 <Card className="px-4 py-2 rounded text-center w-fit">
