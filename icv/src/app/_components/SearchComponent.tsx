@@ -22,9 +22,7 @@ const SearchComponent = () => {
     const searchParams = useSearchParams()
     const { user } = useUser()
     const [searchTerm, setSearchTerm] = useState('')
-    const [results, setResults] = useState<ClientWithLastCheckin[]>([])
     const [loading, setLoading] = useState(false)
-    const [initialPage, setInitialPage] = useState(true)
     const [managerClients, setManagerClients] = useState<ClientWithLastCheckin[]>([])
     const [allClients, setAllClients] = useState<ClientWithLastCheckin[]>([])
     const [sortedManagerClients, setSortedManagerClients] = useState<ClientWithLastCheckin[]>([])
@@ -34,6 +32,7 @@ const SearchComponent = () => {
     const [sortBy, setSortBy] = useState<'asc' | 'desc' | null>(null)
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [activeTab, setActiveTab] = useState<'my' | 'all'>('my')
+    const [displayedClients, setDisplayedClients] = useState<ClientWithLastCheckin[]>([])
     const [filters, setFilters] = useState<{
         selectedDates: string[]
         dateType: string
@@ -41,7 +40,11 @@ const SearchComponent = () => {
         selectedDates: [],
         dateType: 'Month',
     })
-    const [currentPage, setCurrentPage] = useState(1)
+    const [myClientsPage, setMyClientsPage] = useState(1)
+    const [allClientsPage, setAllClientsPage] = useState(1)
+    const [searchResults, setSearchResults] = useState<ClientWithLastCheckin[]>([])
+    const isSearchMode = searchTerm.trim().length > 0
+    const [pageNumber, setPageNumber] = useState(1)
 
     // Get initial page from URL
     useEffect(() => {
@@ -49,21 +52,26 @@ const SearchComponent = () => {
         if (page) {
             const pageNum = parseInt(page, 10)
             if (!isNaN(pageNum) && pageNum > 0) {
-                setCurrentPage(pageNum)
+                if (activeTab === 'my') {
+                    setMyClientsPage(pageNum)
+                } else {
+                    setAllClientsPage(pageNum)
+                }
             }
         }
-    }, [searchParams])
+    }, [searchParams, activeTab])
 
     // Update URL when page changes
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString())
+        const currentPage = activeTab === 'my' ? myClientsPage : allClientsPage
         if (currentPage > 1) {
             params.set('page', currentPage.toString())
         } else {
             params.delete('page')
         }
         router.push(`?${params.toString()}`, { scroll: false })
-    }, [currentPage, router, searchParams])
+    }, [myClientsPage, allClientsPage, activeTab, router, searchParams])
 
     // console.log(managerClients)
 
@@ -100,17 +108,16 @@ const SearchComponent = () => {
 
     useEffect(() => {
         const performSearch = async () => {
-            if (!searchTerm.trim()) {
-                setResults([])
-                setInitialPage(true)
-                return
-            }
-
             setLoading(true)
-            setInitialPage(false)
             try {
                 const searchResults = await searchByKeyword(searchTerm)
-                setResults(searchResults as ClientWithLastCheckin[])
+                // Filter search results based on active tab
+                const filteredResults = activeTab === 'my' 
+                    ? searchResults.filter(client => managerClients.some(mc => mc.id === client.id))
+                    : searchResults
+                setSearchResults(filteredResults as ClientWithLastCheckin[])
+                // Reset to first page when search results change
+                setPageNumber(1)
             } catch (err) {
                 console.error('Error searching clients:', err)
             } finally {
@@ -120,7 +127,7 @@ const SearchComponent = () => {
 
         const debounceTimer = setTimeout(performSearch, 300)
         return () => clearTimeout(debounceTimer)
-    }, [searchTerm, managerClients])
+    }, [searchTerm, managerClients, activeTab])
 
     // Sort manager clients
     useEffect(() => {
@@ -150,52 +157,96 @@ const SearchComponent = () => {
         setSortedAllClients([...sortedWithDates, ...withoutDates]);
     }, [allClients, sortBy]);
 
-    // Filter the clients based on selected dates
-    const filteredClients = (activeTab === 'my' ? sortedManagerClients : sortedAllClients).filter((client) => {
-        if (filters.selectedDates.length === 0) return true
+    // Apply filters to a list of clients
+    const applyFilters = (clients: ClientWithLastCheckin[]) => {
+        return clients.filter((client) => {
+            // Apply date filter if dates are selected
+            if (filters.selectedDates.length > 0) {
+                const clientDate = new Date(client.lastCheckinDate || '')
+                if (isNaN(clientDate.getTime())) return false
 
-        const clientDate = new Date(client.lastCheckinDate || '')
-        if (isNaN(clientDate.getTime())) return false
+                switch (filters.dateType) {
+                    case 'Month':
+                        const month = clientDate.toLocaleString('default', { month: 'long' })
+                        if (!filters.selectedDates.includes(month)) return false
+                        break
+                    case 'Quarter':
+                        const quarter = Math.floor(clientDate.getMonth() / 3) + 1
+                        if (!filters.selectedDates.includes(`Q${quarter}`)) return false
+                        break
+                    case 'Year':
+                    case 'Fiscal Year':
+                        const year = clientDate.getFullYear().toString()
+                        if (!filters.selectedDates.includes(year)) return false
+                        break
+                }
+            }
 
-        switch (filters.dateType) {
-            case 'Month':
-                const month = clientDate.toLocaleString('default', {
-                    month: 'long',
-                })
-                return filters.selectedDates.includes(month)
-            case 'Quarter':
-                const quarter = Math.floor(clientDate.getMonth() / 3) + 1
-                return filters.selectedDates.includes(`Q${quarter}`)
-            case 'Year':
-            case 'Fiscal Year':
-                const year = clientDate.getFullYear().toString()
-                return filters.selectedDates.includes(year)
-            default:
-                return true
+            // Apply search term filter if search term exists
+            if (searchTerm.trim()) {
+                const searchLower = searchTerm.toLowerCase()
+                const matchesSearch = 
+                    client.firstName?.toLowerCase().includes(searchLower) ||
+                    client.lastName?.toLowerCase().includes(searchLower) ||
+                    client.id?.toLowerCase().includes(searchLower)
+                if (!matchesSearch) return false
+            }
+
+            // If we get here, the client passes all filters
+            return true
+        })
+    }
+
+    const updateDisplayedClients = () => {
+        // Get the correct client list based on active tab and search mode
+        const baseClients = isSearchMode
+            ? searchResults
+            : (activeTab === 'my' ? sortedManagerClients : sortedAllClients)
+
+        const filtered = applyFilters(baseClients)
+        setDisplayedClients(filtered)
+        
+        // Reset to first page if needed
+        const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+        if (pageNumber > totalPages && totalPages > 0) {
+            setPageNumber(1)
         }
-    })
+    }
+
+    // Update displayed clients whenever relevant state changes
+    useEffect(() => {
+        updateDisplayedClients()
+    }, [
+        activeTab,
+        sortedManagerClients,
+        sortedAllClients,
+        filters.selectedDates,
+        filters.dateType,
+        searchTerm,
+        sortBy,
+        searchResults,
+        isSearchMode,
+        pageNumber
+    ])
+
+    // Handle tab changes
+    const handleTabChange = (tab: 'my' | 'all') => {
+        setActiveTab(tab)
+        setPageNumber(1)
+        // Clear search results when changing tabs
+        setSearchResults([])
+        setSearchTerm('')
+    }
 
     // Calculate paginated results
     const getPaginatedResults = (items: ClientWithLastCheckin[]) => {
-        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+        const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE
         const endIndex = startIndex + ITEMS_PER_PAGE
         return items.slice(startIndex, endIndex)
     }
 
-    const totalPages = Math.ceil(
-        initialPage ? filteredClients.length / ITEMS_PER_PAGE : results.length / ITEMS_PER_PAGE
-    )
-
-    const handlePageChange = (newPage: number) => {
-        if (newPage >= 1 && newPage <= totalPages) {
-            setCurrentPage(newPage)
-        }
-    }
-
-    const handleTabChange = (tab: 'my' | 'all') => {
-        setActiveTab(tab);
-        setCurrentPage(1); // Reset to first page when switching tabs
-    };
+    // Calculate total pages based on displayed clients
+    const totalPages = Math.ceil(displayedClients.length / ITEMS_PER_PAGE)
 
     return (
         <div className="mx-auto w-full max-w-6xl p-4">
@@ -258,7 +309,6 @@ const SearchComponent = () => {
                     className="flex w-[170px] items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     onClick={() => {
                         setSortBy((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-                        setCurrentPage(1) // Reset to first page when changing sort
                     }}
                 >
                     <svg
@@ -344,7 +394,6 @@ const SearchComponent = () => {
                     onFilter={(newFilters) => {
                         setFilters(newFilters)
                         setIsFilterOpen(false)
-                        console.log('applied filters:', newFilters)
                     }}
                 />
             )}
@@ -361,7 +410,7 @@ const SearchComponent = () => {
             )}
 
             <div className="grid gap-4">
-                {initialPage ? (
+                {!isSearchMode ? (
                     <div className="mb-4">
                         {isLoadingManagerClients ? (
                             <div className="text-center text-gray-500">
@@ -370,7 +419,7 @@ const SearchComponent = () => {
                         ) : (
                             <>
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                    {getPaginatedResults(filteredClients).map((client) => (
+                                    {getPaginatedResults(displayedClients).map((client) => (
                                         <Link
                                             key={`${client.id}-${client.firstName}-${client.dateOfBirth}`}
                                             href={`/clients/${client.id}`}
@@ -383,21 +432,21 @@ const SearchComponent = () => {
                                         </Link>
                                     ))}
                                 </div>
-                                {totalPages > 1 && (
+                                {displayedClients.length > 0 && totalPages > 1 && (
                                     <div className="mt-8 flex justify-center gap-2">
                                         <button
-                                            onClick={() => handlePageChange(currentPage - 1)}
-                                            disabled={currentPage === 1}
+                                            onClick={() => setPageNumber(pageNumber - 1)}
+                                            disabled={pageNumber === 1}
                                             className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                                         >
                                             Previous
                                         </button>
                                         <span className="flex items-center px-4 py-2 text-sm font-medium text-gray-700">
-                                            Page {currentPage} of {totalPages}
+                                            Page {pageNumber} of {totalPages}
                                         </span>
                                         <button
-                                            onClick={() => handlePageChange(currentPage + 1)}
-                                            disabled={currentPage === totalPages}
+                                            onClick={() => setPageNumber(pageNumber + 1)}
+                                            disabled={pageNumber === totalPages}
                                             className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                                         >
                                             Next
@@ -413,7 +462,7 @@ const SearchComponent = () => {
                             Search Results
                         </h2>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {getPaginatedResults(results).map((client) => (
+                            {getPaginatedResults(displayedClients).map((client) => (
                                 <Link
                                     key={`${client.id}-${client.firstName}-${client.dateOfBirth}`}
                                     href={`/clients/${client.id}`}
@@ -426,25 +475,30 @@ const SearchComponent = () => {
                                 </Link>
                             ))}
                         </div>
-                        {totalPages > 1 && (
+                        {displayedClients.length > 0 && totalPages > 1 && (
                             <div className="mt-8 flex justify-center gap-2">
                                 <button
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                    disabled={currentPage === 1}
+                                    onClick={() => setPageNumber(pageNumber - 1)}
+                                    disabled={pageNumber === 1}
                                     className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                                 >
                                     Previous
                                 </button>
                                 <span className="flex items-center px-4 py-2 text-sm font-medium text-gray-700">
-                                    Page {currentPage} of {totalPages}
+                                    Page {pageNumber} of {totalPages}
                                 </span>
                                 <button
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
+                                    onClick={() => setPageNumber(pageNumber + 1)}
+                                    disabled={pageNumber === totalPages}
                                     className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                                 >
                                     Next
                                 </button>
+                            </div>
+                        )}
+                        {displayedClients.length === 0 && !loading && (
+                            <div className="mt-8 text-center text-gray-500">
+                                No results found
                             </div>
                         )}
                     </div>
