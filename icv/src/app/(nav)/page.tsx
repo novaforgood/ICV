@@ -22,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen flex-col md:flex-row gap-6 p-6 pt-12">
-      {/* md and up */}
+      {/* desktop view */}
       <div className="hidden flex-1 flex-col gap-8 md:flex">
         <h1 className="text-6xl font-bold">Hello, Akhilesh</h1>
         <EventsSchedule />

@@ -131,7 +131,7 @@ const CheckInCounter: React.FC = () => {
 
     return (
         <div>
-            <div className="flex items-center gap-10 mb-4">
+            <div className="flex items-center justify-between mb-4 w-full">
                 <h2 className="text-2xl font-semibold">Check-Ins</h2>
                 <Select value={timeFrame} onValueChange={setTimeFrame}>
                     <SelectTrigger className="flex justify-between items-center bg-white w-40 rounded-md border border-gray-300 px-3 py-2">
