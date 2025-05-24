@@ -157,7 +157,7 @@ const ProfileSection: React.FC<Props> = ({
             onSubmit={handleSubmit(handleSubmitType)}
         >
             <div className="flex min-h-screen items-center justify-center">
-                <div className="min-w-[800px] space-y-[60px]">
+                <div className="w-[90%] space-y-[60px]">
                     {/* Basic Information */}
                     <div className="space-y-[24px]">
                         <div className="grid grid-cols-2 gap-[12px]">

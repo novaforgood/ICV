@@ -408,6 +408,7 @@ export const FamilySchema = ClientIntakeSchema.pick({
     pets: true,
     familyMembersServiced: true,
     headOfHousehold: true,
+    associatedSpouseID: true,
 })
 
 export const ConfirmationSchema = ClientIntakeSchema.pick({

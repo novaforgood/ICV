@@ -1,4 +1,5 @@
 'use client'
+import { getClientById } from '@/api/clients'
 import {
     ClientBio,
     ClientCitizenship,
@@ -19,7 +20,7 @@ import {
 import Symbol from '@/components/Symbol'
 import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
-import { ConfirmationSchema } from '@/types/client-types'
+import { ConfirmationSchema, NewClient } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { collection, getDocs } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
@@ -58,6 +59,15 @@ const Page = () => {
 
     const router = useRouter()
     const { user } = useUser()
+    const [spouseInfo, setSpouseInfo] = useState<NewClient>({} as NewClient)
+
+    useEffect(() => {
+        if (loadedForm.associatedSpouseID) {
+            getClientById(loadedForm.associatedSpouseID).then((spouseData) => {
+                setSpouseInfo(spouseData)
+            })
+        }
+    }, [loadedForm.associatedSpouseID])
 
     // wait until after render (in case rendering occurs before user is async loaded)
     useEffect(() => {
@@ -236,6 +246,7 @@ const Page = () => {
                                                     </label>
                                                     <ClientSpouse
                                                         data={loadedForm}
+                                                        spouseInfo={spouseInfo}
                                                     />
                                                 </div>
                                                 <div className="space-y-[24px]">
@@ -283,7 +294,7 @@ const Page = () => {
                                                 </div>
                                                 <div className="space-y-[24px]">
                                                     <label className="font-epilogue text-[28px] font-semibold leading-[40px] text-[#000]">
-                                                        Case Notes
+                                                        Notes
                                                     </label>
                                                     <ClientNotes
                                                         data={loadedForm}

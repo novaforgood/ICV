@@ -29,7 +29,7 @@ export const ClientProfileToggle = ({ client }: { client: ClientType }) => {
 
     return (
         <div className="flex min-h-screen px-[48px]">
-            <div className="mb-[48px] h-screen w-screen min-w-[800px] space-y-[48px]">
+            <div className="mb-[48px] h-screen w-screen min-w-[70%] space-y-[48px]">
                 <button onClick={toggleButton}>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"

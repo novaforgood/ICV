@@ -149,7 +149,7 @@ export const BackgroundSection: React.FC<Props> = ({
             onSubmit={handleSubmit(handleSubmitType)}
         >
             <div className="flex min-h-screen items-center justify-center">
-                <div className="min-w-[800px] space-y-[48px]">
+                <div className="w-[90%] space-y-[48px]">
                     <div className="space-y-[24px]">
                         <div className="space-y-[8px]">
                             <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">

@@ -497,7 +497,17 @@ export const ClientHistory = ({ data }: ClientProps) => {
 
 // Family Section
 
-export const ClientSpouse = ({ data }: ClientProps) => {
+interface WithSpouseProps {
+    data: ClientType
+    spouseInfo: ClientType
+    showViewButton?: boolean
+}
+
+export const ClientSpouse = ({
+    data,
+    spouseInfo,
+    showViewButton,
+}: WithSpouseProps) => {
     const router = useRouter()
     return (
         <div className="space-y-[24px]">
@@ -606,14 +616,52 @@ export const ClientSpouse = ({ data }: ClientProps) => {
 
             {data.associatedSpouseID && (
                 <div className="mt-4 w-full space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
-                    <button
-                        onClick={() =>
-                            router.push(`/clients/${data.associatedSpouseID}`)
-                        }
-                        className="flex h-[32px] min-w-[96px] items-center gap-[4px] rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
-                    >
-                        View Spouse
-                    </button>
+                    <div className="flex flex-row items-center justify-between">
+                        <label className="font-['Epilogue'] text-[22px] text-neutral-900">
+                            <div className="flex flex-row space-x-[4px]">
+                                {spouseInfo.firstName && (
+                                    <p>{spouseInfo.firstName}</p>
+                                )}
+                                {spouseInfo.lastName && (
+                                    <p>{spouseInfo.lastName}</p>
+                                )}
+                            </div>
+                        </label>
+                        {showViewButton && (
+                            <button
+                                onClick={() =>
+                                    router.push(
+                                        `/clients/${data.associatedSpouseID}`,
+                                    )
+                                }
+                                className="flex h-[32px] min-w-[96px] items-center gap-[4px] rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
+                            >
+                                View Spouse
+                            </button>
+                        )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-5">
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-bold">Client Code</label>
+                            <label>{spouseInfo?.clientCode}</label>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-bold">DOB</label>
+                            <label>{spouseInfo?.dateOfBirth}</label>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-5">
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-bold">Gender</label>
+                            <label>{spouseInfo?.gender}</label>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-bold">Income</label>
+                            <label>
+                                <span>${spouseInfo?.totalIncome}</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
