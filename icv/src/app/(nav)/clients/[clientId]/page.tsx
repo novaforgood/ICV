@@ -1,11 +1,5 @@
 import { getClientById } from '@/api/make-cases/make-case'
-import {
-    ClientBio,
-    ClientCitizenship,
-    ClientContactInfo,
-    ClientEthnicity,
-    ClientHousing,
-} from '@/app/_components/ClientProfileComponents'
+import { ClientProfileToggle } from '@/app/_components/clientProfile/EditClientProfile'
 
 const page = async ({
     params,
@@ -16,42 +10,8 @@ const page = async ({
 }) => {
     const { clientId } = await params
     const client = await getClientById(clientId)
-    return (
-        <div className="flex min-h-screen px-[48px] py-[24px]">
-            <div className="mb-[48px] h-screen w-screen min-w-[800px] space-y-[48px]">
-                <div className="space-y-[24px]">
-                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                        BIO
-                    </label>
-                    <ClientBio data={client} />
-                </div>
-                <div className="space-y-[24px]">
-                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                        CONTACT INFORMATION
-                    </label>
-                    <ClientContactInfo data={client} />
-                </div>
-                <div className="space-y-[24px]">
-                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                        CITIZENSHIP
-                    </label>
-                    <ClientCitizenship data={client} />
-                </div>
-                <div className="space-y-[24px]">
-                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                        ETHNICITY
-                    </label>
-                    <ClientEthnicity data={client} />
-                </div>
-                <div className="space-y-[24px]">
-                    <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                        HOUSING
-                    </label>
-                    <ClientHousing data={client} />
-                </div>
-            </div>
-        </div>
-    )
+
+    return <ClientProfileToggle client={client} />
 }
 
 export default page

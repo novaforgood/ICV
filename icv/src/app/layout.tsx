@@ -25,7 +25,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body className={`${epilogFont.variable} antialiased`}>
+            <body
+                className={`${epilogFont.variable} overflow-x-hidden antialiased`}
+            >
                 <AuthSetup />
                 {children}
             </body>
