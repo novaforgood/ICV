@@ -1,26 +1,26 @@
 'use client'
 
 import {
-    ClientEducation,
-    ClientHistory,
-    ClientIncome,
+    ClientDocs,
+    ClientNotes,
+    ClientPic,
+    ClientServices,
 } from '@/app/_components/ClientProfileComponents'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { useEffect, useState } from 'react'
 import { TypeOf } from 'zod'
 import { useEditFormStore } from '../../_lib/useEditFormStore'
-import { BackgroundSection } from '../intakeForm/BackgroundComponent'
+import { ServicesSection } from '../intakeForm/ServicesComponent'
 
 type ClientType = TypeOf<typeof ClientIntakeSchema>
 
-export const ClientBackgroundToggle = ({ client }: { client: ClientType }) => {
+export const ClientServicesToggle = ({ client }: { client: ClientType }) => {
     const [editMode, setEditMode] = useState(false)
     const { form: loadedForm, updateForm } = useEditFormStore()
 
     const toggleButton = () => {
         setEditMode(!editMode)
     }
-
     const clearForm = () => {
         updateForm(client)
     }
@@ -37,7 +37,7 @@ export const ClientBackgroundToggle = ({ client }: { client: ClientType }) => {
                         <div className="space-y-[24px]">
                             <div className="flex flex-row items-center justify-between">
                                 <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                                    EDUCATION
+                                    ICV SERVICES
                                 </label>
                                 <button
                                     onClick={toggleButton}
@@ -55,24 +55,34 @@ export const ClientBackgroundToggle = ({ client }: { client: ClientType }) => {
                                     <label>Edit</label>
                                 </button>
                             </div>
-                            <ClientEducation data={client} />
+                            <ClientServices data={client} />
                         </div>
+
                         <div className="space-y-[24px]">
                             <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                                INCOME
+                                Profile picture
                             </label>
-                            <ClientIncome data={client} />
+
+                            <ClientPic data={client} />
                         </div>
+
                         <div className="space-y-[24px]">
                             <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                                HISTORY
+                                Documents
                             </label>
-                            <ClientHistory data={client} />
+                            <ClientDocs data={client} />
+                        </div>
+
+                        <div className="space-y-[24px]">
+                            <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                                CLIENT NOTES
+                            </label>
+                            <ClientNotes data={client} />
                         </div>
                     </>
                 ) : (
                     <div className="mt-[20px]">
-                        <BackgroundSection
+                        <ServicesSection
                             formType={loadedForm}
                             updateForm={updateForm}
                             onSubmitEdit={(data) => {

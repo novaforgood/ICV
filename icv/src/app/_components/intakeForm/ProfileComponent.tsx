@@ -26,7 +26,9 @@ interface Props {
     spouseID?: string
     onSubmitNew?: (data: NewClient) => void
     onSubmitEdit?: (data: NewClient) => void
+    onCancel?: () => void
     submitType: 'save' | 'next'
+    titleStyle: string
 }
 
 type ProfileType = TypeOf<typeof ProfileSchema>
@@ -36,7 +38,9 @@ const ProfileSection: React.FC<Props> = ({
     spouseID,
     onSubmitNew,
     onSubmitEdit,
+    onCancel,
     submitType,
+    titleStyle,
 }) => {
     const {
         register,
@@ -157,9 +161,13 @@ const ProfileSection: React.FC<Props> = ({
             onSubmit={handleSubmit(handleSubmitType)}
         >
             <div className="flex min-h-screen items-center justify-center">
-                <div className="w-[90%] space-y-[60px]">
+                <div className="w-full space-y-[60px]">
                     {/* Basic Information */}
                     <div className="space-y-[24px]">
+                        {titleStyle ==
+                            'font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]' && (
+                            <label className={titleStyle}>BIO</label>
+                        )}
                         <div className="grid grid-cols-2 gap-[12px]">
                             <div className="flex flex-col space-y-[4px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
@@ -257,7 +265,7 @@ const ProfileSection: React.FC<Props> = ({
 
                     {/* Contact Information */}
                     <div className="space-y-[24px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                        <label className={titleStyle}>
                             Contact Information
                         </label>
                         <div className="grid grid-cols-2 gap-[12px]">
@@ -288,9 +296,7 @@ const ProfileSection: React.FC<Props> = ({
 
                     {/* Citizenship Information */}
                     <div className="space-y-[24px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Citizenship
-                        </label>
+                        <label className={titleStyle}>Citizenship</label>
                         <div className="space-y-[24px]">
                             <div>
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
@@ -325,9 +331,7 @@ const ProfileSection: React.FC<Props> = ({
 
                     {/* Ethnicity Information */}
                     <div className="space-y-[24px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Ethnicity
-                        </label>
+                        <label className={titleStyle}>Ethnicity</label>
                         <div className="space-y-[24px]">
                             <div className="flex flex-col space-y-[8px]">
                                 <CheckboxListWithOther
@@ -349,9 +353,7 @@ const ProfileSection: React.FC<Props> = ({
 
                     {/* Housing Information */}
                     <div className="space-y-[24px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Housing
-                        </label>
+                        <label className={titleStyle}>Housing</label>
 
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
@@ -447,15 +449,45 @@ const ProfileSection: React.FC<Props> = ({
                     </div>
 
                     {submitType == 'save' && (
-                        <div className="flex justify-end">
+                        <div className="flex justify-start space-x-[24px]">
                             <button
                                 type="submit"
-                                className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                                className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95]"
                             >
-                                Save
+                                <div className="flex flex-row space-x-[8px]">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                        fill="#FFFFFF"
+                                    >
+                                        <path d="M389-267 195-460l51-52 143 143 325-324 51 51-376 375Z" />
+                                    </svg>
+                                    Save
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onCancel}
+                                className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                            >
+                                <div className="flex flex-row space-x-[8px]">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                        fill="#FFFFFF"
+                                    >
+                                        <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
+                                    </svg>
+                                    Cancel
+                                </div>
                             </button>
                         </div>
                     )}
+
                     {submitType == 'next' && (
                         <div className="flex justify-end">
                             <button

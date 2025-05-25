@@ -27,7 +27,9 @@ interface Props {
     updateForm: (form: Partial<NewClient>) => void
     onSubmitNew?: (formType: NewClient) => void
     onSubmitEdit?: (formType: NewClient) => void
+    onCancel?: () => void
     submitType: 'save' | 'new'
+    titleStyle: string
 }
 
 type FamilyType = TypeOf<typeof FamilySchema>
@@ -36,7 +38,9 @@ export const FamilySection: React.FC<Props> = ({
     updateForm,
     onSubmitNew,
     onSubmitEdit,
+    onCancel,
     submitType,
+    titleStyle,
 }) => {
     const {
         register,
@@ -382,12 +386,10 @@ export const FamilySection: React.FC<Props> = ({
             onSubmit={handleSubmit(handleSubmitType)}
         >
             <div className="flex min-h-screen items-center justify-center">
-                <div className="w-[90%] space-y-[48px]">
+                <div className="w-full space-y-[48px]">
                     {/* Spouse Section */}
                     <div className="flex flex-col space-y-[24px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Spouse
-                        </label>
+                        <label className={titleStyle}>Spouse</label>
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                 Marital Status
@@ -569,9 +571,7 @@ export const FamilySection: React.FC<Props> = ({
                     {/* Dependent Section */}
 
                     <div className="flex flex-col space-y-[24px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Dependents
-                        </label>
+                        <label className={titleStyle}>Dependents</label>
                         <div className="flex flex-col">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                 Head of household
@@ -945,9 +945,7 @@ export const FamilySection: React.FC<Props> = ({
 
                     {/* Pets Section */}
                     <div className="flex flex-col space-y-[24px]">
-                        <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                            Pets
-                        </label>
+                        <label className={titleStyle}>Pets</label>
 
                         {watch('pets')?.map((pet, index) => (
                             <div
@@ -1027,21 +1025,65 @@ export const FamilySection: React.FC<Props> = ({
                             + Add Pet
                         </button>
                     </div>
-                    <div className="flex justify-between">
-                        <button
-                            type="button"
-                            onClick={() => router.push('/intake/background')}
-                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
-                        >
-                            Back
-                        </button>
-                        <button
-                            type="submit"
-                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
-                        >
-                            Continue
-                        </button>
-                    </div>
+                    {submitType == 'new' && (
+                        <div className="flex justify-between">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    router.push('/intake/background')
+                                }
+                                className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                            >
+                                Back
+                            </button>
+                            <button
+                                type="submit"
+                                className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                            >
+                                Continue
+                            </button>
+                        </div>
+                    )}
+
+                    {submitType == 'save' && (
+                        <div className="flex justify-start space-x-[24px]">
+                            <button
+                                type="submit"
+                                className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95]"
+                            >
+                                <div className="flex flex-row space-x-[8px]">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                        fill="#FFFFFF"
+                                    >
+                                        <path d="M389-267 195-460l51-52 143 143 325-324 51 51-376 375Z" />
+                                    </svg>
+                                    Save
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onCancel}
+                                className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                            >
+                                <div className="flex flex-row space-x-[8px]">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                        fill="#FFFFFF"
+                                    >
+                                        <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
+                                    </svg>
+                                    Cancel
+                                </div>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </form>

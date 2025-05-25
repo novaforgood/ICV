@@ -192,6 +192,12 @@ export const ClientHousing = ({ data }: ClientProps) => {
                     <div>{data.zipCode ? data.zipCode : <p>N/A</p>}</div>
                 </div>
             </div>
+            <div>
+                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                    Notes on Housing
+                </label>
+                <div>{data.housingNotes ? data.housingNotes : <p>N/A</p>}</div>
+            </div>
         </div>
     )
 }
@@ -490,6 +496,12 @@ export const ClientHistory = ({ data }: ClientProps) => {
                         </div>
                     </div>
                 )}
+            </div>
+            <div>
+                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                    Notes on History
+                </label>
+                <div>{data.historyNotes ? data.historyNotes : <p>N/A</p>}</div>
             </div>
         </div>
     )
@@ -1082,18 +1094,6 @@ export const ClientServices = ({ data }: ClientProps) => {
 export const ClientNotes = ({ data }: ClientProps) => {
     return (
         <div className="space-y-[24px]">
-            <div className="flex flex-col space-y-1">
-                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                    Notes on Housing
-                </label>
-                <div>{data.housingNotes ? data.housingNotes : <p>N/A</p>}</div>
-            </div>
-            <div className="flex flex-col space-y-1">
-                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                    Notes on History
-                </label>
-                <div>{data.historyNotes ? data.historyNotes : <p>N/A</p>}</div>
-            </div>
             <div className="flex flex-col space-y-1">
                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                     Additional Notes
