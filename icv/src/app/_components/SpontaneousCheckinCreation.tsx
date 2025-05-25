@@ -7,7 +7,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import ClientCard from './ClientCard'
-import { Cat } from 'lucide-react'
+import ClientSearch from '@/app/_components/ClientSearch'
 
 const enum Step {
   ChooseClient,
@@ -134,33 +134,14 @@ const MultiStepCheckIn = () => {
     }
   }
 
-const ChooseClient = React.memo(() => (
-  <div>
-    <h2 className="mb-4 text-xl font-bold">Choose A Client</h2>
-    <input
-      ref={inputRef}
-      type="text"
-      value={clientSearch}
-      onChange={(e) => setClientSearch(e.target.value)}
-      placeholder="Search by name"
-      className="mb-2 w-full rounded border border-gray-300 p-2"
-    />
-    <ul className="max-h-48 overflow-y-auto">
-      {filteredClients.map((client: any) => (
-        <li
-          key={client.docId}
-          onClick={() => {
-            setSelectedClientDocId(client.docId);
-            setStep(Step.ConfirmClient);
-          }}
-          className="cursor-pointer p-2 hover:bg-gray-200"
-        >
-          {client.firstName} {client.lastName}
-        </li>
-      ))}
-    </ul>
-  </div>
-));
+const ChooseClient = () => (
+  <ClientSearch
+    onSelect={(id) => {
+      setSelectedClientDocId(id)
+      setStep(Step.ConfirmClient)
+    }}
+  />
+)
 
   const ConfirmClient = () => (
     <form
