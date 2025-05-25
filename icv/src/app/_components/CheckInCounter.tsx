@@ -131,7 +131,7 @@ const CheckInCounter: React.FC = () => {
 
     return (
         <div>
-            <div className="flex items-center gap-10 mb-4">
+            <div className="flex items-center justify-between mb-4 w-full">
                 <h2 className="text-2xl font-semibold">Check-Ins</h2>
                 <Select value={timeFrame} onValueChange={setTimeFrame}>
                     <SelectTrigger className="flex justify-between items-center bg-white w-40 rounded-md border border-gray-300 px-3 py-2">
@@ -173,7 +173,7 @@ const CheckInCounter: React.FC = () => {
             <h2 className="self-stretch text-[#246f95] text-center font-epilogue text-[40px] not-italic font-bold leading-[56px]">
                 {hygieneKits[timeFrame] + hotMeals[timeFrame] + snackPacks[timeFrame]}
             </h2>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-3 md:grid-cols-1 gap-4">
                 {/* Hygiene Kits Card */}
                 <div className="flex items-center justify-between mb-4 p-4 rounded-lg shadow-md bg-sky">
                     <div>

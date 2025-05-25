@@ -29,7 +29,7 @@ const ClientCalendarSearch = ({
     }
 
     return (
-        <div className="flex w-full flex-col items-center justify-center gap-4 p-4 sm:flex-row">
+        <div className="flex w-full flex-col items-center justify-center gap-4 pb-6 sm:flex-row">
             <div className="relative w-full max-w-[800px]">
                 <input
                     type="text"
