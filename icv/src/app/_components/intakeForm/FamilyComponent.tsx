@@ -428,7 +428,7 @@ export const FamilySection: React.FC<Props> = ({
 
                         {formType.maritalStatus === 'Married' &&
                             formType.spouseClientStatus === 'No' && (
-                                <div className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
+                                <div className="mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
                                     <div className="flex justify-end">
                                         <button
                                             type="button"
@@ -611,7 +611,7 @@ export const FamilySection: React.FC<Props> = ({
                                 {watch('dependent')?.map((dependent, index) => (
                                     <div
                                         key={index}
-                                        className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
+                                        className="mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
                                     >
                                         <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                                             <label className="font-epilogue text-[22px] font-medium leading-[24px] text-[#1A1D20]">
@@ -950,7 +950,7 @@ export const FamilySection: React.FC<Props> = ({
                         {watch('pets')?.map((pet, index) => (
                             <div
                                 key={index}
-                                className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
+                                className="mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]"
                             >
                                 <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                                     <label className="font-epilogue text-[22px] font-medium leading-[24px] text-[#1A1D20]">
