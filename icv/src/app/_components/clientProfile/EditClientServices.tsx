@@ -24,7 +24,7 @@ export const ClientServicesToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
-    const { form: loadedForm, updateForm, clearForm } = useEditFormStore()
+    const { getForm, updateForm, setForm, clearForm } = useEditFormStore()
     const router = useRouter()
 
     const toggleButton = () => {
@@ -32,8 +32,8 @@ export const ClientServicesToggle = ({
     }
 
     useEffect(() => {
-        updateForm(client)
-    }, [client])
+        setForm(id, client)
+    }, [client, id])
 
     return (
         <div className="flex min-h-screen px-[48px]">
@@ -68,7 +68,6 @@ export const ClientServicesToggle = ({
                             <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
                                 Profile picture
                             </label>
-
                             <ClientPic data={client} />
                         </div>
 
@@ -89,15 +88,12 @@ export const ClientServicesToggle = ({
                 ) : (
                     <div className="mt-[20px]">
                         <ServicesSection
-                            formType={loadedForm}
-                            updateForm={updateForm}
+                            formType={getForm(id)}
+                            updateForm={(form) => updateForm(id, form)}
                             onSubmitEdit={async (data) => {
-                                console.log('onSubmitEdit called with:', data)
-
                                 try {
                                     await updateClient(id, data)
-                                    console.log('updateClient success')
-                                    clearForm()
+                                    clearForm(id)
                                     setEditMode(false)
                                     router.push(`/clients/${id}/services`)
                                 } catch (err) {
@@ -105,7 +101,7 @@ export const ClientServicesToggle = ({
                                 }
                             }}
                             onCancel={() => {
-                                clearForm()
+                                clearForm(id)
                                 setEditMode(false)
                             }}
                             submitType="save"

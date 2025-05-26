@@ -25,7 +25,7 @@ export const ClientFamilyToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
-    const { form: loadedForm, updateForm, clearForm } = useEditFormStore()
+    const { getForm, updateForm, setForm, clearForm } = useEditFormStore()
     const router = useRouter()
 
     const toggleButton = () => {
@@ -33,8 +33,8 @@ export const ClientFamilyToggle = ({
     }
 
     useEffect(() => {
-        updateForm(client)
-    }, [client])
+        setForm(id, client)
+    }, [client, id])
 
     return (
         <div className="flex min-h-screen px-[48px]">
@@ -83,16 +83,13 @@ export const ClientFamilyToggle = ({
                     </>
                 ) : (
                     <FamilySection
-                        formType={loadedForm}
-                        updateForm={updateForm}
+                        formType={getForm(id)}
+                        updateForm={(form) => updateForm(id, form)}
                         onSubmitEdit={async (data) => {
-                            console.log('onSubmitEdit called with:', data)
-
                             try {
                                 await updateClient(id, data)
-                                console.log('updateClient success')
+                                clearForm(id)
                                 setEditMode(false)
-                                clearForm()
                                 router.push(`/clients/${id}/family`)
                             } catch (err) {
                                 console.error('updateClient error:', err)
@@ -100,7 +97,8 @@ export const ClientFamilyToggle = ({
                         }}
                         onCancel={() => {
                             setEditMode(false)
-                            updateForm(client)
+                            clearForm(id)
+                            router.refresh()
                         }}
                         submitType="save"
                         titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"

@@ -23,8 +23,7 @@ export const ClientBackgroundToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
-    const { form: loadedForm, updateForm, clearForm } = useEditFormStore()
-    console.log('Received ID:', id)
+    const { getForm, updateForm, setForm, clearForm } = useEditFormStore()
     const router = useRouter()
 
     const toggleButton = () => {
@@ -32,8 +31,8 @@ export const ClientBackgroundToggle = ({
     }
 
     useEffect(() => {
-        updateForm(client)
-    }, [client])
+        setForm(id, client)
+    }, [client, id])
 
     return (
         <div className="flex min-h-screen px-[48px]">
@@ -79,15 +78,12 @@ export const ClientBackgroundToggle = ({
                 ) : (
                     <div className="mt-[20px]">
                         <BackgroundSection
-                            formType={loadedForm}
-                            updateForm={updateForm}
+                            formType={getForm(id)}
+                            updateForm={(form) => updateForm(id, form)}
                             onSubmitEdit={async (data) => {
-                                console.log('onSubmitEdit called with:', data)
-
                                 try {
                                     await updateClient(id, data)
-                                    console.log('updateClient success')
-                                    clearForm()
+                                    clearForm(id)
                                     setEditMode(false)
                                     router.push(`/clients/${id}/background`)
                                 } catch (err) {
@@ -96,7 +92,8 @@ export const ClientBackgroundToggle = ({
                             }}
                             onCancel={() => {
                                 setEditMode(false)
-                                updateForm(client)
+                                clearForm(id)
+                                router.refresh()
                             }}
                             submitType="save"
                             titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"
