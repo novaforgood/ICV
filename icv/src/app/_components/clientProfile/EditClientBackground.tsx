@@ -85,6 +85,7 @@ export const ClientBackgroundToggle = ({
                                 console.log('onSubmitEdit called with:', data)
 
                                 try {
+                                    clearForm()
                                     await updateClient(id, data)
                                     console.log('updateClient success')
                                     setEditMode(false)
@@ -95,7 +96,7 @@ export const ClientBackgroundToggle = ({
                             }}
                             onCancel={() => {
                                 setEditMode(false)
-                                updateForm(client)
+                                clearForm()
                             }}
                             submitType="save"
                             titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"

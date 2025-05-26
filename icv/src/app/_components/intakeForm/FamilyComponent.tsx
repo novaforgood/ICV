@@ -120,12 +120,12 @@ export const FamilySection: React.FC<Props> = ({
             }
 
             if (formType.spouseClientStatus) {
-                setValue('spouseClientStatus', undefined)
+                setValue('spouseClientStatus', '')
             }
 
             if (formType.associatedSpouseID) {
-                setValue('associatedSpouseID', undefined)
-                updateForm({ associatedSpouseID: undefined })
+                setValue('associatedSpouseID', '')
+                updateForm({ associatedSpouseID: '' })
             }
         }
     }, [

@@ -1,6 +1,6 @@
 'use client'
 
-import { updateClient } from '@/api/make-cases/make-case'
+import { getClientById, updateClient } from '@/api/make-cases/make-case'
 import {
     ClientDependents,
     ClientPets,
@@ -89,8 +89,11 @@ export const ClientFamilyToggle = ({
                             console.log('onSubmitEdit called with:', data)
 
                             try {
+                                clearForm()
                                 await updateClient(id, data)
-                                console.log('updateClient success')
+                                console.log('UPDATED WITH', data)
+                                const updatedPerson = await getClientById(id)
+                                console.log('updatedPerson:', updatedPerson)
                                 setEditMode(false)
                                 router.push(`/clients/${id}/family`)
                             } catch (err) {
@@ -99,7 +102,7 @@ export const ClientFamilyToggle = ({
                         }}
                         onCancel={() => {
                             setEditMode(false)
-                            updateForm(client)
+                            clearForm()
                         }}
                         submitType="save"
                         titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"

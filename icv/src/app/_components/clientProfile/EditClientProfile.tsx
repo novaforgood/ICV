@@ -108,7 +108,7 @@ export const ClientProfileToggle = ({
                             }}
                             onCancel={() => {
                                 setEditMode(false)
-                                updateForm(client)
+                                clearForm()
                             }}
                             submitType="save"
                             titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"
