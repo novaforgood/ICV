@@ -10,7 +10,7 @@ const page = async ({
 }) => {
     const { clientId } = await params
     const client = await getClientById(clientId)
-    return <ClientBackgroundToggle client={client} />
+    return <ClientBackgroundToggle client={client} id={clientId} />
 }
 
 export default page

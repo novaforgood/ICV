@@ -1,11 +1,13 @@
 'use client'
 
+import { updateClient } from '@/api/make-cases/make-case'
 import {
     ClientDependents,
     ClientPets,
     ClientSpouse,
 } from '@/app/_components/ClientProfileComponents'
 import { ClientIntakeSchema } from '@/types/client-types'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { TypeOf } from 'zod'
 import { useEditFormStore } from '../../_lib/useEditFormStore'
@@ -16,12 +18,15 @@ type ClientType = TypeOf<typeof ClientIntakeSchema>
 export const ClientFamilyToggle = ({
     client,
     spouse,
+    id,
 }: {
     client: ClientType
     spouse?: ClientType
+    id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
     const { form: loadedForm, updateForm } = useEditFormStore()
+    const router = useRouter()
 
     const toggleButton = () => {
         setEditMode(!editMode)
@@ -84,9 +89,17 @@ export const ClientFamilyToggle = ({
                     <FamilySection
                         formType={loadedForm}
                         updateForm={updateForm}
-                        onSubmitEdit={(data) => {
-                            updateForm(data)
-                            setEditMode(false)
+                        onSubmitEdit={async (data) => {
+                            console.log('onSubmitEdit called with:', data)
+
+                            try {
+                                await updateClient(id, data)
+                                console.log('updateClient success')
+                                setEditMode(false)
+                                router.push(`/clients/${id}/family`)
+                            } catch (err) {
+                                console.error('updateClient error:', err)
+                            }
                         }}
                         onCancel={() => {
                             setEditMode(false)

@@ -1,11 +1,13 @@
 'use client'
 
+import { updateClient } from '@/api/make-cases/make-case'
 import {
     ClientEducation,
     ClientHistory,
     ClientIncome,
 } from '@/app/_components/ClientProfileComponents'
 import { ClientIntakeSchema } from '@/types/client-types'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { TypeOf } from 'zod'
 import { useEditFormStore } from '../../_lib/useEditFormStore'
@@ -13,9 +15,17 @@ import { BackgroundSection } from '../intakeForm/BackgroundComponent'
 
 type ClientType = TypeOf<typeof ClientIntakeSchema>
 
-export const ClientBackgroundToggle = ({ client }: { client: ClientType }) => {
+export const ClientBackgroundToggle = ({
+    client,
+    id,
+}: {
+    client: ClientType
+    id: string
+}) => {
     const [editMode, setEditMode] = useState(false)
     const { form: loadedForm, updateForm } = useEditFormStore()
+    console.log('Received ID:', id)
+    const router = useRouter()
 
     const toggleButton = () => {
         setEditMode(!editMode)
@@ -75,9 +85,17 @@ export const ClientBackgroundToggle = ({ client }: { client: ClientType }) => {
                         <BackgroundSection
                             formType={loadedForm}
                             updateForm={updateForm}
-                            onSubmitEdit={(data) => {
-                                updateForm(data)
-                                setEditMode(false)
+                            onSubmitEdit={async (data) => {
+                                console.log('onSubmitEdit called with:', data)
+
+                                try {
+                                    await updateClient(id, data)
+                                    console.log('updateClient success')
+                                    setEditMode(false)
+                                    router.push(`/clients/${id}/background`)
+                                } catch (err) {
+                                    console.error('updateClient error:', err)
+                                }
                             }}
                             onCancel={() => {
                                 setEditMode(false)

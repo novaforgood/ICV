@@ -148,6 +148,7 @@ const ProfileSection: React.FC<Props> = ({
     const selectedSheltered = watch('sheltered') ?? ''
 
     const handleSubmitType = (data: ProfileType) => {
+        console.log('onSubmitEdit called with:', data)
         if (submitType === 'save' && onSubmitEdit) {
             onSubmitEdit(data)
         } else if (submitType === 'next' && onSubmitNew) {

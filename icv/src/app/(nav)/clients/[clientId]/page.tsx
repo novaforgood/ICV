@@ -11,7 +11,7 @@ const page = async ({
     const { clientId } = await params
     const client = await getClientById(clientId)
 
-    return <ClientProfileToggle client={client} />
+    return <ClientProfileToggle client={client} id={clientId} />
 }
 
 export default page
