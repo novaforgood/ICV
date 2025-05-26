@@ -97,6 +97,7 @@ export const ClientServicesToggle = ({
                                 try {
                                     await updateClient(id, data)
                                     console.log('updateClient success')
+                                    clearForm()
                                     setEditMode(false)
                                     router.push(`/clients/${id}/services`)
                                 } catch (err) {
@@ -104,8 +105,8 @@ export const ClientServicesToggle = ({
                                 }
                             }}
                             onCancel={() => {
+                                clearForm()
                                 setEditMode(false)
-                                updateForm(client)
                             }}
                             submitType="save"
                             titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"

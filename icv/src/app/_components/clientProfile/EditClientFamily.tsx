@@ -92,6 +92,7 @@ export const ClientFamilyToggle = ({
                                 await updateClient(id, data)
                                 console.log('updateClient success')
                                 setEditMode(false)
+                                clearForm()
                                 router.push(`/clients/${id}/family`)
                             } catch (err) {
                                 console.error('updateClient error:', err)

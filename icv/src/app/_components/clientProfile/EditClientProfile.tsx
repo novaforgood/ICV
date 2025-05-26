@@ -100,6 +100,7 @@ export const ClientProfileToggle = ({
                                 try {
                                     await updateClient(id, data)
                                     console.log('updateClient success')
+                                    clearForm()
                                     setEditMode(false)
                                     router.push(`/clients/${id}`)
                                 } catch (err) {
