@@ -12,7 +12,7 @@ import {
 } from '@/types/client-types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import ClientSearch from '../ClientSearch'
@@ -60,6 +60,8 @@ export const FamilySection: React.FC<Props> = ({
     })
 
     const router = useRouter()
+    const manualUpdateRef = useRef(false)
+
     const [warnings, setWarnings] = useState<string[]>([])
     type IncomeWarning = {
         message: string
@@ -95,12 +97,12 @@ export const FamilySection: React.FC<Props> = ({
         return unsubscribe
     }, [watch, formType])
 
-    // useEffect(() => {
-    //     if (formType.associatedSpouseID) {
-    //         setValue('maritalStatus', 'Married')
-    //         setValue('spouseClientStatus', 'Yes')
-    //     }
-    // }, [formType.associatedSpouseID])
+    useEffect(() => {
+        if (formType.associatedSpouseID && !manualUpdateRef.current) {
+            setValue('maritalStatus', 'Married')
+            setValue('spouseClientStatus', 'Yes')
+        }
+    }, [formType.associatedSpouseID, setValue])
 
     const [spouseInfo, setSpouseInfo] = useState<NewClient>({} as NewClient)
     const [showSpouseSearch, setShowSpouseSearch] = useState(false)
@@ -113,27 +115,43 @@ export const FamilySection: React.FC<Props> = ({
         }
     }, [formType.associatedSpouseID])
 
+    // useEffect(() => {
+    //     if (formType.maritalStatus !== 'Married') {
+    //         if (formType.spouse) {
+    //             removeSpouse()
+    //         }
+
+    //         if (formType.spouseClientStatus) {
+    //             setValue('spouseClientStatus', '')
+    //         }
+
+    //         // if (formType.associatedSpouseID) {
+    //         //     setValue('associatedSpouseID', '')
+    //         //     updateForm({ associatedSpouseID: '' })
+    //         // }
+    //     }
+    // }, [
+    //     formType.maritalStatus,
+    //     formType.spouse,
+    //     formType.spouseClientStatus,
+    //     formType.associatedSpouseID,
+    // ])
+
     useEffect(() => {
-        if (formType.maritalStatus !== 'Married') {
-            if (formType.spouse) {
-                removeSpouse()
-            }
+        const marital = watch('maritalStatus')
+        const spouseStatus = watch('spouseClientStatus')
 
-            if (formType.spouseClientStatus) {
-                setValue('spouseClientStatus', '')
-            }
-
+        if (
+            (marital && marital !== 'Married') ||
+            (spouseStatus && spouseStatus !== 'Yes')
+        ) {
             if (formType.associatedSpouseID) {
+                manualUpdateRef.current = true
                 setValue('associatedSpouseID', '')
                 updateForm({ associatedSpouseID: '' })
             }
         }
-    }, [
-        formType.maritalStatus,
-        formType.spouse,
-        formType.spouseClientStatus,
-        formType.associatedSpouseID,
-    ])
+    }, [watch('maritalStatus'), watch('spouseClientStatus')])
 
     useEffect(() => {
         if (formType.headOfHousehold != 'Yes' && formType.dependent) {
@@ -594,10 +612,10 @@ export const FamilySection: React.FC<Props> = ({
                                     <button
                                         className="rounded-[5px] bg-black px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
                                         onClick={() => {
-                                            setValue(
-                                                'associatedSpouseID',
-                                                undefined,
-                                            )
+                                            setValue('associatedSpouseID', '')
+                                            updateForm({
+                                                associatedSpouseID: '',
+                                            })
                                             setLinkSpouse(true)
                                         }}
                                     >
@@ -684,6 +702,8 @@ export const FamilySection: React.FC<Props> = ({
                                                 </div>
                                                 <ClientSearch
                                                     onSelect={(docId) => {
+                                                        manualUpdateRef.current =
+                                                            false
                                                         setValue(
                                                             'associatedSpouseID',
                                                             docId,

@@ -72,7 +72,7 @@ const Page = () => {
                             's profile has been created.
                         </p>
                     </div>
-                    <div className="flex flex-col items-center justify-center space-y-[24px]">
+                    <div className="flex flex-row items-center space-x-[24px]">
                         <button
                             type="button"
                             onClick={() => {
