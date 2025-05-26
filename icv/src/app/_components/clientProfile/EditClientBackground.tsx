@@ -23,16 +23,12 @@ export const ClientBackgroundToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
-    const { form: loadedForm, updateForm } = useEditFormStore()
+    const { form: loadedForm, updateForm, clearForm } = useEditFormStore()
     console.log('Received ID:', id)
     const router = useRouter()
 
     const toggleButton = () => {
         setEditMode(!editMode)
-    }
-
-    const clearForm = () => {
-        updateForm(client)
     }
 
     useEffect(() => {
@@ -99,7 +95,7 @@ export const ClientBackgroundToggle = ({
                             }}
                             onCancel={() => {
                                 setEditMode(false)
-                                clearForm()
+                                updateForm(client)
                             }}
                             submitType="save"
                             titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"

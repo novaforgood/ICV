@@ -25,12 +25,8 @@ export const ClientProfileToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
-    const { form: loadedForm, updateForm } = useEditFormStore()
+    const { form: loadedForm, updateForm, clearForm } = useEditFormStore()
     const router = useRouter()
-
-    const clearForm = () => {
-        updateForm(client)
-    }
 
     const toggleButton = () => {
         setEditMode(!editMode)
@@ -112,7 +108,7 @@ export const ClientProfileToggle = ({
                             }}
                             onCancel={() => {
                                 setEditMode(false)
-                                clearForm()
+                                updateForm(client)
                             }}
                             submitType="save"
                             titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"

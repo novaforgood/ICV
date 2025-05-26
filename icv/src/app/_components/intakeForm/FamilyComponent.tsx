@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
+import ClientSearch from '../ClientSearch'
 import {
     CheckboxList,
     RadioChoice,
@@ -30,6 +31,7 @@ interface Props {
     onCancel?: () => void
     submitType: 'save' | 'new'
     titleStyle: string
+    showSpouseLink?: boolean
 }
 
 type FamilyType = TypeOf<typeof FamilySchema>
@@ -41,6 +43,7 @@ export const FamilySection: React.FC<Props> = ({
     onCancel,
     submitType,
     titleStyle,
+    showSpouseLink,
 }) => {
     const {
         register,
@@ -63,6 +66,9 @@ export const FamilySection: React.FC<Props> = ({
         depIndex: number
     }
     const [invalidIncome, setInvalidIncome] = useState<IncomeWarning[]>([])
+    const [linkSpouse, setLinkSpouse] = useState(
+        formType.associatedSpouseID && showSpouseLink ? false : true,
+    )
 
     useEffect(() => {
         reset(formType)
@@ -97,6 +103,7 @@ export const FamilySection: React.FC<Props> = ({
     }, [formType.associatedSpouseID])
 
     const [spouseInfo, setSpouseInfo] = useState<NewClient>({} as NewClient)
+    const [showSpouseSearch, setShowSpouseSearch] = useState(false)
 
     useEffect(() => {
         if (formType.associatedSpouseID) {
@@ -107,10 +114,15 @@ export const FamilySection: React.FC<Props> = ({
     }, [formType.associatedSpouseID])
 
     useEffect(() => {
-        if (formType.maritalStatus != 'Married' && formType.spouse) {
-            removeSpouse()
+        if (formType.maritalStatus !== 'Married') {
+            if (formType.spouse) {
+                removeSpouse()
+            }
+            if (formType.spouseClientStatus) {
+                setValue('spouseClientStatus', undefined)
+            }
         }
-    }, [formType.maritalStatus])
+    }, [formType.maritalStatus, formType.spouse, formType.spouseClientStatus])
 
     useEffect(() => {
         if (formType.headOfHousehold != 'Yes' && formType.dependent) {
@@ -281,23 +293,18 @@ export const FamilySection: React.FC<Props> = ({
         }
     }, [formType.dependent, setValue])
 
-    const onSubmit = (data: FamilyType) => {
-        console.log('in submit...', data)
-        updateForm(data)
-        router.push('/intake/background/family/services')
-    }
-
     // Function to clear spouse information
     const removeSpouse = () => {
         console.log('Remove in progress!')
-
         setValue('spouse.spouseFirstName', undefined)
         setValue('spouse.spouseLastName', undefined)
         setValue('spouse.spouseDOB', undefined)
         setValue('spouse.spouseIncome', undefined)
         setValue('spouse.spouseGender', undefined)
 
-        setValue('spouse', undefined)
+        updateForm({
+            spouse: undefined,
+        })
     }
 
     const removeDependents = () => {
@@ -521,51 +528,169 @@ export const FamilySection: React.FC<Props> = ({
                                 </div>
                             )}
                         {formType.associatedSpouseID && (
-                            <div className="mt-4 w-full space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
-                                <div className="flex flex-row items-center justify-between">
-                                    <label className="font-['Epilogue'] text-[22px] text-neutral-900">
-                                        <div className="flex flex-row space-x-[4px]">
-                                            {spouseInfo.firstName && (
-                                                <p>{spouseInfo.firstName}</p>
-                                            )}
-                                            {spouseInfo.lastName && (
-                                                <p>{spouseInfo.lastName}</p>
-                                            )}
+                            <div className="space-y-[24px]">
+                                <div className="mt-4 w-full space-y-[24px] rounded-[10px] border border-[#DBD8E4] p-[24px]">
+                                    <div className="flex flex-row items-center justify-between">
+                                        <label className="font-['Epilogue'] text-[22px] text-neutral-900">
+                                            <div className="flex flex-row space-x-[4px]">
+                                                {spouseInfo.firstName && (
+                                                    <p>
+                                                        {spouseInfo.firstName}
+                                                    </p>
+                                                )}
+                                                {spouseInfo.lastName && (
+                                                    <p>{spouseInfo.lastName}</p>
+                                                )}
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-x-5">
+                                        <div className="flex flex-col space-y-1">
+                                            <label className="font-bold">
+                                                Client Code
+                                            </label>
+                                            <label>
+                                                {spouseInfo?.clientCode}
+                                            </label>
                                         </div>
-                                    </label>
-                                </div>
-                                <div className="grid grid-cols-2 gap-x-5">
-                                    <div className="flex flex-col space-y-1">
-                                        <label className="font-bold">
-                                            Client Code
-                                        </label>
-                                        <label>{spouseInfo?.clientCode}</label>
+                                        <div className="flex flex-col space-y-1">
+                                            <label className="font-bold">
+                                                DOB
+                                            </label>
+                                            <label>
+                                                {spouseInfo?.dateOfBirth}
+                                            </label>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col space-y-1">
-                                        <label className="font-bold">DOB</label>
-                                        <label>{spouseInfo?.dateOfBirth}</label>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-x-5">
-                                    <div className="flex flex-col space-y-1">
-                                        <label className="font-bold">
-                                            Gender
-                                        </label>
-                                        <label>{spouseInfo?.gender}</label>
-                                    </div>
-                                    <div className="flex flex-col space-y-1">
-                                        <label className="font-bold">
-                                            Income
-                                        </label>
-                                        <label>
-                                            <span>
+                                    <div className="grid grid-cols-2 gap-x-5">
+                                        <div className="flex flex-col space-y-1">
+                                            <label className="font-bold">
+                                                Gender
+                                            </label>
+                                            <label>{spouseInfo?.gender}</label>
+                                        </div>
+                                        <div className="flex flex-col space-y-1">
+                                            <label className="font-bold">
+                                                Income
+                                            </label>
+                                            <label>
                                                 ${spouseInfo?.totalIncome}
-                                            </span>
-                                        </label>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
+                                {showSpouseLink && (
+                                    <button
+                                        className="rounded-[5px] bg-black px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                                        onClick={() => {
+                                            setValue(
+                                                'associatedSpouseID',
+                                                undefined,
+                                            )
+                                            setLinkSpouse(true)
+                                        }}
+                                    >
+                                        <div className="flex flex-row space-x-[8px]">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                height="20px"
+                                                viewBox="0 -960 960 960"
+                                                width="20px"
+                                                fill="#FFFFFF"
+                                            >
+                                                <path d="M312-144q-29.7 0-50.85-21.15Q240-186.3 240-216v-480h-48v-72h192v-48h192v48h192v72h-48v479.57Q720-186 698.85-165T648-144H312Zm336-552H312v480h336v-480ZM384-288h72v-336h-72v336Zm120 0h72v-336h-72v336ZM312-696v480-480Z" />
+                                            </svg>
+                                            <label>Remove spouse</label>
+                                        </div>
+                                    </button>
+                                )}
                             </div>
                         )}
+
+                        {/* Add search to associate a new spouse */}
+                        {showSpouseLink &&
+                            formType.maritalStatus === 'Married' &&
+                            formType.spouseClientStatus === 'Yes' &&
+                            !formType.associatedSpouseID && (
+                                <div>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setShowSpouseSearch(true)
+                                        }
+                                        className="rounded-[5px] bg-black px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                                    >
+                                        <div className="flex flex-row space-x-[8px]">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                height="20px"
+                                                viewBox="0 -960 960 960"
+                                                width="20px"
+                                                fill="#FFFFFF"
+                                            >
+                                                <path d="M432-288H288q-79.68 0-135.84-56.23Q96-400.45 96-480.23 96-560 152.16-616q56.16-56 135.84-56h144v72H288q-50 0-85 35t-35 85q0 50 35 85t85 35h144v72Zm-96-156v-72h288v72H336Zm192 156v-72h144q50 0 85-35t35-85q0-50-35-85t-85-35H528v-72h144q79.68 0 135.84 56.23 56.16 56.22 56.16 136Q864-400 807.84-344 751.68-288 672-288H528Z" />
+                                            </svg>
+                                            <label>Link spouse profile</label>
+                                        </div>
+                                    </button>
+
+                                    {showSpouseSearch && (
+                                        <>
+                                            {/* Modal Backdrop */}
+                                            <div
+                                                className="fixed inset-0 z-40 bg-black bg-opacity-50"
+                                                onClick={() =>
+                                                    setShowSpouseSearch(false)
+                                                }
+                                            />
+
+                                            {/* Modal Content */}
+                                            <div
+                                                className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white p-6 shadow-lg"
+                                                onClick={(e) =>
+                                                    e.stopPropagation()
+                                                }
+                                            >
+                                                <div className="mb-4 flex items-center justify-between">
+                                                    <button
+                                                        onClick={() =>
+                                                            setShowSpouseSearch(
+                                                                false,
+                                                            )
+                                                        }
+                                                        className="text-2xl text-gray-600 hover:text-black"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            height="20px"
+                                                            viewBox="0 -960 960 960"
+                                                            width="20px"
+                                                            fill="#000000"
+                                                        >
+                                                            <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <ClientSearch
+                                                    onSelect={(docId) => {
+                                                        setValue(
+                                                            'associatedSpouseID',
+                                                            docId,
+                                                        )
+                                                        updateForm({
+                                                            associatedSpouseID:
+                                                                docId,
+                                                        })
+                                                        setShowSpouseSearch(
+                                                            false,
+                                                        )
+                                                    }}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )}
                     </div>
 
                     {/* Dependent Section */}
