@@ -62,19 +62,18 @@ const Navbar = () => {
         <div>
             {/*tablet view*/} 
             {!open && (      
-            <div ref={menuRef} className="md:hidden flex fixed left-0 top-0 h-full w-14 flex-col items-center gap-4 bg-foreground text-background">
+            <div ref={menuRef} className="md:hidden flex fixed left-0 top-0 h-full w-20 flex-col items-center gap-4 bg-foreground text-background">
                 <div onClick={() => setOpen(true)} className="absolute top-4 justify-center cursor-pointer z-50">
-                    <div className="w-6 h-0.5 bg-background mb-1"></div>
-                    <div className="w-6 h-0.5 bg-background mb-1"></div>
-                    <div className="w-6 h-0.5 bg-background mb-1"></div>
+                    <Symbol symbol="menu" />
                 </div>
+                <div className='py-6'/>
                 <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
                     <img
                         src={
                             user?.photoURL || '/cavediva.jpeg'
                         }
                         alt="logo"
-                        className="m-4 h-8 w-8 rounded-full"
+                        className="m-4 h-16 w-16 rounded-full"
                     />
                 </div>
                 <div className="flex w-full flex-col items-center justify-center">
