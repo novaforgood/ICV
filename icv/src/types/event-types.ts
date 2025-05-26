@@ -18,7 +18,7 @@ export const ContactType = z.enum([
     'Individual Meeting', // IndividualMeeting
     'Family Meeting', // FamilyMeeting
     'Referral to Service Provider', // ReferralToServiceProvider
-    'Emplyment Job Readiness', // EmploymentJobReadiness and EventActivityFieldTrip
+    'Employment Job Readiness', // EmploymentJobReadiness and EventActivityFieldTrip
     'Transportation', // Transportation
     'Tracking Check Up', // TrackingCheckUp
     'Advocacy', // Advocacy

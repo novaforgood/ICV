@@ -1,13 +1,17 @@
 'use client'
-import ClientCalendarSearch from '@/app/_components/ClientCalendarSearch'
+
+import { getClientById } from '@/api/clients'
 import EventCard from '@/app/_components/EventsCard'
 import ScheduledCheckInCreation from '@/app/_components/ScheduledCheckInCreation'
+import Symbol from '@/components/Symbol'
 import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
 import { CheckInType } from '@/types/event-types'
-import { collection, getDocs, query, where } from 'firebase/firestore'
+import { collection, getDocs, or, query, where } from 'firebase/firestore'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Dropdown from 'react-dropdown'
 
 interface CheckIn extends CheckInType {
     id: string
@@ -17,51 +21,115 @@ type CheckInsState = {
     upcoming: CheckIn[]
 }
 
+// Add sorting type
+type SortOrder = 'newest' | 'oldest'
+
 export default function CheckInsPage() {
     const { clientId } = useParams()
+    const [client, setClient] = useState<any>(null)
     const [checkIns, setCheckIns] = useState<CheckInsState>({
         past: [],
         upcoming: [],
     })
     const [loading, setLoading] = useState(true)
-    const [search, setSearch] = useState('')
     const [newEvents, setNewEvents] = useState(false)
+    const [currentPage, setCurrentPage] = useState(1)
+    const eventsPp = 8
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(
+        null,
+    )
 
-    const handleSearchChange = (searchText: string) => {
-        console.log('search text: ', searchText)
-        setSearch(searchText)
+    // Add sorting state
+    const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
+
+    //pagination!
+    const indexofLastEvent = currentPage * eventsPp
+    const indexofFirstEvent = indexofLastEvent - eventsPp
+
+    const currEvents = [...checkIns.past].slice(
+        indexofFirstEvent,
+        indexofLastEvent,
+    )
+
+    // Sort past events
+    const sortedPastEvents = currEvents.sort((a, b) => {
+        const dateA = new Date(a.startTime).getTime()
+        const dateB = new Date(b.startTime).getTime()
+        return sortOrder === 'newest' ? dateB - dateA : dateA - dateB
+    })
+
+    // Sort upcoming events
+    const sortedUpcomingEvents = [...checkIns.upcoming].sort((a, b) => {
+        const dateA = new Date(a.startTime).getTime()
+        const dateB = new Date(b.startTime).getTime()
+        return sortOrder === 'newest' ? dateB - dateA : dateA - dateB
+    })
+
+
+    //filtering options
+    // const codes = currEvents.map(evt => evt.contactCode); ISSUE: TAKES CATEGORIES FROM ALL PAST< NO TTHE PAST IN THE PAGE
+    const filterOptions = Array.from(
+        new Set([
+            ...checkIns.upcoming.map(ci => String(ci.contactCode)),
+            ...checkIns.past.map(ci => String(ci.contactCode)),
+        ])
+    )
+    // Filter upcoming events by category if a category is selected
+    const filteredUpcomingEvents = selectedCategory
+        ? [...checkIns.upcoming].filter(
+              (event) => event.contactType === selectedCategory,
+          )
+        : sortedUpcomingEvents
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setSortOrder('newest')
+            setCurrentPage(currentPage + 1)
+        }
     }
 
-    const sortBySearchRelevance = (a: CheckIn, b: CheckIn) => {
-        // Convert search and check-in data to lowercase for case-insensitive comparison
-        const searchLower = search.toLowerCase()
-        const aTitle = a.contactCode?.toLowerCase() || ''
-        const bTitle = b.contactCode?.toLowerCase() || ''
-        const aDescription = a.description?.toLowerCase() || ''
-        const bDescription = b.description?.toLowerCase() || ''
+    // Filter events by category if a category is selected
+    const filteredPastEvents = selectedCategory
+        ? sortedPastEvents.filter(
+              (event) => event.contactType === selectedCategory,
+          )
+        : sortedPastEvents
+    const totalPages = Math.ceil(filteredPastEvents.length / eventsPp)
 
-        // Check if search term appears in title (highest priority)
-        const aTitleMatch = aTitle.includes(searchLower)
-        const bTitleMatch = bTitle.includes(searchLower)
-        if (aTitleMatch !== bTitleMatch) return bTitleMatch ? 1 : -1
-
-        // Then check description matches
-        const aDescMatch = aDescription.includes(searchLower)
-        const bDescMatch = bDescription.includes(searchLower)
-        if (aDescMatch !== bDescMatch) return bDescMatch ? 1 : -1
-
-        // If no search term, maintain original date-based sorting
-        return new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setSortOrder('newest')
+            setCurrentPage(currentPage - 1)
+        }
     }
+
+    const handleCategoryChange = (option: { value: string }) => {
+        setSelectedCategory(option.value)
+        setCurrentPage(1) // Reset to first page when filter changes
+    }
+
+    //fetch client
+    useEffect(() => {
+        const fetchClient = async () => {
+            const clientData = await getClientById(clientId as string)
+
+            setClient(clientData)
+        }
+        fetchClient()
+    }, [clientId])
 
     useEffect(() => {
         const fetchCheckIns = async () => {
             try {
                 const q = query(
                     collection(clientDb, 'events'),
-                    where('clientId', '==', clientId),
+                    or(
+                        where('clientDocId', '==', clientId),
+                        where('clientId', '==', clientId),
+                    ),
                 )
                 const querySnapshot = await getDocs(q)
+
                 const checkInsData = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
@@ -93,6 +161,11 @@ export default function CheckInsPage() {
                         new Date(a.startTime).getTime() -
                         new Date(b.startTime).getTime(),
                 )
+                console.log(
+                    'upcoming check ins count:',
+                    upcomingCheckIns.length,
+                )
+                console.log('past check ins count:', pastCheckIns.length)
 
                 setCheckIns({
                     past: pastCheckIns,
@@ -120,31 +193,150 @@ export default function CheckInsPage() {
 
     return (
         <div className="p-7">
-            <ClientCalendarSearch onSearchChange={handleSearchChange} />
-            <div className="flex w-full flex-row gap-6">
-                <h1 className="text-2xl font-medium">Upcoming check ins</h1>
-                <div className="ml-auto">
+            <div className="sticky top-48 z-10 flex h-20 items-center justify-between bg-white pb-4">
+                {/* Title */}
+                <h1 className="text-4xl font-bold">Case Notes</h1>
+
+                <div className="flex items-center gap-4">
                     <ScheduledCheckInCreation
                         onNewEvent={() => setNewEvents(true)}
+                        variant="checkins-page"
+                        clientName={`${client.firstName} ${client.lastName}`}
                     />
+
+                    {/* Filter controls */}
+                    <div className="flex items-center gap-2">
+                        <Dropdown
+                            className="w-full border-black"
+                            placeholderClassName="hidden"
+                            options={filterOptions}
+                            onChange={handleCategoryChange}
+                            controlClassName="flex items-center justify-between border border-black-300 rounded-md px-4 py-2 bg-white w-full hover:border-neutral-400"
+                            menuClassName="dropdown-menu absolute w-400 mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400"
+                            arrowClosed={
+                                <div className="flex w-full items-center justify-between">
+                                    <Symbol
+                                        symbol="filter_list"
+                                        className="h-5 w-5"
+                                    />
+                                    {selectedCategory && (
+                                        <span className="ml-2">
+                                            {selectedCategory}
+                                        </span>
+                                    )}
+                                </div>
+                            }
+                            arrowOpen={
+                                <div className="flex w-full items-center justify-between">
+                                    <Symbol
+                                        symbol="filter_list"
+                                        className="h-5 w-5"
+                                    />
+                                    {selectedCategory && (
+                                        <span className="ml-2">
+                                            {selectedCategory}
+                                        </span>
+                                    )}
+                                </div>
+                            }
+                        />
+                    </div>
+
+                    {/* Sort controls */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setSortOrder('newest')}
+                            className={`rounded-md px-3 py-1 ${
+                                sortOrder === 'newest'
+                                    ? 'bg-blue text-white'
+                                    : 'bg-gray-100 hover:bg-gray-200'
+                            }`}
+                        >
+                            Newest
+                        </button>
+                        <button
+                            onClick={() => setSortOrder('oldest')}
+                            className={`rounded-md px-3 py-1 ${
+                                sortOrder === 'oldest'
+                                    ? 'bg-blue text-white'
+                                    : 'bg-gray-100 hover:bg-gray-200'
+                            }`}
+                        >
+                            Oldest
+                        </button>
+                    </div>
+
+                    {/* Pagination controls */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handlePrevPage}
+                            disabled={currentPage === 1}
+                            className={`flex h-8 w-8 items-center justify-center rounded-md ${
+                                currentPage === 1
+                                    ? 'cursor-not-allowed bg-gray-100 text-gray-400'
+                                    : 'bg-blue text-white hover:bg-navy'
+                            }`}
+                        >
+                            <ChevronLeft className="h-5 w-5" />
+                        </button>
+                        <span className="text-sm">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <button
+                            onClick={handleNextPage}
+                            disabled={currentPage === totalPages}
+                            className={`flex h-8 w-8 items-center justify-center rounded-md ${
+                                currentPage === totalPages
+                                    ? 'cursor-not-allowed bg-gray-100 text-gray-400'
+                                    : 'bg-blue text-white hover:bg-navy'
+                            }`}
+                        >
+                            <ChevronRight className="h-5 w-5" />
+                        </button>
+                    </div>
                 </div>
             </div>
 
+            <div className="flex w-full flex-row gap-6">
+                {currentPage === 1 && (
+                    <div className="flex w-full items-center justify-between pb-4">
+                        <h1 className="text-xl font-medium">
+                            Upcoming check ins
+                        </h1>
+                    </div>
+                )}
+            </div>
+
             <div className="grid gap-4">
-                {[...checkIns.upcoming]
-                    .sort(sortBySearchRelevance)
-                    .map((checkIn: CheckIn) => (
-                        <EventCard key={String(checkIn.id)} event={checkIn} />
+                {currentPage === 1 &&
+                    // Show upcoming check-ins on first page
+                    (filteredUpcomingEvents.length === 0 ? (
+                        <div className="py-4 text-center text-gray-500">
+                            No upcoming check-ins scheduled. Yay!
+                        </div>
+                    ) : (
+                        filteredUpcomingEvents.map((checkIn: CheckIn) => (
+                            <EventCard
+                                key={String(checkIn.id)}
+                                event={checkIn}
+                                variant="checkins-page"
+                            />
+                        ))
                     ))}
             </div>
 
-            <h1 className="mb-4 mt-8 text-2xl font-medium">Past check ins</h1>
+            <div className="mb-4 mt-8 flex w-full items-center justify-between">
+                <h1 className="text-xl font-medium">Past check ins</h1>
+                <div className="flex items-center gap-2"></div>
+            </div>
             <div className="grid gap-4">
-                {[...checkIns.past]
-                    .sort(sortBySearchRelevance)
-                    .map((checkIn: CheckIn) => (
-                        <EventCard key={String(checkIn.id)} event={checkIn} />
-                    ))}
+                {filteredPastEvents.map((checkIn: CheckIn) => (
+                    <EventCard
+                        key={String(checkIn.id)}
+                        event={checkIn}
+                        variant="checkins-page"
+                    />
+                ))}
             </div>
         </div>
     )

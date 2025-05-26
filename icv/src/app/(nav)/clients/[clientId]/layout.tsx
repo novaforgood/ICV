@@ -11,6 +11,9 @@ export default async function layout({
 }>) {
     const { clientId } = params
     const client = await getClientById(clientId)
+    if (!client){
+        throw new Error('Client does not exist')
+    }
     return (
         <>
             <div className="sticky left-0 top-0 flex w-full flex-col items-start overflow-x-hidden rounded-md border-b bg-white">
