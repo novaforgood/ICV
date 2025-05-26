@@ -1143,14 +1143,21 @@ export const ClientPic = ({ data }: ClientProps) => {
                 {/* Row: */}
                 <div>
                     {Array.isArray(data.clientPic) &&
-                    data.clientPic.length > 0 ? ( // Optional chaining used here
-                        data.clientPic.map((file, index) => (
-                            <div key={index} className="space-y-4">
-                                <label>{file.name}</label>
-                            </div>
-                        ))
+                    data.clientPic.length > 0 ? (
+                        <a
+                            href={data.clientPic[0].uri}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                        >
+                            <img
+                                src={data.clientPic[0].uri}
+                                alt="Profile"
+                                className="h-[120px] w-[120px] rounded-full object-cover"
+                            />
+                        </a>
                     ) : (
-                        <p>No file(s) uploaded.</p>
+                        <p>No image uploaded.</p>
                     )}
                 </div>
             </div>
@@ -1159,14 +1166,6 @@ export const ClientPic = ({ data }: ClientProps) => {
 }
 
 export const ClientDocs = ({ data }: ClientProps) => {
-    // console.log('data', data.clientIDocs)
-    // {
-    //     Array.isArray(data.clientIDocs) && data.clientIDocs.length > 0 // Optional chaining used here
-    //         ? data.clientIDocs.map((file, index) =>
-    //               console.log('HERES INFO ON FILES', file.name, file.uri),
-    //           )
-    //         : console.log('ERROR FILES')
-    // }
     return (
         <div className="space-y-[24px]">
             <div className="flex flex-col space-y-1">

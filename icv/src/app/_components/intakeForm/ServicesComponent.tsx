@@ -20,7 +20,7 @@ import {
     uploadBytes,
 } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import FileUpload, { ResetButton } from '../../_components/FileUpload'
@@ -62,12 +62,16 @@ export const ServicesSection: React.FC<Props> = ({
         defaultValues: formType,
     })
 
+    const [uploadingField, setUploadingField] = useState<string | null>(null)
+
     const handleImageChange = async (
         e: React.ChangeEvent<HTMLInputElement>,
         field: string,
     ) => {
         if (e.target.files && e.target.files.length > 0) {
             const files = Array.from(e.target.files)
+
+            setUploadingField(field)
 
             const uploadPromises = files.map(async (file) => {
                 const storageRef = ref(storage, file.name)
@@ -87,6 +91,8 @@ export const ServicesSection: React.FC<Props> = ({
             if (downloadURLs.length > 0) {
                 updateForm({ [field]: downloadURLs })
             }
+
+            setUploadingField(null)
         }
     }
 
@@ -297,25 +303,32 @@ export const ServicesSection: React.FC<Props> = ({
                         ['clientSSN', 'SSN'],
                         ['clientBC', 'Birth Certificate'],
                         ['otherFiles', 'Other Documents'],
-                    ].map(([field, label]) => (
-                        <div className="space-y-[8px]" key={field}>
-                            <div className="flex items-center justify-between">
-                                <label className={titleStyle}>{label}</label>
-                                <ResetButton
+                    ].map(([field, label]) => {
+                        const isProfile = field === 'clientPic'
+
+                        return (
+                            <div className="space-y-[8px]" key={field}>
+                                <div className="flex items-center justify-between">
+                                    <label className={titleStyle}>
+                                        {label}
+                                    </label>
+                                    <ResetButton
+                                        data={formType}
+                                        field={field}
+                                        resetFiles={resetFiles}
+                                    />
+                                </div>
+                                <FileUpload
                                     data={formType}
+                                    handleFileChange={handleImageChange}
+                                    handleAddFile={handleAddFile}
                                     field={field}
-                                    resetFiles={resetFiles}
+                                    isUploading={uploadingField === field}
+                                    isProfilePic={isProfile}
                                 />
                             </div>
-                            <FileUpload
-                                data={formType}
-                                handleFileChange={handleImageChange}
-                                handleAddFile={handleAddFile}
-                                field={field}
-                                buttonText={`Add ${label.toLowerCase()}`}
-                            />
-                        </div>
-                    ))}
+                        )
+                    })}
 
                     <div className="space-y-[8px]">
                         <label className={titleStyle}>Additional Notes</label>
