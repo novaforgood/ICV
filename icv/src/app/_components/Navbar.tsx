@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation'
 
 import { useUser } from '@/hooks/useUser'
 import { cn } from '@/lib/utils'
+import { useEffect, useRef, useState } from 'react'
 import Symbol from '../../components/Symbol'
 import LogoutButton from './LogoutButton'
-import { useState, useEffect, useRef } from 'react'
 
 const Navbar = () => {
     // const [name, setName] = useState<string>('')
@@ -36,119 +36,126 @@ const Navbar = () => {
     //     return () => unsubscribe()
     // }, [])
 
-    
     const { user } = useUser()
-    const [ open, setOpen ] = useState(false)
+    const [open, setOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
     // Close when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-            setOpen(false)
-        }
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target as Node)
+            ) {
+                setOpen(false)
+            }
         }
 
         if (open) {
-        document.addEventListener('mousedown', handleClickOutside)
+            document.addEventListener('mousedown', handleClickOutside)
         }
 
         return () => {
-        document.removeEventListener('mousedown', handleClickOutside)
+            document.removeEventListener('mousedown', handleClickOutside)
         }
     }, [open])
 
     return (
         <div>
-            {/*tablet view*/} 
-            {!open && (      
-            <div ref={menuRef} className="md:hidden flex fixed left-0 top-0 h-full w-14 flex-col items-center gap-4 bg-foreground text-background">
-                <div onClick={() => setOpen(true)} className="absolute top-4 justify-center cursor-pointer z-50">
-                    <div className="w-6 h-0.5 bg-background mb-1"></div>
-                    <div className="w-6 h-0.5 bg-background mb-1"></div>
-                    <div className="w-6 h-0.5 bg-background mb-1"></div>
+            {/*tablet view*/}
+            {!open && (
+                <div
+                    ref={menuRef}
+                    className="fixed left-0 top-0 flex h-full w-14 flex-col items-center gap-4 bg-foreground text-background md:hidden"
+                >
+                    <div
+                        onClick={() => setOpen(true)}
+                        className="absolute top-4 z-50 cursor-pointer justify-center"
+                    >
+                        <div className="mb-1 h-0.5 w-6 bg-background"></div>
+                        <div className="mb-1 h-0.5 w-6 bg-background"></div>
+                        <div className="mb-1 h-0.5 w-6 bg-background"></div>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
+                        <img
+                            src={user?.photoURL || '/cavediva.jpeg'}
+                            alt="logo"
+                            className="m-4 h-8 w-8 rounded-full"
+                        />
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center">
+                        <NavLink href="/" collapsed>
+                            <Symbol symbol="home" />
+                        </NavLink>
+                        <NavLink href="/intake" collapsed>
+                            <Symbol symbol="add" />
+                        </NavLink>
+                        <NavLink href="/calendar" collapsed>
+                            <Symbol symbol="calendar_month" />
+                        </NavLink>
+                        <NavLink href="/clients" collapsed>
+                            <Symbol symbol="group" />
+                        </NavLink>
+                        <NavLink href="/database" collapsed>
+                            <Symbol symbol="database" />
+                        </NavLink>
+                        <NavLink href="/settings" collapsed>
+                            <Symbol symbol="Settings" />
+                        </NavLink>
+                    </div>
                 </div>
-                <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
-                    <img
-                        src={
-                            user?.photoURL || '/cavediva.jpeg'
-                        }
-                        alt="logo"
-                        className="m-4 h-8 w-8 rounded-full"
-                    />
+            )}
+            {open && (
+                <div
+                    ref={menuRef}
+                    className="fixed left-0 top-0 flex h-full w-64 flex-col items-center gap-4 bg-foreground text-background md:hidden"
+                >
+                    <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
+                        <img
+                            src={user?.photoURL || '/cavediva.jpeg'}
+                            alt="logo"
+                            className="m-4 h-16 w-16 rounded-full"
+                        />
+                        <h1 className="text-xl font-bold">
+                            {user?.displayName}
+                        </h1>
+                        <p>{user?.email}</p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-start">
+                        <NavLink href="/">
+                            <Symbol symbol="home" />
+                            Home
+                        </NavLink>
+                        <NavLink href="/intake">
+                            <Symbol symbol="add" />
+                            Intake
+                        </NavLink>
+                        <NavLink href="/calendar">
+                            <Symbol symbol="calendar_month" />
+                            Calendar
+                        </NavLink>
+                        <NavLink href="/clients">
+                            <Symbol symbol="group" />
+                            Clients
+                        </NavLink>
+                        <NavLink href="/database">
+                            <Symbol symbol="database" />
+                            Database
+                        </NavLink>
+                        <NavLink href="/settings">
+                            <Symbol symbol="Settings" />
+                            Settings
+                        </NavLink>
+                    </div>
+                    <div className="flex-1" />
+                    <LogoutButton />
                 </div>
-                <div className="flex w-full flex-col items-center justify-center">
-                    <NavLink href="/" collapsed>
-                        <Symbol symbol="home"/>
-                    </NavLink>
-                    <NavLink href="/intake" collapsed>
-                        <Symbol symbol="add" />
-                    </NavLink>
-                    <NavLink href="/calendar" collapsed>
-                        <Symbol symbol="calendar_month" />
-                    </NavLink>
-                    <NavLink href="/clients" collapsed>
-                        <Symbol symbol="group" />
-                    </NavLink>
-                    <NavLink href="/database" collapsed>
-                        <Symbol symbol="database" />
-                    </NavLink>
-                    <NavLink href="/settings" collapsed>
-                        <Symbol symbol="Settings" />
-                    </NavLink>
-                </div>
-            </div>
-            )}   
-            {open && (        
-            <div ref={menuRef} className="md:hidden flex fixed left-0 top-0 h-full w-64 flex-col items-center gap-4 bg-foreground text-background">
-                <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
-                    <img
-                        src={
-                            user?.photoURL || '/cavediva.jpeg'
-                        }
-                        alt="logo"
-                        className="m-4 h-16 w-16 rounded-full"
-                    />
-                    <h1 className="text-xl font-bold">{user?.displayName}</h1>
-                    <p>{user?.email}</p>
-                </div>
-                <div className="flex w-full flex-col items-center justify-start">
-                    <NavLink href="/">
-                        <Symbol symbol="home" />
-                        Home
-                    </NavLink>
-                    <NavLink href="/intake">
-                        <Symbol symbol="add" />
-                        Intake
-                    </NavLink>
-                    <NavLink href="/calendar">
-                        <Symbol symbol="calendar_month" />
-                        Calendar
-                    </NavLink>
-                    <NavLink href="/clients">
-                        <Symbol symbol="group" />
-                        Clients
-                    </NavLink>
-                    <NavLink href="/database">
-                        <Symbol symbol="database" />
-                        Database
-                    </NavLink>
-                    <NavLink href="/settings">
-                        <Symbol symbol="Settings" />
-                        Settings
-                    </NavLink>
-                </div>
-                <div className="flex-1" />
-                <LogoutButton />
-            </div>
             )}
             {/* desktop view*/}
-            <div className="md:flex hidden fixed left-0 top-0 h-full w-64 flex-col items-center gap-4 bg-foreground text-background">
+            <div className="fixed left-0 top-0 hidden h-full w-64 flex-col items-center gap-4 bg-foreground text-background md:flex">
                 <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
                     <img
-                        src={
-                            user?.photoURL || '/cavediva.jpeg'
-                        }
+                        src={user?.photoURL || '/cavediva.jpeg'}
                         alt="logo"
                         className="m-4 h-16 w-16 rounded-full"
                     />
@@ -208,7 +215,7 @@ const NavLink = ({ href, children, collapsed = false }: NavLinkProps) => {
         <Link
             href={href}
             className={cn(
-                  collapsed
+                collapsed
                     ? 'flex w-full justify-center py-4'
                     : 'flex w-full flex-row justify-start gap-2 px-6 py-4 text-center',
                 {
