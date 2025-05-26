@@ -1,25 +1,31 @@
 interface Props {
   symbol: string
   className?: string
+  largerIcon?: boolean
 }
 
-const Symbol = (props: Props) => {
+const Symbol = ({ symbol, className, largerIcon = false }: Props) => {
   return (
     <>
-      <span className={`material-symbols-outlined responsive-icon ${props.className || ''}`}>
-        {props.symbol}
-      </span>
-      <style jsx>{`
-        .responsive-icon {
-          font-size: 50px;
-        }
+        {largerIcon ? (
+            <div>
+                <span className={`material-symbols-outlined responsive-icon ${className || ''}`}>
+                    {symbol}
+                </span>
+                <style jsx>{`
+                    .responsive-icon {
+                      font-size: 40px;
+                    }
+                `}</style>
+            </div>
+        ) : (
+            <div>
+                <span className={`material-symbols-outlined responsive-icon ${className || ''}`}>
+                    {symbol}
+                </span>
+            </div>
+        )}
 
-        @media (min-width: 1140px) {
-          .responsive-icon {
-            font-size: 30px;
-          }
-        }
-      `}</style>
     </>
   )
 }

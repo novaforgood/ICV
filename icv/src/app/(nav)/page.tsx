@@ -31,7 +31,7 @@ export default function Home() {
       </div>
 
       {/* tablet */}
-      <div className="flex flex-1 flex-col gap-8 md:hidden">
+      <div className="flex gap-8 md:hidden">
         <h1 className="text-6xl font-bold">Hello, Akhilesh</h1>
       </div>
       <div className="md:hidden w-full">

@@ -78,22 +78,22 @@ const Navbar = () => {
                 </div>
                 <div className="flex w-full flex-col items-center justify-center">
                     <NavLink href="/" collapsed>
-                        <Symbol symbol="home"/>
+                        <Symbol symbol="home" largerIcon/>
                     </NavLink>
                     <NavLink href="/intake" collapsed>
-                        <Symbol symbol="add" />
+                        <Symbol symbol="add" largerIcon/>
                     </NavLink>
                     <NavLink href="/calendar" collapsed>
-                        <Symbol symbol="calendar_month" />
+                        <Symbol symbol="calendar_month" largerIcon/>
                     </NavLink>
                     <NavLink href="/clients" collapsed>
-                        <Symbol symbol="group" />
+                        <Symbol symbol="group" largerIcon/>
                     </NavLink>
                     <NavLink href="/database" collapsed>
-                        <Symbol symbol="database" />
+                        <Symbol symbol="database" largerIcon/>
                     </NavLink>
                     <NavLink href="/settings" collapsed>
-                        <Symbol symbol="Settings" />
+                        <Symbol symbol="Settings" largerIcon/>
                     </NavLink>
                 </div>
             </div>
