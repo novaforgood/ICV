@@ -95,12 +95,12 @@ export const FamilySection: React.FC<Props> = ({
         return unsubscribe
     }, [watch, formType])
 
-    useEffect(() => {
-        if (formType.associatedSpouseID) {
-            setValue('maritalStatus', 'Married')
-            setValue('spouseClientStatus', 'Yes')
-        }
-    }, [formType.associatedSpouseID])
+    // useEffect(() => {
+    //     if (formType.associatedSpouseID) {
+    //         setValue('maritalStatus', 'Married')
+    //         setValue('spouseClientStatus', 'Yes')
+    //     }
+    // }, [formType.associatedSpouseID])
 
     const [spouseInfo, setSpouseInfo] = useState<NewClient>({} as NewClient)
     const [showSpouseSearch, setShowSpouseSearch] = useState(false)
@@ -118,11 +118,22 @@ export const FamilySection: React.FC<Props> = ({
             if (formType.spouse) {
                 removeSpouse()
             }
+
             if (formType.spouseClientStatus) {
                 setValue('spouseClientStatus', undefined)
             }
+
+            if (formType.associatedSpouseID) {
+                setValue('associatedSpouseID', undefined)
+                updateForm({ associatedSpouseID: undefined })
+            }
         }
-    }, [formType.maritalStatus, formType.spouse, formType.spouseClientStatus])
+    }, [
+        formType.maritalStatus,
+        formType.spouse,
+        formType.spouseClientStatus,
+        formType.associatedSpouseID,
+    ])
 
     useEffect(() => {
         if (formType.headOfHousehold != 'Yes' && formType.dependent) {
