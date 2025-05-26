@@ -1,6 +1,6 @@
 'use client'
 
-import { getClientById, updateClient } from '@/api/make-cases/make-case'
+import { updateClient } from '@/api/make-cases/make-case'
 import {
     ClientDependents,
     ClientPets,
@@ -25,16 +25,17 @@ export const ClientFamilyToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
-    const { form: loadedForm, updateForm, clearForm } = useEditFormStore()
-    const router = useRouter()
+    const { getForm, updateForm, clearForm } = useEditFormStore()
 
-    const toggleButton = () => {
-        setEditMode(!editMode)
-    }
+    const router = useRouter()
+    const formData = getForm(id)
+
+    const toggleButton = () => setEditMode(!editMode)
 
     useEffect(() => {
-        updateForm(client)
-    }, [client])
+        clearForm(id)
+        updateForm(id, client)
+    }, [client, id])
 
     return (
         <div className="flex min-h-screen px-[48px]">
@@ -83,17 +84,12 @@ export const ClientFamilyToggle = ({
                     </>
                 ) : (
                     <FamilySection
-                        formType={loadedForm}
-                        updateForm={updateForm}
+                        formType={formData}
+                        updateForm={(form) => updateForm(id, form)}
                         onSubmitEdit={async (data) => {
-                            console.log('onSubmitEdit called with:', data)
-
                             try {
-                                clearForm()
                                 await updateClient(id, data)
-                                console.log('UPDATED WITH', data)
-                                const updatedPerson = await getClientById(id)
-                                console.log('updatedPerson:', updatedPerson)
+                                clearForm(id)
                                 setEditMode(false)
                                 router.push(`/clients/${id}/family`)
                             } catch (err) {
@@ -101,8 +97,9 @@ export const ClientFamilyToggle = ({
                             }
                         }}
                         onCancel={() => {
+                            clearForm(id)
+                            updateForm(id, client)
                             setEditMode(false)
-                            clearForm()
                         }}
                         submitType="save"
                         titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"
