@@ -1,6 +1,6 @@
 'use client'
 
-import { getClientById } from '@/api/make-cases/make-case'
+import { getClientById, updateClient } from '@/api/make-cases/make-case'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -21,15 +21,37 @@ const Page = () => {
 
             const clientData = await getClientById(clientID)
             setCreatedClient(clientData)
-            console.log(clientID)
-            console.log(clientData)
+
+            console.log(clientID, clientData)
         }
 
         fetchClient()
     }, [clientID])
 
+    useEffect(() => {
+        if (
+            createdClient?.spouseClientStatus === 'Yes' &&
+            createdClient?.associatedSpouseID &&
+            clientID
+        ) {
+            updateClient(createdClient.associatedSpouseID, {
+                associatedSpouseID: clientID,
+            })
+        }
+    }, [createdClient, clientID])
+
     const onSubmit = () => {
         router.push(`/intake?spouseID=${clientID}`)
+    }
+
+    if (!createdClient) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-white">
+                <p className="text-lg font-medium text-gray-700">
+                    Creating Client...
+                </p>
+            </div>
+        )
     }
 
     return (
