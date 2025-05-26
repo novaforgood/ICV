@@ -70,9 +70,9 @@ export const FamilySection: React.FC<Props> = ({
         formType.associatedSpouseID && showSpouseLink ? false : true,
     )
 
-    useEffect(() => {
-        reset(formType)
-    }, [formType, reset])
+    // useEffect(() => {
+    //     reset(formType)
+    // }, [formType, reset])
 
     useEffect(() => {
         const unsubscribe = watch((data) => {
@@ -121,6 +121,8 @@ export const FamilySection: React.FC<Props> = ({
             if (formType.spouseClientStatus) {
                 setValue('spouseClientStatus', undefined)
             }
+            setValue('associatedSpouseID', '')
+            updateForm({ associatedSpouseID: '' })
         }
     }, [formType.maritalStatus, formType.spouse, formType.spouseClientStatus])
 
