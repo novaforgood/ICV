@@ -49,11 +49,6 @@ export const SignaturePopup: React.FC<Props> = ({
 
     return (
         <div className="space-y-[60px]">
-            <SignatureField
-                fieldKey={fieldKey}
-                formData={data}
-                updateForm={updateForm}
-            />
             <Popup
                 modal
                 open={open}
@@ -70,7 +65,7 @@ export const SignaturePopup: React.FC<Props> = ({
                         ref={padRef}
                         penColor="black"
                         canvasProps={{
-                            width: 600,
+                            width: 500,
                             height: 200,
                             style: {
                                 border: '1px solid black',
@@ -90,7 +85,7 @@ export const SignaturePopup: React.FC<Props> = ({
                                     writing
                                         ? 'bg-black'
                                         : 'cursor-not-allowed bg-gray-400'
-                                } rounded-[5px] px-[20px] py-[8px] text-white`}
+                                } rounded-[5px] px-[12px] py-[8px] text-white hover:bg-[#6D757F]`}
                             >
                                 Save
                             </button>
@@ -98,7 +93,7 @@ export const SignaturePopup: React.FC<Props> = ({
                             <button
                                 type="button"
                                 onClick={clearSig}
-                                className="rounded-[5px] bg-black px-[20px] py-[8px] text-white"
+                                className="rounded-[5px] bg-black px-[12px] py-[8px] text-white hover:bg-[#6D757F]"
                             >
                                 Clear
                             </button>
@@ -106,7 +101,7 @@ export const SignaturePopup: React.FC<Props> = ({
                         <button
                             type="button"
                             onClick={() => setOpen(false)}
-                            className="rounded-[5px] bg-black px-[20px] py-[8px] text-white"
+                            className="rounded-[5px] bg-black px-[12px] py-[8px] text-white hover:bg-[#6D757F]"
                         >
                             Close
                         </button>
@@ -121,12 +116,14 @@ type SigPadProps = {
     fieldKey: keyof NewClient
     formData: NewClient
     updateForm: (form: Partial<NewClient>) => void
+    isExporting: boolean
 }
 
-export const SignatureField: React.FC<SigPadProps> = ({
+export const LoadedSignature: React.FC<SigPadProps> = ({
     fieldKey,
     formData,
     updateForm,
+    isExporting,
 }) => {
     const sigRef = useRef<SignaturePad | null>(null)
     const [open, setOpen] = useState(false)
@@ -142,30 +139,55 @@ export const SignatureField: React.FC<SigPadProps> = ({
                 <img
                     src={formData[fieldKey] as string}
                     alt="Signature"
-                    className="h-auto max-w-full"
+                    className="h-[100px] h-auto w-[200px]"
                 />
             )}
 
-            <div className="flex flex-row space-x-[8px]">
-                <button
-                    type="button"
-                    onClick={() => setOpen(true)}
-                    className="rounded-[5px] bg-black px-[20px] py-[16px] text-white"
-                >
-                    {hasSignature ? 'Replace Signature' : 'Add Signature'}
-                </button>
-
-                {hasSignature && (
+            {!isExporting && (
+                <div className="flex flex-row space-x-[8px]">
                     <button
                         type="button"
-                        onClick={() => updateForm({ [fieldKey]: '' })}
-                        className="rounded-[5px] bg-black px-[20px] py-[16px] text-white"
+                        onClick={() => setOpen(true)}
+                        className="rounded-[5px] bg-black px-[12px] py-[8px] text-white hover:bg-[#6D757F]"
                     >
-                        Remove
+                        <div className="flex flex-row gap-[8px]">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="20px"
+                                viewBox="0 -960 960 960"
+                                width="20px"
+                                fill="#FFFFFF"
+                            >
+                                <path d="M216-216h51l375-375-51-51-375 375v51Zm-72 72v-153l498-498q11-11 23.84-16 12.83-5 27-5 14.16 0 27.16 5t24 16l51 51q11 11 16 24t5 26.54q0 14.45-5.02 27.54T795-642L297-144H144Zm600-549-51-51 51 51Zm-127.95 76.95L591-642l51 51-25.95-25.05Z" />
+                            </svg>
+                            {hasSignature
+                                ? 'Replace Signature'
+                                : 'Add Signature'}
+                        </div>
                     </button>
-                )}
-            </div>
 
+                    {hasSignature && (
+                        <button
+                            type="button"
+                            onClick={() => updateForm({ [fieldKey]: '' })}
+                            className="rounded-[5px] bg-black px-[12px] py-[8px] text-white hover:bg-[#6D757F]"
+                        >
+                            <div className="flex flex-row gap-[8px]">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    height="20px"
+                                    viewBox="0 -960 960 960"
+                                    width="20px"
+                                    fill="#FFFFFF"
+                                >
+                                    <path d="M312-144q-29.7 0-50.85-21.15Q240-186.3 240-216v-480h-48v-72h192v-48h192v48h192v72h-48v479.57Q720-186 698.85-165T648-144H312Zm336-552H312v480h336v-480ZM384-288h72v-336h-72v336Zm120 0h72v-336h-72v336ZM312-696v480-480Z" />
+                                </svg>
+                                Remove
+                            </div>
+                        </button>
+                    )}
+                </div>
+            )}
             <SignaturePopup
                 data={formData}
                 fieldKey={fieldKey}

@@ -291,6 +291,13 @@ export const ClientIntakeSchema = z.object({
 
     // ----- WAIVER -----
     clientSig1: z.string().optional(),
+    clientSig2: z.string().optional(),
+    guardianSig: z.string().optional(),
+    thirdParties: z.string().optional(),
+    disclosurePurpose: z.string().optional(),
+    signDate: z.string().optional(),
+    waiverPDFUri: z.array(z.string()).optional(),
+
     associatedSpouseID: z.string().optional(),
 }) 
 
@@ -400,4 +407,10 @@ export const ConfirmationSchema = ClientIntakeSchema.pick({
 
 export const WaiverSchema = ClientIntakeSchema.pick({
     clientSig1: true,
+    clientSig2: true,
+    guardianSig: true,
+    thirdParties: true,
+    disclosurePurpose: true,
+    signDate: true,
+    waiverPDFUri: true,
 })
