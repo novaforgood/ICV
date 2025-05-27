@@ -43,11 +43,6 @@ const Page = () => {
 
     const [selectedUser, setSelectedUser] = useState<string | undefined>()
 
-    const handleSelect = (selected: string) => {
-        setSelectedUser(selected)
-        console.log('Selected user:', selected)
-        console.log('available users:', users)
-    }
     const {
         handleSubmit,
         formState: { errors },
@@ -68,6 +63,13 @@ const Page = () => {
             })
         }
     }, [loadedForm.associatedSpouseID])
+
+    const handleSelect = (selected: string) => {
+        setSelectedUser(selected)
+        updateForm({ caseManager: selected })
+        console.log('Selected user:', selected)
+        console.log('available users:', users)
+    }
 
     // wait until after render (in case rendering occurs before user is async loaded)
     useEffect(() => {

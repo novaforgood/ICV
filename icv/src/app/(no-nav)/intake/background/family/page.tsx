@@ -11,7 +11,7 @@ const Page = () => {
 
     return (
         <div className="mt-[24px] flex min-h-screen items-center justify-center">
-            <div className="min-w-[800px] space-y-[60px]">
+            <div className="min-w-[800px]">
                 <div>
                     <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
                         Family
