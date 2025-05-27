@@ -116,7 +116,7 @@ const EventsSchedule: React.FC = () => {
                                     <div
                                         className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
                                             isSelected
-                                                ? 'bg-foreground text-secondary'
+                                                ? 'bg-sky text-secondary'
                                                 : 'bg-background text-primary'
                                         } font-epilogue text-[22px] font-medium leading-[24px]`}
                                     >
