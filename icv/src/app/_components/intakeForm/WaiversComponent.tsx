@@ -137,14 +137,6 @@ const WaiverSection: React.FC<Props> = ({
         }
     }
 
-    if (isExporting) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-white">
-                <p className="text-lg font-medium text-gray-700">Saving...</p>
-            </div>
-        )
-    }
-
     return (
         <form
             className="space-y-[24px]"
@@ -167,7 +159,7 @@ const WaiverSection: React.FC<Props> = ({
                                 I consent to participate with Inner-City Visions
                                 and receive services provided by the
                                 organization. I understand that services may
-                                include but are not limited to the following: 
+                                include but are not limited to the following:
                             </p>
                             <div className="flex flex-row items-center justify-center space-x-[60px]">
                                 <ul className="list-disc space-y-[4px] pl-6">
@@ -203,7 +195,7 @@ const WaiverSection: React.FC<Props> = ({
                                 be taken and placed in my file and displayed at
                                 Inner City Visions Intervention Program sites. I
                                 also understand that these photos may be used
-                                for program outreach and publicity. 
+                                for program outreach and publicity.
                             </p>
                             <div className="space-y-[8px]">
                                 <label className="font-bold">
@@ -275,7 +267,7 @@ const WaiverSection: React.FC<Props> = ({
                             <p>
                                 I do herby consent the exchange of information
                                 and / or disclosure of information contained in
-                                my file. 
+                                my file.
                             </p>
                             <p>
                                 Between <strong>INNER CITY VISIONS</strong> and:
@@ -316,7 +308,7 @@ const WaiverSection: React.FC<Props> = ({
                                 This authorization to exchange information will
                                 expire one year after the signature date. A
                                 photocopy or fax is considered as effective as
-                                the original. 
+                                the original.
                             </p>
                             <div className="flex flex-col space-y-[4px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
