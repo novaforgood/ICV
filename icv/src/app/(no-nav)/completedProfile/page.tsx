@@ -72,25 +72,36 @@ const Page = () => {
                             's profile has been created.
                         </p>
                     </div>
-                    <div className="flex flex-row items-center space-x-[24px]">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                router.push(`/clients/${clientID}`)
-                            }}
-                            className="h-[52px] w-[300px] rounded-[5px] bg-neutral-900 px-[20px] py-[16px] text-white"
+                    <div className="flex justify-center gap-[24px]">
+                        <div
+                            className={
+                                createdClient?.spouseClientStatus === 'Yes' &&
+                                !createdClient?.associatedSpouseID
+                                    ? 'w-[300px]'
+                                    : 'w-[400px]'
+                            }
                         >
-                            View client profile
-                        </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    router.push(`/clients/${clientID}`)
+                                }}
+                                className="h-[52px] w-full rounded-[5px] bg-neutral-900 px-[20px] py-[16px] text-white"
+                            >
+                                View client profile
+                            </button>
+                        </div>
                         {createdClient?.spouseClientStatus === 'Yes' &&
                             !createdClient?.associatedSpouseID && (
-                                <button
-                                    type="submit"
-                                    onClick={onSubmit}
-                                    className="h-[52px] w-[400px] rounded-[5px] bg-neutral-900 px-[20px] py-[16px] text-white"
-                                >
-                                    Create spouse intake form
-                                </button>
+                                <div className="w-[300px]">
+                                    <button
+                                        type="submit"
+                                        onClick={onSubmit}
+                                        className="h-[52px] w-full rounded-[5px] bg-neutral-900 px-[20px] py-[16px] text-white"
+                                    >
+                                        Create spouse intake form
+                                    </button>
+                                </div>
                             )}
                     </div>
                 </div>
