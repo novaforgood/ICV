@@ -220,7 +220,7 @@ export async function getCheckInCountYear(checkInCategory: CheckInCategoryType, 
     }
 }
 
-export async function getCheckInCountMonth(checkInCategory: ChecknCategoryType, date: Date) {
+export async function getCheckInCountMonth(checkInCategory: CheckInCategoryType, date: Date) {
     const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
     if (!currentUser) {
         throw new Error('User not found');
