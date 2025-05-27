@@ -4,7 +4,7 @@ import { getAllEvents, getScheduledEvents } from '@/api/events'
 import Symbol from '@/components/Symbol'
 import { Card } from '@/components/ui/card'
 import { CheckInType } from '@/types/event-types'
-import { format, isValid } from 'date-fns'
+import { format, isValid, parseISO } from 'date-fns'
 import React, { useMemo, useState } from 'react'
 import useSWR from 'swr'
 import EventCard from './EventsCard'
@@ -27,9 +27,16 @@ const EventsSchedule: React.FC = () => {
     // Initialized so that the week view starts 3 days before today.
     const [weekStart, setWeekStart] = useState<Date>(() => {
         const now = new Date()
-        now.setDate(now.getDate() - 3)
+        const day = now.getDay() // 0 (Sunday) to 6 (Saturday)
+        now.setDate(now.getDate() - day) // go back to previous Sunday
         return now
     })
+
+    const getStartOfWeek = (date: Date) => {
+        const result = new Date(date)
+        result.setDate(date.getDate() - date.getDay())
+        return result
+    }
 
     // Generate date options for the week view based on weekStart
     const weekDays = useMemo(() => {
@@ -66,10 +73,10 @@ const EventsSchedule: React.FC = () => {
                     <button
                         className="h-6 w-6 flex-shrink-0 text-sm"
                         onClick={() => {
-                            const newWeekStart = new Date(weekStart)
-                            newWeekStart.setDate(newWeekStart.getDate() - 7)
-                            setWeekStart(newWeekStart)
-                            setSelectedDate(format(newWeekStart, 'yyyy-MM-dd'))
+                            const newSelectedDate = parseISO(selectedDate!)
+                            newSelectedDate.setDate(newSelectedDate.getDate() - 7)
+                            setSelectedDate(format(newSelectedDate, 'yyyy-MM-dd'))
+                            setWeekStart(getStartOfWeek(newSelectedDate))
                         }}
                     >
                         <Symbol symbol="keyboard_arrow_left" />
@@ -83,10 +90,10 @@ const EventsSchedule: React.FC = () => {
                     <button
                         className="h-6 w-6 flex-shrink-0 text-sm"
                         onClick={() => {
-                            const newWeekStart = new Date(weekStart)
-                            newWeekStart.setDate(newWeekStart.getDate() + 7)
-                            setWeekStart(newWeekStart)
-                            setSelectedDate(format(newWeekStart, 'yyyy-MM-dd'))
+                            const newSelectedDate = parseISO(selectedDate!)
+                            newSelectedDate.setDate(newSelectedDate.getDate() + 7)
+                            setSelectedDate(format(newSelectedDate, 'yyyy-MM-dd'))
+                            setWeekStart(getStartOfWeek(newSelectedDate))
                         }}
                     >
                         <Symbol symbol="keyboard_arrow_right" />
@@ -109,7 +116,7 @@ const EventsSchedule: React.FC = () => {
                                     <div
                                         className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
                                             isSelected
-                                                ? 'bg-foreground text-secondary'
+                                                ? 'bg-sky text-secondary'
                                                 : 'bg-background text-primary'
                                         } font-epilogue text-[22px] font-medium leading-[24px]`}
                                     >

@@ -11,7 +11,7 @@ import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import ClientCard from './ClientCard'
 import { ContactTypeBadge } from '@/app/_components/ContactTypeBadge'
-import { getUserNames } from '@/api/users'
+import { getUsersCollection } from '@/api/clients'
 
 interface EditScheduledCheckInProps {
   onClose: () => void
@@ -50,6 +50,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user?.displayName) setAssigneeId(user.displayName)
     })
+  
     return () => unsubscribe()
   }, [])
 
@@ -92,14 +93,17 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     // Fetch staff names when component mounts
     const fetchStaffNames = async () => {
       try {
-        const names = await getUserNames()
+        const names = await getUsersCollection()
+        if (assigneeId && !names.includes(assigneeId)) {
+          names.push(assigneeId)
+        }
         setStaffNames(names)
       } catch (error) {
         console.error('Error fetching staff names:', error)
       }
     }
     fetchStaffNames()
-  }, [])
+  }, [assigneeId])
 
   const selectedClient = useMemo(() => {
     if (!clients || !selectedClientDocId) return null
@@ -289,9 +293,17 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
           {/* Staff display */}
           <div className="relative">
             <label className="block mb-1">Staff</label>
-            <div className="w-full border rounded px-4 py-2 border-gray-300 bg-gray-50">
-                {assigneeId}
-            </div>
+            <select
+              className="w-full border rounded px-4 py-2 border-gray-300"
+              value={assigneeId}
+              onChange={(e) => setAssigneeId(e.target.value)}
+            >
+              {staffNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Location */}

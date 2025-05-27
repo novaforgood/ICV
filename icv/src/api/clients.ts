@@ -10,6 +10,7 @@ interface ClientWithLastCheckin extends NewClient {
     lastCheckinDate?: string;
 }
 import  {Users} from '@/types/user-types'
+import { User } from 'firebase/auth'
 
 export async function getAllClients(): Promise<NewClient[]> {
     const { firebaseServerApp, currentUser } =
@@ -47,6 +48,21 @@ export async function getAllUsers():  Promise<Users[]> {
         }
     })
     return userList
+}
+
+export async function getUsersCollection(): Promise<string[]> {
+        const { firebaseServerApp, currentUser } =
+        await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
+    const ssrdb = getFirestore(firebaseServerApp)
+
+    const collectRef = collection(ssrdb, 'users')
+    const querySnapshot = await getDocs(collectRef)
+    const users = querySnapshot.docs.map((doc) => String(doc.data().name))
+
+    return users
 }
 
 export async function getClientById(id: string) {
