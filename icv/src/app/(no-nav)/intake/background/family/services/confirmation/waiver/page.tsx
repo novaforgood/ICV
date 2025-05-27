@@ -44,14 +44,19 @@ const Page = () => {
     }, [watch, loadedForm])
 
     const onSubmit = async (data: ClientType) => {
-        console.log('in submit...', data)
-        const newClientID = await createClient({ ...loadedForm, ...data })
-        clearForm()
-        if (newClientID) {
-            clearForm()
-            router.push(`/completedProfile?clientID=${newClientID}`)
-        } else {
-            console.error('Failed to create client')
+        try {
+            console.log('in submit...', data)
+
+            const newClientID = await createClient({ ...loadedForm, ...data })
+
+            if (newClientID !== undefined && newClientID !== null) {
+                clearForm()
+                router.push(`/completedProfile?clientID=${newClientID}`)
+            } else {
+                console.error('createClient returned null or undefined')
+            }
+        } catch (error) {
+            console.error('Failed to create client:', error)
         }
     }
 
