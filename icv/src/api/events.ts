@@ -281,3 +281,57 @@ export async function updateCaseNotes(eventId: string, newCaseNotes: string): Pr
         throw new Error('Failed to update case notes');
     }
 }
+
+export async function getAllCheckInCounts(date: Date) {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser()
+    if (!currentUser) throw new Error('User not found')
+    const ssrdb = getFirestore(firebaseServerApp)
+
+    const yearStr = date.getFullYear()
+    const monthStr = String(date.getMonth() + 1).padStart(2, '0')
+    const dateString = date.toDateString()
+
+    const dayDocRef = doc(ssrdb, 'checkInCounter', 'day')
+    const monthDocRef = doc(ssrdb, 'checkInCounter', `${yearStr}-${monthStr}`)
+
+    const monthIds = Array.from({ length: 12 }, (_, i) =>
+        doc(ssrdb, 'checkInCounter', `${yearStr}-${String(i + 1).padStart(2, '0')}`)
+    )
+
+    const [dayDoc, monthDoc, ...yearDocs] = await Promise.all([
+        getDoc(dayDocRef),
+        getDoc(monthDocRef),
+        ...monthIds.map((ref) => getDoc(ref)),
+    ])
+
+    const categories: CheckInCategoryType[] = ['Hot Meal', 'Hygiene Kit', 'Snack Pack']
+
+    const counts = {
+        day: Object.fromEntries(
+            categories.map((cat) => [
+                cat,
+                dayDoc.exists() && dayDoc.data().date === dateString
+                    ? dayDoc.data()[cat] || 0
+                    : 0,
+            ])
+        ),
+        month: Object.fromEntries(
+            categories.map((cat) => [
+                cat,
+                monthDoc.exists() ? monthDoc.data()[cat] || 0 : 0,
+            ])
+        ),
+        year: Object.fromEntries(
+            categories.map((cat) => [
+                cat,
+                yearDocs.reduce(
+                    (sum, doc) =>
+                        sum + (doc.exists() ? doc.data()[cat] || 0 : 0),
+                    0
+                ),
+            ])
+        ),
+    }
+
+    return counts
+}
