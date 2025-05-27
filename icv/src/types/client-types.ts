@@ -290,11 +290,7 @@ export const ClientIntakeSchema = z.object({
     // permission: z.boolean().optional(),
 
     // ----- WAIVER -----
-    acknowledgement: z.boolean().optional(),
-    // signatureURI: z.string().optional(),
-    // signatureDate: z.string().optional(),
-    // signatureTime: z.string().optional(),
-
+    clientSig1: z.string().optional(),
     associatedSpouseID: z.string().optional(),
 }) 
 
@@ -403,5 +399,5 @@ export const ConfirmationSchema = ClientIntakeSchema.pick({
 })
 
 export const WaiverSchema = ClientIntakeSchema.pick({
-    acknowledgement: true,
+    clientSig1: true,
 })
