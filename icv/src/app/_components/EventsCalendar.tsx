@@ -24,11 +24,11 @@ import useSWR from 'swr'
 // Localizer setup
 const locales = { 'en-US': enUS }
 const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
+    format,
+    parse,
+    startOfWeek,
+    getDay,
+    locales,
 })
 
 interface EventsCalendarProps {
@@ -199,3 +199,14 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
 }
 
 export default EventsCalendar
+
+// const EventsCalendar = () => {
+//     return (
+//         <div>
+//             <h1>Events Calendar</h1>
+//             <p>This is the Events Calendar component.</p>
+//         </div>
+//     )
+// }
+
+// export default EventsCalendar

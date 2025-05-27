@@ -207,7 +207,6 @@ export default function CheckInsPage() {
     }, [clientId])
 
     const { user } = useUser()
-
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center">
@@ -226,7 +225,7 @@ export default function CheckInsPage() {
                     <ScheduledCheckInCreation
                         onNewEvent={() => setNewEvents(true)}
                         variant="checkins-page"
-                        clientName={`${client.firstName} ${client.lastName}`}
+                        clientName={`${client?.firstName} ${client?.lastName}`}
                     />
 
                     {/* Filter controls */}

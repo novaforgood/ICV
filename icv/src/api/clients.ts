@@ -72,7 +72,7 @@ export async function getClientByCaseManager(): Promise<ClientWithLastCheckin[]>
     }
     const ssrdb = getFirestore(firebaseServerApp)
 
-    const caseManagerId = currentUser.uid
+    const caseManagerId = currentUser.displayName
 
     const clientsCollection = collection(ssrdb, 'clients')
     const clientsQuery = query(clientsCollection, where('caseManager', '==', caseManagerId))

@@ -34,6 +34,10 @@ export const ClientProfileToggle = ({
     }
 
     useEffect(() => {
+        window.scrollTo({ top: 0 })
+    }, [editMode])
+
+    useEffect(() => {
         clearForm(id)
         updateForm(id, client)
     }, [client, id])
