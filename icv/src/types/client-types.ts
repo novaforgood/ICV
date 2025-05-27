@@ -290,10 +290,13 @@ export const ClientIntakeSchema = z.object({
     // permission: z.boolean().optional(),
 
     // ----- WAIVER -----
-    acknowledgement: z.boolean().optional(),
-    // signatureURI: z.string().optional(),
-    // signatureDate: z.string().optional(),
-    // signatureTime: z.string().optional(),
+    clientSig1: z.string().optional(),
+    clientSig2: z.string().optional(),
+    guardianSig: z.string().optional(),
+    thirdParties: z.string().optional(),
+    disclosurePurpose: z.string().optional(),
+    signDate: z.string().optional(),
+    waiverPDFUri: z.array(z.string()).optional(),
 
     associatedSpouseID: z.string().optional(),
 }) 
@@ -403,5 +406,11 @@ export const ConfirmationSchema = ClientIntakeSchema.pick({
 })
 
 export const WaiverSchema = ClientIntakeSchema.pick({
-    acknowledgement: true,
+    clientSig1: true,
+    clientSig2: true,
+    guardianSig: true,
+    thirdParties: true,
+    disclosurePurpose: true,
+    signDate: true,
+    waiverPDFUri: true,
 })
