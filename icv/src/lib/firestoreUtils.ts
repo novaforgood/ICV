@@ -41,3 +41,19 @@ export const searchByKeyword = async (searchTerm: string) => {
     throw error;
   }
 };
+
+/**
+ * Fetch all check-in counter data (no filtering)
+ * @returns Array of objects with docId and data
+ */
+export const fetchCheckInCounterData = async () => {
+  const checkInRef = collection(clientDb, 'checkInCounter');
+  const snapshot = await getDocs(checkInRef);
+  const results: { docId: string; data: Record<string, number> }[] = [];
+  snapshot.forEach((doc) => {
+    const docId = doc.id; // e.g., "2025-03"
+    const data = doc.data() as Record<string, number>;
+    results.push({ docId, data });
+  });
+  return results;
+};
