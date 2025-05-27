@@ -60,7 +60,7 @@ export async function getClientById(id: string) {
     const clientsCollection = collection(ssrdb, 'clients')
     const clientDoc = await getDoc(doc(clientsCollection, id))
     const client = clientDoc.data() as NewClient
-    client.id = clientDoc.id
+    client.docId = clientDoc.id
     return client
 }
 

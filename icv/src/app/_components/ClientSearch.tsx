@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import { getAllClients } from '@/api/clients'
-import { NewClient } from '@/types/client-types' // Update path to where you defined your schema
+import { NewClient } from '@/types/client-types'
+import ClientCard from './ClientCard'
 
 interface ClientSearchProps {
   onSelect: (clientId: string) => void
@@ -23,26 +24,25 @@ const ClientSearch: React.FC<ClientSearchProps> = ({ onSelect }) => {
 
   return (
     <div>
-      <h2 className="mb-4 text-xl font-bold">Choose A Client</h2>
       <input
         ref={inputRef}
         type="text"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search by name"
-        className="mb-2 w-full rounded border border-gray-300 p-2"
+        className="mb-4 w-full rounded border border-gray-300 p-2"
       />
-      <ul className="max-h-48 overflow-y-auto">
+      <div className="max-h-96 overflow-y-auto space-y-2">
         {filteredClients.map((client) => (
-          <li
+          <div
             key={client.docId}
             onClick={() => onSelect(client.docId!)}
-            className="cursor-pointer p-2 hover:bg-gray-200"
+            className="cursor-pointer"
           >
-            {client.firstName} {client.lastName}
-          </li>
+            <ClientCard client={client} showLastCheckin={true} />
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }
