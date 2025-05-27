@@ -13,18 +13,19 @@ export default function ProfileNav() {
         { name: 'Background', href: `/clients/${clientId}/background` },
         { name: 'Family', href: `/clients/${clientId}/family` },
         { name: 'Services', href: `/clients/${clientId}/services` },
+        { name: 'Waivers', href: `/clients/${clientId}/waivers` },
         { name: 'Check-Ins', href: `/clients/${clientId}/checkins` },
     ]
 
     return (
-        <div className="mt-4 w-full border-gray-300 overflow-x-auto">
+        <div className="mt-4 w-full overflow-x-auto border-gray-300">
             <div className="flex justify-start space-x-8 px-4">
                 {tabs.map((tab) => (
                     <Link
                         key={tab.name}
                         onClick={() => router.push(tab.href)}
                         href={tab.href}
-                        className="group relative pb-2 text-lg font-medium whitespace-nowrap"
+                        className="group relative whitespace-nowrap pb-2 text-lg font-medium"
                     >
                         <span
                             className={`${
