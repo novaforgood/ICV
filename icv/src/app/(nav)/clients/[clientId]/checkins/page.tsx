@@ -225,7 +225,7 @@ export default function CheckInsPage() {
                     <ScheduledCheckInCreation
                         onNewEvent={() => setNewEvents(true)}
                         variant="checkins-page"
-                        clientName={`${client.firstName} ${client.lastName}`}
+                        clientName={`${client?.firstName} ${client?.lastName}`}
                     />
 
                     {/* Filter controls */}
