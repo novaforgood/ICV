@@ -3,17 +3,23 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import useSWR, { mutate } from 'swr'
 import { CheckInType, ContactType } from '@/types/event-types'
+import { NewClient } from '@/types/client-types'
 import { deleteCheckIn, updateCheckIn } from '@/api/events'
-import { getAllClients } from '@/api/clients'
+import { getAllClients, getClientById } from '@/api/clients'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
+import ClientCard from './ClientCard'
+import { ContactTypeBadge } from '@/utils/contact-type-colors'
+import { getUserNames } from '@/api/users'
 
 interface EditScheduledCheckInProps {
   onClose: () => void
   onUpdatedEvent: () => void
   selectedEvent: any
 }
+
+type ClientWithLastCheckin = NewClient & { lastCheckinDate?: string }
 
 const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
   onClose,
@@ -27,13 +33,17 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
   const [location, setLocation] = useState('')
-  const [contactType, setContactType] = useState(ContactType.Values['Wellness Check'])
+  const [contactType, setContactType] = useState<string>(ContactType.Values['Wellness Check'])
   const [assigneeId, setAssigneeId] = useState('')
   const [clientSearch, setClientSearch] = useState('')
   const [selectedClientDocId, setSelectedClientDocId] = useState('')
-  const { data: clients } = useSWR('clients', getAllClients)
+  const { data: clients } = useSWR<NewClient[]>('clients', getAllClients)
   const [showUpdateSuccess, setShowUpdateSuccess] = useState(false)
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false)
+  const [client, setClient] = useState<ClientWithLastCheckin | null>(null)
+  const [staffNames, setStaffNames] = useState<string[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   useEffect(() => {
     const auth = getAuth()
@@ -53,17 +63,55 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
       setLocation(selectedEvent.location || '')
       setContactType(selectedEvent.contactCode)
       setSelectedClientDocId(selectedEvent.clientDocId)
+      
+      // Fetch client data asynchronously
+      const fetchClient = async () => {
+        if (!selectedEvent.clientDocId) {
+          setClient(null)
+          return
+        }
+        try {
+          const clientData = await getClientById(selectedEvent.clientDocId)
+          if (clientData) {
+            setClient(clientData)
+            console.log("client updated:", clientData)
+          } else {
+            setClient(null)
+            console.error("No client data found")
+          }
+        } catch (error) {
+          console.error("Error fetching client:", error)
+          setClient(null)
+        }
+      }
+      fetchClient()
     }
   }, [selectedEvent])
 
+  useEffect(() => {
+    // Fetch staff names when component mounts
+    const fetchStaffNames = async () => {
+      try {
+        const names = await getUserNames()
+        setStaffNames(names)
+      } catch (error) {
+        console.error('Error fetching staff names:', error)
+      }
+    }
+    fetchStaffNames()
+  }, [])
+
   const selectedClient = useMemo(() => {
     if (!clients || !selectedClientDocId) return null
-    return clients.find((client: any) => client.docId === selectedClientDocId)
+    return clients.find((client) => client.docId === selectedClientDocId)
   }, [clients, selectedClientDocId])
+
+  const filteredStaff = staffNames.filter(name =>
+    name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
     
     const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
     const endDateTime = new Date(`${date}T${endTime}`).toLocaleString('en-US')
@@ -76,7 +124,12 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
       return
     }
 
-    const updatedEvent: CheckInType & { clientId?: string } = {
+    if (!selectedClient) {
+      alert('No client selected.')
+      return
+    }
+
+    const updatedEvent: CheckInType = {
       id: selectedEvent.id,
       startTime: startDateTime,
       endTime: endDateTime,
@@ -86,14 +139,12 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
       contactCode: contactType,
       scheduled: true,
       clientId: selectedClient.id,
-      clientName: selectedClient.firstName + ' ' + selectedClient.lastName
+      clientName: `${selectedClient.firstName || ''} ${selectedClient.lastName || ''}`.trim()
     }
 
     updateCheckIn(updatedEvent)
       .then(() => {
         setShowUpdateSuccess(true)
-        setEditMode(false)
-
         setTimeout(() => {
           setShowUpdateSuccess(false)
           onUpdatedEvent()
@@ -104,12 +155,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         console.error(err)
         alert('Error updating event.')
       })
-
   }
-
-  useEffect(() => {
-  console.log('showUpdateSuccess changed to:', showUpdateSuccess)
-  }, [showUpdateSuccess])
 
   const handleDelete = (e: React.FormEvent) => {
     e.preventDefault()
@@ -189,7 +235,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     )}
     {/* editing event */}
     {!showUpdateSuccess && !showDeleteSuccess && editMode && (
-      <div className="fixed right-0 top-0 h-full w-[400px] bg-white shadow-lg border-l border-gray-200 p-8 z-[100] overflow-y-auto">
+      <div className="fixed right-0 top-0 h-full w-[600px] bg-white shadow-lg border-l border-gray-200 p-8 z-[100] overflow-y-auto">
           <div className="absolute top-4 right-4 flex gap-3 text-gray-600">
 
             <button onClick={onClose}>
@@ -199,7 +245,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Header */}
           <div>
-            <h2 className="text-2xl font-bold">{selectedEvent.clientName}</h2>
+            <ClientCard client={client} /> 
             <p className="text-gray-500 text-sm">{selectedEvent.clientId}</p>
           </div>
 
@@ -240,15 +286,12 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
             </div>
           </div>
 
-          {/* Assignee */}
-          <div>
+          {/* Staff display */}
+          <div className="relative">
             <label className="block mb-1">Staff</label>
-            <input
-              type="text"
-              value={assigneeId}
-              disabled
-              className="w-full border rounded px-4 py-2 border-gray-300 bg-gray-100 block mb-1"
-            />
+            <div className="w-full border rounded px-4 py-2 border-gray-300 bg-gray-50">
+                {assigneeId}
+            </div>
           </div>
 
           {/* Location */}
@@ -264,18 +307,24 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
 
           {/* Contact Code */}
           <div>
-            <label className="block mb-1">Contact code</label>
-            <select
-              value={contactType}
-              onChange={(e) => setContactType(e.target.value)}
-              className="w-full border rounded px-4 py-2 block mb-1 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <label className="block text-sm font-medium text-gray-700 mb-2">Contact code</label>
+            <div className="grid grid-cols-2 gap-3">
               {Object.values(ContactType.Values).map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
+                <div key={type} className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    id={type.toLowerCase().replace(/\s+/g, '-')}
+                    name="contact-code"
+                    checked={contactType === type}
+                    onChange={() => setContactType(type)}
+                    className="w-4 h-4"
+                  />
+                  <label htmlFor={type.toLowerCase().replace(/\s+/g, '-')}>
+                    <ContactTypeBadge type={type} />
+                  </label>
+                </div>
               ))}
-            </select>
+            </div>
           </div>
 
           {/* Buttons */}

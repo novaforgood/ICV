@@ -18,17 +18,17 @@ import {
   endOfDay,
 } from 'date-fns'
 
-import enUS from 'date-fns/locale/en-US'
+import { enUS } from 'date-fns/locale'
 import useSWR from 'swr'
 
 // Localizer setup
 const locales = { 'en-US': enUS }
 const localizer = dateFnsLocalizer({
-    format,
-    parse,
-    startOfWeek,
-    getDay,
-    locales,
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
 })
 
 interface EventsCalendarProps {
@@ -94,42 +94,78 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
   }, [rawEvents])
 
   if (loading) return <div className="p-4">Loading calendar...</div>
-  if (error) return <div className="p-4 text-red-500">Error loading events: {error.message}</div>
+  if (error) return <div className="p-4 text-red-500">Error loading events</div>
+
+  const CustomToolbar = (toolbar: any) => {
+    const goToBack = () => {
+      toolbar.onNavigate('PREV')
+    }
+
+    const goToNext = () => {
+      toolbar.onNavigate('NEXT')
+    }
+
+    const label = () => {
+      const date = toolbar.date
+      return format(date, 'MMM dd, yyyy')
+    }
+
+    return (
+      <div className="flex items-center justify-center px-4 py-3 border-b">
+        <button
+          onClick={goToBack}
+          className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+        <span className="text-lg font-medium text-gray-900 px-3">{label()}</span>
+        <button
+          onClick={goToNext}
+          className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6 min-h-screen bg-white relative">
-        <div className="flex items-center justify-between mb-4">
-            <h1 className="text-4xl font-bold mb-4">
-                Calendar
-            </h1>
-            <div className="flex gap-2">
-            <button
-                onClick={() => setScheduleType('my')}
-                className={`px-4 py-1 rounded-full ${
-                scheduleType === 'my'
-                    ? 'bg-black text-white'
-                    : 'bg-gray-100 text-gray-800'
-                }`}
-            >
-                My schedule
-            </button>
-            <button
-                onClick={() => setScheduleType('team')}
-                className={`px-4 py-1 rounded-full ${
-                scheduleType === 'team'
-                    ? 'bg-black text-white'
-                    : 'bg-gray-100 text-gray-800'
-                }`}
-            >
-                Team schedule
-            </button>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-4xl font-bold mb-4">
+          Calendar
+        </h1>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setScheduleType('my')}
+            className={`px-4 py-1 rounded-full transition-colors ${
+              scheduleType === 'my'
+                ? 'bg-black text-white'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+            }`}
+          >
+            My schedule
+          </button>
+          <button
+            onClick={() => setScheduleType('team')}
+            className={`px-4 py-1 rounded-full transition-colors ${
+              scheduleType === 'team'
+                ? 'bg-black text-white'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+            }`}
+          >
+            Team schedule
+          </button>
         </div>
-
-        </div>
+      </div>
 
       {/* Calendar */}
-      <div className="border rounded overflow-hidden h-[75vh]">
-        <Calendar
+      <div className="border rounded-lg overflow-hidden h-[75vh] [&_.rbc-header]:py-3 [&_.rbc-header]:font-medium [&_.rbc-header]:bg-gray-50 [&_.rbc-header]:border-b-0 [&_.rbc-time-gutter_.rbc-timeslot-group]:border-r [&_.rbc-timeslot-group]:border-gray-200 [&_.rbc-time-content]:border-t [&_.rbc-time-content]:border-gray-200 [&_.rbc-time-header]:border-gray-200">
+        <Calendar<any>
           localizer={localizer}
           events={events}
           defaultView={Views.WEEK}
@@ -144,22 +180,20 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
           defaultDate={new Date()}
           tooltipAccessor="location"
           onSelectEvent={(event) => setSelectedEvent(event)}
+          components={{
+            toolbar: CustomToolbar
+          }}
           eventPropGetter={() => ({
-            style: {
-              backgroundColor: '#4EA0C9',
-              borderRadius: '6px',
-              padding: '4px',
-              color: 'white',
-              border: 'none',
-            },
+            className: 'bg-[#4EA0C9] rounded-md border-none text-white'
           })}
         />
       </div>
-        <EditScheduledCheckIn
-            selectedEvent={selectedEvent}
-            onClose={() => {setSelectedEvent(null)}}
-            onUpdatedEvent={() => setReloadEvents(true)}
-        />
+
+      <EditScheduledCheckIn
+        selectedEvent={selectedEvent}
+        onClose={() => {setSelectedEvent(null)}}
+        onUpdatedEvent={() => setReloadEvents(true)}
+      />
     </div>
   )
 }

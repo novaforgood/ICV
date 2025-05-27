@@ -37,6 +37,9 @@ export default function Home() {
       <div className="md:hidden w-full">
         <CheckInCounter />
       </div>
+      <div className="flex w-full md:hidden">
+        <SpontaneousCheckInModal />
+      </div>
 
       <div className="flex flex-1 flex-col gap-8 md:hidden">
         <EventsSchedule />
