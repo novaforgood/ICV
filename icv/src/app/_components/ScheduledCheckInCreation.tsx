@@ -9,7 +9,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import ClientSearch from './ClientSearch'
-import { ContactTypeBadge } from '@/utils/contact-type-colors'
+import { ContactTypeBadge } from '@/app/_components/ContactTypeBadge'
 
 interface ScheduledCheckInCreationProps {
   onNewEvent: () => void

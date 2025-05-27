@@ -4,6 +4,7 @@ import { useUser } from '@/hooks/useUser'
 import { CheckInType } from '@/types/event-types'
 import { format, isValid } from 'date-fns'
 import React from 'react'
+import categoryColors from './categoryColors'
 
 interface EventCardProps {
     event: CheckInType
@@ -16,25 +17,6 @@ const EventsCard: React.FC<EventCardProps> = ({
     className = '',
     variant = 'default',
 }) => {
-    //dict for colors associated with each category
-    const categoryColors: { [key: string]: string } = {
-        "Referral and Intake" :'bg-teal-200',
-        "Phone" :'bg-red-200',
-        "Wellness Check" :'bg-amber-300',
-        "Face to Face":'bg-blue-200',
-        "Team Meeting":'bg-green-200',
-        "Individual Meeting":'bg-purple-200',
-        "Family Meeting":'bg-pink-200',
-        "Referral to Service Provider":'bg-indigo-200',
-        "Employment Job Readiness":'bg-orange-200',
-        "Transportation":'bg-cyan-200',
-        "Tracking Check Up":'bg-blue-200',
-        "Advocacy":'bg-green-200',
-        'Other': 'bg-purple-200'
-
-    }
-
-
         // Parse the event date
         const eventDate = new Date(event.startTime)
         if (!isValid(eventDate)) return null
@@ -89,7 +71,7 @@ const EventsCard: React.FC<EventCardProps> = ({
                 </div>
 
                 {/* Assignee Column */}
-                <div className="flex w-[300px] flex-row items-center text-center">
+                <div className="flex max-w-[300px] flex-row items-center text-center">
                     <img
                         src={user?.photoURL || '/cavediva.jpeg'}
                         alt="logo"
