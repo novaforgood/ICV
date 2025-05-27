@@ -30,7 +30,7 @@ const ClientCard: React.FC<ClientCardProps> = ({
                     <Image
                         src={client.clientPic[0].uri}
                         alt={`${client.firstName} ${client.lastName}`}
-                        className="h-16 w-16 rounded-full object-cover"
+                        className="aspect-square h-16 w-16 rounded-full object-cover object-center"
                         width={64}
                         height={64}
                     />

@@ -30,7 +30,7 @@ export default async function layout({
                                 alt="Profile"
                                 width={100}
                                 height={100}
-                                className="object-cover"
+                                className="h-100 w-100 aspect-square rounded-full object-cover object-center"
                             />
                         </div>
                     </div>
