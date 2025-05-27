@@ -1,8 +1,8 @@
 'use client'
 
 import { Card } from '@/components/ui/card'
-import Image from 'next/image'
 import { NewClient } from '@/types/client-types'
+import Image from 'next/image'
 
 const formatDate = (dateString: string | undefined) => {
     if (!dateString) return 'No check-in'
@@ -10,7 +10,7 @@ const formatDate = (dateString: string | undefined) => {
     return date.toLocaleDateString('en-US', {
         month: '2-digit',
         day: '2-digit',
-        year: '2-digit'
+        year: '2-digit',
     })
 }
 
@@ -19,13 +19,16 @@ interface ClientCardProps {
     showLastCheckin?: boolean
 }
 
-const ClientCard: React.FC<ClientCardProps> = ({ client, showLastCheckin = true }) => {
+const ClientCard: React.FC<ClientCardProps> = ({
+    client,
+    showLastCheckin = true,
+}) => {
     return (
         <Card className="flex min-h-24 w-full bg-white p-4 hover:bg-gray-50">
             <div className="flex w-full items-start gap-3">
-                {client.clientImage?.[0] ? (
+                {client.clientPic?.[0]?.uri ? (
                     <Image
-                        src={client.clientImage[0]}
+                        src={client.clientPic[0].uri}
                         alt={`${client.firstName} ${client.lastName}`}
                         className="h-16 w-16 rounded-full object-cover"
                         width={64}
@@ -47,7 +50,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, showLastCheckin = true 
                 <div className="flex w-full flex-col">
                     <div className="flex items-start justify-between">
                         <div>
-                            <div className="text-base font-medium text-gray-900">
+                            <div className="line-clamp-1 font-medium text-gray-900">
                                 {client.firstName} {client.lastName}
                             </div>
                             <div className="mt-0.5 text-sm text-gray-500">
@@ -57,9 +60,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, showLastCheckin = true 
                     </div>
                     {showLastCheckin && (
                         <div className="mt-2 flex flex-row items-center justify-between text-xs text-gray-500">
-                            <span className="text-gray-400">
-                                Last check-in
-                            </span>
+                            <span className="text-gray-400">Last check-in</span>
                             <span className="text-xs">
                                 {formatDate(client.lastCheckinDate)}
                             </span>
