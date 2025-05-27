@@ -2,35 +2,35 @@
 
 import { updateClient } from '@/api/make-cases/make-case'
 import {
-    ClientDependents,
-    ClientPets,
-    ClientSpouse,
+    ClientDocs,
+    ClientNotes,
+    ClientPic,
+    ClientServices,
 } from '@/app/_components/ClientProfileComponents'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { TypeOf } from 'zod'
 import { useEditFormStore } from '../../_lib/useEditFormStore'
-import { FamilySection } from '../intakeForm/FamilyComponent'
+import { ServicesSection } from '../intakeForm/ServicesComponent'
 
 type ClientType = TypeOf<typeof ClientIntakeSchema>
 
-export const ClientFamilyToggle = ({
+export const ClientServicesToggle = ({
     client,
-    spouse,
     id,
 }: {
     client: ClientType
-    spouse?: ClientType
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
     const { getForm, updateForm, clearForm } = useEditFormStore()
-
-    const router = useRouter()
     const formData = getForm(id)
+    const router = useRouter()
 
-    const toggleButton = () => setEditMode(!editMode)
+    const toggleButton = () => {
+        setEditMode(!editMode)
+    }
 
     useEffect(() => {
         clearForm(id)
@@ -45,7 +45,7 @@ export const ClientFamilyToggle = ({
                         <div className="space-y-[24px]">
                             <div className="flex flex-row items-center justify-between">
                                 <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                                    SPOUSE
+                                    ICV SERVICES
                                 </label>
                                 <button
                                     onClick={toggleButton}
@@ -63,48 +63,54 @@ export const ClientFamilyToggle = ({
                                     <label>Edit</label>
                                 </button>
                             </div>
-                            <ClientSpouse
-                                data={client}
-                                spouseInfo={spouse || {}}
-                                showViewButton={true}
-                            />
+                            <ClientServices data={client} />
                         </div>
+
                         <div className="space-y-[24px]">
                             <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                                DEPENDENTS
+                                Profile picture
                             </label>
-                            <ClientDependents data={client} />
+                            <ClientPic data={client} />
                         </div>
+
                         <div className="space-y-[24px]">
                             <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                                PETS
+                                Documents
                             </label>
-                            <ClientPets data={client} />
+                            <ClientDocs data={client} />
+                        </div>
+
+                        <div className="space-y-[24px]">
+                            <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                                CLIENT NOTES
+                            </label>
+                            <ClientNotes data={client} />
                         </div>
                     </>
                 ) : (
-                    <FamilySection
-                        formType={formData}
-                        updateForm={(form) => updateForm(id, form)}
-                        onSubmitEdit={async (data) => {
-                            try {
-                                await updateClient(id, data)
+                    <div className="mt-[20px]">
+                        <ServicesSection
+                            formType={formData}
+                            updateForm={(form) => updateForm(id, form)}
+                            onSubmitEdit={async (data) => {
+                                try {
+                                    await updateClient(id, data)
+                                    clearForm(id)
+                                    setEditMode(false)
+                                    router.push(`/clients/${id}/services`)
+                                } catch (err) {
+                                    console.error('updateClient error:', err)
+                                }
+                            }}
+                            onCancel={() => {
                                 clearForm(id)
+                                updateForm(id, client)
                                 setEditMode(false)
-                                router.push(`/clients/${id}/family`)
-                            } catch (err) {
-                                console.error('updateClient error:', err)
-                            }
-                        }}
-                        onCancel={() => {
-                            clearForm(id)
-                            updateForm(id, client)
-                            setEditMode(false)
-                        }}
-                        submitType="save"
-                        titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"
-                        showSpouseLink={true}
-                    />
+                            }}
+                            submitType="save"
+                            titleStyle="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]"
+                        />
+                    </div>
                 )}
             </div>
         </div>

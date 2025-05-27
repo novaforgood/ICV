@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation'
 
 import { useUser } from '@/hooks/useUser'
 import { cn } from '@/lib/utils'
+import { useEffect, useRef, useState } from 'react'
 import Symbol from '../../components/Symbol'
 import LogoutButton from './LogoutButton'
-import { useState, useEffect, useRef } from 'react'
 
 const Navbar = () => {
     // const [name, setName] = useState<string>('')
@@ -36,25 +36,27 @@ const Navbar = () => {
     //     return () => unsubscribe()
     // }, [])
 
-    
     const { user } = useUser()
-    const [ open, setOpen ] = useState(false)
+    const [open, setOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
     // Close when clicking outside
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-            setOpen(false)
-        }
+            if (
+                menuRef.current &&
+                !menuRef.current.contains(event.target as Node)
+            ) {
+                setOpen(false)
+            }
         }
 
         if (open) {
-        document.addEventListener('mousedown', handleClickOutside)
+            document.addEventListener('mousedown', handleClickOutside)
         }
 
         return () => {
-        document.removeEventListener('mousedown', handleClickOutside)
+            document.removeEventListener('mousedown', handleClickOutside)
         }
     }, [open])
 
@@ -142,12 +144,10 @@ const Navbar = () => {
             </div>
             )}
             {/* desktop view*/}
-            <div className="md:flex hidden fixed left-0 top-0 h-full w-64 flex-col items-center gap-4 bg-foreground text-background">
+            <div className="fixed left-0 top-0 hidden h-full w-64 flex-col items-center gap-4 bg-foreground text-background md:flex">
                 <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
                     <img
-                        src={
-                            user?.photoURL || '/cavediva.jpeg'
-                        }
+                        src={user?.photoURL || '/cavediva.jpeg'}
                         alt="logo"
                         className="m-4 h-16 w-16 rounded-full"
                     />
@@ -207,7 +207,7 @@ const NavLink = ({ href, children, collapsed = false }: NavLinkProps) => {
         <Link
             href={href}
             className={cn(
-                  collapsed
+                collapsed
                     ? 'flex w-full justify-center py-4'
                     : 'flex w-full flex-row justify-start gap-2 px-6 py-4 text-center',
                 {

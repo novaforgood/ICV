@@ -23,7 +23,9 @@ interface Props {
     updateForm: (form: Partial<NewClient>) => void
     onSubmitNew?: (data: NewClient) => void
     onSubmitEdit?: (data: NewClient) => void
+    onCancel?: () => void
     submitType: 'save' | 'new'
+    titleStyle: string
 }
 
 type BackgroundInfoType = TypeOf<typeof BackgroundSchema>
@@ -32,7 +34,9 @@ export const BackgroundSection: React.FC<Props> = ({
     updateForm,
     onSubmitNew,
     onSubmitEdit,
+    onCancel,
     submitType,
+    titleStyle,
 }) => {
     const {
         register,
@@ -129,12 +133,6 @@ export const BackgroundSection: React.FC<Props> = ({
         return unsubscribe
     }, [watch, formType])
 
-    // const onSubmit = (data: BackgroundInfoType) => {
-    //     console.log('in submit...', data)
-    //     updateForm(data)
-    //     router.push('/intake/background/family')
-    // }
-
     const handleSubmitType = (data: BackgroundInfoType) => {
         if (submitType === 'save' && onSubmitEdit) {
             onSubmitEdit(data)
@@ -149,12 +147,10 @@ export const BackgroundSection: React.FC<Props> = ({
             onSubmit={handleSubmit(handleSubmitType)}
         >
             <div className="flex min-h-screen items-center justify-center">
-                <div className="w-[90%] space-y-[48px]">
+                <div className="w-full space-y-[48px]">
                     <div className="space-y-[24px]">
                         <div className="space-y-[8px]">
-                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                                Education
-                            </label>
+                            <label className={titleStyle}>Education</label>
                         </div>
                         <div className="space-y-[8px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
@@ -180,7 +176,7 @@ export const BackgroundSection: React.FC<Props> = ({
 
                     <div className="space-y-[24px]">
                         <div className="space-y-[24px]">
-                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
+                            <label className={titleStyle}>
                                 Public Services
                             </label>
                             <div className="grid grid-cols-2 gap-[12px]">
@@ -353,9 +349,7 @@ export const BackgroundSection: React.FC<Props> = ({
 
                     <div className="flex grid grid-cols-2 items-center gap-[12px]">
                         <div>
-                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                                Total Income
-                            </label>
+                            <label className={titleStyle}>Total Income</label>
                         </div>
                         <div className="flex items-center rounded border p-2">
                             <span className="mr-1 text-neutral-900">$</span>
@@ -377,9 +371,7 @@ export const BackgroundSection: React.FC<Props> = ({
 
                     <div className="space-y-[24px]">
                         <div className="space-y-[20px]">
-                            <label className="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900">
-                                History
-                            </label>
+                            <label className={titleStyle}>History</label>
                             <div className="flex flex-col space-y-[4px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                     Mental health conditions
@@ -511,13 +503,42 @@ export const BackgroundSection: React.FC<Props> = ({
                             </button>
                         </div>
                     )}
-                    {submitType === 'save' && (
-                        <div className="flex justify-end">
+                    {submitType == 'save' && (
+                        <div className="flex justify-start space-x-[24px]">
                             <button
                                 type="submit"
-                                className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                                className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95]"
                             >
-                                Save
+                                <div className="flex flex-row space-x-[8px]">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                        fill="#FFFFFF"
+                                    >
+                                        <path d="M389-267 195-460l51-52 143 143 325-324 51 51-376 375Z" />
+                                    </svg>
+                                    Save
+                                </div>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={onCancel}
+                                className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                            >
+                                <div className="flex flex-row space-x-[8px]">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                        fill="#FFFFFF"
+                                    >
+                                        <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
+                                    </svg>
+                                    Cancel
+                                </div>
                             </button>
                         </div>
                     )}

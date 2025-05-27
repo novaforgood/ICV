@@ -30,6 +30,7 @@ const Page = () => {
                         router.push('/intake/background')
                     }}
                     submitType="next"
+                    titleStyle="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900"
                 />
             </div>
         </div>

@@ -26,6 +26,7 @@ const Page = () => {
                         router.push('/intake/background/family')
                     }}
                     submitType="new"
+                    titleStyle="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900"
                 />
             </div>
         </div>
