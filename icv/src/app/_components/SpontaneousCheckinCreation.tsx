@@ -7,7 +7,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import ClientCard from './ClientCard'
-import { Cat } from 'lucide-react'
+import ClientSearch from '@/app/_components/ClientSearch'
 
 const enum Step {
   ChooseClient,
@@ -32,6 +32,7 @@ const CaseNotesComponent: React.FC<CaseNotesProps> = React.memo(({ caseNotes, se
 
   return (
     <div>
+      <h2 className="text-xl font-bold mb-4">Wellness Check</h2>
       <textarea
         ref={textAreaRef}
         value={caseNotes}
@@ -39,7 +40,6 @@ const CaseNotesComponent: React.FC<CaseNotesProps> = React.memo(({ caseNotes, se
         placeholder="Enter case notes"
         className="w-full p-2 border border-gray-300 rounded mb-2 h-32"
       />
-      <h2 className="text-xl font-bold mb-4">Check-In Complete</h2>
       <button onClick={submitCaseNotes} className="w-full bg-foreground text-white p-2 rounded">
         Add Case Notes
       </button>
@@ -134,33 +134,14 @@ const MultiStepCheckIn = () => {
     }
   }
 
-const ChooseClient = React.memo(() => (
-  <div>
-    <h2 className="mb-4 text-xl font-bold">Choose A Client</h2>
-    <input
-      ref={inputRef}
-      type="text"
-      value={clientSearch}
-      onChange={(e) => setClientSearch(e.target.value)}
-      placeholder="Search by name"
-      className="mb-2 w-full rounded border border-gray-300 p-2"
-    />
-    <ul className="max-h-48 overflow-y-auto">
-      {filteredClients.map((client: any) => (
-        <li
-          key={client.docId}
-          onClick={() => {
-            setSelectedClientDocId(client.docId);
-            setStep(Step.ConfirmClient);
-          }}
-          className="cursor-pointer p-2 hover:bg-gray-200"
-        >
-          {client.firstName} {client.lastName}
-        </li>
-      ))}
-    </ul>
-  </div>
-));
+const ChooseClient = () => (
+  <ClientSearch
+    onSelect={(id) => {
+      setSelectedClientDocId(id)
+      setStep(Step.ConfirmClient)
+    }}
+  />
+)
 
   const ConfirmClient = () => (
     <form
@@ -168,29 +149,45 @@ const ChooseClient = React.memo(() => (
         e.preventDefault()
         handleSubmit()
       }}
+      className="w-full"
     >
-      <h2 className="text-xl font-bold mb-4">Submit Check-In</h2>
+      {selectedClient && (
+        <ClientCard
+          client={selectedClient}
+        />
+      )}
 
-      <ClientCard
-        client={selectedClient}
-      ></ClientCard>
-
-      <button type="submit" className="w-full bg-foreground text-white p-2 rounded">
-        Submit
-      </button>
+      <div className="mt-8 grid grid-cols-2 gap-4">
+        <button 
+          type="button" 
+          onClick={() => setStep(Step.ChooseClient)}
+          className="w-full bg-gray-500 text-white p-3 rounded-lg"
+        >
+          Back
+        </button>
+        <button 
+          type="submit" 
+          className="w-full bg-black text-white p-3 rounded-lg"
+        >
+          Continue
+        </button>
+      </div>
     </form>
   )
 
   const Complete = () => (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Check-In Complete</h2>
-      <p>Check-in for {selectedClient?.firstName} has been successfully logged.</p>
+    <div className="flex flex-col items-center text-center">
+      <h2 className="text-2xl font-semibold mb-4">Wellness Check Completed</h2>
+      <p className="text-gray-600 mb-8">
+        {selectedClient?.firstName} {selectedClient?.lastName}'s client profile has been updated.
+      </p>
       <button
         type="button"
-        onClick={() => setStep((s) => s + 1)}
-        className="w-full bg-foreground text-white p-2 rounded"
+        onClick={() => setStep(Step.CaseNotes)}
+        className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg"
       >
-        Add Case Notes
+        Create Case Note
+        <span className="text-xl">+</span>
       </button>
     </div>
   )
@@ -212,8 +209,8 @@ const ChooseClient = React.memo(() => (
 
   return (
     <>
-      <button onClick={openModal} className="px-4 py-2 bg-foreground text-white rounded">
-        Create Check-In Event
+      <button onClick={openModal} className="w-full px-4 py-4 bg-foreground text-white rounded">
+        + Add Wellness Event
       </button>
       {isOpen && showSuccess && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -227,18 +224,14 @@ const ChooseClient = React.memo(() => (
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black opacity-50" onClick={closeModal} />
           {/* Modal container */}
-          <div className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6 z-10">
+          <div className="relative bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 z-10">
             <button onClick={closeModal} className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
               &#x2715;
             </button>
-            <Card className="flex w-full max-w-md p-6 flex-col justify-start items-center">
+            <div className="w-full">
+              {step < Step.Complete && (<h2 className="mb-4 text-xl font-bold">Wellness Check</h2>)}
               {renderStep()}
-              {step > Step.ChooseClient && step < Step.Complete && (
-                <button onClick={() => setStep((s) => s - 1)} className="mt-4 text-foreground">
-                  Back
-                </button>
-              )}
-            </Card>
+            </div>
           </div>
         </div>
       )}

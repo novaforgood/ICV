@@ -192,6 +192,12 @@ export const ClientHousing = ({ data }: ClientProps) => {
                     <div>{data.zipCode ? data.zipCode : <p>N/A</p>}</div>
                 </div>
             </div>
+            <div>
+                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                    Notes on Housing
+                </label>
+                <div>{data.housingNotes ? data.housingNotes : <p>N/A</p>}</div>
+            </div>
         </div>
     )
 }
@@ -491,6 +497,12 @@ export const ClientHistory = ({ data }: ClientProps) => {
                     </div>
                 )}
             </div>
+            <div>
+                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                    Notes on History
+                </label>
+                <div>{data.historyNotes ? data.historyNotes : <p>N/A</p>}</div>
+            </div>
         </div>
     )
 }
@@ -512,7 +524,7 @@ export const ClientSpouse = ({
     return (
         <div className="space-y-[24px]">
             <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                {/* ROW */}
+                {/* ROW: Marital Status */}
                 <div className="flex flex-col space-y-1">
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                         Marital Status
@@ -521,98 +533,128 @@ export const ClientSpouse = ({
                         {data.maritalStatus ? data.maritalStatus : <p>N/A</p>}
                     </div>
                 </div>
-                {/* ROW */}
-                <div className="flex flex-col space-y-1">
-                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                        If married, is spouse an ICV client?
-                    </label>
-                    <div>
-                        {data.spouseClientStatus ? (
-                            data.spouseClientStatus
-                        ) : (
-                            <p>N/A</p>
-                        )}
-                    </div>
-                </div>
+
+                {data.maritalStatus === 'Married' && (
+                    <>
+                        {/* ROW: Spouse Client Status */}
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                If married, is spouse an ICV client?
+                            </label>
+                            <div>
+                                {data.spouseClientStatus ? (
+                                    data.spouseClientStatus
+                                ) : (
+                                    <p>N/A</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Warning if spouse not linked */}
+                        {data.spouseClientStatus === 'Yes' &&
+                            !data.associatedSpouseID && (
+                                <div className="col-span-2 flex flex-row space-x-[8px] text-[#FF394D]">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                        fill="#ff394d"
+                                    >
+                                        <path d="M479.79-288q15.21 0 25.71-10.29t10.5-25.5q0-15.21-10.29-25.71t-25.5-10.5q-15.21 0-25.71 10.29t-10.5 25.5q0 15.21 10.29 25.71t25.5 10.5ZM444-432h72v-240h-72v240Zm36.28 336Q401-96 331-126t-122.5-82.5Q156-261 126-330.96t-30-149.5Q96-560 126-629.5q30-69.5 82.5-122T330.96-834q69.96-30 149.5-30t149.04 30q69.5 30 122 82.5T834-629.28q30 69.73 30 149Q864-401 834-331t-82.5 122.5Q699-156 629.28-126q-69.73 30-149 30Zm-.28-72q130 0 221-91t91-221q0-130-91-221t-221-91q-130 0-221 91t-91 221q0 130 91 221t221 91Zm0-312Z" />
+                                    </svg>
+                                    <label className="text-[16px]">
+                                        Spouse profile is not linked
+                                    </label>
+                                </div>
+                            )}
+                    </>
+                )}
             </div>
 
-            {data.spouse && !data.associatedSpouseID && (
-                <div className="relative mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
-                    {/* Name + Gender Row */}
-                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                        <div className="flex flex-col space-y-1">
-                            <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
-                                Name
-                            </label>
-                            <div className="flex flex-row space-x-[4px]">
-                                {data.spouse.spouseFirstName && (
-                                    <p>{data.spouse.spouseFirstName}</p>
-                                )}
-                                {data.spouse.spouseLastName && (
-                                    <p>{data.spouse.spouseLastName}</p>
-                                )}
+            {/* SPOUSE IS NOT AN ICV CLIENT */}
+            {data.spouseClientStatus === 'No' &&
+                !data.associatedSpouseID &&
+                data.spouse &&
+                Object.values(data.spouse).some(
+                    (val) => val !== undefined && val !== '',
+                ) && (
+                    <div className="mt-4 space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
+                        {/* Name + Gender Row */}
+                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                            <div className="flex flex-col space-y-1">
+                                <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                    Name
+                                </label>
+                                <div className="flex flex-row space-x-[4px]">
+                                    {data.spouse.spouseFirstName && (
+                                        <p>{data.spouse.spouseFirstName}</p>
+                                    )}
+                                    {data.spouse.spouseLastName && (
+                                        <p>{data.spouse.spouseLastName}</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex flex-col space-y-1">
+                                <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                    Gender
+                                </label>
+                                <div>
+                                    {data.spouse.spouseGender ? (
+                                        <p>{data.spouse.spouseGender}</p>
+                                    ) : (
+                                        <p>N/A</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                        <div className="flex flex-col space-y-1">
-                            <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
-                                Gender
-                            </label>
-                            <div>
-                                {data.spouse.spouseGender ? (
-                                    <p>{data.spouse.spouseGender}</p>
-                                ) : (
-                                    <p>N/A</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* DOB + Age Row */}
-                    <div className="grid grid-cols-2 gap-x-5">
-                        <div className="flex flex-col space-y-1">
-                            <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
-                                DOB
-                            </label>
-                            <div>
-                                {data.spouse.spouseDOB ? (
-                                    <p>{data.spouse.spouseDOB}</p>
-                                ) : (
-                                    <p>N/A</p>
-                                )}
+                        {/* DOB + Age Row */}
+                        <div className="grid grid-cols-2 gap-x-5">
+                            <div className="flex flex-col space-y-1">
+                                <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                    DOB
+                                </label>
+                                <div>
+                                    {data.spouse.spouseDOB ? (
+                                        <p>{data.spouse.spouseDOB}</p>
+                                    ) : (
+                                        <p>N/A</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex flex-col space-y-1">
+                                <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                    Age
+                                </label>
+                                <div>
+                                    {data.spouse.spouseAge ? (
+                                        <p>{data.spouse.spouseAge}</p>
+                                    ) : (
+                                        <p>N/A</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                        <div className="flex flex-col space-y-1">
-                            <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
-                                Age
-                            </label>
-                            <div>
-                                {data.spouse.spouseAge ? (
-                                    <p>{data.spouse.spouseAge}</p>
-                                ) : (
-                                    <p>N/A</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* Income Row */}
-                    <div className="flex flex-col space-y-1">
-                        <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
-                            Income
-                        </label>
-                        <div>
-                            {data.spouse.spouseIncome ? (
-                                <p>
-                                    {'$'}
-                                    {data.spouse.spouseIncome}
-                                </p>
-                            ) : (
-                                <p>N/A</p>
-                            )}
+                        {/* Income Row */}
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-['Epilogue'] text-[16px] font-bold text-neutral-900">
+                                Income
+                            </label>
+                            <div>
+                                {data.spouse.spouseIncome ? (
+                                    <p>
+                                        {'$'}
+                                        {data.spouse.spouseIncome}
+                                    </p>
+                                ) : (
+                                    <p>N/A</p>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
             {data.associatedSpouseID && (
                 <div className="mt-4 w-full space-y-[24px] rounded-[10px] border-[1px] border-solid border-[#DBD8E4] p-[24px]">
@@ -1084,18 +1126,6 @@ export const ClientNotes = ({ data }: ClientProps) => {
         <div className="space-y-[24px]">
             <div className="flex flex-col space-y-1">
                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                    Notes on Housing
-                </label>
-                <div>{data.housingNotes ? data.housingNotes : <p>N/A</p>}</div>
-            </div>
-            <div className="flex flex-col space-y-1">
-                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                    Notes on History
-                </label>
-                <div>{data.historyNotes ? data.historyNotes : <p>N/A</p>}</div>
-            </div>
-            <div className="flex flex-col space-y-1">
-                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                     Additional Notes
                 </label>
                 <div>
@@ -1113,14 +1143,21 @@ export const ClientPic = ({ data }: ClientProps) => {
                 {/* Row: */}
                 <div>
                     {Array.isArray(data.clientPic) &&
-                    data.clientPic.length > 0 ? ( // Optional chaining used here
-                        data.clientPic.map((file, index) => (
-                            <div key={index} className="space-y-4">
-                                <label>{file.name}</label>
-                            </div>
-                        ))
+                    data.clientPic.length > 0 ? (
+                        <a
+                            href={data.clientPic[0].uri}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                        >
+                            <img
+                                src={data.clientPic[0].uri}
+                                alt="Profile"
+                                className="h-[120px] w-[120px] rounded-full object-cover"
+                            />
+                        </a>
                     ) : (
-                        <p>No file(s) uploaded.</p>
+                        <p>No image uploaded.</p>
                     )}
                 </div>
             </div>
@@ -1129,14 +1166,6 @@ export const ClientPic = ({ data }: ClientProps) => {
 }
 
 export const ClientDocs = ({ data }: ClientProps) => {
-    // console.log('data', data.clientIDocs)
-    // {
-    //     Array.isArray(data.clientIDocs) && data.clientIDocs.length > 0 // Optional chaining used here
-    //         ? data.clientIDocs.map((file, index) =>
-    //               console.log('HERES INFO ON FILES', file.name, file.uri),
-    //           )
-    //         : console.log('ERROR FILES')
-    // }
     return (
         <div className="space-y-[24px]">
             <div className="flex flex-col space-y-1">

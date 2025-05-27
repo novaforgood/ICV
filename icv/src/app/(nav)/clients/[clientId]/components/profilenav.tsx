@@ -13,7 +13,6 @@ export default function ProfileNav() {
         { name: 'Background', href: `/clients/${clientId}/background` },
         { name: 'Family', href: `/clients/${clientId}/family` },
         { name: 'Services', href: `/clients/${clientId}/services` },
-        { name: 'Documents', href: `/clients/${clientId}/documents` },
         { name: 'Check-Ins', href: `/clients/${clientId}/checkins` },
     ]
 

@@ -11,7 +11,7 @@ export default async function layout({
 }>) {
     const { clientId } = params
     const client = await getClientById(clientId)
-    if (!client){
+    if (!client) {
         throw new Error('Client does not exist')
     }
     return (
@@ -19,14 +19,20 @@ export default async function layout({
             <div className="sticky left-0 top-0 flex w-full flex-col items-start overflow-x-hidden rounded-md border-b bg-white">
                 <div className="flex w-full flex-row px-10">
                     <div className="mr-8 pt-4">
-                        <Image
-                            src="/icv.png"
-                            alt="ICV Logo"
-                            width={150}
-                            height={150}
-                            priority
-                            className="rounded-full"
-                        />
+                        <div className="h-[100px] w-[100px] overflow-hidden rounded-full">
+                            <Image
+                                src={
+                                    Array.isArray(client.clientPic) &&
+                                    client.clientPic.length > 0
+                                        ? client.clientPic[0]?.uri || '/icv.png'
+                                        : '/icv.png'
+                                }
+                                alt="Profile"
+                                width={100}
+                                height={100}
+                                className="object-cover"
+                            />
+                        </div>
                     </div>
                     <div className="sticky top-0 flex w-full flex-col pt-8">
                         <h1 className="text-5xl font-bold">

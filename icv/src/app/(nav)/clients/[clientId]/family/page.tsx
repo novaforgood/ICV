@@ -19,6 +19,7 @@ const page = async ({
                     ? await getClientById(client.associatedSpouseID)
                     : undefined
             }
+            id={clientId}
         />
     )
 }
