@@ -37,6 +37,10 @@ export const ClientServicesToggle = ({
         updateForm(id, client)
     }, [client, id])
 
+    useEffect(() => {
+        window.scrollTo({ top: 0 })
+    }, [editMode])
+
     return (
         <div className="flex min-h-screen px-[48px]">
             <div className="mb-[48px] h-screen w-screen min-w-[70%] space-y-[48px]">

@@ -19,22 +19,22 @@ import {
 } from 'firebase/firestore'
 
 export async function createClient(client: NewClient) {
-    try {
-        const { firebaseServerApp, currentUser } =
-            await getAuthenticatedAppForUser()
-        if (!currentUser) {
-            throw new Error('User not found')
-        }
-        const ssrdb = getFirestore(firebaseServerApp)
+  try {
+      const { firebaseServerApp, currentUser } =
+          await getAuthenticatedAppForUser()
+      if (!currentUser) {
+          throw new Error('User not found')
+      }
+      const ssrdb = getFirestore(firebaseServerApp)
 
-        const clientsCollection = collection(ssrdb, 'clients')
-        const newDoc = await addDoc(clientsCollection, client)
-        console.log('Case added with ID: ', newDoc.id)
-        return newDoc.id
-    } catch (error) {
-        console.error('Error creating client:', error)
-        throw error
-    }
+      const clientsCollection = collection(ssrdb, 'clients')
+      const newDoc = await addDoc(clientsCollection, client)
+      console.log('Case added with ID: ', newDoc.id)
+      return newDoc.id
+  } catch (error) {
+      console.error('Error creating client:', error)
+      throw error
+  }
 }
 
 export async function getAllClients() {
