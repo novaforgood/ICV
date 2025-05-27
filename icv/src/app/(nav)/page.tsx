@@ -23,16 +23,16 @@ export default function Home() {
   const { user } = useUser()
 
   return (
-    <div className="flex h-screen flex-col md:flex-row gap-6 p-6 pt-12">
+    <div className="flex h-screen flex-col  justify-between md:flex-row gap-6 p-6 pt-12">
       {/* desktop view */}
-      <div className="hidden flex-1 flex-col gap-8 md:flex">
+      <div className="hidden flex-2/3 flex-col gap-8 md:flex">
         <h1 className="text-6xl font-bold">Hello, {user?.displayName}</h1>
         <EventsSchedule />
       </div>
 
       {/* tablet */}
       <div className="flex gap-8 md:hidden">
-        <h1 className="text-6xl font-bold">Hello, Akhilesh</h1>
+        <h1 className="text-6xl font-bold">Hello, {user?.displayName}</h1>
       </div>
       <div className="md:hidden w-full">
         <CheckInCounter />

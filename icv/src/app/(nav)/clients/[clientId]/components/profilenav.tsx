@@ -17,14 +17,14 @@ export default function ProfileNav() {
     ]
 
     return (
-        <div className="mt-4 w-full border-gray-300">
+        <div className="mt-4 w-full border-gray-300 overflow-x-auto">
             <div className="flex justify-start space-x-8 px-4">
                 {tabs.map((tab) => (
                     <Link
                         key={tab.name}
                         onClick={() => router.push(tab.href)}
                         href={tab.href}
-                        className="group relative pb-2 text-lg font-medium"
+                        className="group relative pb-2 text-lg font-medium whitespace-nowrap"
                     >
                         <span
                             className={`${
