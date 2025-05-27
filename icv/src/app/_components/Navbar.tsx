@@ -101,7 +101,7 @@ const Navbar = () => {
             </div>
             )}   
             {open && (        
-            <div ref={menuRef} className="md:hidden flex fixed left-0 top-0 h-full w-64 flex-col items-center gap-4 bg-foreground text-background">
+            <div ref={menuRef} className="md:hidden z-50 flex fixed left-0 top-0 h-full w-64 flex-col items-center gap-4 bg-foreground text-background">
                 <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
                     <img
                         src={

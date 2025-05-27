@@ -10,7 +10,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import ClientCard from './ClientCard'
-import { ContactTypeBadge } from '@/utils/contact-type-colors'
+import { ContactTypeBadge } from '@/app/_components/ContactTypeBadge'
 import { getUserNames } from '@/api/users'
 
 interface EditScheduledCheckInProps {
