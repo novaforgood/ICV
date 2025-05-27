@@ -25,7 +25,7 @@ export default function Home() {
   return (
     <div className="flex h-screen flex-col  justify-between md:flex-row gap-6 p-6 pt-12">
       {/* desktop view */}
-      <div className="hidden flex-2/3 flex-col gap-8 md:flex">
+      <div className="hidden flex-2/3 w-full flex-col gap-8 md:flex">
         <h1 className="text-6xl font-bold">Hello, {user?.displayName}</h1>
         <EventsSchedule />
       </div>
