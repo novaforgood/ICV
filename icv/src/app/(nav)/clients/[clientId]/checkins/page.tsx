@@ -42,6 +42,27 @@ export default function CheckInsPage() {
     // Add sorting state
     const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
 
+    // Define color mapping for categories
+    const getCategoryColor = (category: string) => {
+        const colors: { [key: string]: string } = {
+            None: 'bg-white',
+            'Referral and Intake': 'bg-teal-200',
+            Phone: 'bg-red-200',
+            'Wellness Check': 'bg-amber-300',
+            'Face to Face': 'bg-blue-200',
+            'Team Meeting': 'bg-green-200',
+            'Individual Meeting': 'bg-purple-200',
+            'Family Meeting': 'bg-pink-200',
+            'Referral to Service Provider': 'bg-indigo-200',
+            'Employment Job Readiness': 'bg-orange-200',
+            Transportation: 'bg-cyan-200',
+            'Tracking Check Up': 'bg-blue-200',
+            Advocacy: 'bg-green-200',
+            Other: 'bg-purple-200',
+        }
+        return colors[category] || colors['Other']
+    }
+
     //pagination!
     const indexofLastEvent = currentPage * eventsPp
     const indexofFirstEvent = indexofLastEvent - eventsPp
@@ -65,19 +86,19 @@ export default function CheckInsPage() {
         return sortOrder === 'newest' ? dateB - dateA : dateA - dateB
     })
 
-
     //filtering options
     // const codes = currEvents.map(evt => evt.contactCode); ISSUE: TAKES CATEGORIES FROM ALL PAST< NO TTHE PAST IN THE PAGE
     const filterOptions = Array.from(
         new Set([
-            ...checkIns.upcoming.map(ci => String(ci.contactCode)),
-            ...checkIns.past.map(ci => String(ci.contactCode)),
-        ])
+            'None',
+            ...checkIns.upcoming.map((ci) => String(ci.contactCode)),
+            ...checkIns.past.map((ci) => String(ci.contactCode)),
+        ]),
     )
     // Filter upcoming events by category if a category is selected
     const filteredUpcomingEvents = selectedCategory
         ? [...checkIns.upcoming].filter(
-              (event) => event.contactType === selectedCategory,
+              (event) => event.contactCode === selectedCategory,
           )
         : sortedUpcomingEvents
 
@@ -91,7 +112,7 @@ export default function CheckInsPage() {
     // Filter events by category if a category is selected
     const filteredPastEvents = selectedCategory
         ? sortedPastEvents.filter(
-              (event) => event.contactType === selectedCategory,
+              (event) => event.contactCode === selectedCategory,
           )
         : sortedPastEvents
     const totalPages = Math.ceil(filteredPastEvents.length / eventsPp)
@@ -104,7 +125,11 @@ export default function CheckInsPage() {
     }
 
     const handleCategoryChange = (option: { value: string }) => {
-        setSelectedCategory(option.value)
+        if (selectedCategory == option.value || option.value == 'None') {
+            setSelectedCategory('')
+        } else {
+            setSelectedCategory(option.value)
+        }
         setCurrentPage(1) // Reset to first page when filter changes
     }
 
@@ -209,16 +234,30 @@ export default function CheckInsPage() {
                         <Dropdown
                             className="w-full border-black"
                             placeholderClassName="hidden"
-                            options={filterOptions}
+                            options={filterOptions.map((option) => ({
+                                value: option,
+                                label: (
+                                    <div
+                                        className={`${getCategoryColor(option)} flex h-[30px] w-full items-center justify-center rounded-md border border-gray-200 p-4`}
+                                    >
+                                        <span className="truncate text-sm font-medium">
+                                            {option}
+                                        </span>
+                                    </div>
+                                ),
+                            }))}
                             onChange={handleCategoryChange}
-                            controlClassName="flex items-center justify-between border border-black-300 rounded-md px-4 py-2 bg-white w-full hover:border-neutral-400"
-                            menuClassName="dropdown-menu absolute w-400 mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400"
+                            controlClassName={`flex items-center justify-between border border-black-300 rounded-md px-4 py-2 ${selectedCategory ? 'bg-sky' : 'bg-white'} w-full hover:border-neutral-400`}
+                            menuClassName="dropdown-menu absolute w-400 mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400 [&>div]:!bg-transparent [&>div]:!p-1"
                             arrowClosed={
                                 <div className="flex w-full items-center justify-between">
-                                    <Symbol
-                                        symbol="filter_list"
-                                        className="h-5 w-5"
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <Symbol
+                                            symbol="filter_list"
+                                            className="h-5 w-5"
+                                        />
+                                        <span>Filter</span>
+                                    </div>
                                     {selectedCategory && (
                                         <span className="ml-2">
                                             {selectedCategory}
@@ -228,10 +267,13 @@ export default function CheckInsPage() {
                             }
                             arrowOpen={
                                 <div className="flex w-full items-center justify-between">
-                                    <Symbol
-                                        symbol="filter_list"
-                                        className="h-5 w-5"
-                                    />
+                                    <div className="flex items-center gap-2">
+                                        <Symbol
+                                            symbol="filter_list"
+                                            className="h-5 w-5"
+                                        />
+                                        <span>Filter</span>
+                                    </div>
                                     {selectedCategory && (
                                         <span className="ml-2">
                                             {selectedCategory}
