@@ -89,10 +89,24 @@ export const ClientWaiversToggle = ({
                             </div>
                         ) : (
                             <div className="p-4">
-                                <h2 className="text-xl font-bold">
-                                    No Waivers Found
+                                <h2 className="font-epilogue mb-[24px] text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                                    Client Waivers
                                 </h2>
-                                <p>Add a waiver to view them here.</p>
+                                <button
+                                    onClick={toggleButton}
+                                    className="flex flex-row space-x-[8px] rounded-[5px] bg-black px-[12px] py-[8px] text-[14px] text-white"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                        fill="#FFFFFF"
+                                    >
+                                        <path d="M192-396v-72h288v72H192Zm0-150v-72h432v72H192Zm0-150v-72h432v72H192Zm336 504v-113l210-209q7.26-7.41 16.13-10.71Q763-528 771.76-528q9.55 0 18.31 3.5Q798.83-521 806-514l44 45q6.59 7.26 10.29 16.13Q864-444 864-435.24t-3.29 17.92q-3.3 9.15-10.71 16.32L641-192H528Zm288-243-45-45 45 45ZM576-240h45l115-115-22-23-22-22-116 115v45Zm138-138-22-22 44 45-22-23Z" />
+                                    </svg>
+                                    Add new waiver
+                                </button>
                             </div>
                         )}
                     </div>
