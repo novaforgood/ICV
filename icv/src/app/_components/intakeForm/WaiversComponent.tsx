@@ -145,7 +145,6 @@ const WaiverSection: React.FC<Props> = ({
             </div>
         )
     }
-
     return (
         <form
             className="space-y-[24px]"
