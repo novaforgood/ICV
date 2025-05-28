@@ -139,27 +139,30 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
         <h1 className="text-4xl font-bold mb-4">
           Calendar
         </h1>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setScheduleType('my')}
-            className={`px-4 py-1 rounded-full transition-colors ${
-              scheduleType === 'my'
-                ? 'bg-black text-white'
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-            }`}
-          >
-            My schedule
-          </button>
-          <button
-            onClick={() => setScheduleType('team')}
-            className={`px-4 py-1 rounded-full transition-colors ${
-              scheduleType === 'team'
-                ? 'bg-black text-white'
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-            }`}
-          >
-            Team schedule
-          </button>
+        <div className="relative inline-flex items-end justify-start rounded-[20px] bg-zinc-200 p-1">
+          <div
+              className={`absolute transition-all duration-300 ease-in-out ${scheduleType === 'my' ? 'left-1' : 'left-[calc(100%-50%-4px)]'} h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-[16px] bg-black`}
+          />
+            <button
+                onClick={() => setScheduleType('my')}
+                className={`relative flex items-center justify-center gap-2.5 rounded-[16px] px-5 py-2 transition-colors duration-300 ${
+                    scheduleType === 'my' ? 'text-white' : 'text-black'
+                }`}
+            >
+                <div className="justify-center font-['Epilogue'] text-base font-normal leading-none">
+                    My schedule
+                </div>
+            </button>
+            <button
+                onClick={() => setScheduleType('team')}
+                className={`relative flex items-center justify-center gap-2.5 rounded-[16px] px-5 py-2 transition-colors duration-300 ${
+                    scheduleType === 'team' ? 'text-white' : 'text-black'
+                }`}
+            >
+                <div className="justify-center font-['Epilogue'] text-base font-normal leading-none">
+                    Team schedule
+                </div>
+            </button>
         </div>
       </div>
 
