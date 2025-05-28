@@ -136,15 +136,7 @@ const WaiverSection: React.FC<Props> = ({
             onSubmitEdit(finalData as NewClient)
         }
     }
-    if (isExporting) {
-        return (
-            <div className="flex min-h-screen items-center justify-center bg-white">
-                <p className="text-lg font-medium text-gray-700">
-                    Uploading...
-                </p>
-            </div>
-        )
-    }
+
     return (
         <form
             className="space-y-[24px]"
