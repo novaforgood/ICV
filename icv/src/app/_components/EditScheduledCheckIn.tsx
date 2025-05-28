@@ -43,7 +43,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
   const [client, setClient] = useState<ClientWithLastCheckin | null>(null)
   const [staffNames, setStaffNames] = useState<string[]>([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     const auth = getAuth()
@@ -115,6 +115,8 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
   )
 
   const handleSubmit = (e: React.FormEvent) => {
+    if (submitting) return
+    setSubmitting(true)
     e.preventDefault()
     
     const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
@@ -154,10 +156,12 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
           onUpdatedEvent()
           onClose()
         }, 1000)
+        setSubmitting(false)
       })
       .catch((err) => {
         console.error(err)
         alert('Error updating event.')
+        setSubmitting(false)
       })
   }
 
@@ -249,8 +253,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Header */}
           <div>
-            <ClientCard client={client} /> 
-            <p className="text-gray-500 text-sm">{selectedEvent.clientId}</p>
+            { client && (< ClientCard client={client} /> )}
           </div>
 
           {/* Date */}
@@ -343,9 +346,10 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
           <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              className="flex-1 bg-[#4EA0C9] text-white py-2 rounded shadow hover:bg-[#3b8db2] transition"
-            >
-              Save changes
+              className={`flex-1  text-white py-2 rounded shadow transition"
+                ${submitting ? 'bg-gray-300' : 'bg-[#4EA0C9]'}`}
+              >
+                {submitting ? 'Submitting...' : 'Save changes'}
             </button>
             <button
               type="button"
