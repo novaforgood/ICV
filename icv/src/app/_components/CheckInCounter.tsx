@@ -127,41 +127,15 @@ const CheckInCounter: React.FC = () => {
         <div>
             <div className="mb-4 flex w-full items-center justify-between">
                 <h2 className="text-2xl font-semibold">Check-Ins</h2>
-                <Select value={timeFrame} onValueChange={setTimeFrame}>
-                    <SelectTrigger className="flex w-40 items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2">
-                        <SelectValue>
-                            {timeFrame.charAt(0).toUpperCase() +
-                                timeFrame.slice(1)}
-                        </SelectValue>
-                        <Symbol symbol="arrow_drop_down" className="ml-2" />
-                    </SelectTrigger>
-                    <SelectContent
-                        className="rounded-md border border-gray-200 bg-white shadow-md"
-                        align="center"
-                        sideOffset={4}
-                    >
-                        <SelectViewport>
-                            <SelectItem
-                                value="day"
-                                className="hover:bg-blue-100 focus:bg-blue-100 px-3 py-2"
-                            >
-                                Day
-                            </SelectItem>
-                            <SelectItem
-                                value="month"
-                                className="hover:bg-blue-100 focus:bg-blue-100 px-3 py-2"
-                            >
-                                Month
-                            </SelectItem>
-                            <SelectItem
-                                value="year"
-                                className="hover:bg-blue-100 focus:bg-blue-100 px-3 py-2"
-                            >
-                                Year
-                            </SelectItem>
-                        </SelectViewport>
-                    </SelectContent>
-                </Select>
+                <select
+                    value={timeFrame}
+                    onChange={(e) => setTimeFrame(e.target.value)}
+                    className="w-40 rounded-md border border-gray-300 bg-white px-3 py-2"
+                >
+                    <option value="day">Day</option>
+                    <option value="month">Month</option>
+                    <option value="year">Year</option>
+                </select>
             </div>
 
             {isLoading ? (
