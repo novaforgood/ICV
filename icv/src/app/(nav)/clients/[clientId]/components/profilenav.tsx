@@ -9,12 +9,12 @@ export default function ProfileNav() {
     const { clientId } = useParams()
 
     const tabs = [
+        { name: 'Check-Ins', href: `/clients/${clientId}/checkins` },
         { name: 'Profile', href: `/clients/${clientId}` },
         { name: 'Background', href: `/clients/${clientId}/background` },
         { name: 'Family', href: `/clients/${clientId}/family` },
         { name: 'Services', href: `/clients/${clientId}/services` },
         { name: 'Waivers', href: `/clients/${clientId}/waivers` },
-        { name: 'Check-Ins', href: `/clients/${clientId}/checkins` },
     ]
 
     return (

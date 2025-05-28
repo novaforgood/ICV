@@ -17,7 +17,8 @@ import {
     SortingState,
     useReactTable,
 } from '@tanstack/react-table'
-import React, { useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 
 import Symbol from '@/components/Symbol'
 import { Button } from '@/components/ui/button'
@@ -30,6 +31,8 @@ interface ClientsTableProps {
 const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
     const [globalFilter, setGlobalFilter] = useState('')
     const [sorting, setSorting] = useState<SortingState>([])
+    const [currentPage, setCurrentPage] = useState(1)
+    const rowsPerPage = 50
 
     const table = useReactTable({
         data: clients,
@@ -45,87 +48,144 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
         },
     })
 
+    const pageCount = Math.ceil(table.getRowModel().rows.length / rowsPerPage)
+    const paginatedRows = table
+        .getRowModel()
+        .rows.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+
+    // Reset page when sorting or filtering changes
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [globalFilter, sorting])
+
     return (
-        <div>
+        <div className="space-y-[20px]">
             {/* Search Input */}
-            {/* <div className="mb-4 flex gap-2">
+            <div className="flex flex-row items-center justify-between">
+                <div>
+                    <strong>{clients.length}</strong> ICV clients
+                </div>
                 <input
                     value={globalFilter}
                     onChange={(e) => setGlobalFilter(e.target.value)}
-                    placeholder="Search clients..."
-                    className="w-64"
+                    placeholder="Search..."
+                    className="w-[40%] rounded-[5px] bg-[#D8DDE7] px-[12px] py-[6px]"
                 />
-                <Button onClick={() => setGlobalFilter('')}>Clear</Button>
-            </div> */}
+            </div>
 
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                const canSort = header.column.getCanSort()
-                                const sortOrder = header.column.getIsSorted()
+            <div className="space-y-[16px]">
+                {/* Pagination Controls */}
+                <div className="flex items-center justify-end gap-2 text-neutral-800">
+                    <button
+                        onClick={() =>
+                            setCurrentPage((p) => Math.max(p - 1, 1))
+                        }
+                        disabled={currentPage === 1}
+                        className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
+                    >
+                        <ChevronLeft />
+                    </button>
+                    <div className="w-[120px] text-center tabular-nums">
+                        {(currentPage - 1) * rowsPerPage + 1}–
+                        {Math.min(currentPage * rowsPerPage, clients.length)} of{' '}
+                        {clients.length}
+                    </div>
+                    <button
+                        onClick={() =>
+                            setCurrentPage((p) => Math.min(p + 1, pageCount))
+                        }
+                        disabled={currentPage === pageCount}
+                        className="text-xl disabled:cursor-not-allowed disabled:text-gray-300"
+                    >
+                        <ChevronRight />
+                    </button>
+                </div>
 
-                                return (
-                                    <TableHead key={header.id}>
-                                        <div className="flex items-center gap-1">
-                                            {flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext(),
-                                            )}
-                                            {canSort && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        header.column.toggleSorting()
-                                                    }
-                                                >
-                                                    {sortOrder === 'asc' ? (
-                                                        <Symbol symbol="keyboard_arrow_up" />
-                                                    ) : sortOrder === 'desc' ? (
-                                                        <Symbol symbol="keyboard_arrow_down" />
-                                                    ) : (
-                                                        <Symbol symbol="filter_list" />
-                                                    )}
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                data-state={row.getIsSelected() && 'selected'}
-                            >
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext(),
-                                        )}
-                                    </TableCell>
-                                ))}
+                {/* Table */}
+                <Table className="table-fixed">
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    const canSort = header.column.getCanSort()
+                                    const sortOrder =
+                                        header.column.getIsSorted()
+
+                                    return (
+                                        <TableHead
+                                            key={header.id}
+                                            style={{
+                                                width: header.column.getSize(),
+                                            }}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                {flexRender(
+                                                    header.column.columnDef
+                                                        .header,
+                                                    header.getContext(),
+                                                )}
+                                                {canSort && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            header.column.toggleSorting()
+                                                        }
+                                                    >
+                                                        {sortOrder === 'asc' ? (
+                                                            <Symbol symbol="keyboard_arrow_up" />
+                                                        ) : sortOrder ===
+                                                          'desc' ? (
+                                                            <Symbol symbol="keyboard_arrow_down" />
+                                                        ) : (
+                                                            <Symbol symbol="filter_list" />
+                                                        )}
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        </TableHead>
+                                    )
+                                })}
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell
-                                colSpan={CLIENT_TABLE_COLUMNS.length}
-                                className="h-24 text-center"
-                            >
-                                No results.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {paginatedRows.length ? (
+                            paginatedRows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={
+                                        row.getIsSelected() && 'selected'
+                                    }
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell
+                                            key={cell.id}
+                                            style={{
+                                                width: cell.column.getSize(),
+                                            }}
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={CLIENT_TABLE_COLUMNS.length}
+                                    className="h-24 text-center"
+                                >
+                                    No results.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }
