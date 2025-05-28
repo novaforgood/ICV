@@ -335,3 +335,20 @@ export async function getAllCheckInCounts(date: Date) {
 
     return counts
 }
+
+export async function getEventById(eventId: string): Promise<CheckInType> {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
+    const ssrdb = getFirestore(firebaseServerApp)
+    const eventDoc = await getDoc(doc(ssrdb, 'events', eventId))
+    
+    if (!eventDoc.exists()) {
+        throw new Error('Event not found')
+    }
+
+    const eventData = eventDoc.data() as CheckInType
+    eventData.id = eventDoc.id
+    return eventData
+}

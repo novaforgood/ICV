@@ -10,6 +10,7 @@ import {
 import { useState } from 'react'
 import Image from 'next/image'
 import { doc, setDoc } from 'firebase/firestore'
+import { useRouter } from 'next/navigation'
 
 const page = () => {
     const [email, setEmail] = useState('')
@@ -19,6 +20,7 @@ const page = () => {
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const [forgotPassword, setForgotPassword] = useState(false) 
+    const router = useRouter()
 
     // Handle password reset
     const handlePasswordReset = async (e: React.FormEvent) => {
@@ -78,6 +80,7 @@ const page = () => {
 
                     console.log('Token set in cookie:', token)
                     console.log('Welcome, ', auth.currentUser?.displayName)
+                    router.push('/')
                 }
             }
             
@@ -87,6 +90,13 @@ const page = () => {
             } else {
                 setError('An unknown error occurred')
             }
+        }
+    }
+
+    //handle enter buttonw hen pressed
+    const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter'){
+            handleAuth
         }
     }
     return (
@@ -185,6 +195,7 @@ const page = () => {
                             )}
                             {!loading && (
                             <button
+                                type="button"//need this or else default behavior = forgot password when enter key pressed
                                 onClick={() => setForgotPassword(true)}
                                 className="mt-4 text-black text-sm"
                             >
@@ -194,6 +205,7 @@ const page = () => {
                             <button
                                 type="submit"
                                 className="mx-auto mt-4 w-[128px] rounded-md items-center bg-black p-2 text-white"
+
                             >
                                 {loading ? 'Sign Up' : 'Login'}
                             </button>

@@ -59,13 +59,13 @@ const SettingsPage = () => {
                         Profile
                     </h2>
                     <img
-                        src={user?.photoURL || '/default-avatar.png'}
+                        src={user?.photoURL || '/icv.png'}
                         alt="Profile pic"
                         className="mb-4 h-32 w-32 rounded-full border object-cover"
                     />
 
                     <div className="flex w-full flex-row gap-12">
-                        {/* user infoooo */}
+                        {/* user infooo */}
                         <div className="flex-1">
                             <span className="font-bold">First Name</span>
                             <div>{firstName}</div>

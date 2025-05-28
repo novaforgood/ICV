@@ -217,7 +217,7 @@ export default function CheckInsPage() {
 
     return (
         <div className="p-7">
-            <div className="sticky top-48 z-10 flex h-20 items-center justify-between bg-white pb-4">
+            <div className="sticky top-[168px] w-full z-10 flex h-20 items-center justify-between bg-white pb-4 pt-4 border">
                 {/* Title */}
                 <h1 className="text-4xl font-bold">Case Notes</h1>
 
