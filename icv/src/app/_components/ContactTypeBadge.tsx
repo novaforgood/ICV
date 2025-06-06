@@ -1,15 +1,17 @@
-import React from 'react';
-import { ContactType } from '../../types/event-types';
-import categoryColors from './categoryColors';
+import React from 'react'
+import { ContactType } from '../../types/event-types'
+import categoryColors, { ContactTypeKey } from './categoryColors'
 
 interface Props {
-  type: ContactType;
+    type: ContactTypeKey 
 }
 
 export const ContactTypeBadge: React.FC<Props> = ({ type }) => {
-  return (
-    <span className={`px-2 py-1 rounded-full ${categoryColors[type]} text-sm`}>
-      {type}
-    </span>
-  );
-};
+    return (
+        <span
+            className={`rounded-full px-2 py-1 ${categoryColors[type]} text-sm`}
+        >
+            {type}
+        </span>
+    )
+}

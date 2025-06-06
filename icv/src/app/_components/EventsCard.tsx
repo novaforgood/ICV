@@ -20,7 +20,6 @@ const EventsCard: React.FC<EventCardProps> = ({
 }) => {
     const router = useRouter()
 
-
     const eventDate = new Date(event.startTime)
     if (!isValid(eventDate)) return null
 

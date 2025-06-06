@@ -196,6 +196,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
         selectedEvent={selectedEvent}
         onClose={() => {setSelectedEvent(null)}}
         onUpdatedEvent={() => setReloadEvents(true)}
+        fromEvent={false}
       />
     </div>
   )

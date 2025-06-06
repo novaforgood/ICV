@@ -13,6 +13,8 @@ const categoryColors: { [key: string]: string } = {
         "Advocacy":'bg-green-200',
         'Other': 'bg-purple-200'
 
-    }
+    } as const;
+
+    export type ContactTypeKey = keyof typeof categoryColors;
 
 export default categoryColors
