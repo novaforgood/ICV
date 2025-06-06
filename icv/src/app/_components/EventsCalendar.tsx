@@ -7,6 +7,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getMyScheduledEvents, getScheduledEvents } from '@/api/events'
 import { CheckInType } from '@/types/event-types'
 import EditScheduledCheckIn from '@/app/_components/EditScheduledCheckIn'
+import { getUserColor } from '@/utils/colorUtils'
 
 import {
   format,
@@ -45,6 +46,12 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
   const [error, setError] = useState('')
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null)
   const [reloadEvents, setReloadEvents] = useState(false)
+
+  // Create a Date object set to the current time
+  const scrollTime = useMemo(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0, 0)
+  }, [])
 
   useEffect(() => {
     const auth = getAuth()
@@ -133,6 +140,17 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
     )
   }
 
+  const CustomEvent = ({ event }: { event: any }) => {
+    return (
+      <div className="h-full p-1">
+        <div className="font-medium text-foreground">{event.title}</div>
+        <div className="text-sm text-foreground/80">
+          {format(new Date(event.start), 'h:mm a')} - {format(new Date(event.end), 'h:mm a')}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="p-6 min-h-screen bg-white relative">
       <div className="flex items-center justify-between mb-4">
@@ -178,16 +196,22 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
           startAccessor="start"
           endAccessor="end"
           style={{ height: '100%' }}
+          className="[&_.rbc-timeslot-group]:!min-h-[100px] [&_.rbc-event-label]:hidden"
           timeslots={1}
           step={60}
           defaultDate={new Date()}
+          scrollToTime={scrollTime}
           tooltipAccessor="location"
           onSelectEvent={(event) => setSelectedEvent(event)}
           components={{
-            toolbar: CustomToolbar
+            toolbar: CustomToolbar,
+            event: CustomEvent
           }}
-          eventPropGetter={() => ({
-            className: 'bg-[#4EA0C9] rounded-md border-none text-white'
+          eventPropGetter={(event) => ({
+            className: 'rounded-md border-none bg-background',
+            style: {
+              backgroundColor: event.assigneeId ? getUserColor(event.assigneeId) : '#4EA0C9'
+            }
           })}
         />
       </div>

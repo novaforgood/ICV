@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import useSWR, { mutate } from 'swr'
 import { CheckInType, CheckInCategory, ContactType } from '@/types/event-types'
 import { createCheckIn } from '@/api/events'
 import { getAllClients } from '@/api/clients'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
 import ClientSearch from './ClientSearch'
@@ -44,7 +44,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
 
   useEffect(() => {
     const auth = getAuth()
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
       if (user?.displayName) setAssigneeId(user.displayName)
       else setAssigneeId('')
     })
@@ -68,61 +68,85 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
     resetFormDefaults()
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    if (submitting) return
-    setSubmitting(true)
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
 
-    if (!selectedClient) {
-      alert('Please select a client before scheduling the event.')
-      return
-    }
+      if (!selectedClient) {
+        alert('Please select a client before scheduling the event.')
+        return
+      }
 
-    const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
-    const endDateTime = new Date(`${date}T${endTime}`).toLocaleString('en-US')
+      if (!assigneeId) {
+        alert('No assignee found. Please try logging in again.')
+        return
+      }
 
-    const startDateTimeObj = new Date(`${date}T${startTime}`)
-    const endDateTimeObj = new Date(`${date}T${endTime}`)
+      const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
+      const endDateTime = new Date(`${date}T${endTime}`).toLocaleString('en-US')
 
-    if (endDateTimeObj <= startDateTimeObj) {
-      alert('End time must be after start time.')
-      return
-    }
+      const startDateTimeObj = new Date(`${date}T${startTime}`)
+      const endDateTimeObj = new Date(`${date}T${endTime}`)
 
-    const newEvent: CheckInType & { clientId?: string } = {
-      name,
-      startTime: startDateTime,
-      endTime: endDateTime,
-      assigneeId,
-      location,
-      clientDocId: selectedClientDocId,
-      contactCode: contactType,
-      scheduled: true,
-      clientId: selectedClient.id,
-      clientName: selectedClient.firstName + ' ' + selectedClient.lastName
-    }
+      if (endDateTimeObj <= startDateTimeObj) {
+        alert('End time must be after start time.')
+        return
+      }
 
-    createCheckIn(newEvent)
-      .then(() => {
-        setSubmitting(false)
-        setShowSuccess(true)
-        setLocation('')
-        setSelectedClientId('')
-        mutate('calendar-events')
+      const newEvent: CheckInType & { clientId?: string } = {
+        name,
+        startTime: startDateTime,
+        endTime: endDateTime,
+        assigneeId,
+        location,
+        clientDocId: selectedClientDocId,
+        contactCode: contactType,
+        scheduled: true,
+        clientId: selectedClient.id,
+        clientName: selectedClient.firstName + ' ' + selectedClient.lastName
+      }
 
-        setTimeout(() => {
-          setShowSuccess(false)
-          closeModal()
-        }, 2000)
+      // Add timeout to the createCheckIn call
+      const timeoutDuration = 10000; // 10 seconds
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out')), timeoutDuration);
+      });
 
-        onNewEvent()
-      })
-      .catch((err) => {
-        setSubmitting(false)
-        console.error(err)
-        alert('Error creating event.')
-      })
+      setSubmitting(true)
+      createCheckIn(newEvent)
+        .then(() => {
+            setShowSuccess(true)
+            setLocation('')
+            setSelectedClientId('')
+            mutate('calendar-events')
+            onNewEvent()
+            
+            setTimeout(() => {
+                if (mounted.current) {
+                    setShowSuccess(false)
+                    closeModal()
+                }
+            }, 2000)
+        })
+        .catch((err) => {
+            console.error('Error creating event:', err)
+            alert(`Error creating event: ${err.message}. Please try again.`)
+        })
+        .finally(() => {
+            if (mounted.current) {
+                setSubmitting(false)
+            }
+        })
   }
+
+  // Add mounted ref to handle cleanup
+  const mounted = useRef(true)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
 
   return (
     <>
@@ -251,8 +275,9 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
 
                 <button
                   type="submit"
-                  className={`w-full text-white p-3 rounded-lg font-medium  transition-colors
-                  ${submitting ? 'bg-gray-300' : 'bg-black'}`}
+                  disabled={submitting}
+                  className={`w-full text-white p-3 rounded-lg font-medium transition-colors
+                  ${submitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-black hover:bg-gray-800'}`}
                 >
                   {submitting ? 'Submitting...' : 'Save'}
                 </button>

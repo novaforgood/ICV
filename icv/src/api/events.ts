@@ -352,3 +352,42 @@ export async function getEventById(eventId: string): Promise<CheckInType> {
     eventData.id = eventDoc.id
     return eventData
 }
+
+export async function getLastCheckInDate(clientDocId: string): Promise<Date | null> {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+    if (!currentUser) {
+        throw new Error('User not found');
+    }
+    const ssrdb = getFirestore(firebaseServerApp);
+
+    try {
+        const eventsCollection = collection(ssrdb, 'events');
+        const now = new Date();
+        
+        // Query for events with matching clientDocId and startTime before now
+        const q = query(
+            eventsCollection,
+            where('clientDocId', '==', clientDocId)
+        );
+
+        const querySnapshot = await getDocs(q);
+        
+        if (querySnapshot.empty) {
+            return null;
+        }
+
+        // Find the most recent event
+        let latestDate = new Date(0); // Start with earliest possible date
+        querySnapshot.forEach((doc) => {
+            const eventDate = new Date(doc.data().startTime);
+            if (eventDate < now && eventDate > latestDate) {
+                latestDate = eventDate;
+            }
+        });
+
+        return latestDate;
+    } catch (error) {
+        console.error('Error getting last check-in date:', error);
+        throw new Error('Failed to get last check-in date');
+    }
+}

@@ -116,7 +116,6 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     if (submitting) return
-    setSubmitting(true)
     e.preventDefault()
     
     const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
@@ -148,6 +147,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
       clientName: `${selectedClient.firstName || ''} ${selectedClient.lastName || ''}`.trim()
     }
 
+    setSubmitting(true)
     updateCheckIn(updatedEvent)
       .then(() => {
         setShowUpdateSuccess(true)
