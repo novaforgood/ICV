@@ -12,9 +12,10 @@ import {
 } from '@radix-ui/react-select'
 import React, { useEffect, useState } from 'react'
 import Symbol from '../../components/Symbol'
+import { useTimeFrame } from '../_context/TimeFrameContext'
 
 const CheckInCounter: React.FC = () => {
-    const [timeFrame, setTimeFrame] = useState<string>('day')
+    const { timeFrame, setTimeFrame } = useTimeFrame()
     const [isLoading, setIsLoading] = useState(true)
 
     const [hygieneKits, setHygieneKits] = useState<{ [key: string]: number }>({
@@ -129,7 +130,7 @@ const CheckInCounter: React.FC = () => {
                 <h2 className="text-2xl font-semibold">Check-Ins</h2>
                 <select
                     value={timeFrame}
-                    onChange={(e) => setTimeFrame(e.target.value)}
+                    onChange={(e) => setTimeFrame(e.target.value as 'day' | 'month' | 'year')}
                     className="w-40 rounded-md border border-gray-300 bg-white px-3 py-2"
                 >
                     <option value="day">Day</option>
