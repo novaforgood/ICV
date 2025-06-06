@@ -11,7 +11,7 @@ export const CONTACTSOURCE = [
 ]
 export const SERVICESELECT = ['Recipient', 'Not a recipient']
 export const CITIZEN = ['Citizen', 'Resident', 'Undocumented']
-export const HOMELESS = ['Yes', 'No', 'At risk']
+export const HOMELESS = ['Homeless', 'At risk', 'Vehicle', 'Sheltered', 'Transitional housing', 'Rehabilitation', 'Permanently housed']
 export const ETHNICITY = [
     'White',
     'Black or African American',
