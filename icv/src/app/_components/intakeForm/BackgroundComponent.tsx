@@ -12,11 +12,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import {
-    CheckboxList,
-    RadioChoice,
-    ServicesWithIncome,
-} from '../../_components/MakeOptions'
+import { CheckboxList, RadioChoice, ServicesWithIncome } from './MakeOptions'
 
 interface Props {
     formType: Partial<NewClient>

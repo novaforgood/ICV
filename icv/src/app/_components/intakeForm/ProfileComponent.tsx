@@ -18,7 +18,7 @@ import {
     CheckboxListWithOther,
     RadioChoice,
     RadioWithOther,
-} from '../MakeOptions'
+} from './MakeOptions'
 
 interface Props {
     formType: Partial<NewClient>

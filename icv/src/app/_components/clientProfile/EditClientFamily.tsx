@@ -5,7 +5,7 @@ import {
     ClientDependents,
     ClientPets,
     ClientSpouse,
-} from '@/app/_components/ClientProfileComponents'
+} from '@/app/_components/clientProfile/ClientProfileComponents'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
