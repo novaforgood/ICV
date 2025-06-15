@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import useSWR from 'swr'
 import { createCheckIn, updateCaseNotes } from '@/api/events'
 import { getAllClients } from '@/api/clients'
@@ -18,34 +18,33 @@ const enum Step {
 
 interface CaseNotesProps {
   caseNotes: string
-  setCaseNotes: (notes: string) => void
-  submitCaseNotes: () => void
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onSubmit: () => void
+  submitting: boolean
 }
 
-const CaseNotesComponent: React.FC<CaseNotesProps> = React.memo(({ caseNotes, setCaseNotes, submitCaseNotes }) => {
-  const textAreaRef = useRef<HTMLTextAreaElement>(null)
-
-  useEffect(() => {
-    // Focus the textarea on mount
-    textAreaRef.current?.focus()
-  }, [])
-
-  return (
+const CaseNotes: React.FC<CaseNotesProps> = React.memo(({ caseNotes, onChange, onSubmit, submitting }) => (
+  <div>
     <div>
       <h2 className="text-xl font-bold mb-4">Wellness Check</h2>
       <textarea
-        ref={textAreaRef}
         value={caseNotes}
-        onChange={(e) => setCaseNotes(e.target.value)}
-        placeholder="Enter case notes"
-        className="w-full p-2 border border-gray-300 rounded mb-2 h-32"
+        onChange={onChange}
+        rows={6}
+        cols={40}
+        placeholder="Enter your notes here..."
+        className="border border-gray-300 p-2 rounded-md w-full"
+        autoFocus
       />
-      <button onClick={submitCaseNotes} className="w-full bg-foreground text-white p-2 rounded">
-        Add Case Notes
-      </button>
     </div>
-  )
-})
+    <button
+      onClick={onSubmit}
+      className={`w-full text-white p-2 rounded ${submitting ? 'bg-gray-300' : 'bg-black'}`}
+    >
+      {submitting ? 'Submitting...' : 'Add Case Notes'}
+    </button>
+  </div>
+))
 
 const MultiStepCheckIn = () => {
   const [step, setStep] = useState<Step>(Step.ChooseClient)
@@ -59,6 +58,7 @@ const MultiStepCheckIn = () => {
   const [checkInID, setcheckInID] = useState('')
   const [showSuccess, setShowSuccess] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const openModal = () => setIsOpen(true)
   const closeModal = () => {
@@ -73,33 +73,23 @@ const MultiStepCheckIn = () => {
     setCaseNotes('')
     setcheckInID('')
   }
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    // After changes, put the focus back on the input
-    inputRef.current?.focus();
-  }, [clientSearch]);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const { data: clients } = useSWR('clients', getAllClients)
 
-  const filteredClients = clients
-    ? clients.filter((client: any) => {
-        const fullName = `${client.firstName} ${client.lastName}`.toLowerCase()
-        return fullName.includes(clientSearch.toLowerCase())
-      })
-    : []
-
   const selectedClient = clients?.find((client: any) => client.docId === selectedClientDocId) || null
 
-    useEffect(() => {
-        const auth = getAuth()
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user?.displayName) setAssigneeId(user.displayName)
-        })
-        return () => unsubscribe()
-    }, [])
+  useEffect(() => {
+      const auth = getAuth()
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (user?.displayName) setAssigneeId(user.displayName)
+      })
+      return () => unsubscribe()
+  }, [])
 
   const handleSubmit = async () => {
+    if (submitting) return
+    setSubmitting(true)
     const newEvent: CheckInType & { clientId?: string } = {
       startTime: new Date().toLocaleString('en-US'),
       assigneeId,
@@ -113,14 +103,18 @@ const MultiStepCheckIn = () => {
       createCheckIn(newEvent).then((id) => {
         setStep(Step.Complete)
         setcheckInID(id)
+        setSubmitting(false)
       })
     } catch (err) {
       alert('Error creating event ' + err)
       console.error('Error creating event:', err)
+      setSubmitting(false)
     }
   }
 
   const submitCaseNotes = async () => {
+    if (submitting) return
+    setSubmitting(true)
     try {
       await updateCaseNotes(checkInID, caseNotes).then(() => {
           setShowSuccess(true)
@@ -128,9 +122,11 @@ const MultiStepCheckIn = () => {
             setShowSuccess(false)
             closeModal()
           }, 2000)
+          setSubmitting(false)
       })
     } catch (err) {
       console.error('Error updating case notes:', err)
+      setSubmitting(false)
     }
   }
 
@@ -167,9 +163,10 @@ const ChooseClient = () => (
         </button>
         <button 
           type="submit" 
-          className="w-full bg-black text-white p-3 rounded-lg"
+          className={`w-full text-white p-3 rounded-lg
+          ${submitting ? 'bg-gray-300' : 'bg-black'}`}
         >
-          Continue
+          {submitting ? 'Submitting...' : 'Continue'}
         </button>
       </div>
     </form>
@@ -192,6 +189,15 @@ const ChooseClient = () => (
     </div>
   )
 
+  const handleCaseNotesChange = useCallback(
+    (e) => setCaseNotes(e.target.value),
+    [setCaseNotes]
+  );
+
+  const handleCaseNotesSubmit = useCallback(() => {
+    submitCaseNotes();
+  }, [submitCaseNotes]);
+
   const renderStep = () => {
     switch (step) {
       case Step.ChooseClient:
@@ -201,7 +207,13 @@ const ChooseClient = () => (
       case Step.Complete:
         return <Complete />
       case Step.CaseNotes:
-        return <CaseNotesComponent caseNotes={caseNotes} setCaseNotes={setCaseNotes} submitCaseNotes={submitCaseNotes} />
+        return (
+          <CaseNotes
+            caseNotes={caseNotes}
+            onChange={handleCaseNotesChange}
+            onSubmit={handleCaseNotesSubmit}
+            submitting={submitting}
+          /> )
       default:
         return null
     }

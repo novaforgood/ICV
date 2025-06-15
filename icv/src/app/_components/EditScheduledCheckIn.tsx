@@ -119,15 +119,13 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         name.toLowerCase().includes(searchTerm.toLowerCase()),
     )
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-
-        const startDateTime = new Date(`${date}T${startTime}`).toLocaleString(
-            'en-US',
-        )
-        const endDateTime = new Date(`${date}T${endTime}`).toLocaleString(
-            'en-US',
-        )
+  const handleSubmit = (e: React.FormEvent) => {
+    if (submitting) return
+    setSubmitting(true)
+    e.preventDefault()
+    
+    const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
+    const endDateTime = new Date(`${date}T${endTime}`).toLocaleString('en-US')
 
         const startDateTimeObj = new Date(`${date}T${startTime}`)
         const endDateTimeObj = new Date(`${date}T${endTime}`)
@@ -164,10 +162,12 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                     onUpdatedEvent()
                     onClose()
                 }, 1000)
+        setSubmitting(false)
             })
             .catch((err) => {
                 console.error(err)
                 alert('Error updating event.')
+        setSubmitting(false)
             })
     }
 
@@ -264,33 +264,27 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                 </div>
                             )}
 
-                            <div className="text-blue-700 mt-4 flex cursor-pointer items-center gap-2 underline">
-                                <span className="material-symbols-outlined">
-                                    description
-                                </span>
-                                <p>View case notes</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            {/* editing event */}
-            {!showUpdateSuccess && !showDeleteSuccess && editMode && (
-                <div className={ `fixed right-0 top-0 z-[100] h-full ${fromEvent ? 'w-full' : 'w-[600px]'} overflow-y-auto border-l border-gray-200 bg-white p-8 shadow-lg` }>
-                    <div className="absolute right-4 top-4 flex gap-3 text-gray-600">
-                        <button onClick={onClose}>
-                            <span className="material-symbols-outlined">
-                                close
-                            </span>
-                        </button>
-                    </div>
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Header */}
-                        <div>
-                            {client && <ClientCard client={client} />}
-                            <p className="text-sm text-gray-500">
-                                {selectedEvent.clientId}
-                            </p>
-                        </div>
+          <div className="flex items-center gap-2 text-blue-700 mt-4 underline cursor-pointer">
+            <span className="material-symbols-outlined">description</span>
+            <p>View case notes</p>
+          </div>
+        </div>
+      </div>
+    )}
+    {/* editing event */}
+    {!showUpdateSuccess && !showDeleteSuccess && editMode && (
+      <div className="fixed right-0 top-0 h-full w-[600px] bg-white shadow-lg border-l border-gray-200 p-8 z-[100] overflow-y-auto">
+          <div className="absolute top-4 right-4 flex gap-3 text-gray-600">
+
+            <button onClick={onClose}>
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Header */}
+          <div>
+            { client && (< ClientCard client={client} /> )}
+          </div>
 
                         {/* Date */}
                         <div>
@@ -406,9 +400,10 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                         <div className="flex gap-4 pt-4">
                             <button
                                 type="submit"
-                                className="flex-1 rounded bg-[#4EA0C9] py-2 text-white shadow transition hover:bg-[#3b8db2]"
-                            >
-                                Save changes
+                                className={`flex-1 rounded  py-2 text-white shadow transition"
+                                ${submitting ? 'bg-gray-300' : 'bg-[#4EA0C9]'}`}
+              >
+                                  {submitting ? 'Submitting...' : 'Save changes'}
                             </button>
                             <button
                                 type="button"

@@ -26,6 +26,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
   const [contactType, setContactType] = useState<string>(ContactType.Values['Wellness Check'])
   const [assigneeId, setAssigneeId] = useState('')
   const [selectedClientDocId, setSelectedClientId] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   const { data: clients } = useSWR('clients', getAllClients)
 
@@ -68,6 +69,8 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
   }
 
   const handleSubmit = (e: React.FormEvent) => {
+    if (submitting) return
+    setSubmitting(true)
     e.preventDefault()
 
     if (!selectedClient) {
@@ -101,6 +104,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
 
     createCheckIn(newEvent)
       .then(() => {
+        setSubmitting(false)
         setShowSuccess(true)
         setLocation('')
         setSelectedClientId('')
@@ -114,6 +118,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
         onNewEvent()
       })
       .catch((err) => {
+        setSubmitting(false)
         console.error(err)
         alert('Error creating event.')
       })
@@ -246,9 +251,10 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({onNe
 
                 <button
                   type="submit"
-                  className="w-full bg-black text-white p-3 rounded-lg font-medium hover:bg-gray-900 transition-colors"
+                  className={`w-full text-white p-3 rounded-lg font-medium  transition-colors
+                  ${submitting ? 'bg-gray-300' : 'bg-black'}`}
                 >
-                  Save
+                  {submitting ? 'Submitting...' : 'Save'}
                 </button>
               </form>
             </div>
