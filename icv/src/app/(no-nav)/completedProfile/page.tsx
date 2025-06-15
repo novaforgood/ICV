@@ -1,6 +1,7 @@
 'use client'
 
 import { getClientById, updateClient } from '@/api/make-cases/make-case'
+import { createHousingUpdate } from '@/api/make-cases/make-housing'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -37,6 +38,25 @@ const Page = () => {
             updateClient(createdClient.associatedSpouseID, {
                 associatedSpouseID: clientID,
             })
+        }
+
+        if (createdClient?.homeless && clientID) {
+            const newHousing = {
+                clientID: clientID,
+                date: createdClient.housingDate ?? createdClient.intakeDate,
+                housingStatus: createdClient.homeless,
+            }
+
+            createHousingUpdate(newHousing)
+                .then(() => {
+                    updateClient(clientID, {
+                        homeless: '',
+                        housingDate: '',
+                    })
+                })
+                .catch((err) => {
+                    console.error('Failed to create housing update:', err)
+                })
         }
     }, [createdClient, clientID])
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { updateClient } from '@/api/make-cases/make-case'
+import { createHousingUpdate } from '@/api/make-cases/make-housing'
 import {
     ClientBio,
     ClientCitizenship,
@@ -102,7 +103,29 @@ export const ClientProfileToggle = ({
                             updateForm={(form) => updateForm(id, form)}
                             onSubmitEdit={async (data) => {
                                 try {
+                                    if (data.homeless) {
+                                        const newHousing = {
+                                            clientID: id,
+                                            date:
+                                                data.housingDate ??
+                                                data.intakeDate,
+                                            housingStatus: data.homeless || '',
+                                        }
+
+                                        await createHousingUpdate(
+                                            newHousing,
+                                        ).catch((err) =>
+                                            console.error(
+                                                'Failed to create housing update:',
+                                                err,
+                                            ),
+                                        )
+                                        data.homeless = ''
+                                        data.housingDate = ''
+                                    }
+
                                     await updateClient(id, data)
+
                                     clearForm(id)
                                     setEditMode(false)
                                     router.push(`/clients/${id}`)

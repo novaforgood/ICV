@@ -48,6 +48,7 @@ const ProfileSection: React.FC<Props> = ({
         reset,
         watch,
         setValue,
+        getValues,
         formState: { errors },
     } = useForm<ProfileType>({
         mode: 'onChange',
@@ -130,13 +131,6 @@ const ProfileSection: React.FC<Props> = ({
         const calculatedCode = `${formType.firstName?.[0]?.toUpperCase() ?? 'N'}${formType.gender?.[0]?.toUpperCase() ?? 'X'}${formType.lastName?.[0]?.toUpperCase() ?? 'N'}${new Date().getFullYear()}`
         updateForm({ clientCode: calculatedCode })
     }, [formType.firstName, formType.lastName, formType.gender])
-
-    useEffect(() => {
-        if (submitType === 'next') {
-            const today = new Date().toISOString().split('T')[0]
-            setValue('intakeDate', today)
-        }
-    }, [submitType, setValue])
 
     const selectedGender = watch('gender') ?? ''
     const selectedRef = watch('contactSource') ?? ''
@@ -356,25 +350,38 @@ const ProfileSection: React.FC<Props> = ({
                     <div className="space-y-[24px]">
                         <label className={titleStyle}>Housing</label>
 
-                        <div className="flex flex-col space-y-[4px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Homeless
-                            </label>
-                            <div className="flex flex-col space-y-[8px]">
-                                <RadioChoice
-                                    options={HOMELESS}
-                                    selectedValue={selectedHomeless}
-                                    onChange={(updatedHM) =>
-                                        setValue('homeless', updatedHM)
-                                    }
-                                    name="homeless?"
+                        <div className="grid grid-cols-2 gap-[24px]">
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Date
+                                </label>
+                                <input
+                                    {...register('housingDate')}
+                                    type="date"
+                                    placeholder="Text"
+                                    className="w-full rounded border p-2"
                                 />
+                            </div>
+                            <div className="flex flex-col space-y-[4px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    Housing status
+                                </label>
+                                <div className="flex flex-col space-y-[8px]">
+                                    <RadioChoice
+                                        options={HOMELESS}
+                                        selectedValue={selectedHomeless}
+                                        onChange={(updatedHM) =>
+                                            setValue('homeless', updatedHM)
+                                        }
+                                        name="homeless?"
+                                    />
+                                </div>
                             </div>
                         </div>
 
                         <div className="flex flex-col space-y-[4px]">
                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                Sheltered
+                                Sheltered by ICV
                             </label>
                             <RadioChoice
                                 options={YESNO}
