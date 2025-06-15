@@ -16,7 +16,7 @@ import {
     ClientPic,
     ClientServices,
     ClientSpouse,
-} from '@/app/_components/ClientProfileComponents'
+} from '@/app/_components/clientProfile/ClientProfileComponents'
 import Symbol from '@/components/Symbol'
 import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
