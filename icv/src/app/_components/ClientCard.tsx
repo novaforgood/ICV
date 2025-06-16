@@ -1,13 +1,31 @@
 'use client'
 
+import { getLastCheckInDate } from '@/api/events'
 import { Card } from '@/components/ui/card'
 import { NewClient } from '@/types/client-types'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
-const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return 'No check-in'
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-CA', {
+const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return 'No check-in'
+
+    let dateObj: Date
+    if (date instanceof Date) {
+        dateObj = date
+    } else {
+        try {
+            dateObj = new Date(date)
+            // Check if the date is valid
+            if (isNaN(dateObj.getTime())) {
+                return 'No check-in'
+            }
+        } catch (error) {
+            console.error('Error parsing date:', error)
+            return 'No check-in'
+        }
+    }
+
+    return dateObj.toLocaleDateString('en-CA', {
         month: '2-digit',
         day: '2-digit',
         year: '2-digit',
@@ -15,7 +33,7 @@ const formatDate = (dateString: string | undefined) => {
 }
 
 interface ClientCardProps {
-    client: NewClient & { lastCheckinDate?: string }
+    client: NewClient
     showLastCheckin?: boolean
 }
 
@@ -23,6 +41,24 @@ const ClientCard: React.FC<ClientCardProps> = ({
     client,
     showLastCheckin = true,
 }) => {
+    const [lastCheckIn, setLastCheckIn] = useState<Date | null>(null)
+
+    useEffect(() => {
+        const fetchLastCheckIn = async () => {
+            if ((client.docId, showLastCheckin)) {
+                try {
+                    const date = await getLastCheckInDate(client.docId)
+                    setLastCheckIn(date)
+                } catch (error) {
+                    console.error('Error fetching last check-in date:', error)
+                    setLastCheckIn(null)
+                }
+            }
+        }
+
+        fetchLastCheckIn()
+    }, [client.docId])
+
     return (
         <Card className="flex min-h-24 w-full bg-white p-4 hover:bg-gray-50">
             <div className="flex w-full items-start gap-3">
@@ -62,7 +98,7 @@ const ClientCard: React.FC<ClientCardProps> = ({
                         <div className="mt-2 flex flex-row items-center justify-between text-xs text-gray-500">
                             <span className="text-gray-400">Last check-in</span>
                             <span className="text-xs">
-                                {formatDate(client.lastCheckinDate)}
+                                {formatDate(lastCheckIn || client.intakeDate)}
                             </span>
                         </div>
                     )}
