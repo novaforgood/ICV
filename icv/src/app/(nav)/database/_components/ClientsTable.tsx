@@ -68,7 +68,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
             {/* Search Input */}
             <div className="flex flex-row items-center justify-between">
                 <div>
-                    <strong>{clients.length}</strong> ICV clients
+                    <strong>{table.getFilteredRowModel().rows.length}</strong> ICV clients
                 </div>
                 <input
                     value={globalFilter}
@@ -92,8 +92,8 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                     </button>
                     <div className="w-[120px] text-center tabular-nums">
                         {(currentPage - 1) * rowsPerPage + 1}–
-                        {Math.min(currentPage * rowsPerPage, clients.length)} of{' '}
-                        {clients.length}
+                        {Math.min(currentPage * rowsPerPage, table.getFilteredRowModel().rows.length)} of{' '}
+                        {table.getFilteredRowModel().rows.length}
                     </div>
                     <button
                         onClick={() =>
