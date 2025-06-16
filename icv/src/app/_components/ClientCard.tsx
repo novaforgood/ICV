@@ -45,7 +45,7 @@ const ClientCard: React.FC<ClientCardProps> = ({
 
     useEffect(() => {
         const fetchLastCheckIn = async () => {
-            if (client.docId) {
+            if (client.docId, showLastCheckin) {
                 try {
                     const date = await getLastCheckInDate(client.docId);
                     setLastCheckIn(date);
