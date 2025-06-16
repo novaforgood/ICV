@@ -1,5 +1,17 @@
+'use client'
+
 import { NewClient } from '@/types/client-types'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+} from '@/components/ui/select'
+import { Eye, ArrowUpDown, FilterIcon } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import Symbol from '@/components/Symbol'
+import { MultiCheckbox } from '@/components/ui/multi-checkbox'
 
 const columnHelper = createColumnHelper<NewClient>()
 
@@ -55,24 +67,115 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         size: 180,
     }),
     columnHelper.accessor('firstName', {
-        header: () => <div>First Name</div>,
+        header: ({ column }) => (
+            <div className="flex items-center justify-between w-full">
+                <div>First Name</div>
+                <Select
+                    onValueChange={(value) => {
+                        column.toggleSorting(value === 'desc');
+                    }}
+                    >
+                    <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                        <ArrowUpDown className="h-4 w-4" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="asc">Sort ascending</SelectItem>
+                        <SelectItem value="desc">Sort descending</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+        ),
         cell: (info) => renderValue(info.getValue()),
         size: 200,
     }),
     columnHelper.accessor('lastName', {
-        header: () => <div>Last Name</div>,
+        header: ({ column }) => (
+            <div className="flex items-center justify-between w-full">
+                <div>Last Name</div>
+                <Select
+                    onValueChange={(value) => {
+                        column.toggleSorting(value === 'desc');
+                    }}
+                    >
+                    <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                        <ArrowUpDown className="h-4 w-4" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="asc">Sort ascending</SelectItem>
+                        <SelectItem value="desc">Sort descending</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+        ),
         cell: (info) => renderValue(info.getValue()),
         size: 200,
     }),
     columnHelper.accessor('intakeDate', {
-        header: () => <div>Intake Date</div>,
+        header: ({ column }) => (
+            <div className="flex items-center justify-between w-full">
+                <div>Intake Date</div>
+                <Select
+                    onValueChange={(value) => {
+                        column.toggleSorting(value === 'desc');
+                    }}
+                    >
+                    <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                        <ArrowUpDown className="h-4 w-4 " />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="asc">Sort ascending</SelectItem>
+                        <SelectItem value="desc">Sort descending</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+        ),
         cell: (info) => renderValue(info.getValue()),
         size: 180,
     }),
     columnHelper.accessor('caseManager', {
-        header: () => <div>Case Manager</div>,
+        header: ({ column, table }) => {
+            const caseManagers = Array.from(column.getFacetedUniqueValues()?.keys() ?? [])
+            const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+
+            return (
+                <div className="flex items-center justify-between w-full">
+                    <div>Case Manager</div>
+                    <Select
+                        onValueChange={(value) => {
+                            if (value === 'all') {
+                                column.setFilterValue(undefined);
+                            }
+                        }}
+                        >
+                        <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                            <Symbol symbol="filter_list"/>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <div className="p-2">
+                                <MultiCheckbox
+                                    options={caseManagers.map(cm => ({ label: cm, value: cm }))}
+                                    selectedValues={selectedFilters}
+                                    onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                                />
+                            </div>
+                        </SelectContent>
+                    </Select>
+                </div>
+            );
+        },
         cell: (info) => renderValue(info.getValue()),
         size: 250,
+        filterFn: (row, columnId, filterValues) => {
+            // If no filter selected, show all rows
+            if (!filterValues || filterValues.length === 0) return true;
+        
+            const caseManager = row.original.caseManager;
+        
+            // Check if case manager matches any of the selected values
+            return filterValues.some((filterValue: string) => {
+                return caseManager === filterValue;
+            });
+        },
     }),
     columnHelper.accessor('clientNumber', {
         header: () => <div>Number</div>,
@@ -85,24 +188,231 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         size: 180,
     }),
     columnHelper.accessor('age', {
-        header: () => <div>Age</div>,
+        header: ({ column }) => {
+          const ageRanges = [
+            { label: '<17 yrs', value: 'lessThan17' },
+            { label: '18-24 yrs', value: 'between18and24' },
+            { label: '25-61 yrs', value: 'between25and61' },
+            { label: '>62 yrs', value: 'greaterThan62' },
+            { label: 'Unknown', value: 'unknown' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Age</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={ageRanges}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
+      
         cell: (info) => renderValue(info.getValue()),
+      
         size: 180,
-    }),
+      
+        filterFn: (row, columnId, filterValues) => {
+          // If no filter selected, show all rows
+          if (!filterValues || filterValues.length === 0) return true;
+      
+          const age = row.original.age;
+          const numericAge = typeof age === 'string' ? parseInt(age, 10) : age;
+      
+          // Check if row age matches any selected range
+          return filterValues.some((filterValue: string) => {
+            if (filterValue === 'unknown') {
+              return age === null || age === undefined;
+            }
+            if (typeof numericAge !== 'number' || isNaN(numericAge)) {
+              return false;
+            }
+            if (filterValue === 'lessThan17') {
+              return numericAge < 17;
+            } else if (filterValue === 'between18and24') {
+              return numericAge >= 18 && numericAge <= 24;
+            } else if (filterValue === 'between25and61') {
+              return numericAge >= 25 && numericAge <= 61;
+            } else if (filterValue === 'greaterThan62') {
+              return numericAge > 62;
+            }
+            return false;
+          });
+        },
+      }),
+      
     columnHelper.accessor('gender', {
-        header: () => <div>Gender</div>,
+        header: ({ column }) => {
+          const genderOptions = [
+            { label: 'Male', value: 'Male' },
+            { label: 'Female', value: 'Female' },
+            { label: 'Nonbinary', value: 'Nonbinary' },
+            { label: 'Other', value: 'Other' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Gender</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={genderOptions}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue()),
         size: 200,
+        filterFn: (row, columnId, filterValues) => {
+          // If no filter selected, show all rows
+          if (!filterValues || filterValues.length === 0) return true;
+      
+          const gender = row.original.gender;
+      
+          // Check if gender matches any of the selected values
+          return filterValues.some((filterValue: string) => {
+            return gender === filterValue;
+          });
+        },
     }),
     columnHelper.accessor('contactSource', {
-        header: () => <div>Contact Source</div>,
+        header: ({ column }) => {
+          const contactSourceOptions = [
+            { label: 'Outreach', value: 'Outreach' },
+            { label: 'Police Department', value: 'Police Department' },
+            { label: 'City of Huntington Park', value: 'City of Huntington Park' },
+            { label: 'Community', value: 'Community' },
+            { label: 'Service Provider', value: 'Service Provider' },
+            { label: 'School Liaison', value: 'School Liaison' },
+            { label: 'Other', value: 'Other' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Contact Source</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={contactSourceOptions}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue()),
         size: 200,
+        filterFn: (row, columnId, filterValues) => {
+          // If no filter selected, show all rows
+          if (!filterValues || filterValues.length === 0) return true;
+      
+          const contactSource = row.original.contactSource;
+      
+          // Check if contact source matches any of the selected values
+          return filterValues.some((filterValue: string) => {
+            return contactSource === filterValue;
+          });
+        },
     }),
     columnHelper.accessor('homeless', {
-        header: () => <div>Homeless</div>,
+        header: ({ column }) => {
+          const homelessOptions = [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+            { label: 'At risk', value: 'At risk' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Homeless</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={homelessOptions}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue()),
         size: 200,
+        filterFn: (row, columnId, filterValues) => {
+          // If no filter selected, show all rows
+          if (!filterValues || filterValues.length === 0) return true;
+      
+          const homeless = row.original.homeless;
+      
+          // Check if homeless status matches any of the selected values
+          return filterValues.some((filterValue: string) => {
+            return homeless === filterValue;
+          });
+        },
     }),
     columnHelper.accessor('sheltered', {
         header: () => <div>Sheltered</div>,
@@ -115,53 +425,531 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         size: 180,
     }),
     columnHelper.accessor('citizenship', {
-        header: () => <div>Citizenship</div>,
+        header: ({ column }) => {
+          const citizenshipOptions = [
+            { label: 'Resident', value: 'Resident' },
+            { label: 'Citizen', value: 'Citizen' },
+            { label: 'Undocumented', value: 'Undocumented' },
+            { label: 'Other', value: 'Other' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Citizenship</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Clear All</SelectItem>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={citizenshipOptions}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue()),
         size: 200,
+        filterFn: (row, columnId, filterValues) => {
+          // If no filter selected, show all rows
+          if (!filterValues || filterValues.length === 0) return true;
+      
+          const citizenship = row.original.citizenship;
+      
+          // Check if citizenship matches any of the selected values
+          return filterValues.some((filterValue: string) => {
+            return citizenship === filterValue;
+          });
+        },
     }),
     columnHelper.accessor('ethnicity', {
-        header: () => <div>Ethnicity</div>,
+        header: ({ column }) => {
+          const ethnicityOptions = [
+            { label: 'African American', value: 'African American' },
+            { label: 'Asian', value: 'Asian' },
+            { label: 'Latino/Hispanic', value: 'Latino/Hispanic' },
+            { label: 'Native American', value: 'Native American' },
+            { label: 'White/Caucasian', value: 'White/Caucasian' },
+            { label: 'Other', value: 'Other' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Ethnicity</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={ethnicityOptions}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue()),
         size: 200,
+        filterFn: (row, columnId, filterValues) => {
+          // If no filter selected, show all rows
+          if (!filterValues || filterValues.length === 0) return true;
+      
+          const ethnicity = row.original.ethnicity; // This is potentially string[] or undefined
+      
+          // If the row has no ethnicities, it cannot match any filter values
+          if (!ethnicity || (ethnicity as string[]).length === 0) return false;
+
+          // Check if any of the row's ethnicities are present in the selected filterValues
+          return (ethnicity as string[]).some(rowEthnicity => {
+            return (filterValues as string[]).includes(rowEthnicity);
+          });
+        },
     }),
     columnHelper.accessor('employment', {
-        header: () => <div>Employed</div>,
+        header: ({ column }) => {
+          const employmentOptions = [
+            { label: 'Part time', value: 'Part time' },
+            { label: 'Full time', value: 'Full time' },
+            { label: 'Unemployed', value: 'Unemployed' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Employed</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={employmentOptions}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue()),
         size: 200,
+        filterFn: (row, columnId, filterValues) => {
+          // If no filter selected, show all rows
+          if (!filterValues || filterValues.length === 0) return true;
+      
+          const employment = row.original.employment;
+      
+          // Check if employment matches any of the selected values
+          return (filterValues as string[]).some((filterValue: string) => {
+            return employment === filterValue;
+          });
+        },
     }),
     columnHelper.accessor('familySize', {
-        header: () => <div>Family Size</div>,
+        header: ({ column }) => {
+          const familySizeOptions = [
+            { label: '1', value: '1' },
+            { label: '2', value: '2' },
+            { label: '3', value: '3' },
+            { label: '4+', value: '4+' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Family Size</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={familySizeOptions}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+              <Select
+                    onValueChange={(value) => {
+                        column.toggleSorting(value === 'desc');
+                    }}
+                    >
+                    <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                        <ArrowUpDown className="h-4 w-4 " />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="asc">Sort ascending</SelectItem>
+                        <SelectItem value="desc">Sort descending</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue()),
         size: 200,
+        filterFn: (row, columnId, filterValues) => {
+          // If no filter selected, show all rows
+          if (!filterValues || filterValues.length === 0) return true;
+      
+          const familySize = row.original.familySize;
+          const numericFamilySize = typeof familySize === 'string' ? parseInt(familySize, 10) : familySize;
+      
+          // Check if family size matches any selected range/value
+          return (filterValues as string[]).some((filterValue: string) => {
+            if (filterValue === '4+') {
+              return typeof numericFamilySize === 'number' && !isNaN(numericFamilySize) && numericFamilySize >= 4;
+            } else {
+              return typeof numericFamilySize === 'number' && !isNaN(numericFamilySize) && numericFamilySize === parseInt(filterValue, 10);
+            }
+          });
+        },
     }),
     columnHelper.accessor('mentalHealthConditions', {
-        header: () => <div>Mental Health Conditions</div>,
+        header: ({ column }) => {
+          const options = [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Mental Health Conditions</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={options}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue(), true),
         size: 260,
+        filterFn: (row, columnId, filterValues) => {
+          if (!filterValues || filterValues.length === 0) return true;
+          const value = row.original.mentalHealthConditions;
+          return filterValues.some((filterValue: string) => value === filterValue);
+        },
     }),
     columnHelper.accessor('medicalConditions', {
-        header: () => <div>Medical Conditions</div>,
+        header: ({ column }) => {
+          const options = [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Medical Conditions</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={options}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue(), true),
         size: 230,
+        filterFn: (row, columnId, filterValues) => {
+          if (!filterValues || filterValues.length === 0) return true;
+          const value = row.original.medicalConditions;
+          return filterValues.some((filterValue: string) => value === filterValue);
+        },
     }),
     columnHelper.accessor('substanceAbuse', {
-        header: () => <div>Substance Abuse</div>,
+        header: ({ column }) => {
+          const options = [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Substance Abuse</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={options}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue(), true),
         size: 230,
+        filterFn: (row, columnId, filterValues) => {
+          if (!filterValues || filterValues.length === 0) return true;
+          const value = row.original.substanceAbuse;
+          return filterValues.some((filterValue: string) => value === filterValue);
+        },
     }),
     columnHelper.accessor('fosterYouth', {
-        header: () => <div>Foster Youth</div>,
+        header: ({ column }) => {
+          const options = [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Foster Youth</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={options}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue(), true),
         size: 230,
+        filterFn: (row, columnId, filterValues) => {
+          if (!filterValues || filterValues.length === 0) return true;
+          const value = row.original.fosterYouth;
+          return filterValues.some((filterValue: string) => value === filterValue);
+        },
     }),
     columnHelper.accessor('openCPS', {
-        header: () => <div>Open Probation Case</div>,
+        header: ({ column }) => {
+          const options = [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Open CPS Case</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={options}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue(), true),
         size: 250,
+        filterFn: (row, columnId, filterValues) => {
+          if (!filterValues || filterValues.length === 0) return true;
+          const value = row.original.openCPS;
+          return filterValues.some((filterValue: string) => value === filterValue);
+        },
+    }),
+    columnHelper.accessor('openProbation', {
+        header: ({ column }) => {
+          const options = [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Open Probation Case</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={options}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
+        cell: (info) => renderValue(info.getValue(), true),
+        size: 250,
+        filterFn: (row, columnId, filterValues) => {
+          if (!filterValues || filterValues.length === 0) return true;
+          const value = row.original.openProbation;
+          return filterValues.some((filterValue: string) => value === filterValue);
+        },
     }),
     columnHelper.accessor('sexOffender', {
-        header: () => <div>Sex Offender</div>,
+        header: ({ column }) => {
+          const options = [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+          ];
+      
+          const selectedFilters = (column.getFilterValue() as string[]) ?? [];
+      
+          return (
+            <div className="flex items-center justify-between w-full">
+              <div>Sex Offender</div>
+              <Select
+                onValueChange={(value) => {
+                  if (value === 'all') {
+                    column.setFilterValue(undefined);
+                  }
+                }}
+                >
+                <SelectTrigger className="w-[30px] h-[30px] p-0 border-none shadow-none focus:ring-0">
+                  <Symbol symbol="filter_list"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="p-2">
+                    <MultiCheckbox
+                      options={options}
+                      selectedValues={selectedFilters}
+                      onChange={(values) => column.setFilterValue(values.length ? values : undefined)}
+                    />
+                  </div>
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        },
         cell: (info) => renderValue(info.getValue(), true),
         size: 200,
+        filterFn: (row, columnId, filterValues) => {
+          if (!filterValues || filterValues.length === 0) return true;
+          const value = row.original.sexOffender;
+          return filterValues.some((filterValue: string) => value === filterValue);
+        },
     }),
 ]
