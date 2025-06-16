@@ -13,6 +13,7 @@ import {
     ClientHousing,
 } from '@/app/_components/clientProfile/ClientProfileComponents'
 import { ClientIntakeSchema } from '@/types/client-types'
+import html2pdf from 'html2pdf.js'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { TypeOf } from 'zod'
@@ -31,6 +32,7 @@ export const ClientProfileToggle = ({
     const [editMode, setEditMode] = useState(false)
     const [showHousingLog, setShowHousingLog] = useState(false)
     const [housingStatuses, setHousingStatuses] = useState<any[]>([])
+    const [exporting, setExporting] = useState(false)
     const { getForm, updateForm, clearForm } = useEditFormStore()
     const formData = getForm(id)
     const router = useRouter()
@@ -61,6 +63,36 @@ export const ClientProfileToggle = ({
         console.log(housingStatuses)
     }, [showHousingLog, id])
 
+    const exportHousingLogPDF = async () => {
+        try {
+            setExporting(true)
+            const el = document.getElementById('housingLogExport')
+            if (!el) throw new Error('Housing log element not found')
+
+            const today = new Date().toLocaleDateString('en-CA')
+
+            const filename = `HousingLog_${client.clientCode}_${today}.pdf`
+
+            await html2pdf()
+                .set({
+                    filename,
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+                    jsPDF: {
+                        unit: 'in',
+                        format: 'a4',
+                        orientation: 'portrait',
+                    },
+                })
+                .from(el)
+                .save() // <-- this directly downloads the PDF
+        } catch (err) {
+            console.error('Export housing log failed:', err)
+        } finally {
+            setExporting(false)
+        }
+    }
+
     return (
         <div className="flex min-h-screen px-[48px]">
             <div className="mb-[48px] h-screen w-screen min-w-[70%] space-y-[48px]">
@@ -70,20 +102,23 @@ export const ClientProfileToggle = ({
                         onClick={() => setShowHousingLog(false)} // click outside = close
                     >
                         <div
-                            className="h-full w-[50%] max-w-[600px] overflow-y-auto bg-white p-[24px] shadow-lg"
+                            id="housingLogExport"
+                            className="m-[240xp h-full w-[70%] overflow-y-auto bg-white p-[24px] shadow-lg"
                             onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
                         >
-                            <h2 className="mb-4 text-xl font-bold">
-                                Housing Log
-                            </h2>
-                            <div className="mb-[12px]">
+                            <div className="m-[20px] flex flex-row">
+                                <h2 className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
+                                    Housing Log
+                                </h2>
+                            </div>
+                            <div className="m-[20px]">
                                 <div className="grid grid-cols-3 border-b pb-2 font-bold">
                                     <p>Date</p>
-                                    <p>Status</p>
                                     <p>Housed by ICV</p>
+                                    <p>Housing status</p>
                                 </div>
                             </div>
-                            <div className="space-y-4">
+                            <div className="m-[20px] space-y-4">
                                 {housingStatuses.map((h) => (
                                     <div
                                         key={h.docID}
@@ -91,24 +126,37 @@ export const ClientProfileToggle = ({
                                     >
                                         <div className="grid grid-cols-3">
                                             <p>{h.date}</p>
-                                            <p>{h.housingStatus}</p>
                                             <p>{h.housedByICV}</p>
+                                            <p>{h.housingStatus}</p>
                                         </div>
                                     </div>
                                 ))}
-                                {/* {housingStatuses.length === 0 && (
+                                {housingStatuses.length === 0 && (
                                     <p className="text-sm italic text-gray-500">
                                         No housing history found.
                                     </p>
-                                )} */}
+                                )}
                             </div>
 
-                            <button
-                                onClick={() => setShowHousingLog(false)}
-                                className="bg-blue-500 mt-4 rounded px-4 py-2 text-white"
-                            >
-                                Close
-                            </button>
+                            {!exporting && (
+                                <button
+                                    onClick={exportHousingLogPDF}
+                                    className="m-[20px] rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white"
+                                >
+                                    <div className="items-align flex flex-row justify-center space-x-[12px]">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            height="24px"
+                                            viewBox="0 -960 960 960"
+                                            width="24px"
+                                            fill="#FFFFFF"
+                                        >
+                                            <path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z" />
+                                        </svg>
+                                        <label>Export to PDF</label>
+                                    </div>
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}

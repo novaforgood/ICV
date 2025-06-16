@@ -7,7 +7,7 @@ import Image from 'next/image'
 const formatDate = (dateString: string | undefined) => {
     if (!dateString) return 'No check-in'
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('en-CA', {
         month: '2-digit',
         day: '2-digit',
         year: '2-digit',
