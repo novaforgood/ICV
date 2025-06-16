@@ -6,4 +6,5 @@ export const HousingStatusSchema = z.object({
     clientID: z.string().optional(),
     housingStatus: z.string().optional(),
     date: z.string().optional(),
+    housedByICV: z.string().optional(),
 })

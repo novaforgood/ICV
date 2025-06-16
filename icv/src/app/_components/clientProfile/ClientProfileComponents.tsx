@@ -8,6 +8,7 @@ type ClientType = TypeOf<typeof ClientIntakeSchema>
 
 interface ClientProps {
     data: ClientType
+    setShowHousingLog?: (value: boolean) => void
 }
 
 // Profile Section
@@ -144,24 +145,20 @@ export const ClientEthnicity = ({ data }: ClientProps) => {
     )
 }
 
-export const ClientHousing = ({ data }: ClientProps) => {
+export const ClientHousing = ({ data, setShowHousingLog }: ClientProps) => {
     return (
         <div className="space-y-[24px]">
-            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                {/* Row: */}
-                <div className="flex flex-col space-y-1">
-                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                        Homeless
-                    </label>
-                    <div>{data.homeless ? data.homeless : <p>N/A</p>}</div>
-                </div>
-                <div className="flex flex-col space-y-1">
-                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                        Sheltered
-                    </label>
-                    <div>{data.sheltered ? data.sheltered : <p>N/A</p>}</div>
-                </div>
-            </div>
+            <button
+                type="button"
+                className="rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
+                onClick={() => {
+                    if (setShowHousingLog) setShowHousingLog(true)
+                    console.log('Clicked')
+                }}
+            >
+                View Log
+            </button>
+
             <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                 <div className="flex flex-col space-y-1">
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">

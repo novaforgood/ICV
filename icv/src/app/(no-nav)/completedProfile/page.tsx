@@ -45,6 +45,7 @@ const Page = () => {
                 clientID: clientID,
                 date: createdClient.housingDate ?? createdClient.intakeDate,
                 housingStatus: createdClient.homeless,
+                housedByICV: createdClient.sheltered,
             }
 
             createHousingUpdate(newHousing)
@@ -52,6 +53,7 @@ const Page = () => {
                     updateClient(clientID, {
                         homeless: '',
                         housingDate: '',
+                        sheltered: '',
                     })
                 })
                 .catch((err) => {
