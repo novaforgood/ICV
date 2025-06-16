@@ -3,6 +3,7 @@
 import { updateClient } from '@/api/make-cases/make-case'
 import {
     createHousingUpdate,
+    deleteHousingStatus,
     getHousingById,
 } from '@/api/make-cases/make-housing'
 import {
@@ -30,6 +31,7 @@ export const ClientProfileToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
+    const [editHousing, setEditHousing] = useState(false)
     const [showHousingLog, setShowHousingLog] = useState(false)
     const [housingStatuses, setHousingStatuses] = useState<any[]>([])
     const [exporting, setExporting] = useState(false)
@@ -50,15 +52,16 @@ export const ClientProfileToggle = ({
         updateForm(id, client)
     }, [client, id])
 
-    useEffect(() => {
-        const fetchHousingStatuses = async () => {
-            try {
-                const statuses = await getHousingById(id)
-                setHousingStatuses(statuses)
-            } catch (error) {
-                console.error('Error fetching housing statuses:', error)
-            }
+    const fetchHousingStatuses = async () => {
+        try {
+            const statuses = await getHousingById(id)
+            setHousingStatuses(statuses)
+        } catch (error) {
+            console.error('Error fetching housing statuses:', error)
         }
+    }
+
+    useEffect(() => {
         fetchHousingStatuses()
         console.log(housingStatuses)
     }, [showHousingLog, id])
@@ -106,13 +109,34 @@ export const ClientProfileToggle = ({
                             className="m-[240xp h-full w-[70%] overflow-y-auto bg-white p-[24px] shadow-lg"
                             onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
                         >
-                            <div className="m-[20px] flex flex-row">
+                            <div className="m-[20px] flex flex-row justify-between">
                                 <h2 className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
                                     Housing Log
                                 </h2>
+                                {!exporting && (
+                                    <button
+                                        onClick={() => setEditMode(!editMode)}
+                                        className="flex flex-row space-x-[8px] rounded-[5px] bg-black px-[12px] py-[8px] text-[14px] text-white"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            height="20px"
+                                            viewBox="0 -960 960 960"
+                                            width="20px"
+                                            fill="#FFFFFF"
+                                        >
+                                            <path d="M216-216h51l375-375-51-51-375 375v51Zm-72 72v-153l498-498q11-11 23.84-16 12.83-5 27-5 14.16 0 27.16 5t24 16l51 51q11 11 16 24t5 26.54q0 14.45-5.02 27.54T795-642L297-144H144Zm600-549-51-51 51 51Zm-127.95 76.95L591-642l51 51-25.95-25.05Z" />
+                                        </svg>
+                                        <label>
+                                            {editMode ? 'Done' : 'Edit'}
+                                        </label>
+                                    </button>
+                                )}
                             </div>
                             <div className="m-[20px]">
-                                <div className="grid grid-cols-3 border-b pb-2 font-bold">
+                                <div
+                                    className={`grid ${editMode ? 'grid-cols-4' : 'grid-cols-3'} border-b pb-2 font-bold`}
+                                >
                                     <p>Date</p>
                                     <p>Housed by ICV</p>
                                     <p>Housing status</p>
@@ -122,15 +146,34 @@ export const ClientProfileToggle = ({
                                 {housingStatuses.map((h) => (
                                     <div
                                         key={h.docID}
-                                        className="border-b pb-2"
+                                        className="relative border-b pb-2"
                                     >
-                                        <div className="grid grid-cols-3">
+                                        <div
+                                            className={`grid ${editMode ? 'grid-cols-4' : 'grid-cols-3'}`}
+                                        >
                                             <p>{h.date}</p>
                                             <p>{h.housedByICV}</p>
                                             <p>{h.housingStatus}</p>
+                                            {editMode && (
+                                                <div className="flex justify-end">
+                                                    <button
+                                                        onClick={async () => {
+                                                            await deleteHousingStatus(
+                                                                h.docID,
+                                                            )
+                                                            await fetchHousingStatuses()
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700"
+                                                        title="Delete"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
+
                                 {housingStatuses.length === 0 && (
                                     <p className="text-sm italic text-gray-500">
                                         No housing history found.
