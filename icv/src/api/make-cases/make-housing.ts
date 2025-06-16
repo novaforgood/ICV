@@ -24,7 +24,7 @@ export async function createHousingUpdate(client: NewHousing) {
             throw new Error('User not found')
         }
         const ssrdb = getFirestore(firebaseServerApp)
-  
+
         const housingCollection = collection(ssrdb, 'housingStatus')
         const newDoc = await addDoc(housingCollection, client)
         console.log('Housing case added with ', newDoc.id)
@@ -33,11 +33,11 @@ export async function createHousingUpdate(client: NewHousing) {
         console.error('Error creating client:', error)
         throw error
     }
-  }
+}
 
-  export async function getHousingById(id: string){
+export async function getHousingById(id: string) {
     const { firebaseServerApp, currentUser } =
-    await getAuthenticatedAppForUser()
+        await getAuthenticatedAppForUser()
     if (!currentUser) {
         throw new Error('User not found')
     }
@@ -48,8 +48,8 @@ export async function createHousingUpdate(client: NewHousing) {
         eventsCollection,
         where('clientID', '==', id),
         orderBy('date')
-      )
-      
+    )
+
     const querySnapshot = await getDocs(q)
 
     // Map through documents and include their 'id' along with data
@@ -63,11 +63,30 @@ export async function createHousingUpdate(client: NewHousing) {
 export async function deleteHousingStatus(docID: string) {
     const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser()
     if (!currentUser) {
-      throw new Error('User not found')
+        throw new Error('User not found')
     }
-  
+
     const db = getFirestore(firebaseServerApp)
     const docRef = doc(db, 'housingStatus', docID)
-  
+
     await deleteDoc(docRef)
-  }
+}
+
+export async function getAllHousing() {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
+    const ssrdb = getFirestore(firebaseServerApp)
+
+    const housingCollection = collection(ssrdb, 'housingStatus')
+    const q = query(housingCollection, orderBy('date'))
+    const querySnapshot = await getDocs(q)
+
+    // Map through documents and include their 'id' along with data
+    const statuses = querySnapshot.docs.map((doc) => ({
+        docID: doc.id,
+        ...doc.data(),
+    }))
+    return statuses
+}

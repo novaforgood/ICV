@@ -91,9 +91,14 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                         <ChevronLeft />
                     </button>
                     <div className="w-[120px] text-center tabular-nums">
-                        {(currentPage - 1) * rowsPerPage + 1}–
-                        {Math.min(currentPage * rowsPerPage, table.getFilteredRowModel().rows.length)} of{' '}
-                        {table.getFilteredRowModel().rows.length}
+                        {table.getFilteredRowModel().rows.length === 0 ? (
+                            "0 of 0"
+                        ) : (
+                            `${(currentPage - 1) * rowsPerPage + 1}–${Math.min(
+                                currentPage * rowsPerPage,
+                                table.getFilteredRowModel().rows.length,
+                            )} of ${table.getFilteredRowModel().rows.length}`
+                        )}
                     </div>
                     <button
                         onClick={() =>
