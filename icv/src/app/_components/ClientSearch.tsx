@@ -39,7 +39,7 @@ const ClientSearch: React.FC<ClientSearchProps> = ({ onSelect }) => {
             onClick={() => onSelect(client.docId!)}
             className="cursor-pointer"
           >
-            <ClientCard client={client} showLastCheckin={true} />
+            <ClientCard client={client} showLastCheckin={false} />
           </div>
         ))}
       </div>

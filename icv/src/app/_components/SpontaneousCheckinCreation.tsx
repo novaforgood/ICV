@@ -39,7 +39,9 @@ const CaseNotes: React.FC<CaseNotesProps> = React.memo(({ caseNotes, onChange, o
     </div>
     <button
       onClick={onSubmit}
-      className={`w-full text-white p-2 rounded ${submitting ? 'bg-gray-300' : 'bg-black'}`}
+      disabled={submitting}
+      className={`w-full text-white p-2 rounded 
+      ${submitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-black hover:bg-gray-800'}`}
     >
       {submitting ? 'Submitting...' : 'Add Case Notes'}
     </button>
@@ -88,45 +90,46 @@ const MultiStepCheckIn = () => {
   }, [])
 
   const handleSubmit = async () => {
-    if (submitting) return
-    setSubmitting(true)
-    const newEvent: CheckInType & { clientId?: string } = {
-      startTime: new Date().toLocaleString('en-US'),
-      assigneeId,
-      clientId: selectedClientDocId,
-      category: category,
-      scheduled: false,
-      contactCode: ContactType.Values['Wellness Check'],
-    }
-    console.log('trying to add event:', newEvent);
     try {
-      createCheckIn(newEvent).then((id) => {
-        setStep(Step.Complete)
-        setcheckInID(id)
-        setSubmitting(false)
-      })
+      setSubmitting(true)
+      const newEvent: CheckInType & { clientId?: string } = {
+        startTime: new Date().toLocaleString('en-US'),
+        assigneeId,
+        clientId: selectedClientDocId,
+        category: category,
+        scheduled: false,
+        contactCode: ContactType.Values['Wellness Check'],
+      }
+      console.log('trying to add event:', newEvent);
+      
+      const id = await createCheckIn(newEvent);
+      setStep(Step.Complete);
+      setcheckInID(id);
+      
     } catch (err) {
-      alert('Error creating event ' + err)
-      console.error('Error creating event:', err)
-      setSubmitting(false)
+      console.error('Error creating event:', err);
+      alert('Error creating event. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   }
 
   const submitCaseNotes = async () => {
-    if (submitting) return
-    setSubmitting(true)
     try {
-      await updateCaseNotes(checkInID, caseNotes).then(() => {
-          setShowSuccess(true)
-          setTimeout(() => {
-            setShowSuccess(false)
-            closeModal()
-          }, 2000)
-          setSubmitting(false)
-      })
+      setSubmitting(true)
+      await updateCaseNotes(checkInID, caseNotes);
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        setShowSuccess(false);
+        closeModal();
+      }, 2000);
+      
     } catch (err) {
-      console.error('Error updating case notes:', err)
-      setSubmitting(false)
+      console.error('Error updating case notes:', err);
+      alert('Error updating case notes. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -157,14 +160,17 @@ const ChooseClient = () => (
         <button 
           type="button" 
           onClick={() => setStep(Step.ChooseClient)}
-          className="w-full bg-gray-500 text-white p-3 rounded-lg"
+          disabled={submitting}
+          className={`w-full text-white p-3 rounded-lg
+          ${submitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-500 hover:bg-gray-600'}`}
         >
           Back
         </button>
         <button 
           type="submit" 
+          disabled={submitting}
           className={`w-full text-white p-3 rounded-lg
-          ${submitting ? 'bg-gray-300' : 'bg-black'}`}
+          ${submitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-black hover:bg-gray-800'}`}
         >
           {submitting ? 'Submitting...' : 'Continue'}
         </button>
