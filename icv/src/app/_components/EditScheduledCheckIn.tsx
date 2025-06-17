@@ -47,6 +47,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     const [staffNames, setStaffNames] = useState<string[]>([])
     const [searchTerm, setSearchTerm] = useState('')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
 
     useEffect(() => {
         const auth = getAuth()
@@ -121,7 +122,6 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     if (submitting) return
-    setSubmitting(true)
     e.preventDefault()
     
     const startDateTime = new Date(`${date}T${startTime}`).toLocaleString('en-US')
@@ -154,14 +154,15 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                 `${selectedClient.firstName || ''} ${selectedClient.lastName || ''}`.trim(),
         }
 
-        updateCheckIn(updatedEvent)
-            .then(() => {
-                setShowUpdateSuccess(true)
-                setTimeout(() => {
-                    setShowUpdateSuccess(false)
-                    onUpdatedEvent()
-                    onClose()
-                }, 1000)
+    setSubmitting(true)
+    updateCheckIn(updatedEvent)
+      .then(() => {
+        setShowUpdateSuccess(true)
+        setTimeout(() => {
+          setShowUpdateSuccess(false)
+          onUpdatedEvent()
+          onClose()
+        }, 1000)
         setSubmitting(false)
             })
             .catch((err) => {

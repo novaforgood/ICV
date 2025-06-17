@@ -208,8 +208,8 @@ const NavLink = ({ href, children, collapsed = false }: NavLinkProps) => {
             href={href}
             className={cn(
                 collapsed
-                    ? 'flex w-full justify-center py-4'
-                    : 'flex w-full flex-row justify-start gap-2 px-6 py-4 text-center',
+                    ? 'flex w-full justify-center py-4 items-center'
+                    : 'flex w-full flex-row justify-start gap-2 px-6 py-4 text-center items-center',
                 {
                     'bg-background': isActive,
                     'text-foreground': isActive,

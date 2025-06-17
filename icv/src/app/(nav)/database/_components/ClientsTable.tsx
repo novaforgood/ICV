@@ -16,6 +16,8 @@ import {
     getSortedRowModel,
     SortingState,
     useReactTable,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
 } from '@tanstack/react-table'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
@@ -41,11 +43,14 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         onSortingChange: setSorting,
+        enableMultiSort: false,
         onGlobalFilterChange: setGlobalFilter,
         state: {
             sorting,
             globalFilter,
         },
+        getFacetedUniqueValues: getFacetedUniqueValues(),
+        getFacetedRowModel: getFacetedRowModel(),
     })
 
     const pageCount = Math.ceil(table.getRowModel().rows.length / rowsPerPage)
@@ -123,24 +128,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                                                     header.column.columnDef
                                                         .header,
                                                     header.getContext(),
-                                                )}
-                                                {canSort && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            header.column.toggleSorting()
-                                                        }
-                                                    >
-                                                        {sortOrder === 'asc' ? (
-                                                            <Symbol symbol="keyboard_arrow_up" />
-                                                        ) : sortOrder ===
-                                                          'desc' ? (
-                                                            <Symbol symbol="keyboard_arrow_down" />
-                                                        ) : (
-                                                            <Symbol symbol="filter_list" />
-                                                        )}
-                                                    </Button>
                                                 )}
                                             </div>
                                         </TableHead>
