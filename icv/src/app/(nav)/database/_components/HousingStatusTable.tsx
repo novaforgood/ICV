@@ -17,7 +17,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowUpDown, ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -39,10 +39,10 @@ const MONTHS = [
 
 // Constants for quarter display and selection
 const QUARTERS = [
-    { label: 'Q1', months: ['1', '2', '3'] },
-    { label: 'Q2', months: ['4', '5', '6'] },
-    { label: 'Q3', months: ['7', '8', '9'] },
-    { label: 'Q4', months: ['10', '11', '12'] },
+    { label: 'Q1: JUL-SEP', months: ['1', '2', '3'] },
+    { label: 'Q2: OCT-DEC', months: ['4', '5', '6'] },
+    { label: 'Q3: JAN-MAR', months: ['7', '8', '9'] },
+    { label: 'Q4: APR-JUN', months: ['10', '11', '12'] },
 ]
 
 // Available housing status options
@@ -68,8 +68,27 @@ const HousingStatusTable = () => {
         'calendar',
     ) // Date filter type
     const [selectedYear, setSelectedYear] = useState<string>('all') // Selected year
-    const [selectedMonths, setSelectedMonths] = useState<string[]>(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']) // All months selected by default
-    const [selectedQuarters, setSelectedQuarters] = useState<string[]>(['Q1', 'Q2', 'Q3', 'Q4']) // All quarters selected by default
+    const [selectedMonths, setSelectedMonths] = useState<string[]>([
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        '11',
+        '12',
+    ]) // All months selected by default
+    const [selectedQuarters, setSelectedQuarters] = useState<string[]>([
+        'Q1: JUL-SEP',
+        'Q2: OCT-DEC',
+        'Q3: JAN-MAR',
+        'Q4: APR-JUN',
+    ]) // All quarters selected by default
+    const [isFilterVisible, setIsFilterVisible] = useState(true) // Filter panel visibility
 
     const itemsPerPage = 20 // Number of items to display per page
     const router = useRouter()
@@ -92,7 +111,9 @@ const HousingStatusTable = () => {
         // Apply housing status filter
         if (statusFilter !== 'all') {
             filtered = filtered.filter(
-                (record) => record.housing_status === statusFilter,
+                (record) =>
+                    record.housingStatus?.toLowerCase() ===
+                    statusFilter.toLowerCase(),
             )
         }
 
@@ -197,264 +218,294 @@ const HousingStatusTable = () => {
         <div className="flex flex-col gap-8">
             {/* Main content area */}
             <div className="flex-1 space-y-[20px]">
+                {/* Filter toggle button */}
+                <button
+                    onClick={() => setIsFilterVisible(!isFilterVisible)}
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                >
+                    {isFilterVisible ? (
+                        <>
+                            <ChevronUp className="h-4 w-4" />
+                            Hide Filters
+                        </>
+                    ) : (
+                        <>
+                            <ChevronDown className="h-4 w-4" />
+                            Show Filters
+                        </>
+                    )}
+                </button>
+
                 {/* Filter panel - at the top */}
-                <div className="w-full pb-8">
-                    <div className="space-y-6">
-                        {/* Year type selection - horizontal layout */}
-                        <div className="flex gap-8">
-                            {/* Calendar year filter section */}
-                            <div className="flex-1 space-y-4">
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="radio"
-                                        checked={dateFilterType === 'calendar'}
-                                        onChange={() =>
-                                            setDateFilterType('calendar')
-                                        }
-                                        className="h-4 w-4"
-                                    />
-                                    <label className="text-sm font-medium">
-                                        Calendar Year
-                                    </label>
-                                </div>
-                                <div
-                                    className={`space-y-4 pl-6 ${dateFilterType === 'fiscal' ? 'pointer-events-none opacity-50' : ''}`}
-                                >
-                                    {/* Year selection */}
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium">
-                                            Year
+                {isFilterVisible && (
+                    <div className="w-full pb-8">
+                        <div className="space-y-6">
+                            {/* Year type selection - horizontal layout */}
+                            <div className="flex gap-8">
+                                {/* Calendar year filter section */}
+                                <div className="flex-1 space-y-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input
+                                            type="radio"
+                                            checked={dateFilterType === 'calendar'}
+                                            onChange={() =>
+                                                setDateFilterType('calendar')
+                                            }
+                                            className="h-4 w-4"
+                                        />
+                                        <label className="text-sm font-medium">
+                                            Calendar Year
                                         </label>
-                                        <Select
-                                            value={selectedYear}
-                                            onValueChange={setSelectedYear}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select year" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">
-                                                    All Years
-                                                </SelectItem>
-                                                {years.map((year) => (
-                                                    <SelectItem
-                                                        key={year}
-                                                        value={year.toString()}
-                                                    >
-                                                        {year}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
                                     </div>
-                                    {/* Month selection */}
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-medium">
-                                            Months
-                                        </label>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <div className="flex flex-col gap-2">
-                                                <div className="flex gap-2">
-                                                    {MONTHS.slice(0, 3).map(
-                                                        (month, index) => (
-                                                            <button
-                                                                key={month.full}
-                                                                onClick={() =>
-                                                                    handleMonthToggle(
-                                                                        (
-                                                                            index +
-                                                                            1
-                                                                        ).toString(),
-                                                                    )
-                                                                }
-                                                                className={`rounded-full px-1.5 py-0.5 text-sm transition-colors whitespace-nowrap w-12 ${
-                                                                    dateFilterType === 'calendar' && selectedMonths.includes(
-                                                                        (
-                                                                            index +
-                                                                            1
-                                                                        ).toString(),
-                                                                    )
-                                                                        ? 'bg-black text-white'
-                                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                                }`}
-                                                            >
-                                                                {month.short}
-                                                            </button>
-                                                        ),
-                                                    )}
+                                    <div
+                                        className={`space-y-4 pl-6 ${dateFilterType === 'fiscal' ? 'pointer-events-none opacity-50' : ''}`}
+                                    >
+                                        {/* Year selection */}
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium">
+                                                Year
+                                            </label>
+                                            <Select
+                                                value={selectedYear}
+                                                onValueChange={setSelectedYear}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select year" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">
+                                                        All Years
+                                                    </SelectItem>
+                                                    {years.map((year) => (
+                                                        <SelectItem
+                                                            key={year}
+                                                            value={year.toString()}
+                                                        >
+                                                            {year}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {/* Month selection */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium">
+                                                Months
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex gap-2">
+                                                        {MONTHS.slice(0, 3).map(
+                                                            (month, index) => (
+                                                                <button
+                                                                    key={month.full}
+                                                                    onClick={() =>
+                                                                        handleMonthToggle(
+                                                                            (
+                                                                                index +
+                                                                                1
+                                                                            ).toString(),
+                                                                        )
+                                                                    }
+                                                                    className={`w-12 whitespace-nowrap rounded-full px-1.5 py-0.5 text-sm transition-colors ${
+                                                                        dateFilterType ===
+                                                                            'calendar' &&
+                                                                        selectedMonths.includes(
+                                                                            (
+                                                                                index +
+                                                                                1
+                                                                            ).toString(),
+                                                                        )
+                                                                            ? 'bg-black text-white'
+                                                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                                    }`}
+                                                                >
+                                                                    {month.short}
+                                                                </button>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        {MONTHS.slice(3, 6).map(
+                                                            (month, index) => (
+                                                                <button
+                                                                    key={month.full}
+                                                                    onClick={() =>
+                                                                        handleMonthToggle(
+                                                                            (
+                                                                                index +
+                                                                                4
+                                                                            ).toString(),
+                                                                        )
+                                                                    }
+                                                                    className={`w-12 whitespace-nowrap rounded-full px-1.5 py-0.5 text-sm transition-colors ${
+                                                                        dateFilterType ===
+                                                                            'calendar' &&
+                                                                        selectedMonths.includes(
+                                                                            (
+                                                                                index +
+                                                                                4
+                                                                            ).toString(),
+                                                                        )
+                                                                            ? 'bg-black text-white'
+                                                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                                    }`}
+                                                                >
+                                                                    {month.short}
+                                                                </button>
+                                                            ),
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div className="flex gap-2">
-                                                    {MONTHS.slice(3, 6).map(
-                                                        (month, index) => (
-                                                            <button
-                                                                key={month.full}
-                                                                onClick={() =>
-                                                                    handleMonthToggle(
-                                                                        (
-                                                                            index +
-                                                                            4
-                                                                        ).toString(),
-                                                                    )
-                                                                }
-                                                                className={`rounded-full px-1.5 py-0.5 text-sm transition-colors whitespace-nowrap w-12 ${
-                                                                    dateFilterType === 'calendar' && selectedMonths.includes(
-                                                                        (
-                                                                            index +
-                                                                            4
-                                                                        ).toString(),
-                                                                    )
-                                                                        ? 'bg-black text-white'
-                                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                                }`}
-                                                            >
-                                                                {month.short}
-                                                            </button>
-                                                        ),
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col gap-2">
-                                                <div className="flex gap-2">
-                                                    {MONTHS.slice(6, 9).map(
-                                                        (month, index) => (
-                                                            <button
-                                                                key={month.full}
-                                                                onClick={() =>
-                                                                    handleMonthToggle(
-                                                                        (
-                                                                            index +
-                                                                            7
-                                                                        ).toString(),
-                                                                    )
-                                                                }
-                                                                className={`rounded-full px-1.5 py-0.5 text-sm transition-colors whitespace-nowrap w-12 ${
-                                                                    dateFilterType === 'calendar' && selectedMonths.includes(
-                                                                        (
-                                                                            index +
-                                                                            7
-                                                                        ).toString(),
-                                                                    )
-                                                                        ? 'bg-black text-white'
-                                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                                }`}
-                                                            >
-                                                                {month.short}
-                                                            </button>
-                                                        ),
-                                                    )}
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    {MONTHS.slice(9).map(
-                                                        (month, index) => (
-                                                            <button
-                                                                key={month.full}
-                                                                onClick={() =>
-                                                                    handleMonthToggle(
-                                                                        (
-                                                                            index +
-                                                                            10
-                                                                        ).toString(),
-                                                                    )
-                                                                }
-                                                                className={`rounded-full px-1.5 py-0.5 text-sm transition-colors whitespace-nowrap w-12 ${
-                                                                    dateFilterType === 'calendar' && selectedMonths.includes(
-                                                                        (
-                                                                            index +
-                                                                            10
-                                                                        ).toString(),
-                                                                    )
-                                                                        ? 'bg-black text-white'
-                                                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                                }`}
-                                                            >
-                                                                {month.short}
-                                                            </button>
-                                                        ),
-                                                    )}
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex gap-2">
+                                                        {MONTHS.slice(6, 9).map(
+                                                            (month, index) => (
+                                                                <button
+                                                                    key={month.full}
+                                                                    onClick={() =>
+                                                                        handleMonthToggle(
+                                                                            (
+                                                                                index +
+                                                                                7
+                                                                            ).toString(),
+                                                                        )
+                                                                    }
+                                                                    className={`w-12 whitespace-nowrap rounded-full px-1.5 py-0.5 text-sm transition-colors ${
+                                                                        dateFilterType ===
+                                                                            'calendar' &&
+                                                                        selectedMonths.includes(
+                                                                            (
+                                                                                index +
+                                                                                7
+                                                                            ).toString(),
+                                                                        )
+                                                                            ? 'bg-black text-white'
+                                                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                                    }`}
+                                                                >
+                                                                    {month.short}
+                                                                </button>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        {MONTHS.slice(9).map(
+                                                            (month, index) => (
+                                                                <button
+                                                                    key={month.full}
+                                                                    onClick={() =>
+                                                                        handleMonthToggle(
+                                                                            (
+                                                                                index +
+                                                                                10
+                                                                            ).toString(),
+                                                                        )
+                                                                    }
+                                                                    className={`w-12 whitespace-nowrap rounded-full px-1.5 py-0.5 text-sm transition-colors ${
+                                                                        dateFilterType ===
+                                                                            'calendar' &&
+                                                                        selectedMonths.includes(
+                                                                            (
+                                                                                index +
+                                                                                10
+                                                                            ).toString(),
+                                                                        )
+                                                                            ? 'bg-black text-white'
+                                                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                                    }`}
+                                                                >
+                                                                    {month.short}
+                                                                </button>
+                                                            ),
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Fiscal year filter section */}
-                            <div className="flex-1 space-y-4">
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="radio"
-                                        checked={dateFilterType === 'fiscal'}
-                                        onChange={() =>
-                                            setDateFilterType('fiscal')
-                                        }
-                                        className="h-4 w-4"
-                                    />
-                                    <label className="text-sm font-medium">
-                                        Fiscal Year
-                                    </label>
-                                </div>
-                                <div
-                                    className={`space-y-4 pl-6 ${dateFilterType === 'calendar' ? 'pointer-events-none opacity-50' : ''}`}
-                                >
-                                    {/* Year selection */}
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium">
-                                            Year
+                                {/* Fiscal year filter section */}
+                                <div className="flex-1 space-y-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input
+                                            type="radio"
+                                            checked={dateFilterType === 'fiscal'}
+                                            onChange={() =>
+                                                setDateFilterType('fiscal')
+                                            }
+                                            className="h-4 w-4"
+                                        />
+                                        <label className="text-sm font-medium">
+                                            Fiscal Year
                                         </label>
-                                        <Select
-                                            value={selectedYear}
-                                            onValueChange={setSelectedYear}
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select year" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">
-                                                    All Years
-                                                </SelectItem>
-                                                {years.map((year) => (
-                                                    <SelectItem
-                                                        key={year}
-                                                        value={year.toString()}
-                                                    >
-                                                        {year}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
                                     </div>
-                                    {/* Quarter selection */}
-                                    <div className="space-y-2">
-                                        <label className="block text-sm font-medium">
-                                            Quarters
-                                        </label>
-                                        <div className="flex flex-wrap gap-2">
-                                            {QUARTERS.map((quarter) => (
-                                                <button
-                                                    key={quarter.label}
-                                                    onClick={() =>
-                                                        handleQuarterToggle(
-                                                            quarter.label,
-                                                        )
-                                                    }
-                                                    className={`rounded-full px-3 py-1 text-sm transition-colors ${
-                                                        dateFilterType === 'fiscal' && selectedQuarters.includes(
-                                                            quarter.label,
-                                                        )
-                                                            ? 'bg-black text-white'
-                                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                                    }`}
-                                                >
-                                                    {quarter.label}
-                                                </button>
-                                            ))}
+                                    <div
+                                        className={`space-y-4 pl-6 ${dateFilterType === 'calendar' ? 'pointer-events-none opacity-50' : ''}`}
+                                    >
+                                        {/* Year selection */}
+                                        <div>
+                                            <label className="mb-2 block text-sm font-medium">
+                                                Year
+                                            </label>
+                                            <Select
+                                                value={selectedYear}
+                                                onValueChange={setSelectedYear}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select year" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="all">
+                                                        All Years
+                                                    </SelectItem>
+                                                    {years.map((year) => (
+                                                        <SelectItem
+                                                            key={year}
+                                                            value={year.toString()}
+                                                        >
+                                                            {year}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        {/* Quarter selection */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium">
+                                                Quarters
+                                            </label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {QUARTERS.map((quarter) => (
+                                                    <button
+                                                        key={quarter.label}
+                                                        onClick={() =>
+                                                            handleQuarterToggle(
+                                                                quarter.label,
+                                                            )
+                                                        }
+                                                        className={`rounded-full px-3 py-1 text-sm transition-colors ${
+                                                            dateFilterType ===
+                                                                'fiscal' &&
+                                                            selectedQuarters.includes(
+                                                                quarter.label,
+                                                            )
+                                                                ? 'bg-black text-white'
+                                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                                        }`}
+                                                    >
+                                                        {quarter.label}
+                                                    </button>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Header with record count and filter controls */}
                 <div className="flex flex-row items-center justify-between">
@@ -465,7 +516,7 @@ const HousingStatusTable = () => {
                         {/* Housing status filter dropdown */}
                         <Select
                             value={statusFilter}
-                            onValueChange={setStatusFilter}
+                            onValueChange={(value) => setStatusFilter(value)}
                         >
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Filter by status" />
