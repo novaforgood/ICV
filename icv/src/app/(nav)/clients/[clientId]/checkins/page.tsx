@@ -217,19 +217,18 @@ export default function CheckInsPage() {
 
     return (
         <div className="p-7">
-            <div className="sticky top-[168px] w-full z-10 flex h-20 items-center justify-between bg-white pb-4 pt-4 border">
+            <div className="sticky top-[168px] z-10 flex h-20 w-full items-center justify-between bg-white pb-4">
                 {/* Title */}
                 <h1 className="text-4xl font-bold">Case Notes</h1>
 
                 <div className="flex items-center gap-4">
                     <ScheduledCheckInCreation
                         onNewEvent={() => setNewEvents(true)}
-                        variant="checkins-page"
                         clientName={`${client?.firstName} ${client?.lastName}`}
                     />
 
                     {/* Filter controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="relative flex items-center gap-2">
                         <Dropdown
                             className="w-full border-black"
                             placeholderClassName="hidden"
