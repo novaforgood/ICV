@@ -1,6 +1,7 @@
 'use client'
 import { auth, clientDb } from '@/data/firebase'
 import { setCookie } from 'cookies-next'
+import { FirebaseError } from 'firebase/app'
 import {
     createUserWithEmailAndPassword,
     sendPasswordResetEmail, // Added import for password reset
@@ -90,7 +91,18 @@ const page = () => {
             }
         } catch (err) {
             if (err instanceof Error) {
-                setError(err.message)
+                const error = err as FirebaseError
+
+                const messages: Record<string, string> = {
+                    "auth/invalid-credential": "Incorrect Password. Please try again or reset password.",
+                    "auth/user-not-found": "No user associated with email.",
+                    "auth/invalid-email": "Invalid Email Address.",
+                    "auth/too-many-requests": "Too many login attempts. Please try again in 5 minutes.",
+                    "auth/missing-password": "You didn't enter a password silly!"
+                }
+
+                const text = messages[error.code] ?? error.message
+                setError(text)
             } else {
                 setError('An unknown error occurred')
             }
@@ -240,6 +252,7 @@ const page = () => {
                         onClick={() => setLoading(!loading)}
                         className="bold mt-4 text-sm text-black"
                     >
+                        {/*if not loading, then logging in */}
                         {loading ? (
                             <>
                                 Already have an account?{' '}
