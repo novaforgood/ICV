@@ -19,6 +19,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { ArrowUpDown, Calendar, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 const MONTHS = [
@@ -67,7 +68,8 @@ const HousingStatusTable = () => {
     const [selectedMonths, setSelectedMonths] = useState<string[]>([])
     const [selectedQuarters, setSelectedQuarters] = useState<string[]>([])
 
-    const itemsPerPage = 10
+    const itemsPerPage = 20
+    const router = useRouter()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -408,25 +410,39 @@ const HousingStatusTable = () => {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Date</TableHead>
-                                <TableHead>Client ID</TableHead>
                                 <TableHead>Housing Status</TableHead>
                                 <TableHead>Housed by ICV</TableHead>
+                                <TableHead>Client Profile</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {currentData.map((record, index) => (
                                 <TableRow key={index}>
                                     <TableCell>
-                                        {new Date(
-                                            record.date,
-                                        ).toLocaleDateString()}
+                                        {record.date &&
+                                        !isNaN(new Date(record.date).getTime())
+                                            ? new Date(
+                                                  record.date,
+                                              ).toLocaleDateString()
+                                            : 'N/A'}
                                     </TableCell>
-                                    <TableCell>{record.clientID}</TableCell>
                                     <TableCell>
                                         {record.housingStatus}
                                     </TableCell>
                                     <TableCell>
                                         {record.housed_by_icv ? 'Yes' : 'No'}
+                                    </TableCell>
+                                    <TableCell>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                router.push(
+                                                    `/clients/${record.clientID}`,
+                                                )
+                                            }
+                                        >
+                                            View
+                                        </button>
                                     </TableCell>
                                 </TableRow>
                             ))}
