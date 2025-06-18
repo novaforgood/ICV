@@ -547,75 +547,39 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                 paginatedRows.map((row) => (
                                     <TableRow
                                         key={row.id}
-                                        data-state={
-                                            row.getIsSelected() && 'selected'
-                                        }
+                                        data-state={row.getIsSelected() && 'selected'}
                                     >
-                                        {row
-                                            .getVisibleCells()
-                                            .map((cell, index) => {
-                                                const isHidden =
-                                                    hiddenColumns.includes(
-                                                        cell.column.id,
-                                                    )
-                                                const isLastColumn =
-                                                    index ===
-                                                    row.getVisibleCells()
-                                                        .length -
-                                                        1
-                                                return (
-                                                    <TableCell
-                                                        key={cell.id}
-                                                        style={{
-                                                            width: cell.column.getSize(),
-                                                            background: isHidden
-                                                                ? '#f3f4f6'
-                                                                : undefined,
-                                                            color: isHidden
-                                                                ? '#a3a3a3'
-                                                                : undefined,
-                                                            opacity: isHidden
-                                                                ? 0.5
-                                                                : 1,
-                                                            pointerEvents:
-                                                                isHidden
-                                                                    ? 'none'
-                                                                    : 'auto',
-                                                        }}
-                                                        className={
-                                                            isLastColumn
-                                                                ? 'border-r border-gray-200'
-                                                                : ''
-                                                        }
-                                                    >
-                                                        <div
-                                                            style={{
-                                                                pointerEvents:
-                                                                    isHidden
-                                                                        ? 'none'
-                                                                        : 'auto',
-                                                            }}
-                                                        >
-                                                            {flexRender(
-                                                                cell.column
-                                                                    .columnDef
-                                                                    .cell,
-                                                                cell.getContext(),
-                                                            )}
-                                                        </div>
-                                                    </TableCell>
-                                                )
-                                            })}
+                                        {row.getVisibleCells().map((cell, index) => {
+                                            const isHidden = hiddenColumns.includes(cell.column.id)
+                                            const isLastColumn =
+                                                index === row.getVisibleCells().length - 1
+                                            return (
+                                                <TableCell
+                                                    key={cell.id}
+                                                    style={{
+                                                        width: cell.column.getSize(),
+                                                        background: isHidden ? '#f3f4f6' : undefined,
+                                                        color: isHidden ? '#a3a3a3' : undefined,
+                                                        opacity: isHidden ? 0.5 : 1,
+                                                        pointerEvents: isHidden ? 'none' : 'auto',
+                                                    }}
+                                                    className={isLastColumn ? 'border-r border-gray-200' : ''}
+                                                >
+                                                    <div style={{ pointerEvents: isHidden ? 'none' : 'auto' }}>
+                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                    </div>
+                                                </TableCell>
+                                            )
+                                        })}
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
                                     <TableCell
                                         colSpan={CLIENT_TABLE_COLUMNS.length}
-                                        className="h-24 text-center"
-                                    >
-                                        No results.
-                                    </TableCell>
+                                        className="border-b border-[#D8DDE7] p-0 h-0"
+                                        style={{ height: 0, padding: 0 }}
+                                    />
                                 </TableRow>
                             )}
                         </TableBody>
