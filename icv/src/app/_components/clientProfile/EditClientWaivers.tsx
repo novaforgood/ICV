@@ -38,7 +38,7 @@ export const ClientWaiversToggle = ({
 
     return (
         <div className="flex min-h-screen px-[48px]">
-            <div className="mb-[48px] h-screen w-screen min-w-[70%] space-y-[48px]">
+            <div className="mb-[48px] w-screen min-w-[70%] space-y-[48px]">
                 {!editMode ? (
                     <div>
                         {client.waivers && client.waivers.length >= 0 ? (

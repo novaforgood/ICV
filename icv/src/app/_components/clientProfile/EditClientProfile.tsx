@@ -98,7 +98,7 @@ export const ClientProfileToggle = ({
 
     return (
         <div className="flex min-h-screen px-[48px]">
-            <div className="mb-[48px] h-screen w-screen min-w-[70%] space-y-[48px]">
+            <div className="mb-[48px] w-screen min-w-[70%] space-y-[48px]">
                 {showHousingLog && (
                     <div
                         className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50"
@@ -138,7 +138,7 @@ export const ClientProfileToggle = ({
                                     className={`grid ${editMode ? 'grid-cols-4' : 'grid-cols-3'} border-b pb-2 font-bold`}
                                 >
                                     <p>Date</p>
-                                    <p>Housed by ICV</p>
+                                    <p>Sheltered by ICV</p>
                                     <p>Housing status</p>
                                 </div>
                             </div>
@@ -146,14 +146,29 @@ export const ClientProfileToggle = ({
                                 {housingStatuses.map((h) => (
                                     <div
                                         key={h.docID}
-                                        className="relative border-b pb-2"
+                                        className="relative border-b pb-4"
                                     >
                                         <div
                                             className={`grid ${editMode ? 'grid-cols-4' : 'grid-cols-3'}`}
                                         >
-                                            <p>{h.date}</p>
-                                            <p>{h.housedByICV}</p>
-                                            <p>{h.housingStatus}</p>
+                                            <div>
+                                                {h.date ? (
+                                                    new Date(
+                                                        h.date,
+                                                    ).toLocaleDateString(
+                                                        'en-US',
+                                                        {
+                                                            month: '2-digit',
+                                                            day: '2-digit',
+                                                            year: 'numeric',
+                                                        },
+                                                    )
+                                                ) : (
+                                                    <p>N/A</p>
+                                                )}
+                                            </div>
+                                            <p>{h.housedByICV || 'N/A'}</p>
+                                            <p>{h.housingStatus || 'N/A'}</p>
                                             {editMode && (
                                                 <div className="flex justify-end">
                                                     <button
@@ -251,9 +266,17 @@ export const ClientProfileToggle = ({
                             <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
                                 HOUSING
                             </label>
+
                             <ClientHousing
                                 data={client}
                                 setShowHousingLog={setShowHousingLog}
+                                recentHousing={
+                                    housingStatuses.length > 0
+                                        ? housingStatuses[
+                                              housingStatuses.length - 1
+                                          ]
+                                        : undefined
+                                }
                             />
                         </div>
                     </>

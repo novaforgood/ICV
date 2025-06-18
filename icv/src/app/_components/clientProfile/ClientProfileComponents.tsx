@@ -1,5 +1,6 @@
 'use client'
 import { ClientIntakeSchema } from '@/types/client-types'
+import { NewHousing } from '@/types/housingStatus-types'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { TypeOf } from 'zod'
@@ -9,6 +10,7 @@ type ClientType = TypeOf<typeof ClientIntakeSchema>
 interface ClientProps {
     data: ClientType
     setShowHousingLog?: (value: boolean) => void
+    recentHousing?: NewHousing
 }
 
 // Profile Section
@@ -41,7 +43,20 @@ export const ClientBio = ({ data }: ClientProps) => {
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                         DOB
                     </label>
-                    <div>{data.dateOfBirth || <p>N/A</p>}</div>
+                    <div>
+                        {data.dateOfBirth ? (
+                            new Date(data.dateOfBirth).toLocaleDateString(
+                                'en-US',
+                                {
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    year: 'numeric',
+                                },
+                            )
+                        ) : (
+                            <p>N/A</p>
+                        )}
+                    </div>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
@@ -57,7 +72,20 @@ export const ClientBio = ({ data }: ClientProps) => {
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                         Intake Date
                     </label>
-                    <div>{data.intakeDate || <p>N/A</p>}</div>
+                    <div>
+                        {data.intakeDate ? (
+                            new Date(data.intakeDate).toLocaleDateString(
+                                'en-US',
+                                {
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    year: 'numeric',
+                                },
+                            )
+                        ) : (
+                            <p>N/A</p>
+                        )}
+                    </div>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
@@ -145,19 +173,95 @@ export const ClientEthnicity = ({ data }: ClientProps) => {
     )
 }
 
-export const ClientHousing = ({ data, setShowHousingLog }: ClientProps) => {
+export const ClientHousing = ({
+    data,
+    setShowHousingLog,
+    recentHousing,
+}: ClientProps) => {
     return (
         <div className="space-y-[24px]">
-            <button
-                type="button"
-                className="rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
-                onClick={() => {
-                    if (setShowHousingLog) setShowHousingLog(true)
-                    console.log('Clicked')
-                }}
-            >
-                View Log
-            </button>
+            {recentHousing ? (
+                <div className="space-y-[24px] rounded-[10px] border border-[#DBD8E4] p-[24px]">
+                    <div className="flex flex-row justify-between">
+                        <div className="max-w-[200px] truncate font-['Epilogue'] text-[22px] text-neutral-900">
+                            Current status
+                        </div>
+                        <button
+                            type="button"
+                            className="flex h-[32px] min-w-[96px] items-center gap-[4px] rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
+                            onClick={() => {
+                                if (setShowHousingLog) setShowHousingLog(true)
+                                console.log('Clicked')
+                            }}
+                        >
+                            View Log
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                Date
+                            </label>
+                            <div>
+                                {recentHousing.date ? (
+                                    new Date(
+                                        recentHousing.date,
+                                    ).toLocaleDateString('en-US', {
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        year: 'numeric',
+                                    })
+                                ) : (
+                                    <p>N/A</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                Housing status
+                            </label>
+                            <div>
+                                {recentHousing.housingStatus ? (
+                                    recentHousing.housingStatus
+                                ) : (
+                                    <p>N/A</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                            Sheltered by ICV
+                        </label>
+                        <div>
+                            {recentHousing.housedByICV ? (
+                                recentHousing.housedByICV
+                            ) : (
+                                <p>N/A</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                    <div className="flex flex-col space-y-1">
+                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                            Housing status
+                        </label>
+                        <div>
+                            <p>N/A</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col space-y-1">
+                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                            Sheltered by ICV
+                        </label>
+                        <div>
+                            <p>N/A</p>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                 <div className="flex flex-col space-y-1">
@@ -615,7 +719,13 @@ export const ClientSpouse = ({
                                 </label>
                                 <div>
                                     {data.spouse.spouseDOB ? (
-                                        <p>{data.spouse.spouseDOB}</p>
+                                        new Date(
+                                            data.spouse.spouseDOB,
+                                        ).toLocaleDateString('en-US', {
+                                            month: '2-digit',
+                                            day: '2-digit',
+                                            year: 'numeric',
+                                        })
                                     ) : (
                                         <p>N/A</p>
                                     )}
@@ -793,7 +903,20 @@ export const ClientDependents = ({ data }: ClientProps) => {
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     DOB
                                 </label>
-                                <div>{child.dob ? child.dob : <p>N/A</p>}</div>
+                                <div>
+                                    {child.dob ? (
+                                        new Date(child.dob).toLocaleDateString(
+                                            'en-US',
+                                            {
+                                                month: '2-digit',
+                                                day: '2-digit',
+                                                year: 'numeric',
+                                            },
+                                        )
+                                    ) : (
+                                        <p>N/A</p>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">

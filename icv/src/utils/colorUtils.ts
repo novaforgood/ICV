@@ -26,19 +26,56 @@ function stringToNormalizedChecksum(str: string): number {
     return checksum / 0xFFFFFFFF; // Normalize to [0, 1]
 }
 
-// Predefined set of colors
-export const USER_COLORS = [
-    '#FFC7DC',  // Pink
-    '#FFE9A7',  // Orange
-    '#DAFEBE',  // Green
-    '#C8F8FF',  // Blue
-    '#CAC7FF',  // Indigo
-    '#8B5CF6',  // Lilac
-] as const;
+// Convert HSL to RGB
+function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+    let r, g, b;
+
+    if (s === 0) {
+        r = g = b = l; // achromatic
+    } else {
+        const hue2rgb = (p: number, q: number, t: number) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+// Convert RGB to hex
+function rgbToHex(r: number, g: number, b: number): string {
+    return '#' + [r, g, b].map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
+}
+
+// Generate a pastel color from a number between 0 and 1
+function generatePastelColor(value: number): string {
+    // Use the value to determine hue (0-360 degrees)
+    const hue = value * 360;
+
+    // Fixed values for pastel colors
+    const saturation = 0.4; // 40% saturation for pastel look
+    const lightness = 0.85; // 85% lightness for pastel look
+
+    const [r, g, b] = hslToRgb(hue / 360, saturation, lightness);
+    return rgbToHex(r, g, b);
+}
 
 // Get deterministic color based on username
 export function getUserColor(userName: string): string {
     const normalizedValue = stringToNormalizedChecksum(userName);
-    const colorIndex = Math.floor(normalizedValue * USER_COLORS.length);
-    return USER_COLORS[colorIndex];
+    return generatePastelColor(normalizedValue);
 } 
