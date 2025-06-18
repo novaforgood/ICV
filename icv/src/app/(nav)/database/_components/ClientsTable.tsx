@@ -19,11 +19,18 @@ import {
     SortingState,
     useReactTable,
 } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
 import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
 import { CLIENT_TABLE_COLUMNS } from './client-table-columns'
+import { Button } from '@/components/ui/button'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+} from '@/components/ui/select'
 
 interface ClientsTableProps {
     clients: NewClient[]
@@ -33,6 +40,8 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
     const [globalFilter, setGlobalFilter] = useState('')
     const [sorting, setSorting] = useState<SortingState>([])
     const [currentPage, setCurrentPage] = useState(1)
+    const [sortField, setSortField] = useState<string>('intakeDate')
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
     const rowsPerPage = 50
 
     // Date filter state
@@ -105,7 +114,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
         filtered = filtered.filter((record) => {
             const recordDate = new Date(
                 record.intakeDate || record.intakeDate || new Date(),
-            ) // adjust field!
+            )
             const recordYear = recordDate.getFullYear()
             const recordMonth = (recordDate.getMonth() + 1).toString()
 
@@ -140,6 +149,37 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
             return true
         })
 
+        // Apply sorting
+        filtered.sort((a, b) => {
+            const aValue = a[sortField as keyof NewClient]
+            const bValue = b[sortField as keyof NewClient]
+
+            if (aValue === undefined || aValue === null) return 1
+            if (bValue === undefined || bValue === null) return -1
+
+            if (sortField === 'intakeDate') {
+                const dateA = new Date(aValue as string)
+                const dateB = new Date(bValue as string)
+                return sortDirection === 'asc' 
+                    ? dateA.getTime() - dateB.getTime()
+                    : dateB.getTime() - dateA.getTime()
+            }
+
+            if (typeof aValue === 'string' && typeof bValue === 'string') {
+                return sortDirection === 'asc'
+                    ? aValue.localeCompare(bValue)
+                    : bValue.localeCompare(aValue)
+            }
+
+            if (typeof aValue === 'number' && typeof bValue === 'number') {
+                return sortDirection === 'asc'
+                    ? aValue - bValue
+                    : bValue - aValue
+            }
+
+            return 0
+        })
+
         setFilteredClients(filtered)
         setCurrentPage(1)
     }, [
@@ -148,19 +188,17 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
         selectedYear,
         selectedMonths,
         selectedQuarters,
+        sortField,
+        sortDirection,
     ])
 
     const table = useReactTable({
         data: filteredClients,
         columns: CLIENT_TABLE_COLUMNS,
         getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        onSortingChange: setSorting,
-        enableMultiSort: false,
         onGlobalFilterChange: setGlobalFilter,
         state: {
-            sorting,
             globalFilter,
         },
         getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -175,7 +213,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
     // Reset page when sorting or filtering changes
     useEffect(() => {
         setCurrentPage(1)
-    }, [globalFilter, sorting])
+    }, [globalFilter, sortField, sortDirection])
 
     return (
         <div className="space-y-[20px]">
@@ -204,7 +242,38 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                     </div>
                 </div>
 
-                <div className="space-y-[16px]">
+                <div className="flex items-center gap-4">
+                    {/* Sort Controls */}
+                    <div className="flex items-center gap-2">
+                        <Select
+                            value={sortField}
+                            onValueChange={setSortField}
+                        >
+                            <SelectTrigger className="w-[180px]">
+                                <span>Sort by</span>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="intakeDate">Intake Date</SelectItem>
+                                <SelectItem value="firstName">First Name</SelectItem>
+                                <SelectItem value="lastName">Last Name</SelectItem>
+                                <SelectItem value="age">Age</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                            className="flex items-center gap-2"
+                        >
+                            <ArrowUpDown className="h-4 w-4" />
+                            {sortField === 'intakeDate' 
+                                ? (sortDirection === 'asc' ? 'Oldest' : 'Newest')
+                                : sortField === 'age'
+                                ? (sortDirection === 'asc' ? 'Lowest' : 'Highest')
+                                : (sortDirection === 'asc' ? 'A-Z' : 'Z-A')}
+                        </Button>
+                    </div>
+
                     {/* Pagination Controls */}
                     <div className="flex items-center gap-2 text-neutral-800">
                         <button

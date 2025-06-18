@@ -115,68 +115,17 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         size: 180,
     }),
     columnHelper.accessor('firstName', {
-        header: ({ column }) => (
-            <div className="flex w-full items-center justify-between">
-                <div>First Name</div>
-                <Select
-                    onValueChange={(value) => {
-                        column.toggleSorting(value === 'desc')
-                    }}
-                >
-                    <SelectTrigger className="h-[30px] w-[30px] border-none p-0 shadow-none focus:ring-0">
-                        <ArrowUpDown className="h-4 w-4" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="asc">Sort ascending</SelectItem>
-                        <SelectItem value="desc">Sort descending</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-        ),
+        header: () => <div>First Name</div>,
         cell: (info) => renderValue(info.getValue()),
         size: 200,
     }),
     columnHelper.accessor('lastName', {
-        header: ({ column }) => (
-            <div className="flex w-full items-center justify-between">
-                <div>Last Name</div>
-                <Select
-                    onValueChange={(value) => {
-                        column.toggleSorting(value === 'desc')
-                    }}
-                >
-                    <SelectTrigger className="h-[30px] w-[30px] border-none p-0 shadow-none focus:ring-0">
-                        <ArrowUpDown className="h-4 w-4" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="asc">Sort ascending</SelectItem>
-                        <SelectItem value="desc">Sort descending</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-        ),
+        header: () => <div>Last Name</div>,
         cell: (info) => renderValue(info.getValue()),
         size: 200,
     }),
     columnHelper.accessor('intakeDate', {
-        header: ({ column }) => (
-            <div className="flex w-full items-center justify-between">
-                <div>Intake Date</div>
-                <Select
-                    onValueChange={(value) => {
-                        column.toggleSorting(value === 'desc')
-                    }}
-                >
-                    <SelectTrigger className="h-[30px] w-[30px] border-none p-0 shadow-none focus:ring-0">
-                        <ArrowUpDown className="h-4 w-4" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="asc">Sort ascending</SelectItem>
-                        <SelectItem value="desc">Sort descending</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-        ),
+        header: () => <div>Intake Date</div>,
         cell: (info) => {
             const dateValue = info.getValue()
             const parsedDate = new Date(dateValue)
