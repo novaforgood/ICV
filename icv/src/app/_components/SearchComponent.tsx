@@ -31,7 +31,7 @@ const SearchComponent = () => {
     const [sortedAllClients, setSortedAllClients] = useState<NewClient[]>([])
     const [isLoadingPage, setIsLoadingPage] = useState(false)
     const [sortBy, setSortBy] = useState<'asc' | 'desc' | null>(null)
-    const [isFilterVisible, setIsFilterVisible] = useState(true)
+    const [isFilterVisible, setIsFilterVisible] = useState(false)
     const [activeTab, setActiveTab] = useState<'my' | 'all'>('my')
     const [displayedClients, setDisplayedClients] = useState<NewClient[]>([])
     const [filters, setFilters] = useState<{
@@ -42,7 +42,20 @@ const SearchComponent = () => {
     }>({
         dateFilterType: 'calendar',
         selectedYear: 'all',
-        selectedMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
+        selectedMonths: [
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+            '10',
+            '11',
+            '12',
+        ],
         selectedQuarters: [],
     })
     const [pageNumber, setPageNumber] = useState(1)
@@ -316,7 +329,7 @@ const SearchComponent = () => {
                     />
                 </div>
                 <button
-                    className="flex w-[170px] items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="flex items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     onClick={() => {
                         setSortBy((prev) => (prev === 'asc' ? 'desc' : 'asc'))
                     }}
@@ -335,10 +348,10 @@ const SearchComponent = () => {
                             d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
                         />
                     </svg>
-                    {sortBy === 'asc' ? 'Sort by newest' : 'Sort by oldest'}
+                    {sortBy === 'asc' ? 'Newest' : 'Oldest'}
                 </button>
                 <button
-                    className="flex w-[170px] items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="flex items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     onClick={() => setIsFilterVisible(!isFilterVisible)}
                 >
                     <svg
@@ -355,7 +368,7 @@ const SearchComponent = () => {
                             d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
                         />
                     </svg>
-                    Filter by date
+                    Filter intake date
                 </button>
             </div>
 
@@ -370,7 +383,7 @@ const SearchComponent = () => {
                     {/* Side menu */}
                     <div className="fixed right-0 top-0 z-50 h-full w-[400px] bg-white p-6 shadow-xl">
                         <div className="mb-6 flex items-center justify-between">
-                            <h2 className="text-xl font-semibold">Filter by Date</h2>
+                            <h2 className="text-xl font-semibold">Filter</h2>
                             <button
                                 onClick={() => setIsFilterVisible(false)}
                                 className="text-gray-500 hover:text-gray-700"
@@ -400,13 +413,40 @@ const SearchComponent = () => {
                                 setFilters((prev) => ({
                                     ...prev,
                                     dateFilterType: type,
-                                    selectedMonths: type === 'calendar' ? ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] : [],
-                                    selectedQuarters: type === 'fiscal' ? ['Q1: JUL-SEP', 'Q2: OCT-DEC', 'Q3: JAN-MAR', 'Q4: APR-JUN'] : []
+                                    selectedMonths:
+                                        type === 'calendar'
+                                            ? [
+                                                  '1',
+                                                  '2',
+                                                  '3',
+                                                  '4',
+                                                  '5',
+                                                  '6',
+                                                  '7',
+                                                  '8',
+                                                  '9',
+                                                  '10',
+                                                  '11',
+                                                  '12',
+                                              ]
+                                            : [],
+                                    selectedQuarters:
+                                        type === 'fiscal'
+                                            ? [
+                                                  'Q1: JUL-SEP',
+                                                  'Q2: OCT-DEC',
+                                                  'Q3: JAN-MAR',
+                                                  'Q4: APR-JUN',
+                                              ]
+                                            : [],
                                 }))
                             }
                             selectedYear={filters.selectedYear}
                             setSelectedYear={(year) =>
-                                setFilters((prev) => ({ ...prev, selectedYear: year }))
+                                setFilters((prev) => ({
+                                    ...prev,
+                                    selectedYear: year,
+                                }))
                             }
                             selectedMonths={filters.selectedMonths}
                             handleMonthToggle={handleMonthToggle}

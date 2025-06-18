@@ -41,7 +41,20 @@ export const ClientBio = ({ data }: ClientProps) => {
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                         DOB
                     </label>
-                    <div>{data.dateOfBirth || <p>N/A</p>}</div>
+                    <div>
+                        {data.dateOfBirth ? (
+                            new Date(data.dateOfBirth).toLocaleDateString(
+                                'en-US',
+                                {
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    year: 'numeric',
+                                },
+                            )
+                        ) : (
+                            <p>N/A</p>
+                        )}
+                    </div>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
