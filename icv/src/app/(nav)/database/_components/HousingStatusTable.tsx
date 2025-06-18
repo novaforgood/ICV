@@ -22,22 +22,6 @@ import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-// Constants for month display and selection
-const MONTHS = [
-    { full: 'January', short: 'JAN' },
-    { full: 'February', short: 'FEB' },
-    { full: 'March', short: 'MAR' },
-    { full: 'April', short: 'APR' },
-    { full: 'May', short: 'MAY' },
-    { full: 'June', short: 'JUN' },
-    { full: 'July', short: 'JUL' },
-    { full: 'August', short: 'AUG' },
-    { full: 'September', short: 'SEP' },
-    { full: 'October', short: 'OCT' },
-    { full: 'November', short: 'NOV' },
-    { full: 'December', short: 'DEC' },
-]
-
 // Constants for quarter display and selection
 const QUARTERS = [
     { label: 'Q1: JUL-SEP', months: ['1', '2', '3'] },
@@ -281,7 +265,7 @@ const HousingStatusTable = () => {
                                 <ChevronLeft className="h-4 w-4" />
                             </button>
 
-                            <div className="w-[120px] text-center text-sm tabular-nums">
+                            <div className="w-[120px] text-center tabular-nums">
                                 {filteredData.length === 0
                                     ? '0 of 0'
                                     : `${startIndex + 1}–${Math.min(endIndex, filteredData.length)} of ${filteredData.length}`}

@@ -9,8 +9,28 @@ import {
     SelectTrigger,
 } from '@/components/ui/select'
 import { NewClient } from '@/types/client-types'
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
+import { ColumnDef, createColumnHelper, FilterFn } from '@tanstack/react-table'
 import { ArrowUpDown, X } from 'lucide-react'
+
+// Define the filter value type
+interface DateFilterValue {
+    type: 'calendar' | 'fiscal'
+    year: string
+    months: string[]
+    quarters: string[]
+}
+
+// Constants for quarter display and selection
+const QUARTERS = [
+    { label: 'Q1: JUL-SEP', months: ['1', '2', '3'] as const },
+    { label: 'Q2: OCT-DEC', months: ['4', '5', '6'] as const },
+    { label: 'Q3: JAN-MAR', months: ['7', '8', '9'] as const },
+    { label: 'Q4: APR-JUN', months: ['10', '11', '12'] as const },
+] as const
+
+type Quarter = typeof QUARTERS[number]
+type QuarterLabel = Quarter['label']
+type QuarterMonths = Quarter['months'][number]
 
 const columnHelper = createColumnHelper<NewClient>()
 
@@ -165,6 +185,37 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                 : renderValue(parsedDate.toLocaleDateString())
         },
         size: 180,
+        filterFn: (row, columnId, filterValue: DateFilterValue) => {
+            const intakeDate = row.original.intakeDate
+            if (!intakeDate) return false
+
+            const date = new Date(intakeDate)
+            const year = date.getFullYear()
+            const month = (date.getMonth() + 1).toString()
+
+            // Filter by year
+            if (filterValue.year !== 'all' && year !== parseInt(filterValue.year)) {
+                return false
+            }
+
+            // Filter by months or quarters based on date filter type
+            if (filterValue.type === 'calendar') {
+                if (filterValue.months.length > 0 && !filterValue.months.includes(month)) {
+                    return false
+                }
+            } else {
+                if (filterValue.quarters.length > 0) {
+                    const isInSelectedQuarter = filterValue.quarters.some((quarter) => {
+                        const quarterMonths = QUARTERS.find((q) => q.label === quarter)?.months
+                        if (!quarterMonths) return false
+                        return (quarterMonths as readonly string[]).includes(month)
+                    })
+                    if (!isInSelectedQuarter) return false
+                }
+            }
+
+            return true
+        },
     }),
     columnHelper.accessor('caseManager', {
         header: ({ column, table }) => {
