@@ -1,15 +1,13 @@
 'use client'
 
 import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
-import { fetchCheckInCounterData } from '@/lib/firestoreUtils'
-import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
-    Cell,
-    Pie,
-    PieChart as RechartsPieChart,
-    ResponsiveContainer,
-    Tooltip,
-} from 'recharts'
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
     Table,
     TableBody,
@@ -18,6 +16,18 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
+import { fetchCheckInCounterData } from '@/lib/firestoreUtils'
+import html2canvas from 'html2canvas'
+import html2pdf from 'html2pdf.js'
+import { Download } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+    Cell,
+    Pie,
+    PieChart as RechartsPieChart,
+    ResponsiveContainer,
+    Tooltip,
+} from 'recharts'
 
 const COLORS = ['#B6CCE2', '#4A7CA5', '#23425B', '#1A2633']
 
@@ -43,6 +53,7 @@ const PieChart = () => {
     const [years, setYears] = useState<number[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
+    const [isExporting, setIsExporting] = useState(false)
 
     const [data, setData] = useState<ChartData[]>([
         { name: 'Hygiene Kits', value: 0 },
@@ -193,6 +204,55 @@ const PieChart = () => {
         )
     }
 
+    const exportData = async (format: 'pdf' | 'png') => {
+        try {
+            setIsExporting(true)
+            const el = document.getElementById('exportContainer')
+            if (!el) throw new Error('Export element not found')
+
+            const today = new Date().toLocaleDateString('en-CA')
+            const filename = `CheckIns_${today}.${format}`
+
+            if (format === 'pdf') {
+                await html2pdf()
+                    .set({
+                        filename,
+                        image: { type: 'jpeg', quality: 1 },
+                        html2canvas: { 
+                            scale: 3,
+                            useCORS: true,
+                            scrollY: 0,
+                            logging: false,
+                            backgroundColor: '#ffffff'
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'a4',
+                            orientation: 'portrait',
+                            compress: true
+                        },
+                    })
+                    .from(el)
+                    .save()
+            } else {
+                // For PNG export
+                const canvas = await html2canvas(el, {
+                    scale: 2,
+                    useCORS: true,
+                    scrollY: 0,
+                })
+                const link = document.createElement('a')
+                link.download = filename
+                link.href = canvas.toDataURL('image/png')
+                link.click()
+            }
+        } catch (err) {
+            console.error('Export failed:', err)
+        } finally {
+            setIsExporting(false)
+        }
+    }
+
     return (
         <div className="flex w-full flex-col lg:flex-row lg:justify-between">
             {/* Chart/Table View */}
@@ -203,8 +263,8 @@ const PieChart = () => {
                         <button
                             onClick={() => setViewMode('chart')}
                             className={`px-2 py-1 ${
-                                viewMode === 'chart' 
-                                    ? 'font-semibold text-black' 
+                                viewMode === 'chart'
+                                    ? 'font-semibold text-black'
                                     : 'text-gray-500 hover:text-gray-700'
                             }`}
                         >
@@ -214,8 +274,8 @@ const PieChart = () => {
                         <button
                             onClick={() => setViewMode('table')}
                             className={`px-2 py-1 ${
-                                viewMode === 'table' 
-                                    ? 'font-semibold text-black' 
+                                viewMode === 'table'
+                                    ? 'font-semibold text-black'
                                     : 'text-gray-500 hover:text-gray-700'
                             }`}
                         >
@@ -228,89 +288,53 @@ const PieChart = () => {
                     <div className="flex h-[500px] w-[500px] items-center justify-center text-lg">
                         Loading data...
                     </div>
-                ) : viewMode === 'chart' ? (
-                    <>
-                        <div className="relative h-[500px] w-[500px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <RechartsPieChart>
-                                    <Pie
-                                        data={data}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={120}
-                                        outerRadius={240}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {data.map((entry, idx) => (
-                                            <Cell
-                                                key={entry.name}
-                                                fill={COLORS[idx % COLORS.length]}
-                                            />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip />
-                                </RechartsPieChart>
-                            </ResponsiveContainer>
-                            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="mb-1 text-lg font-bold tracking-widest text-gray-400">
-                                    TOTAL
-                                </span>
-                                <span className="text-6xl font-extrabold">
-                                    {total.toLocaleString()}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Custom Legend */}
-                        <div className="mt-12 flex justify-center gap-16">
-                            {data.map((entry, idx) => {
-                                const percent = total
-                                    ? Math.round((entry.value / total) * 100)
-                                    : 0
-                                return (
-                                    <div
-                                        key={entry.name}
-                                        className="flex flex-col items-center"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <span
-                                                className="inline-block h-4 w-4 rounded-full"
-                                                style={{
-                                                    backgroundColor:
-                                                        COLORS[idx % COLORS.length],
-                                                }}
-                                            />
-                                            <span className="font-semibold text-gray-700">
-                                                {entry.name}
-                                            </span>
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                            {entry.value.toLocaleString()} ({percent}%)
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </>
                 ) : (
-                    <div className="w-full">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[300px]">Category</TableHead>
-                                    <TableHead className="text-right w-[200px]">Count</TableHead>
-                                    <TableHead className="text-right w-[200px] border-r border-gray-200">Percentage</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {data.map((entry, idx) => {
-                                    const percent = total
-                                        ? Math.round((entry.value / total) * 100)
-                                        : 0
-                                    return (
-                                        <TableRow key={entry.name}>
-                                            <TableCell>
+                    <div id="exportContainer" className="w-full p-8 flex flex-col items-center">
+                        {viewMode === 'chart' ? (
+                            <div className="flex flex-col items-center">
+                                <div className="relative h-[500px] w-[500px]">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RechartsPieChart>
+                                            <Pie
+                                                data={data}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={120}
+                                                outerRadius={240}
+                                                dataKey="value"
+                                                stroke="none"
+                                            >
+                                                {data.map((entry, idx) => (
+                                                    <Cell
+                                                        key={entry.name}
+                                                        fill={COLORS[idx % COLORS.length]}
+                                                    />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip />
+                                        </RechartsPieChart>
+                                    </ResponsiveContainer>
+                                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                        <span className="mb-1 text-lg font-bold tracking-widest text-gray-400">
+                                            TOTAL
+                                        </span>
+                                        <span className="text-6xl font-extrabold">
+                                            {total.toLocaleString()}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Custom Legend */}
+                                <div className="mt-12 flex justify-center gap-16">
+                                    {data.map((entry, idx) => {
+                                        const percent = total
+                                            ? Math.round((entry.value / total) * 100)
+                                            : 0
+                                        return (
+                                            <div
+                                                key={entry.name}
+                                                className="flex flex-col items-center"
+                                            >
                                                 <div className="flex items-center gap-2">
                                                     <span
                                                         className="inline-block h-4 w-4 rounded-full"
@@ -319,31 +343,114 @@ const PieChart = () => {
                                                                 COLORS[idx % COLORS.length],
                                                         }}
                                                     />
-                                                    <span className="font-semibold">
+                                                    <span className="font-semibold text-gray-700">
                                                         {entry.name}
                                                     </span>
                                                 </div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {entry.value.toLocaleString()}
-                                            </TableCell>
-                                            <TableCell className="text-right border-r border-gray-200">
-                                                {percent}%
-                                            </TableCell>
+                                                <div className="text-sm text-gray-500">
+                                                    {entry.value.toLocaleString()} ({percent}%)
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="w-full">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[300px]">
+                                                Category
+                                            </TableHead>
+                                            <TableHead className="w-[200px] text-right">
+                                                Count
+                                            </TableHead>
+                                            <TableHead className="w-[200px] border-r border-gray-200 text-right">
+                                                Percentage
+                                            </TableHead>
                                         </TableRow>
-                                    )
-                                })}
-                                <TableRow className="border-b border-gray-200 bg-gray-50">
-                                    <TableCell className="font-bold">Total</TableCell>
-                                    <TableCell className="text-right font-bold">
-                                        {total.toLocaleString()}
-                                    </TableCell>
-                                    <TableCell className="border-r border-gray-200" />
-                                </TableRow>
-                            </TableBody>
-                        </Table>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {data.map((entry, idx) => {
+                                            const percent = total
+                                                ? Math.round(
+                                                      (entry.value / total) *
+                                                          100,
+                                                  )
+                                                : 0
+                                            return (
+                                                <TableRow key={entry.name}>
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-2">
+                                                            <span
+                                                                className="inline-block h-4 w-4 rounded-full"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        COLORS[
+                                                                            idx %
+                                                                                COLORS.length
+                                                                        ],
+                                                                }}
+                                                            />
+                                                            <span className="font-semibold">
+                                                                {entry.name}
+                                                            </span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {entry.value.toLocaleString()}
+                                                    </TableCell>
+                                                    <TableCell className="border-r border-gray-200 text-right">
+                                                        {percent}%
+                                                    </TableCell>
+                                                </TableRow>
+                                            )
+                                        })}
+                                        <TableRow className="border-b border-gray-200 bg-gray-50">
+                                            <TableCell className="font-bold">
+                                                Total
+                                            </TableCell>
+                                            <TableCell className="text-right font-bold">
+                                                {total.toLocaleString()}
+                                            </TableCell>
+                                            <TableCell className="border-r border-gray-200" />
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
                     </div>
                 )}
+
+                {/* Export Button */}
+                <div className="mt-4 flex justify-start">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isExporting}
+                            >
+                                <Download className="mr-2 h-4 w-4" />
+                                {isExporting ? 'Exporting...' : 'Export'}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            side="bottom"
+                            align="start"
+                            sideOffset={5}
+                            className="w-[160px] data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
+                        >
+                            <DropdownMenuItem onClick={() => exportData('pdf')}>
+                                Export as PDF
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => exportData('png')}>
+                                Export as PNG
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
             </div>
 
             {/* Filter Panel */}
