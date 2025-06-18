@@ -397,11 +397,11 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                             const serviced = parseInt(
                                                 row.original
                                                     .familyMembersServiced ||
-                                                    '0',
+                                                    '1',
                                             )
                                             return (
                                                 total +
-                                                (isNaN(serviced) ? 0 : serviced)
+                                                (isNaN(serviced) ? 1 : serviced)
                                             )
                                         }, 0)}
                                 </strong>{' '}

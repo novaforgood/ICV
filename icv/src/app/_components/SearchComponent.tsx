@@ -174,27 +174,33 @@ const SearchComponent = () => {
 
             // Apply search term filter if search term exists
             if (searchTerm.trim()) {
-                const searchTerms = searchTerm.toLowerCase().split(' ');
-                const firstName = client.firstName?.toLowerCase() || '';
-                const lastName = client.lastName?.toLowerCase() || '';
+                const searchTerms = searchTerm.toLowerCase().split(' ')
+                const firstName = client.firstName?.toLowerCase() || ''
+                const lastName = client.lastName?.toLowerCase() || ''
 
                 // If there's only one search term, check both first and last name
                 if (searchTerms.length === 1) {
-                    if (!firstName.includes(searchTerms[0]) && !lastName.includes(searchTerms[0])) {
-                        return false;
+                    if (
+                        !firstName.includes(searchTerms[0]) &&
+                        !lastName.includes(searchTerms[0])
+                    ) {
+                        return false
                     }
                 }
-                
+
                 // If there are two search terms, first term should match firstName and second term should match lastName
                 if (searchTerms.length === 2) {
-                    if (!firstName.includes(searchTerms[0]) || !lastName.includes(searchTerms[1])) {
-                        return false;
+                    if (
+                        !firstName.includes(searchTerms[0]) ||
+                        !lastName.includes(searchTerms[1])
+                    ) {
+                        return false
                     }
                 }
 
                 // If more than two terms, don't match
                 if (searchTerms.length > 2) {
-                    return false;
+                    return false
                 }
             }
 
@@ -398,11 +404,11 @@ const SearchComponent = () => {
                     <strong>
                         {displayedClients.reduce((total, client) => {
                             const familyMembers = parseInt(
-                                client.familyMembersServiced || '0',
+                                client.familyMembersServiced || '1',
                             )
                             return (
                                 total +
-                                (isNaN(familyMembers) ? 0 : familyMembers)
+                                (isNaN(familyMembers) ? 1 : familyMembers)
                             )
                         }, 0)}
                     </strong>{' '}
