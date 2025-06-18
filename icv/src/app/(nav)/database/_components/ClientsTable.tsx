@@ -135,18 +135,15 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
             }
 
             if (dateFilterType === 'calendar') {
-                if (selectedMonths.length === 0) return false;
-                if (!selectedMonths.includes(recordMonth)) return false;
+                if (selectedMonths.length === 0) return false
+                if (!selectedMonths.includes(recordMonth)) return false
             } else {
-                if (selectedQuarters.length === 0) return false;
-                const isInSelectedQuarter = selectedQuarters.some(
-                    (quarter) => {
-                        const quarterMonths =
-                            QUARTERS.find((q) => q.label === quarter)
-                                ?.months || []
-                        return quarterMonths.includes(recordMonth)
-                    },
-                )
+                if (selectedQuarters.length === 0) return false
+                const isInSelectedQuarter = selectedQuarters.some((quarter) => {
+                    const quarterMonths =
+                        QUARTERS.find((q) => q.label === quarter)?.months || []
+                    return quarterMonths.includes(recordMonth)
+                })
                 if (!isInSelectedQuarter) return false
             }
 
@@ -257,6 +254,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
     useEffect(() => {
         setCurrentPage(1)
     }, [globalFilter, sortField, sortDirection])
+
+    const anyColumnFiltered = table
+        .getAllColumns()
+        .some((col) => col.getIsFiltered?.())
 
     return (
         <div className="space-y-4">
@@ -429,15 +430,32 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                 </div>
                             </div>
                         </div>
-                        {hiddenColumns.length > 0 && (
-                            <button
-                                className="text-blue-600 hover:text-blue-800 ml-4 text-sm font-medium underline transition-colors"
-                                onClick={() => setHiddenColumns([])}
-                                type="button"
-                            >
-                                Unhide all
-                            </button>
-                        )}
+                        <div className="flex flex-row gap-4">
+                            {anyColumnFiltered && (
+                                <button
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium underline transition-colors"
+                                    onClick={() => {
+                                        table.getAllColumns().forEach((col) => {
+                                            if (col.getIsFiltered?.()) {
+                                                col.setFilterValue(undefined)
+                                            }
+                                        })
+                                    }}
+                                    type="button"
+                                >
+                                    Remove all filters
+                                </button>
+                            )}
+                            {hiddenColumns.length > 0 && (
+                                <button
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium underline transition-colors"
+                                    onClick={() => setHiddenColumns([])}
+                                    type="button"
+                                >
+                                    Unhide all
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* Table */}
@@ -547,37 +565,72 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                 paginatedRows.map((row) => (
                                     <TableRow
                                         key={row.id}
-                                        data-state={row.getIsSelected() && 'selected'}
+                                        data-state={
+                                            row.getIsSelected() && 'selected'
+                                        }
                                     >
-                                        {row.getVisibleCells().map((cell, index) => {
-                                            const isHidden = hiddenColumns.includes(cell.column.id)
-                                            const isLastColumn =
-                                                index === row.getVisibleCells().length - 1
-                                            return (
-                                                <TableCell
-                                                    key={cell.id}
-                                                    style={{
-                                                        width: cell.column.getSize(),
-                                                        background: isHidden ? '#f3f4f6' : undefined,
-                                                        color: isHidden ? '#a3a3a3' : undefined,
-                                                        opacity: isHidden ? 0.5 : 1,
-                                                        pointerEvents: isHidden ? 'none' : 'auto',
-                                                    }}
-                                                    className={isLastColumn ? 'border-r border-gray-200' : ''}
-                                                >
-                                                    <div style={{ pointerEvents: isHidden ? 'none' : 'auto' }}>
-                                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                    </div>
-                                                </TableCell>
-                                            )
-                                        })}
+                                        {row
+                                            .getVisibleCells()
+                                            .map((cell, index) => {
+                                                const isHidden =
+                                                    hiddenColumns.includes(
+                                                        cell.column.id,
+                                                    )
+                                                const isLastColumn =
+                                                    index ===
+                                                    row.getVisibleCells()
+                                                        .length -
+                                                        1
+                                                return (
+                                                    <TableCell
+                                                        key={cell.id}
+                                                        style={{
+                                                            width: cell.column.getSize(),
+                                                            background: isHidden
+                                                                ? '#f3f4f6'
+                                                                : undefined,
+                                                            color: isHidden
+                                                                ? '#a3a3a3'
+                                                                : undefined,
+                                                            opacity: isHidden
+                                                                ? 0.5
+                                                                : 1,
+                                                            pointerEvents:
+                                                                isHidden
+                                                                    ? 'none'
+                                                                    : 'auto',
+                                                        }}
+                                                        className={
+                                                            isLastColumn
+                                                                ? 'border-r border-gray-200'
+                                                                : ''
+                                                        }
+                                                    >
+                                                        <div
+                                                            style={{
+                                                                pointerEvents:
+                                                                    isHidden
+                                                                        ? 'none'
+                                                                        : 'auto',
+                                                            }}
+                                                        >
+                                                            {flexRender(
+                                                                cell.column
+                                                                    .columnDef
+                                                                    .cell,
+                                                                cell.getContext(),
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                )
+                                            })}
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
                                     <TableCell
                                         colSpan={CLIENT_TABLE_COLUMNS.length}
-                                        className="border-b border-[#D8DDE7] p-0 h-0"
+                                        className="h-0 border-b border-[#D8DDE7] p-0"
                                         style={{ height: 0, padding: 0 }}
                                     />
                                 </TableRow>

@@ -88,12 +88,12 @@ const FilterTags = ({
             {filters.map((filter, index) => (
                 <div
                     key={index}
-                    className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-sm"
+                    className="flex items-center gap-1 rounded-full bg-black text-white px-2 py-1 text-sm"
                 >
                     <span>{filter}</span>
                     <button
                         onClick={() => onClear(filter)}
-                        className="rounded-full p-0.5 hover:bg-gray-200"
+                        className="rounded-full p-0.5 hover:bg-gray-800"
                     >
                         <X className="h-3 w-3" />
                     </button>

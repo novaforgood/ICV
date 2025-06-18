@@ -125,10 +125,10 @@ const HousingStatusTable = () => {
                     return false
                 }
                 if (dateFilterType === 'calendar') {
-                    if (selectedMonths.length === 0) return false;
-                    if (!selectedMonths.includes(recordMonth)) return false;
+                    if (selectedMonths.length === 0) return false
+                    if (!selectedMonths.includes(recordMonth)) return false
                 } else {
-                    if (selectedQuarters.length === 0) return false;
+                    if (selectedQuarters.length === 0) return false
                     const isInSelectedQuarter = selectedQuarters.some(
                         (quarter) => {
                             const quarterMonths =
@@ -220,13 +220,16 @@ const HousingStatusTable = () => {
                         {/* record count and filter controls */}
                         <div className="flex flex-row items-center justify-between">
                             <div>
-                                <strong>{filteredData.length}</strong> Housing Records
+                                <strong>{filteredData.length}</strong> Housing
+                                Records
                             </div>
                             <div className="flex items-center gap-2">
                                 {/* housing status filter dropdown */}
                                 <Select
                                     value={statusFilter}
-                                    onValueChange={(value) => setStatusFilter(value)}
+                                    onValueChange={(value) =>
+                                        setStatusFilter(value)
+                                    }
                                 >
                                     <SelectTrigger className="w-[180px]">
                                         <SelectValue placeholder="Filter by status" />
@@ -236,7 +239,10 @@ const HousingStatusTable = () => {
                                             All Statuses
                                         </SelectItem>
                                         {HOUSING_STATUSES.map((status) => (
-                                            <SelectItem key={status} value={status}>
+                                            <SelectItem
+                                                key={status}
+                                                value={status}
+                                            >
                                                 {status}
                                             </SelectItem>
                                         ))}
@@ -257,14 +263,18 @@ const HousingStatusTable = () => {
                                     className="flex items-center gap-2"
                                 >
                                     <ArrowUpDown className="h-4 w-4" />
-                                    {sortOrder === 'newest' ? 'Oldest' : 'Newest'}
+                                    {sortOrder === 'newest'
+                                        ? 'Oldest'
+                                        : 'Newest'}
                                 </Button>
 
                                 {/* pagination controls */}
                                 <div className="flex items-center gap-2 text-neutral-800">
                                     <button
                                         onClick={() =>
-                                            setCurrentPage((p) => Math.max(p - 1, 1))
+                                            setCurrentPage((p) =>
+                                                Math.max(p - 1, 1),
+                                            )
                                         }
                                         disabled={currentPage === 1}
                                         className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
@@ -300,9 +310,13 @@ const HousingStatusTable = () => {
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>Date</TableHead>
-                                            <TableHead>Housing Status</TableHead>
+                                            <TableHead>
+                                                Housing Status
+                                            </TableHead>
                                             <TableHead>Housed by ICV</TableHead>
-                                            <TableHead>Client Profile</TableHead>
+                                            <TableHead>
+                                                Client Profile
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -311,7 +325,9 @@ const HousingStatusTable = () => {
                                                 <TableCell>
                                                     {record.date &&
                                                     !isNaN(
-                                                        new Date(record.date).getTime(),
+                                                        new Date(
+                                                            record.date,
+                                                        ).getTime(),
                                                     )
                                                         ? new Date(
                                                               record.date,
@@ -322,7 +338,7 @@ const HousingStatusTable = () => {
                                                     {record.housingStatus}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {record.housed_by_icv
+                                                    {record.housedByICV
                                                         ? 'Yes'
                                                         : 'No'}
                                                 </TableCell>
@@ -331,9 +347,10 @@ const HousingStatusTable = () => {
                                                         type="button"
                                                         onClick={() =>
                                                             router.push(
-                                                                `/clients/${record.clientID}`,
+                                                                `/clients/${record.clientID}/profile`,
                                                             )
                                                         }
+                                                        className="flex h-[32px] items-center justify-center rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
                                                     >
                                                         View
                                                     </button>
