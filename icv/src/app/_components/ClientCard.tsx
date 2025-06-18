@@ -7,48 +7,40 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 const formatDate = (date: Date | string | null | undefined) => {
-    if (!date) return 'No check-in'
+    const parsedDate = date ? new Date(date) : null
+    if (!parsedDate || isNaN(parsedDate.getTime())) return 'N/A'
 
-    let dateObj: Date
-    if (date instanceof Date) {
-        dateObj = date
-    } else {
-        try {
-            dateObj = new Date(date)
-            // Check if the date is valid
-            if (isNaN(dateObj.getTime())) {
-                return 'No check-in'
-            }
-        } catch (error) {
-            console.error('Error parsing date:', error)
-            return 'No check-in'
-        }
-    }
-
-    return dateObj.toLocaleDateString('en-CA', {
-        month: '2-digit',
-        day: '2-digit',
-        year: '2-digit',
+    return parsedDate.toLocaleDateString('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+        year: 'numeric',
     })
 }
 
 interface ClientCardProps {
     client: NewClient
     showLastCheckin?: boolean
+    docID?: string
 }
 
 const ClientCard: React.FC<ClientCardProps> = ({
     client,
     showLastCheckin = true,
+    docID,
 }) => {
     const [lastCheckIn, setLastCheckIn] = useState<Date | null>(null)
 
     useEffect(() => {
         const fetchLastCheckIn = async () => {
-            if ((client.docId, showLastCheckin)) {
+            if (docID && showLastCheckin) {
                 try {
-                    const date = await getLastCheckInDate(client.docId)
-                    setLastCheckIn(date)
+                    if (docID) {
+                        const date = await getLastCheckInDate(docID)
+                        setLastCheckIn(date)
+                    } else {
+                        console.error('client.docId is undefined')
+                        setLastCheckIn(null)
+                    }
                 } catch (error) {
                     console.error('Error fetching last check-in date:', error)
                     setLastCheckIn(null)

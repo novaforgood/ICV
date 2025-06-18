@@ -433,12 +433,6 @@ const SearchComponent = () => {
                                     </button>
                                 </div>
                             )}
-                            {/* {displayedClients.length === 0 &&
-                                !isLoadingPage && (
-                                    <div className="mt-8 text-center text-gray-500">
-                                        Loading clients...
-                                    </div>
-                                )} */}
                         </>
                     )}
                 </div>
