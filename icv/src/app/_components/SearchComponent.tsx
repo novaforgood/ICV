@@ -7,37 +7,26 @@ import {
 import ClientCard from '@/app/_components/ClientCard'
 import FilterPanel from '@/app/_components/FilterPanel'
 import { useUser } from '@/hooks/useUser'
-import type { NewClient } from '@/types/client-types'
+import { NewClient } from '@/types/client-types'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-interface ClientWithLastCheckin extends NewClient {
-    lastCheckinDate?: string
-}
 
 const ITEMS_PER_PAGE = 12
 
 const SearchComponent = () => {
-    // const router = useRouter()
-    // const searchParams = useSearchParams()
     const { user } = useUser()
     const [searchTerm, setSearchTerm] = useState('')
-    const [managerClients, setManagerClients] = useState<
-        ClientWithLastCheckin[]
-    >([])
-    const [allClients, setAllClients] = useState<ClientWithLastCheckin[]>([])
+    const [managerClients, setManagerClients] = useState<NewClient[]>([])
+    const [allClients, setAllClients] = useState<NewClient[]>([])
     const [sortedManagerClients, setSortedManagerClients] = useState<
-        ClientWithLastCheckin[]
+        NewClient[]
     >([])
-    const [sortedAllClients, setSortedAllClients] = useState<
-        ClientWithLastCheckin[]
-    >([])
+    const [sortedAllClients, setSortedAllClients] = useState<NewClient[]>([])
     const [isLoadingPage, setIsLoadingPage] = useState(false)
     const [sortBy, setSortBy] = useState<'asc' | 'desc' | null>(null)
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [activeTab, setActiveTab] = useState<'my' | 'all'>('my')
-    const [displayedClients, setDisplayedClients] = useState<
-        ClientWithLastCheckin[]
-    >([])
+    const [displayedClients, setDisplayedClients] = useState<NewClient[]>([])
     const [filters, setFilters] = useState<{
         selectedDates: string[]
         dateType: string
@@ -47,9 +36,7 @@ const SearchComponent = () => {
     })
     const [pageNumber, setPageNumber] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [currentPageItems, setCurrentPageItems] = useState<
-        ClientWithLastCheckin[]
-    >([])
+    const [currentPageItems, setCurrentPageItems] = useState<NewClient[]>([])
 
     useEffect(() => {
         const fetchClients = async () => {
@@ -62,8 +49,8 @@ const SearchComponent = () => {
                     getAllClientsByLastCheckinDate(),
                 ])
 
-                setManagerClients(managerClientsData as ClientWithLastCheckin[])
-                setAllClients(allClientsData as ClientWithLastCheckin[])
+                setManagerClients(managerClientsData as NewClient[])
+                setAllClients(allClientsData as NewClient[])
             } catch (err) {
                 console.error('Error fetching clients:', err)
             } finally {
@@ -76,18 +63,16 @@ const SearchComponent = () => {
 
     // Sort clients
     useEffect(() => {
-        const sortClients = (clients: ClientWithLastCheckin[]) => {
-            const withDates = clients.filter((client) => client.lastCheckinDate)
-            const withoutDates = clients.filter(
-                (client) => !client.lastCheckinDate,
-            )
+        const sortClients = (clients: NewClient[]) => {
+            const withDates = clients.filter((client) => client.intakeDate)
+            const withoutDates = clients.filter((client) => !client.intakeDate)
 
             const sortedWithDates = [...withDates].sort((a, b) => {
-                const dateA = a.lastCheckinDate
-                    ? new Date(a.lastCheckinDate).getTime()
+                const dateA = a.intakeDate
+                    ? new Date(a.intakeDate).getTime()
                     : 0
-                const dateB = b.lastCheckinDate
-                    ? new Date(b.lastCheckinDate).getTime()
+                const dateB = b.intakeDate
+                    ? new Date(b.intakeDate).getTime()
                     : 0
                 return sortBy === 'asc' ? dateA - dateB : dateB - dateA
             })
@@ -100,11 +85,11 @@ const SearchComponent = () => {
     }, [managerClients, allClients])
 
     // Apply filters to a list of clients
-    const applyFilters = (clients: ClientWithLastCheckin[]) => {
+    const applyFilters = (clients: NewClient[]) => {
         return clients.filter((client) => {
             // Apply date filter if dates are selected
             if (filters.selectedDates.length > 0) {
-                const clientDate = new Date(client.lastCheckinDate || '')
+                const clientDate = new Date(client.intakeDate || '')
                 if (isNaN(clientDate.getTime())) return false
 
                 switch (filters.dateType) {
@@ -153,9 +138,7 @@ const SearchComponent = () => {
             setIsLoadingPage(true)
             try {
                 // Apply filters to search results
-                const filtered = applyFilters(
-                    baseClients as ClientWithLastCheckin[],
-                )
+                const filtered = applyFilters(baseClients as NewClient[])
                 setDisplayedClients(filtered)
                 setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE))
 
@@ -221,7 +204,7 @@ const SearchComponent = () => {
 
     // Calculate paginated results
     useEffect(() => {
-        const getPaginatedResults = (items: ClientWithLastCheckin[]) => {
+        const getPaginatedResults = (items: NewClient[]) => {
             const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE
             const endIndex = startIndex + ITEMS_PER_PAGE
             console.log('items', items.slice(startIndex, endIndex))
