@@ -174,12 +174,28 @@ const SearchComponent = () => {
 
             // Apply search term filter if search term exists
             if (searchTerm.trim()) {
-                const searchLower = searchTerm.toLowerCase()
-                const matchesSearch =
-                    client.firstName?.toLowerCase().includes(searchLower) ||
-                    client.lastName?.toLowerCase().includes(searchLower) ||
-                    client.id?.toLowerCase().includes(searchLower)
-                if (!matchesSearch) return false
+                const searchTerms = searchTerm.toLowerCase().split(' ');
+                const firstName = client.firstName?.toLowerCase() || '';
+                const lastName = client.lastName?.toLowerCase() || '';
+
+                // If there's only one search term, check both first and last name
+                if (searchTerms.length === 1) {
+                    if (!firstName.includes(searchTerms[0]) && !lastName.includes(searchTerms[0])) {
+                        return false;
+                    }
+                }
+                
+                // If there are two search terms, first term should match firstName and second term should match lastName
+                if (searchTerms.length === 2) {
+                    if (!firstName.includes(searchTerms[0]) || !lastName.includes(searchTerms[1])) {
+                        return false;
+                    }
+                }
+
+                // If more than two terms, don't match
+                if (searchTerms.length > 2) {
+                    return false;
+                }
             }
 
             return true
