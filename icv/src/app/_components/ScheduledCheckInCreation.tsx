@@ -229,15 +229,11 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
                                             </button>
                                         </div>
                                     ) : (
-                                      clientName != null && clientName !== '' ? (
                                         <ClientSearch
-                                          key={clientName}
-                                          onSelect={setSelectedClientId}
-                                          initialSearch={clientName}
+                                            key={clientName}
+                                            onSelect={setSelectedClientId}
+                                            initialSearch={clientName}
                                         />
-                                      ) : (
-                                        <div>Loading…</div>
-                                      )
                                     )}
                                 </div>
 

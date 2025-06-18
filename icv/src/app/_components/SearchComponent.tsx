@@ -5,13 +5,20 @@ import {
     getClientByCaseManager,
 } from '@/api/clients'
 import ClientCard from '@/app/_components/ClientCard'
-import FilterPanel from '@/app/_components/FilterPanel'
+import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
 import { useUser } from '@/hooks/useUser'
 import { NewClient } from '@/types/client-types'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 const ITEMS_PER_PAGE = 12
+
+const QUARTERS = [
+    { label: 'Q1: JUL-SEP', months: ['7', '8', '9'] },
+    { label: 'Q2: OCT-DEC', months: ['10', '11', '12'] },
+    { label: 'Q3: JAN-MAR', months: ['1', '2', '3'] },
+    { label: 'Q4: APR-JUN', months: ['4', '5', '6'] },
+]
 
 const SearchComponent = () => {
     const { user } = useUser()
@@ -24,15 +31,19 @@ const SearchComponent = () => {
     const [sortedAllClients, setSortedAllClients] = useState<NewClient[]>([])
     const [isLoadingPage, setIsLoadingPage] = useState(false)
     const [sortBy, setSortBy] = useState<'asc' | 'desc' | null>(null)
-    const [isFilterOpen, setIsFilterOpen] = useState(false)
+    const [isFilterVisible, setIsFilterVisible] = useState(true)
     const [activeTab, setActiveTab] = useState<'my' | 'all'>('my')
     const [displayedClients, setDisplayedClients] = useState<NewClient[]>([])
     const [filters, setFilters] = useState<{
-        selectedDates: string[]
-        dateType: string
+        dateFilterType: 'calendar' | 'fiscal'
+        selectedYear: string
+        selectedMonths: string[]
+        selectedQuarters: string[]
     }>({
-        selectedDates: [],
-        dateType: 'Month',
+        dateFilterType: 'calendar',
+        selectedYear: 'all',
+        selectedMonths: [],
+        selectedQuarters: [],
     })
     const [pageNumber, setPageNumber] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
@@ -82,34 +93,69 @@ const SearchComponent = () => {
 
         setSortedManagerClients(sortClients(managerClients))
         setSortedAllClients(sortClients(allClients))
-    }, [managerClients, allClients])
+    }, [managerClients, allClients, sortBy])
+
+    const handleMonthToggle = (month: string) => {
+        setFilters((prev) => ({
+            ...prev,
+            selectedMonths: prev.selectedMonths.includes(month)
+                ? prev.selectedMonths.filter((m) => m !== month)
+                : [...prev.selectedMonths, month],
+        }))
+    }
+
+    const handleQuarterToggle = (quarter: string) => {
+        setFilters((prev) => ({
+            ...prev,
+            selectedQuarters: prev.selectedQuarters.includes(quarter)
+                ? prev.selectedQuarters.filter((q) => q !== quarter)
+                : [...prev.selectedQuarters, quarter],
+        }))
+    }
 
     // Apply filters to a list of clients
     const applyFilters = (clients: NewClient[]) => {
         return clients.filter((client) => {
             // Apply date filter if dates are selected
-            if (filters.selectedDates.length > 0) {
+            if (
+                filters.selectedYear !== 'all' ||
+                filters.selectedMonths.length > 0 ||
+                filters.selectedQuarters.length > 0
+            ) {
                 const clientDate = new Date(client.intakeDate || '')
                 if (isNaN(clientDate.getTime())) return false
 
-                switch (filters.dateType) {
-                    case 'Month':
-                        const month = clientDate.toLocaleString('default', {
-                            month: 'long',
-                        })
-                        if (!filters.selectedDates.includes(month)) return false
-                        break
-                    case 'Quarter':
-                        const quarter =
-                            Math.floor(clientDate.getMonth() / 3) + 1
-                        if (!filters.selectedDates.includes(`Q${quarter}`))
-                            return false
-                        break
-                    case 'Year':
-                    case 'Fiscal Year':
-                        const year = clientDate.getFullYear().toString()
-                        if (!filters.selectedDates.includes(year)) return false
-                        break
+                const clientYear = clientDate.getFullYear().toString()
+                const clientMonth = (clientDate.getMonth() + 1).toString()
+
+                // Filter by year
+                if (
+                    filters.selectedYear !== 'all' &&
+                    clientYear !== filters.selectedYear
+                ) {
+                    return false
+                }
+
+                // Filter by months or quarters based on date filter type
+                if (filters.dateFilterType === 'calendar') {
+                    if (
+                        filters.selectedMonths.length > 0 &&
+                        !filters.selectedMonths.includes(clientMonth)
+                    ) {
+                        return false
+                    }
+                } else {
+                    if (filters.selectedQuarters.length > 0) {
+                        const isInSelectedQuarter =
+                            filters.selectedQuarters.some((quarter) => {
+                                const quarterMonths = QUARTERS.find(
+                                    (q) => q.label === quarter,
+                                )?.months
+                                if (!quarterMonths) return false
+                                return quarterMonths.includes(clientMonth)
+                            })
+                        if (!isInSelectedQuarter) return false
+                    }
                 }
             }
 
@@ -123,7 +169,6 @@ const SearchComponent = () => {
                 if (!matchesSearch) return false
             }
 
-            // If we get here, the client passes all filters
             return true
         })
     }
@@ -133,50 +178,22 @@ const SearchComponent = () => {
         const baseClients =
             activeTab === 'my' ? sortedManagerClients : sortedAllClients
 
-        // If there's a search term, perform the search on the base clients
-        if (searchTerm.trim()) {
-            setIsLoadingPage(true)
-            try {
-                // Apply filters to search results
-                const filtered = applyFilters(baseClients as NewClient[])
-                setDisplayedClients(filtered)
-                setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE))
+        // Apply filters to base clients
+        const filtered = applyFilters(baseClients)
+        const newTotalPages = Math.max(
+            1,
+            Math.ceil(filtered.length / ITEMS_PER_PAGE),
+        )
 
-                console.log('filtered length:', filtered.length)
-                console.log('ITEMS_PER_PAGE:', ITEMS_PER_PAGE)
-                console.log(
-                    'total pages:',
-                    Math.ceil(filtered.length / ITEMS_PER_PAGE),
-                )
-                setPageNumber(1)
-            } catch (err) {
-                console.error('Error searching clients:', err)
-                setDisplayedClients([])
-            } finally {
-                setIsLoadingPage(false)
-            }
+        setDisplayedClients(filtered)
+        setTotalPages(newTotalPages)
+
+        // Ensure current page is valid for new total
+        if (pageNumber > newTotalPages) {
+            setPageNumber(newTotalPages)
         } else {
-            // If no search term, apply filters to base clients
-            const filtered = applyFilters(baseClients)
-            setDisplayedClients(filtered)
-            setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE))
-
-            console.log('filtered length:', filtered.length)
-            console.log('ITEMS_PER_PAGE:', ITEMS_PER_PAGE)
-            console.log(
-                'total pages:',
-                Math.ceil(filtered.length / ITEMS_PER_PAGE),
-            )
             setPageNumber(1)
         }
-
-        console.log('displayedClients:', displayedClients)
-        console.log('totalPages:', totalPages)
-        console.log('pageNumber:', pageNumber)
-        console.log('searchTerm:', searchTerm)
-        console.log('activeTab:', activeTab)
-        console.log('filters:', filters)
-        console.log('sortBy:', sortBy)
     }
 
     // Update displayed clients whenever relevant state changes
@@ -188,8 +205,10 @@ const SearchComponent = () => {
         return () => clearTimeout(debounceTimer)
     }, [
         activeTab,
-        filters.selectedDates,
-        filters.dateType,
+        filters.dateFilterType,
+        filters.selectedYear,
+        filters.selectedMonths,
+        filters.selectedQuarters,
         sortBy,
         searchTerm,
         sortedManagerClients,
@@ -204,15 +223,42 @@ const SearchComponent = () => {
 
     // Calculate paginated results
     useEffect(() => {
-        const getPaginatedResults = (items: NewClient[]) => {
-            const startIndex = (pageNumber - 1) * ITEMS_PER_PAGE
-            const endIndex = startIndex + ITEMS_PER_PAGE
-            console.log('items', items.slice(startIndex, endIndex))
-            console.log('items list', items)
-            setCurrentPageItems(items.slice(startIndex, endIndex))
+        if (!displayedClients.length) {
+            setCurrentPageItems([])
+            return
         }
-        getPaginatedResults(displayedClients)
+
+        // Ensure page number is within valid range
+        const maxPage = Math.max(
+            1,
+            Math.ceil(displayedClients.length / ITEMS_PER_PAGE),
+        )
+        const validPageNumber = Math.min(Math.max(1, pageNumber), maxPage)
+
+        if (validPageNumber !== pageNumber) {
+            setPageNumber(validPageNumber)
+            return
+        }
+
+        const startIndex = (validPageNumber - 1) * ITEMS_PER_PAGE
+        const endIndex = Math.min(
+            startIndex + ITEMS_PER_PAGE,
+            displayedClients.length,
+        )
+        const newPageItems = displayedClients.slice(startIndex, endIndex)
+        setCurrentPageItems(newPageItems)
     }, [pageNumber, displayedClients])
+
+    // Calculate available years
+    const years = Array.from(
+        new Set(
+            allClients.map((client) =>
+                client.intakeDate
+                    ? new Date(client.intakeDate).getFullYear()
+                    : NaN,
+            ),
+        ),
+    ).sort((a, b) => b - a)
 
     return (
         <div className="mx-auto w-full max-w-6xl p-4">
@@ -291,84 +337,26 @@ const SearchComponent = () => {
                     </svg>
                     {sortBy === 'asc' ? 'Sort by newest' : 'Sort by oldest'}
                 </button>
-                <button
-                    className="flex w-[200px] items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    onClick={() => setIsFilterOpen(true)}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        stroke="currentColor"
-                        className="h-4 w-4"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-                        />
-                    </svg>
-                    Filter check-in date
-                </button>
             </div>
 
-            <div className="width-full mb-4 mt-0 flex flex-wrap gap-2">
-                {filters.selectedDates.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                        {filters.selectedDates.map((date) => (
-                            <div
-                                key={date}
-                                className="flex border-spacing-0 items-center gap-1 rounded-full border-2 border-gray-300 bg-white px-3 py-1 text-sm text-black"
-                            >
-                                <div
-                                    onClick={() => {
-                                        const newSelectedDates =
-                                            filters.selectedDates.filter(
-                                                (d) => d !== date,
-                                            )
-                                        setFilters((prev) => ({
-                                            ...prev,
-                                            selectedDates: newSelectedDates,
-                                        }))
-                                    }}
-                                    className="mr-1 cursor-pointer rounded-full hover:bg-gray-300"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-4 w-4"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M6 18L18 6M6 6l12 12"
-                                        />
-                                    </svg>
-                                </div>
-                                <span>{date}</span>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+            <YearFilter
+                years={years}
+                isFilterVisible={isFilterVisible}
+                setIsFilterVisible={setIsFilterVisible}
+                dateFilterType={filters.dateFilterType}
+                setDateFilterType={(type) =>
+                    setFilters((prev) => ({ ...prev, dateFilterType: type }))
+                }
+                selectedYear={filters.selectedYear}
+                setSelectedYear={(year) =>
+                    setFilters((prev) => ({ ...prev, selectedYear: year }))
+                }
+                selectedMonths={filters.selectedMonths}
+                handleMonthToggle={handleMonthToggle}
+                selectedQuarters={filters.selectedQuarters}
+                handleQuarterToggle={handleQuarterToggle}
+            />
 
-            {isFilterOpen && (
-                <FilterPanel
-                    currentFilters={filters}
-                    onClose={() => {
-                        setIsFilterOpen(false)
-                        console.log('closed without applying filters')
-                    }}
-                    onFilter={(newFilters) => {
-                        setFilters(newFilters)
-                        setIsFilterOpen(false)
-                    }}
-                />
-            )}
             <div className="grid gap-4">
                 <div className="mb-4">
                     {isLoadingPage ? (
@@ -387,6 +375,7 @@ const SearchComponent = () => {
                                         <ClientCard
                                             client={client}
                                             showLastCheckin={true}
+                                            docID={client.id}
                                         />
                                     </Link>
                                 ))}
@@ -423,4 +412,5 @@ const SearchComponent = () => {
         </div>
     )
 }
+
 export default SearchComponent
