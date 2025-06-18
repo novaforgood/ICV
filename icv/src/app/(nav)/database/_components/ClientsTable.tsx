@@ -15,15 +15,13 @@ import {
     getFacetedRowModel,
     getFacetedUniqueValues,
     getFilteredRowModel,
-    getSortedRowModel,
     SortingState,
     useReactTable,
 } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react'
+import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
 import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
-import { CLIENT_TABLE_COLUMNS } from './client-table-columns'
 import { Button } from '@/components/ui/button'
 import {
     Select,
@@ -31,13 +29,17 @@ import {
     SelectItem,
     SelectTrigger,
 } from '@/components/ui/select'
+import { CLIENT_TABLE_COLUMNS } from './client-table-columns'
 
 interface ClientsTableProps {
     clients: NewClient[]
     isLoading?: boolean
 }
 
-const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false }) => {
+const ClientsTable: React.FC<ClientsTableProps> = ({
+    clients,
+    isLoading = false,
+}) => {
     const [globalFilter, setGlobalFilter] = useState('')
     const [sorting, setSorting] = useState<SortingState>([])
     const [currentPage, setCurrentPage] = useState(1)
@@ -161,7 +163,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
             if (sortField === 'intakeDate') {
                 const dateA = new Date(aValue as string)
                 const dateB = new Date(bValue as string)
-                return sortDirection === 'asc' 
+                return sortDirection === 'asc'
                     ? dateA.getTime() - dateB.getTime()
                     : dateB.getTime() - dateA.getTime()
             }
@@ -241,11 +243,38 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
                     <div className="flex flex-row justify-between">
                         {/* Search Input */}
                         <div className="flex flex-row items-center justify-between">
-                            <div>
-                                <strong>
-                                    {table.getFilteredRowModel().rows.length}
-                                </strong>{' '}
-                                ICV clients
+                            <div className="flex items-center gap-2">
+                                <div>
+                                    <strong>
+                                        {
+                                            table.getFilteredRowModel().rows
+                                                .length
+                                        }
+                                    </strong>{' '}
+                                    ICV clients
+                                </div>
+                                <span className="text-gray-400">/</span>
+                                <div>
+                                    <strong>
+                                        {table
+                                            .getFilteredRowModel()
+                                            .rows.reduce((total, row) => {
+                                                const serviced = parseInt(
+                                                    row.original
+                                                        .familyMembersServiced ||
+                                                        '0',
+                                                )
+                                                return (
+                                                    total +
+                                                    1 +
+                                                    (isNaN(serviced)
+                                                        ? 0
+                                                        : serviced)
+                                                )
+                                            }, 0)}
+                                    </strong>{' '}
+                                    Total clients
+                                </div>
                             </div>
                         </div>
 
@@ -260,24 +289,40 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
                                         <span>Sort by</span>
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="intakeDate">Intake Date</SelectItem>
-                                        <SelectItem value="firstName">First Name</SelectItem>
-                                        <SelectItem value="lastName">Last Name</SelectItem>
+                                        <SelectItem value="intakeDate">
+                                            Intake Date
+                                        </SelectItem>
+                                        <SelectItem value="firstName">
+                                            First Name
+                                        </SelectItem>
+                                        <SelectItem value="lastName">
+                                            Last Name
+                                        </SelectItem>
                                         <SelectItem value="age">Age</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                    onClick={() =>
+                                        setSortDirection((prev) =>
+                                            prev === 'asc' ? 'desc' : 'asc',
+                                        )
+                                    }
                                     className="flex items-center gap-2"
                                 >
                                     <ArrowUpDown className="h-4 w-4" />
-                                    {sortField === 'intakeDate' 
-                                        ? (sortDirection === 'asc' ? 'Oldest' : 'Newest')
+                                    {sortField === 'intakeDate'
+                                        ? sortDirection === 'asc'
+                                            ? 'Oldest'
+                                            : 'Newest'
                                         : sortField === 'age'
-                                        ? (sortDirection === 'asc' ? 'Lowest' : 'Highest')
-                                        : (sortDirection === 'asc' ? 'A-Z' : 'Z-A')}
+                                          ? sortDirection === 'asc'
+                                              ? 'Lowest'
+                                              : 'Highest'
+                                          : sortDirection === 'asc'
+                                            ? 'A-Z'
+                                            : 'Z-A'}
                                 </Button>
                             </div>
 
@@ -285,7 +330,9 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
                             <div className="flex items-center gap-2 text-neutral-800">
                                 <button
                                     onClick={() =>
-                                        setCurrentPage((p) => Math.max(p - 1, 1))
+                                        setCurrentPage((p) =>
+                                            Math.max(p - 1, 1),
+                                        )
                                     }
                                     disabled={currentPage === 1}
                                     className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
@@ -293,11 +340,13 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
                                     <ChevronLeft />
                                 </button>
                                 <div className="w-[120px] text-center tabular-nums">
-                                    {table.getFilteredRowModel().rows.length === 0
+                                    {table.getFilteredRowModel().rows.length ===
+                                    0
                                         ? '0 of 0'
                                         : `${(currentPage - 1) * rowsPerPage + 1}–${Math.min(
                                               currentPage * rowsPerPage,
-                                              table.getFilteredRowModel().rows.length,
+                                              table.getFilteredRowModel().rows
+                                                  .length,
                                           )} of ${table.getFilteredRowModel().rows.length}`}
                                 </div>
                                 <button
@@ -320,25 +369,35 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
                         <TableHeader>
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header, index) => {
-                                        const isLastColumn = index === headerGroup.headers.length - 1
-                                        return (
-                                            <TableHead
-                                                key={header.id}
-                                                style={{
-                                                    width: header.column.getSize(),
-                                                }}
-                                                className={isLastColumn ? 'border-r border-gray-200' : ''}
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    {flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext(),
-                                                    )}
-                                                </div>
-                                            </TableHead>
-                                        )
-                                    })}
+                                    {headerGroup.headers.map(
+                                        (header, index) => {
+                                            const isLastColumn =
+                                                index ===
+                                                headerGroup.headers.length - 1
+                                            return (
+                                                <TableHead
+                                                    key={header.id}
+                                                    style={{
+                                                        width: header.column.getSize(),
+                                                    }}
+                                                    className={
+                                                        isLastColumn
+                                                            ? 'border-r border-gray-200'
+                                                            : ''
+                                                    }
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        {flexRender(
+                                                            header.column
+                                                                .columnDef
+                                                                .header,
+                                                            header.getContext(),
+                                                        )}
+                                                    </div>
+                                                </TableHead>
+                                            )
+                                        },
+                                    )}
                                 </TableRow>
                             ))}
                         </TableHeader>
@@ -347,25 +406,38 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
                                 paginatedRows.map((row) => (
                                     <TableRow
                                         key={row.id}
-                                        data-state={row.getIsSelected() && 'selected'}
+                                        data-state={
+                                            row.getIsSelected() && 'selected'
+                                        }
                                     >
-                                        {row.getVisibleCells().map((cell, index) => {
-                                            const isLastColumn = index === row.getVisibleCells().length - 1
-                                            return (
-                                                <TableCell
-                                                    key={cell.id}
-                                                    style={{
-                                                        width: cell.column.getSize(),
-                                                    }}
-                                                    className={isLastColumn ? 'border-r border-gray-200' : ''}
-                                                >
-                                                    {flexRender(
-                                                        cell.column.columnDef.cell,
-                                                        cell.getContext(),
-                                                    )}
-                                                </TableCell>
-                                            )
-                                        })}
+                                        {row
+                                            .getVisibleCells()
+                                            .map((cell, index) => {
+                                                const isLastColumn =
+                                                    index ===
+                                                    row.getVisibleCells()
+                                                        .length -
+                                                        1
+                                                return (
+                                                    <TableCell
+                                                        key={cell.id}
+                                                        style={{
+                                                            width: cell.column.getSize(),
+                                                        }}
+                                                        className={
+                                                            isLastColumn
+                                                                ? 'border-r border-gray-200'
+                                                                : ''
+                                                        }
+                                                    >
+                                                        {flexRender(
+                                                            cell.column
+                                                                .columnDef.cell,
+                                                            cell.getContext(),
+                                                        )}
+                                                    </TableCell>
+                                                )
+                                            })}
                                     </TableRow>
                                 ))
                             ) : (
