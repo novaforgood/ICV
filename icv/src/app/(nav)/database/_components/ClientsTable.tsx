@@ -266,7 +266,6 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                                 )
                                                 return (
                                                     total +
-                                                    1 +
                                                     (isNaN(serviced)
                                                         ? 0
                                                         : serviced)

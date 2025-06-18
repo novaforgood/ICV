@@ -372,6 +372,28 @@ const SearchComponent = () => {
                 </button>
             </div>
 
+            {/* Count display */}
+            <div className="mb-4 flex items-center gap-2 text-sm text-gray-600">
+                <div>
+                    <strong>{displayedClients.length}</strong> ICV clients
+                </div>
+                <span className="text-gray-400">/</span>
+                <div>
+                    <strong>
+                        {displayedClients.reduce((total, client) => {
+                            const familyMembers = parseInt(
+                                client.familyMembersServiced || '0',
+                            )
+                            return (
+                                total +
+                                (isNaN(familyMembers) ? 0 : familyMembers)
+                            )
+                        }, 0)}
+                    </strong>{' '}
+                    Total clients
+                </div>
+            </div>
+
             {/* Side popup menu */}
             {isFilterVisible && (
                 <>
