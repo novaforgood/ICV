@@ -146,14 +146,29 @@ export const ClientProfileToggle = ({
                                 {housingStatuses.map((h) => (
                                     <div
                                         key={h.docID}
-                                        className="relative border-b pb-2"
+                                        className="relative border-b pb-4"
                                     >
                                         <div
                                             className={`grid ${editMode ? 'grid-cols-4' : 'grid-cols-3'}`}
                                         >
-                                            <p>{h.date}</p>
-                                            <p>{h.housedByICV}</p>
-                                            <p>{h.housingStatus}</p>
+                                            <div>
+                                                {h.date ? (
+                                                    new Date(
+                                                        h.date,
+                                                    ).toLocaleDateString(
+                                                        'en-US',
+                                                        {
+                                                            month: '2-digit',
+                                                            day: '2-digit',
+                                                            year: 'numeric',
+                                                        },
+                                                    )
+                                                ) : (
+                                                    <p>N/A</p>
+                                                )}
+                                            </div>
+                                            <p>{h.housedByICV || 'N/A'}</p>
+                                            <p>{h.housingStatus || 'N/A'}</p>
                                             {editMode && (
                                                 <div className="flex justify-end">
                                                     <button

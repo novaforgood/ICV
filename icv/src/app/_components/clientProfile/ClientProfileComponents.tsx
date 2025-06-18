@@ -72,7 +72,20 @@ export const ClientBio = ({ data }: ClientProps) => {
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                         Intake Date
                     </label>
-                    <div>{data.intakeDate || <p>N/A</p>}</div>
+                    <div>
+                        {data.intakeDate ? (
+                            new Date(data.intakeDate).toLocaleDateString(
+                                'en-US',
+                                {
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    year: 'numeric',
+                                },
+                            )
+                        ) : (
+                            <p>N/A</p>
+                        )}
+                    </div>
                 </div>
                 <div className="flex flex-col space-y-1">
                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
@@ -191,7 +204,13 @@ export const ClientHousing = ({
                             </label>
                             <div>
                                 {recentHousing.date ? (
-                                    recentHousing.date
+                                    new Date(
+                                        recentHousing.date,
+                                    ).toLocaleDateString('en-US', {
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        year: 'numeric',
+                                    })
                                 ) : (
                                     <p>N/A</p>
                                 )}
@@ -700,7 +719,13 @@ export const ClientSpouse = ({
                                 </label>
                                 <div>
                                     {data.spouse.spouseDOB ? (
-                                        <p>{data.spouse.spouseDOB}</p>
+                                        new Date(
+                                            data.spouse.spouseDOB,
+                                        ).toLocaleDateString('en-US', {
+                                            month: '2-digit',
+                                            day: '2-digit',
+                                            year: 'numeric',
+                                        })
                                     ) : (
                                         <p>N/A</p>
                                     )}
@@ -878,7 +903,20 @@ export const ClientDependents = ({ data }: ClientProps) => {
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     DOB
                                 </label>
-                                <div>{child.dob ? child.dob : <p>N/A</p>}</div>
+                                <div>
+                                    {child.dob ? (
+                                        new Date(child.dob).toLocaleDateString(
+                                            'en-US',
+                                            {
+                                                month: '2-digit',
+                                                day: '2-digit',
+                                                year: 'numeric',
+                                            },
+                                        )
+                                    ) : (
+                                        <p>N/A</p>
+                                    )}
+                                </div>
                             </div>
                             <div className="flex flex-col space-y-1">
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
