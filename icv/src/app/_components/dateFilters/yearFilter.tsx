@@ -44,6 +44,7 @@ interface YearFilterProps {
     selectedQuarters?: string[]
     handleQuarterToggle: (quarter: string) => void
     layout?: 'horizontal' | 'vertical'
+    showToggle?: boolean
 }
 
 export const YearFilter: React.FC<YearFilterProps> = ({
@@ -59,26 +60,29 @@ export const YearFilter: React.FC<YearFilterProps> = ({
     selectedQuarters = [],
     handleQuarterToggle,
     layout = 'horizontal',
+    showToggle = true,
 }) => {
     return (
         <div className="flex-1 space-y-[20px]">
             {/* Filter toggle button */}
-            <button
-                onClick={() => setIsFilterVisible(!isFilterVisible)}
-                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-            >
-                {isFilterVisible ? (
-                    <>
-                        <ChevronUp className="h-4 w-4" />
-                        Hide Filters
-                    </>
-                ) : (
-                    <>
-                        <ChevronDown className="h-4 w-4" />
-                        Show Filters
-                    </>
-                )}
-            </button>
+            {showToggle && (
+                <button
+                    onClick={() => setIsFilterVisible(!isFilterVisible)}
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                >
+                    {isFilterVisible ? (
+                        <>
+                            <ChevronUp className="h-4 w-4" />
+                            Hide Filters
+                        </>
+                    ) : (
+                        <>
+                            <ChevronDown className="h-4 w-4" />
+                            Show Filters
+                        </>
+                    )}
+                </button>
+            )}
 
             {/* filter panel */}
             {isFilterVisible && (

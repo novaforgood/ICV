@@ -42,7 +42,7 @@ const SearchComponent = () => {
     }>({
         dateFilterType: 'calendar',
         selectedYear: 'all',
-        selectedMonths: [],
+        selectedMonths: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
         selectedQuarters: [],
     })
     const [pageNumber, setPageNumber] = useState(1)
@@ -291,7 +291,7 @@ const SearchComponent = () => {
                 </div>
             </div>
 
-            <div className="mb-8 flex items-center gap-4">
+            <div className="mb-8 mt-8 flex items-center gap-4">
                 <div className="flex flex-1 flex-row items-center gap-2 rounded bg-midground px-4 py-2 text-black">
                     <svg
                         className="h-4 w-4 flex-shrink-0 -translate-y-[1px] text-gray-700"
@@ -337,25 +337,87 @@ const SearchComponent = () => {
                     </svg>
                     {sortBy === 'asc' ? 'Sort by newest' : 'Sort by oldest'}
                 </button>
+                <button
+                    className="flex w-[170px] items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsFilterVisible(!isFilterVisible)}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="h-4 w-4"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
+                        />
+                    </svg>
+                    Filter by date
+                </button>
             </div>
 
-            <YearFilter
-                years={years}
-                isFilterVisible={isFilterVisible}
-                setIsFilterVisible={setIsFilterVisible}
-                dateFilterType={filters.dateFilterType}
-                setDateFilterType={(type) =>
-                    setFilters((prev) => ({ ...prev, dateFilterType: type }))
-                }
-                selectedYear={filters.selectedYear}
-                setSelectedYear={(year) =>
-                    setFilters((prev) => ({ ...prev, selectedYear: year }))
-                }
-                selectedMonths={filters.selectedMonths}
-                handleMonthToggle={handleMonthToggle}
-                selectedQuarters={filters.selectedQuarters}
-                handleQuarterToggle={handleQuarterToggle}
-            />
+            {/* Side popup menu */}
+            {isFilterVisible && (
+                <>
+                    {/* Backdrop */}
+                    <div
+                        className="fixed inset-0 z-40 bg-black bg-opacity-50"
+                        onClick={() => setIsFilterVisible(false)}
+                    />
+                    {/* Side menu */}
+                    <div className="fixed right-0 top-0 z-50 h-full w-[400px] bg-white p-6 shadow-xl">
+                        <div className="mb-6 flex items-center justify-between">
+                            <h2 className="text-xl font-semibold">Filter by Date</h2>
+                            <button
+                                onClick={() => setIsFilterVisible(false)}
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="h-6 w-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                        <YearFilter
+                            years={years}
+                            isFilterVisible={isFilterVisible}
+                            setIsFilterVisible={setIsFilterVisible}
+                            dateFilterType={filters.dateFilterType}
+                            setDateFilterType={(type) =>
+                                setFilters((prev) => ({
+                                    ...prev,
+                                    dateFilterType: type,
+                                    selectedMonths: type === 'calendar' ? ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'] : [],
+                                    selectedQuarters: type === 'fiscal' ? ['Q1: JUL-SEP', 'Q2: OCT-DEC', 'Q3: JAN-MAR', 'Q4: APR-JUN'] : []
+                                }))
+                            }
+                            selectedYear={filters.selectedYear}
+                            setSelectedYear={(year) =>
+                                setFilters((prev) => ({ ...prev, selectedYear: year }))
+                            }
+                            selectedMonths={filters.selectedMonths}
+                            handleMonthToggle={handleMonthToggle}
+                            selectedQuarters={filters.selectedQuarters}
+                            handleQuarterToggle={handleQuarterToggle}
+                            layout="vertical"
+                            showToggle={false}
+                        />
+                    </div>
+                </>
+            )}
 
             <div className="grid gap-4">
                 <div className="mb-4">
