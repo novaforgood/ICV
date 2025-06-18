@@ -2,15 +2,10 @@
 
 import Symbol from '@/components/Symbol'
 import { MultiCheckbox } from '@/components/ui/multi-checkbox'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectTrigger } from '@/components/ui/select'
 import { NewClient } from '@/types/client-types'
-import { ColumnDef, createColumnHelper, FilterFn } from '@tanstack/react-table'
-import { ArrowUpDown, X } from 'lucide-react'
+import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
+import { X } from 'lucide-react'
 
 // Define the filter value type
 interface DateFilterValue {
@@ -28,7 +23,7 @@ const QUARTERS = [
     { label: 'Q4: APR-JUN', months: ['10', '11', '12'] as const },
 ] as const
 
-type Quarter = typeof QUARTERS[number]
+type Quarter = (typeof QUARTERS)[number]
 type QuarterLabel = Quarter['label']
 type QuarterMonths = Quarter['months'][number]
 
@@ -143,22 +138,34 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
             const month = (date.getMonth() + 1).toString()
 
             // Filter by year
-            if (filterValue.year !== 'all' && year !== parseInt(filterValue.year)) {
+            if (
+                filterValue.year !== 'all' &&
+                year !== parseInt(filterValue.year)
+            ) {
                 return false
             }
 
             // Filter by months or quarters based on date filter type
             if (filterValue.type === 'calendar') {
-                if (filterValue.months.length > 0 && !filterValue.months.includes(month)) {
+                if (
+                    filterValue.months.length > 0 &&
+                    !filterValue.months.includes(month)
+                ) {
                     return false
                 }
             } else {
                 if (filterValue.quarters.length > 0) {
-                    const isInSelectedQuarter = filterValue.quarters.some((quarter) => {
-                        const quarterMonths = QUARTERS.find((q) => q.label === quarter)?.months
-                        if (!quarterMonths) return false
-                        return (quarterMonths as readonly string[]).includes(month)
-                    })
+                    const isInSelectedQuarter = filterValue.quarters.some(
+                        (quarter) => {
+                            const quarterMonths = QUARTERS.find(
+                                (q) => q.label === quarter,
+                            )?.months
+                            if (!quarterMonths) return false
+                            return (
+                                quarterMonths as readonly string[]
+                            ).includes(month)
+                        },
+                    )
                     if (!isInSelectedQuarter) return false
                 }
             }
@@ -497,9 +504,16 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
     columnHelper.accessor('homeless', {
         header: ({ column }) => {
             const homelessOptions = [
-                { label: 'Yes', value: 'Yes' },
-                { label: 'No', value: 'No' },
+                { label: 'Homeless', value: 'Homeless' },
                 { label: 'At risk', value: 'At risk' },
+                { label: 'Vehicle', value: 'Vehicle' },
+                { label: 'Sheltered', value: 'Sheltered' },
+                {
+                    label: 'Transitional housing',
+                    value: 'Transitional housing',
+                },
+                { label: 'Rehabilitation', value: 'Rehabilitation' },
+                { label: 'Permanently housed', value: 'Permanently housed' },
             ]
 
             const selectedFilters = (column.getFilterValue() as string[]) ?? []
@@ -507,7 +521,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
             return (
                 <div className="flex w-full flex-col">
                     <div className="flex w-full items-center justify-between">
-                        <div>Homeless</div>
+                        <div>Housing Status</div>
                         <Select
                             onValueChange={(value) => {
                                 if (value === 'all') {
