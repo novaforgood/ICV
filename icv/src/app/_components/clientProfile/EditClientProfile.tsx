@@ -138,7 +138,7 @@ export const ClientProfileToggle = ({
                                     className={`grid ${editMode ? 'grid-cols-4' : 'grid-cols-3'} border-b pb-2 font-bold`}
                                 >
                                     <p>Date</p>
-                                    <p>Housed by ICV</p>
+                                    <p>Sheltered by ICV</p>
                                     <p>Housing status</p>
                                 </div>
                             </div>
@@ -251,9 +251,17 @@ export const ClientProfileToggle = ({
                             <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
                                 HOUSING
                             </label>
+
                             <ClientHousing
                                 data={client}
                                 setShowHousingLog={setShowHousingLog}
+                                recentHousing={
+                                    housingStatuses.length > 0
+                                        ? housingStatuses[
+                                              housingStatuses.length - 1
+                                          ]
+                                        : undefined
+                                }
                             />
                         </div>
                     </>
