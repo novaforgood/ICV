@@ -10,12 +10,18 @@ import HousingStatusTable from './_components/HousingStatusTable'
 const DatabasePage = () => {
     const [activeView, setActiveView] = useState<'table' | 'chart' | 'housing'>('table')
     const [clients, setClients] = useState<NewClient[]>([])
+    const [isLoading, setIsLoading] = useState(true)
 
     // Fetch clients when component mounts
     useEffect(() => {
         const fetchClients = async () => {
-            const data = await getAllClients()
-            setClients(data)
+            setIsLoading(true)
+            try {
+                const data = await getAllClients()
+                setClients(data)
+            } finally {
+                setIsLoading(false)
+            }
         }
         fetchClients()
     }, [])
@@ -71,7 +77,7 @@ const DatabasePage = () => {
 
             {/* Conditional Rendering */}
             {activeView === 'table' ? (
-                <ClientsTable clients={clients} />
+                <ClientsTable clients={clients} isLoading={isLoading} />
             ) : activeView === 'chart' ? (
                 <PieChart />
             ) : (

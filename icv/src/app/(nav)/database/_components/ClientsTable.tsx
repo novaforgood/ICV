@@ -34,9 +34,10 @@ import {
 
 interface ClientsTableProps {
     clients: NewClient[]
+    isLoading?: boolean
 }
 
-const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
+const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false }) => {
     const [globalFilter, setGlobalFilter] = useState('')
     const [sorting, setSorting] = useState<SortingState>([])
     const [currentPage, setCurrentPage] = useState(1)
@@ -231,142 +232,150 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients }) => {
                 handleQuarterToggle={handleQuarterToggle}
             />
 
-            <div className="flex flex-row justify-between">
-                {/* Search Input */}
-                <div className="flex flex-row items-center justify-between">
-                    <div>
-                        <strong>
-                            {table.getFilteredRowModel().rows.length}
-                        </strong>{' '}
-                        ICV clients
-                    </div>
+            {isLoading ? (
+                <div className="flex h-[400px] items-center justify-center text-lg">
+                    Loading clients...
                 </div>
-
-                <div className="flex items-center gap-4">
-                    {/* Sort Controls */}
-                    <div className="flex items-center gap-2">
-                        <Select
-                            value={sortField}
-                            onValueChange={setSortField}
-                        >
-                            <SelectTrigger className="w-[180px]">
-                                <span>Sort by</span>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="intakeDate">Intake Date</SelectItem>
-                                <SelectItem value="firstName">First Name</SelectItem>
-                                <SelectItem value="lastName">Last Name</SelectItem>
-                                <SelectItem value="age">Age</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
-                            className="flex items-center gap-2"
-                        >
-                            <ArrowUpDown className="h-4 w-4" />
-                            {sortField === 'intakeDate' 
-                                ? (sortDirection === 'asc' ? 'Oldest' : 'Newest')
-                                : sortField === 'age'
-                                ? (sortDirection === 'asc' ? 'Lowest' : 'Highest')
-                                : (sortDirection === 'asc' ? 'A-Z' : 'Z-A')}
-                        </Button>
-                    </div>
-
-                    {/* Pagination Controls */}
-                    <div className="flex items-center gap-2 text-neutral-800">
-                        <button
-                            onClick={() =>
-                                setCurrentPage((p) => Math.max(p - 1, 1))
-                            }
-                            disabled={currentPage === 1}
-                            className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
-                        >
-                            <ChevronLeft />
-                        </button>
-                        <div className="w-[120px] text-center tabular-nums">
-                            {table.getFilteredRowModel().rows.length === 0
-                                ? '0 of 0'
-                                : `${(currentPage - 1) * rowsPerPage + 1}–${Math.min(
-                                      currentPage * rowsPerPage,
-                                      table.getFilteredRowModel().rows.length,
-                                  )} of ${table.getFilteredRowModel().rows.length}`}
+            ) : (
+                <>
+                    <div className="flex flex-row justify-between">
+                        {/* Search Input */}
+                        <div className="flex flex-row items-center justify-between">
+                            <div>
+                                <strong>
+                                    {table.getFilteredRowModel().rows.length}
+                                </strong>{' '}
+                                ICV clients
+                            </div>
                         </div>
-                        <button
-                            onClick={() =>
-                                setCurrentPage((p) =>
-                                    Math.min(p + 1, pageCount),
-                                )
-                            }
-                            disabled={currentPage === pageCount}
-                            className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
-                        >
-                            <ChevronRight />
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            {/* Table */}
-            <Table className="table-fixed">
-                <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead
-                                        key={header.id}
-                                        style={{
-                                            width: header.column.getSize(),
-                                        }}
+                        <div className="flex items-center gap-4">
+                            {/* Sort Controls */}
+                            <div className="flex items-center gap-2">
+                                <Select
+                                    value={sortField}
+                                    onValueChange={setSortField}
+                                >
+                                    <SelectTrigger className="w-[180px]">
+                                        <span>Sort by</span>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="intakeDate">Intake Date</SelectItem>
+                                        <SelectItem value="firstName">First Name</SelectItem>
+                                        <SelectItem value="lastName">Last Name</SelectItem>
+                                        <SelectItem value="age">Age</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')}
+                                    className="flex items-center gap-2"
+                                >
+                                    <ArrowUpDown className="h-4 w-4" />
+                                    {sortField === 'intakeDate' 
+                                        ? (sortDirection === 'asc' ? 'Oldest' : 'Newest')
+                                        : sortField === 'age'
+                                        ? (sortDirection === 'asc' ? 'Lowest' : 'Highest')
+                                        : (sortDirection === 'asc' ? 'A-Z' : 'Z-A')}
+                                </Button>
+                            </div>
+
+                            {/* Pagination Controls */}
+                            <div className="flex items-center gap-2 text-neutral-800">
+                                <button
+                                    onClick={() =>
+                                        setCurrentPage((p) => Math.max(p - 1, 1))
+                                    }
+                                    disabled={currentPage === 1}
+                                    className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
+                                >
+                                    <ChevronLeft />
+                                </button>
+                                <div className="w-[120px] text-center tabular-nums">
+                                    {table.getFilteredRowModel().rows.length === 0
+                                        ? '0 of 0'
+                                        : `${(currentPage - 1) * rowsPerPage + 1}–${Math.min(
+                                              currentPage * rowsPerPage,
+                                              table.getFilteredRowModel().rows.length,
+                                          )} of ${table.getFilteredRowModel().rows.length}`}
+                                </div>
+                                <button
+                                    onClick={() =>
+                                        setCurrentPage((p) =>
+                                            Math.min(p + 1, pageCount),
+                                        )
+                                    }
+                                    disabled={currentPage === pageCount}
+                                    className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
+                                >
+                                    <ChevronRight />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Table */}
+                    <Table className="table-fixed">
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <TableHead
+                                                key={header.id}
+                                                style={{
+                                                    width: header.column.getSize(),
+                                                }}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    {flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext(),
+                                                    )}
+                                                </div>
+                                            </TableHead>
+                                        )
+                                    })}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {paginatedRows.length ? (
+                                paginatedRows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={row.getIsSelected() && 'selected'}
                                     >
-                                        <div className="flex items-center justify-between">
-                                            {flexRender(
-                                                header.column.columnDef.header,
-                                                header.getContext(),
-                                            )}
-                                        </div>
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {paginatedRows.length ? (
-                        paginatedRows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                data-state={row.getIsSelected() && 'selected'}
-                            >
-                                {row.getVisibleCells().map((cell) => (
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell
+                                                key={cell.id}
+                                                style={{
+                                                    width: cell.column.getSize(),
+                                                }}
+                                            >
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext(),
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
                                     <TableCell
-                                        key={cell.id}
-                                        style={{
-                                            width: cell.column.getSize(),
-                                        }}
+                                        colSpan={CLIENT_TABLE_COLUMNS.length}
+                                        className="h-24 text-center"
                                     >
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext(),
-                                        )}
+                                        No results.
                                     </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell
-                                colSpan={CLIENT_TABLE_COLUMNS.length}
-                                className="h-24 text-center"
-                            >
-                                No results.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </>
+            )}
         </div>
     )
 }

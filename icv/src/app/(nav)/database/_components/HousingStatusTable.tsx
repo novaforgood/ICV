@@ -45,6 +45,7 @@ const HousingStatusTable = () => {
     // State management for data and UI
     const [housingData, setHousingData] = useState<any[]>([])
     const [filteredData, setFilteredData] = useState<any[]>([])
+    const [isLoading, setIsLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
     const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest')
     const [statusFilter, setStatusFilter] = useState<string>('all')
@@ -80,8 +81,13 @@ const HousingStatusTable = () => {
     // fetch housing status data on component mount
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getAllHousing()
-            setHousingData(data)
+            setIsLoading(true)
+            try {
+                const data = await getAllHousing()
+                setHousingData(data)
+            } finally {
+                setIsLoading(false)
+            }
         }
         fetchData()
     }, [])
@@ -210,133 +216,141 @@ const HousingStatusTable = () => {
                     handleQuarterToggle={handleQuarterToggle}
                 />
 
-                {/* record count and filter controls */}
-                <div className="flex flex-row items-center justify-between">
-                    <div>
-                        <strong>{filteredData.length}</strong> Housing Records
+                {isLoading ? (
+                    <div className="flex h-[400px] items-center justify-center text-lg">
+                        Loading records...
                     </div>
-                    <div className="flex items-center gap-2">
-                        {/* housing status filter dropdown */}
-                        <Select
-                            value={statusFilter}
-                            onValueChange={(value) => setStatusFilter(value)}
-                        >
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Filter by status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="all">
-                                    All Statuses
-                                </SelectItem>
-                                {HOUSING_STATUSES.map((status) => (
-                                    <SelectItem key={status} value={status}>
-                                        {status}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        {/* sort order toggle button */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                                setSortOrder(
-                                    sortOrder === 'newest'
-                                        ? 'oldest'
-                                        : 'newest',
-                                )
-                            }
-                            className="flex items-center gap-2"
-                        >
-                            <ArrowUpDown className="h-4 w-4" />
-                            {sortOrder === 'newest' ? 'Oldest' : 'Newest'}
-                        </Button>
-
-                        {/* pagination controls */}
-                        <div className="flex items-center gap-2 text-neutral-800">
-                            <button
-                                onClick={() =>
-                                    setCurrentPage((p) => Math.max(p - 1, 1))
-                                }
-                                disabled={currentPage === 1}
-                                className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                            </button>
-
-                            <div className="w-[120px] text-center tabular-nums">
-                                {filteredData.length === 0
-                                    ? '0 of 0'
-                                    : `${startIndex + 1}–${Math.min(endIndex, filteredData.length)} of ${filteredData.length}`}
+                ) : (
+                    <>
+                        {/* record count and filter controls */}
+                        <div className="flex flex-row items-center justify-between">
+                            <div>
+                                <strong>{filteredData.length}</strong> Housing Records
                             </div>
+                            <div className="flex items-center gap-2">
+                                {/* housing status filter dropdown */}
+                                <Select
+                                    value={statusFilter}
+                                    onValueChange={(value) => setStatusFilter(value)}
+                                >
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Filter by status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">
+                                            All Statuses
+                                        </SelectItem>
+                                        {HOUSING_STATUSES.map((status) => (
+                                            <SelectItem key={status} value={status}>
+                                                {status}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
 
-                            <button
-                                onClick={() =>
-                                    setCurrentPage((p) =>
-                                        Math.min(p + 1, totalPages),
-                                    )
-                                }
-                                disabled={currentPage === totalPages}
-                                className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
-                            >
-                                <ChevronRight className="h-4 w-4" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                                {/* sort order toggle button */}
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() =>
+                                        setSortOrder(
+                                            sortOrder === 'newest'
+                                                ? 'oldest'
+                                                : 'newest',
+                                        )
+                                    }
+                                    className="flex items-center gap-2"
+                                >
+                                    <ArrowUpDown className="h-4 w-4" />
+                                    {sortOrder === 'newest' ? 'Oldest' : 'Newest'}
+                                </Button>
 
-                {/* data table */}
-                <div className="space-y-[16px]">
-                    <div className="rounded-md border">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Housing Status</TableHead>
-                                    <TableHead>Housed by ICV</TableHead>
-                                    <TableHead>Client Profile</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {currentData.map((record, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>
-                                            {record.date &&
-                                            !isNaN(
-                                                new Date(record.date).getTime(),
+                                {/* pagination controls */}
+                                <div className="flex items-center gap-2 text-neutral-800">
+                                    <button
+                                        onClick={() =>
+                                            setCurrentPage((p) => Math.max(p - 1, 1))
+                                        }
+                                        disabled={currentPage === 1}
+                                        className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
+                                    >
+                                        <ChevronLeft className="h-4 w-4" />
+                                    </button>
+
+                                    <div className="w-[120px] text-center tabular-nums">
+                                        {filteredData.length === 0
+                                            ? '0 of 0'
+                                            : `${startIndex + 1}–${Math.min(endIndex, filteredData.length)} of ${filteredData.length}`}
+                                    </div>
+
+                                    <button
+                                        onClick={() =>
+                                            setCurrentPage((p) =>
+                                                Math.min(p + 1, totalPages),
                                             )
-                                                ? new Date(
-                                                      record.date,
-                                                  ).toLocaleDateString()
-                                                : 'N/A'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {record.housingStatus}
-                                        </TableCell>
-                                        <TableCell>
-                                            {record.housed_by_icv
-                                                ? 'Yes'
-                                                : 'No'}
-                                        </TableCell>
-                                        <TableCell>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    router.push(
-                                                        `/clients/${record.clientID}`,
+                                        }
+                                        disabled={currentPage === totalPages}
+                                        className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
+                                    >
+                                        <ChevronRight className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* data table */}
+                        <div className="space-y-[16px]">
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Housing Status</TableHead>
+                                            <TableHead>Housed by ICV</TableHead>
+                                            <TableHead>Client Profile</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {currentData.map((record, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell>
+                                                    {record.date &&
+                                                    !isNaN(
+                                                        new Date(record.date).getTime(),
                                                     )
-                                                }
-                                            >
-                                                View
-                                            </button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </div>
+                                                        ? new Date(
+                                                              record.date,
+                                                          ).toLocaleDateString()
+                                                        : 'N/A'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {record.housingStatus}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {record.housed_by_icv
+                                                        ? 'Yes'
+                                                        : 'No'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            router.push(
+                                                                `/clients/${record.clientID}`,
+                                                            )
+                                                        }
+                                                    >
+                                                        View
+                                                    </button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     )
