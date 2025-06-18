@@ -218,18 +218,18 @@ const PieChart = () => {
                     .set({
                         filename,
                         image: { type: 'jpeg', quality: 1 },
-                        html2canvas: { 
-                            scale: 3,
+                        html2canvas: {
+                            scale: 2,
                             useCORS: true,
                             scrollY: 0,
                             logging: false,
-                            backgroundColor: '#ffffff'
+                            backgroundColor: '#ffffff',
                         },
                         jsPDF: {
                             unit: 'in',
                             format: 'a4',
                             orientation: 'portrait',
-                            compress: true
+                            compress: true,
                         },
                     })
                     .from(el)
@@ -289,11 +289,17 @@ const PieChart = () => {
                         Loading data...
                     </div>
                 ) : (
-                    <div id="exportContainer" className="w-full p-8 flex flex-col items-center">
+                    <div
+                        id="exportContainer"
+                        className="flex w-full flex-col items-center p-8"
+                    >
                         {viewMode === 'chart' ? (
                             <div className="flex flex-col items-center">
                                 <div className="relative h-[500px] w-[500px]">
-                                    <ResponsiveContainer width="100%" height="100%">
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height="100%"
+                                    >
                                         <RechartsPieChart>
                                             <Pie
                                                 data={data}
@@ -307,7 +313,12 @@ const PieChart = () => {
                                                 {data.map((entry, idx) => (
                                                     <Cell
                                                         key={entry.name}
-                                                        fill={COLORS[idx % COLORS.length]}
+                                                        fill={
+                                                            COLORS[
+                                                                idx %
+                                                                    COLORS.length
+                                                            ]
+                                                        }
                                                     />
                                                 ))}
                                             </Pie>
@@ -328,7 +339,9 @@ const PieChart = () => {
                                 <div className="mt-12 flex justify-center gap-16">
                                     {data.map((entry, idx) => {
                                         const percent = total
-                                            ? Math.round((entry.value / total) * 100)
+                                            ? Math.round(
+                                                  (entry.value / total) * 100,
+                                              )
                                             : 0
                                         return (
                                             <div
@@ -340,7 +353,10 @@ const PieChart = () => {
                                                         className="inline-block h-4 w-4 rounded-full"
                                                         style={{
                                                             backgroundColor:
-                                                                COLORS[idx % COLORS.length],
+                                                                COLORS[
+                                                                    idx %
+                                                                        COLORS.length
+                                                                ],
                                                         }}
                                                     />
                                                     <span className="font-semibold text-gray-700">
@@ -348,7 +364,8 @@ const PieChart = () => {
                                                     </span>
                                                 </div>
                                                 <div className="text-sm text-gray-500">
-                                                    {entry.value.toLocaleString()} ({percent}%)
+                                                    {entry.value.toLocaleString()}{' '}
+                                                    ({percent}%)
                                                 </div>
                                             </div>
                                         )

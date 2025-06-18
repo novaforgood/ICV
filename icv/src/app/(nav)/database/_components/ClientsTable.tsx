@@ -320,13 +320,15 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
                         <TableHeader>
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => {
+                                    {headerGroup.headers.map((header, index) => {
+                                        const isLastColumn = index === headerGroup.headers.length - 1
                                         return (
                                             <TableHead
                                                 key={header.id}
                                                 style={{
                                                     width: header.column.getSize(),
                                                 }}
+                                                className={isLastColumn ? 'border-r border-gray-200' : ''}
                                             >
                                                 <div className="flex items-center justify-between">
                                                     {flexRender(
@@ -347,19 +349,23 @@ const ClientsTable: React.FC<ClientsTableProps> = ({ clients, isLoading = false 
                                         key={row.id}
                                         data-state={row.getIsSelected() && 'selected'}
                                     >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell
-                                                key={cell.id}
-                                                style={{
-                                                    width: cell.column.getSize(),
-                                                }}
-                                            >
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext(),
-                                                )}
-                                            </TableCell>
-                                        ))}
+                                        {row.getVisibleCells().map((cell, index) => {
+                                            const isLastColumn = index === row.getVisibleCells().length - 1
+                                            return (
+                                                <TableCell
+                                                    key={cell.id}
+                                                    style={{
+                                                        width: cell.column.getSize(),
+                                                    }}
+                                                    className={isLastColumn ? 'border-r border-gray-200' : ''}
+                                                >
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext(),
+                                                    )}
+                                                </TableCell>
+                                            )
+                                        })}
                                     </TableRow>
                                 ))
                             ) : (

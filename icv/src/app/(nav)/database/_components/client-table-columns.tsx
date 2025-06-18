@@ -1206,6 +1206,9 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                 (filterValue: string) => value === filterValue,
             )
         },
+        meta: {
+            className: 'border-r border-gray-200'
+        }
     }),
     columnHelper.accessor('openProbation', {
         header: ({ column }) => {
