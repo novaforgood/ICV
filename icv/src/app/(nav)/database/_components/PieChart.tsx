@@ -23,7 +23,6 @@ type CheckInCounterEntry = {
     data: Record<string, number>
 }
 
-// Constants for quarters
 const QUARTERS = [
     { label: 'Q1: JUL-SEP', months: ['7', '8', '9'] },
     { label: 'Q2: OCT-DEC', months: ['10', '11', '12'] },
@@ -32,6 +31,9 @@ const QUARTERS = [
 ]
 
 const PieChart = () => {
+    const [entries, setEntries] = useState<CheckInCounterEntry[]>([])
+    const [years, setYears] = useState<number[]>([])
+
     const [data, setData] = useState<ChartData[]>([
         { name: 'Hygiene Kits', value: 0 },
         { name: 'Hot Meals', value: 0 },
@@ -39,16 +41,47 @@ const PieChart = () => {
         { name: 'Client Check-Ins', value: 0 },
     ])
 
-    const [entries, setEntries] = useState<CheckInCounterEntry[]>([])
-    const [dateFilterType, setDateFilterType] = useState<'calendar' | 'fiscal'>('calendar')
+    const [dateFilterType, setDateFilterType] = useState<'calendar' | 'fiscal'>(
+        'calendar',
+    )
     const [selectedYear, setSelectedYear] = useState<string>('all')
     const [selectedMonths, setSelectedMonths] = useState<string[]>([
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        '11',
+        '12',
     ])
     const [selectedQuarters, setSelectedQuarters] = useState<string[]>([
-        'Q1: JAN-MAR', 'Q2: APR-JUN', 'Q3: JUL-SEP', 'Q4: OCT-DEC'
+        'Q1: JUL-SEP',
+        'Q2: OCT-DEC',
+        'Q3: JAN-MAR',
+        'Q4: APR-JUN',
     ])
     const [isFilterVisible, setIsFilterVisible] = useState(true)
+
+    const [isLargeScreen, setIsLargeScreen] = useState(false)
+
+    // Track screen size for layout switching
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(min-width: 1024px)')
+        setIsLargeScreen(mediaQuery.matches)
+
+        const handler = (event: MediaQueryListEvent) =>
+            setIsLargeScreen(event.matches)
+        mediaQuery.addEventListener('change', handler)
+
+        return () => {
+            mediaQuery.removeEventListener('change', handler)
+        }
+    }, [])
 
     // Set all quarters as selected when switching to fiscal year
     useEffect(() => {
@@ -62,15 +95,28 @@ const PieChart = () => {
         }
     }, [dateFilterType])
 
+    // Fetch data once
     useEffect(() => {
         const fetchData = async () => {
             const fetchedEntries = await fetchCheckInCounterData()
             setEntries(fetchedEntries)
+
+            const uniqueYears = Array.from(
+                new Set(
+                    fetchedEntries.map((entry) =>
+                        parseInt(entry.docId.split('-')[0]),
+                    ),
+                ),
+            )
+                .filter((year): year is number => !isNaN(year))
+                .sort((a, b) => b - a)
+
+            setYears(uniqueYears)
         }
         fetchData()
     }, [])
 
-    // Apply filters when entries change or filter state changes
+    // Apply filters to compute pie data
     useEffect(() => {
         const totals = { 'Hygiene Kits': 0, 'Hot Meals': 0, 'Snack Packs': 0 }
         let checkInCount = 0
@@ -80,14 +126,15 @@ const PieChart = () => {
             const recordYear = parseInt(year)
             const recordMonth = parseInt(monthStr).toString()
 
-            if (selectedYear !== 'all' && recordYear !== parseInt(selectedYear)) return
+            if (selectedYear !== 'all' && recordYear !== parseInt(selectedYear))
+                return
 
             if (dateFilterType === 'calendar') {
                 if (!selectedMonths.includes(recordMonth)) return
             } else {
-                // For fiscal year, we need to check if the month is in any of the selected quarters
                 const isInSelectedQuarter = selectedQuarters.some((quarter) => {
-                    const quarterMonths = QUARTERS.find((q) => q.label === quarter)?.months || []
+                    const quarterMonths =
+                        QUARTERS.find((q) => q.label === quarter)?.months || []
                     return quarterMonths.includes(recordMonth)
                 })
                 if (!isInSelectedQuarter) return
@@ -105,14 +152,15 @@ const PieChart = () => {
             { name: 'Snack Packs', value: totals['Snack Packs'] },
             { name: 'Client Check-Ins', value: checkInCount },
         ])
-    }, [entries, dateFilterType, selectedYear, selectedMonths, selectedQuarters])
+    }, [
+        entries,
+        dateFilterType,
+        selectedYear,
+        selectedMonths,
+        selectedQuarters,
+    ])
 
     const total = data.reduce((sum, d) => sum + d.value, 0)
-
-    // Unique years from the data
-    const years = Array.from(
-        new Set(entries.map((entry) => parseInt(entry.docId.split('-')[0]))),
-    ).filter((year): year is number => !isNaN(year)).sort((a, b) => b - a)
 
     const handleMonthToggle = (month: string) => {
         setSelectedMonths((prev) =>
@@ -131,73 +179,96 @@ const PieChart = () => {
     }
 
     return (
-        <div className="flex flex-col items-left w-full px-10">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Check-In Pie Chart</h2>
-            </div>
+        <div className="flex w-full flex-col lg:flex-row lg:justify-between">
+            {/* Pie Chart */}
+            <div className="order-2 flex flex-col items-center lg:order-1">
+                <div className="self-start">
+                    <h2 className="text-2xl font-bold">Check-Ins</h2>
+                </div>
 
-            <YearFilter
-                years={years}
-                isFilterVisible={isFilterVisible}
-                setIsFilterVisible={setIsFilterVisible}
-                dateFilterType={dateFilterType}
-                setDateFilterType={setDateFilterType}
-                selectedYear={selectedYear}
-                setSelectedYear={setSelectedYear}
-                selectedMonths={selectedMonths}
-                handleMonthToggle={handleMonthToggle}
-                selectedQuarters={selectedQuarters}
-                handleQuarterToggle={handleQuarterToggle}
-            />
+                <div className="relative h-[500px] w-[500px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <RechartsPieChart>
+                            <Pie
+                                data={data}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={120}
+                                outerRadius={240}
+                                dataKey="value"
+                                stroke="none"
+                            >
+                                {data.map((entry, idx) => (
+                                    <Cell
+                                        key={entry.name}
+                                        fill={COLORS[idx % COLORS.length]}
+                                    />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                        </RechartsPieChart>
+                    </ResponsiveContainer>
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="mb-1 text-lg font-bold tracking-widest text-gray-400">
+                            TOTAL
+                        </span>
+                        <span className="text-6xl font-extrabold">
+                            {total.toLocaleString()}
+                        </span>
+                    </div>
+                </div>
 
-            <div className="relative mt-8 h-[420px] w-[420px]">
-                <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
-                        <Pie
-                            data={data}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={100}
-                            outerRadius={200}
-                            fill="#8884d8"
-                            dataKey="value"
-                            stroke="none"
-                        >
-                            {data.map((entry, idx) => (
-                                <Cell key={entry.name} fill={COLORS[idx % COLORS.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip />
-                    </RechartsPieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-gray-400 font-bold tracking-widest text-lg mb-1">TOTAL</span>
-                    <span className="text-5xl font-extrabold">{total.toLocaleString()}</span>
+                {/* Custom Legend */}
+                <div className="mt-12 flex justify-center gap-16">
+                    {data.map((entry, idx) => {
+                        const percent = total
+                            ? Math.round((entry.value / total) * 100)
+                            : 0
+                        return (
+                            <div
+                                key={entry.name}
+                                className="flex flex-col items-center"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span
+                                        className="inline-block h-4 w-4 rounded-full"
+                                        style={{
+                                            backgroundColor:
+                                                COLORS[idx % COLORS.length],
+                                        }}
+                                    />
+                                    <span className="font-semibold text-gray-700">
+                                        {entry.name}
+                                    </span>
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    {entry.value.toLocaleString()} ({percent}%)
+                                </div>
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
 
-            {/* Custom Legend */}
-            <div className="flex justify-left gap-10 mt-8">
-                {data.map((entry, idx) => {
-                    const percent = total ? Math.round((entry.value / total) * 100) : 0
-                    return (
-                        <div key={entry.name} className="flex flex-col items-center">
-                            <div className="flex items-center gap-2">
-                                <span
-                                    className="inline-block w-4 h-4 rounded-full"
-                                    style={{ backgroundColor: COLORS[idx % COLORS.length] }}
-                                />
-                                <span className="font-semibold text-gray-700">{entry.name}</span>
-                            </div>
-                            <div className="text-gray-500 text-sm">
-                                {entry.value.toLocaleString()} ({percent}%)
-                            </div>
-                        </div>
-                    )
-                })}
+            {/* Filter Panel */}
+            <div className="order-1 mb-8 w-full lg:order-2 lg:mb-0 lg:w-[400px]">
+                <YearFilter
+                    years={years}
+                    isFilterVisible={isFilterVisible}
+                    setIsFilterVisible={setIsFilterVisible}
+                    dateFilterType={dateFilterType}
+                    setDateFilterType={setDateFilterType}
+                    selectedYear={selectedYear}
+                    setSelectedYear={setSelectedYear}
+                    selectedMonths={selectedMonths}
+                    handleMonthToggle={handleMonthToggle}
+                    selectedQuarters={selectedQuarters}
+                    handleQuarterToggle={handleQuarterToggle}
+                    layout={isLargeScreen ? 'vertical' : 'horizontal'}
+                />
             </div>
         </div>
     )
 }
 
-export default PieChart 
+export default PieChart
