@@ -92,18 +92,18 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                             className={`flex ${layout === 'vertical' ? 'flex-col md:flex-row lg:flex-col' : 'gap-8'}`}
                         >
                             <div className="flex-1 space-y-4">
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="radio"
-                                        checked={dateFilterType === 'calendar'}
-                                        onChange={() =>
-                                            setDateFilterType('calendar')
-                                        }
-                                        className="h-4 w-4"
-                                    />
-                                    <label className="text-sm font-medium">
-                                        Calendar Year
-                                    </label>
+                                <div className="flex items-center justify-between space-x-2">
+                                    <div className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            checked={dateFilterType === 'calendar'}
+                                            onChange={() => setDateFilterType('calendar')}
+                                            className="h-4 w-4"
+                                        />
+                                        <label className="ml-2 text-sm font-medium">
+                                            Calendar Year
+                                        </label>
+                                    </div>
                                 </div>
                                 <div
                                     className={`space-y-4 pl-6 ${dateFilterType === 'fiscal' ? 'pointer-events-none opacity-50' : ''}`}
@@ -135,9 +135,37 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium">
-                                            Months
-                                        </label>
+                                        <div className="flex items-center justify-between">
+                                            <label className="block text-sm font-medium">
+                                                Months
+                                            </label>
+                                            {dateFilterType === 'calendar' && (
+                                                selectedMonths.length === 12 ? (
+                                                    <button
+                                                        type="button"
+                                                        className="text-xs text-blue-600 hover:underline"
+                                                        onClick={() => selectedMonths.forEach(m => handleMonthToggle(m))}
+                                                    >
+                                                        Deselect all
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        className="text-xs text-blue-600 hover:underline"
+                                                        onClick={() => {
+                                                            for (let i = 1; i <= 12; i++) {
+                                                                const monthStr = i.toString();
+                                                                if (!selectedMonths.includes(monthStr)) {
+                                                                    handleMonthToggle(monthStr);
+                                                                }
+                                                            }
+                                                        }}
+                                                    >
+                                                        Select all
+                                                    </button>
+                                                )
+                                            )}
+                                        </div>
                                         <div className="flex flex-wrap gap-2 sm:hidden">
                                             {MONTHS.map((month, index) => (
                                                 <button
@@ -302,18 +330,18 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                             <div
                                 className={`flex-1 space-y-4 ${layout === 'vertical' ? 'mt-8 md:mt-0 lg:mt-8' : ''}`}
                             >
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="radio"
-                                        checked={dateFilterType === 'fiscal'}
-                                        onChange={() =>
-                                            setDateFilterType('fiscal')
-                                        }
-                                        className="h-4 w-4"
-                                    />
-                                    <label className="text-sm font-medium">
-                                        Fiscal Year
-                                    </label>
+                                <div className="flex items-center justify-between space-x-2">
+                                    <div className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            checked={dateFilterType === 'fiscal'}
+                                            onChange={() => setDateFilterType('fiscal')}
+                                            className="h-4 w-4"
+                                        />
+                                        <label className="ml-2 text-sm font-medium">
+                                            Fiscal Year
+                                        </label>
+                                    </div>
                                 </div>
                                 <div
                                     className={`space-y-4 pl-6 ${dateFilterType === 'calendar' ? 'pointer-events-none opacity-50' : ''}`}
@@ -345,9 +373,42 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium">
-                                            Quarters
-                                        </label>
+                                        <div className="flex items-center justify-between">
+                                            <label className="block text-sm font-medium">
+                                                Quarters
+                                            </label>
+                                            {dateFilterType === 'fiscal' && (
+                                                selectedQuarters.length === 4 ? (
+                                                    <button
+                                                        type="button"
+                                                        className="text-xs text-blue-600 hover:underline"
+                                                        onClick={() => selectedQuarters.forEach(q => handleQuarterToggle(q))}
+                                                    >
+                                                        Deselect all
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        type="button"
+                                                        className="text-xs text-blue-600 hover:underline"
+                                                        onClick={() => {
+                                                            const allQuarters = [
+                                                                'Q1: JUL-SEP',
+                                                                'Q2: OCT-DEC',
+                                                                'Q3: JAN-MAR',
+                                                                'Q4: APR-JUN',
+                                                            ];
+                                                            allQuarters.forEach(q => {
+                                                                if (!selectedQuarters.includes(q)) {
+                                                                    handleQuarterToggle(q);
+                                                                }
+                                                            });
+                                                        }}
+                                                    >
+                                                        Select all
+                                                    </button>
+                                                )
+                                            )}
+                                        </div>
                                         <div className="flex flex-wrap gap-2">
                                             {QUARTERS.map((quarter) => (
                                                 <button
