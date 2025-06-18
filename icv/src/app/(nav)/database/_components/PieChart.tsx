@@ -10,6 +10,14 @@ import {
     ResponsiveContainer,
     Tooltip,
 } from 'recharts'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table'
 
 const COLORS = ['#B6CCE2', '#4A7CA5', '#23425B', '#1A2633']
 
@@ -34,6 +42,7 @@ const PieChart = () => {
     const [entries, setEntries] = useState<CheckInCounterEntry[]>([])
     const [years, setYears] = useState<number[]>([])
     const [isLoading, setIsLoading] = useState(true)
+    const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
 
     const [data, setData] = useState<ChartData[]>([
         { name: 'Hygiene Kits', value: 0 },
@@ -186,17 +195,40 @@ const PieChart = () => {
 
     return (
         <div className="flex w-full flex-col lg:flex-row lg:justify-between">
-            {/* Pie Chart */}
+            {/* Chart/Table View */}
             <div className="order-2 flex flex-col items-center lg:order-1">
-                <div className="self-start">
+                <div className="mb-4 flex w-full items-center justify-between">
                     <h2 className="text-2xl font-bold">Check-Ins</h2>
+                    <div className="flex items-center gap-2 text-sm">
+                        <button
+                            onClick={() => setViewMode('chart')}
+                            className={`px-2 py-1 ${
+                                viewMode === 'chart' 
+                                    ? 'font-semibold text-black' 
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            Chart
+                        </button>
+                        <span className="text-gray-300">|</span>
+                        <button
+                            onClick={() => setViewMode('table')}
+                            className={`px-2 py-1 ${
+                                viewMode === 'table' 
+                                    ? 'font-semibold text-black' 
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            Table
+                        </button>
+                    </div>
                 </div>
 
                 {isLoading ? (
                     <div className="flex h-[500px] w-[500px] items-center justify-center text-lg">
                         Loading data...
                     </div>
-                ) : (
+                ) : viewMode === 'chart' ? (
                     <>
                         <div className="relative h-[500px] w-[500px]">
                             <ResponsiveContainer width="100%" height="100%">
@@ -261,6 +293,56 @@ const PieChart = () => {
                             })}
                         </div>
                     </>
+                ) : (
+                    <div className="w-full">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[300px]">Category</TableHead>
+                                    <TableHead className="text-right w-[200px]">Count</TableHead>
+                                    <TableHead className="text-right w-[200px] border-r border-gray-200">Percentage</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {data.map((entry, idx) => {
+                                    const percent = total
+                                        ? Math.round((entry.value / total) * 100)
+                                        : 0
+                                    return (
+                                        <TableRow key={entry.name}>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <span
+                                                        className="inline-block h-4 w-4 rounded-full"
+                                                        style={{
+                                                            backgroundColor:
+                                                                COLORS[idx % COLORS.length],
+                                                        }}
+                                                    />
+                                                    <span className="font-semibold">
+                                                        {entry.name}
+                                                    </span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                {entry.value.toLocaleString()}
+                                            </TableCell>
+                                            <TableCell className="text-right border-r border-gray-200">
+                                                {percent}%
+                                            </TableCell>
+                                        </TableRow>
+                                    )
+                                })}
+                                <TableRow className="border-b border-gray-200 bg-gray-50">
+                                    <TableCell className="font-bold">Total</TableCell>
+                                    <TableCell className="text-right font-bold">
+                                        {total.toLocaleString()}
+                                    </TableCell>
+                                    <TableCell className="border-r border-gray-200" />
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </div>
                 )}
             </div>
 
