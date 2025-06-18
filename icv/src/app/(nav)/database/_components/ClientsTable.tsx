@@ -135,24 +135,19 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
             }
 
             if (dateFilterType === 'calendar') {
-                if (
-                    selectedMonths.length > 0 &&
-                    !selectedMonths.includes(recordMonth)
-                ) {
-                    return false
-                }
+                if (selectedMonths.length === 0) return false;
+                if (!selectedMonths.includes(recordMonth)) return false;
             } else {
-                if (selectedQuarters.length > 0) {
-                    const isInSelectedQuarter = selectedQuarters.some(
-                        (quarter) => {
-                            const quarterMonths =
-                                QUARTERS.find((q) => q.label === quarter)
-                                    ?.months || []
-                            return quarterMonths.includes(recordMonth)
-                        },
-                    )
-                    if (!isInSelectedQuarter) return false
-                }
+                if (selectedQuarters.length === 0) return false;
+                const isInSelectedQuarter = selectedQuarters.some(
+                    (quarter) => {
+                        const quarterMonths =
+                            QUARTERS.find((q) => q.label === quarter)
+                                ?.months || []
+                        return quarterMonths.includes(recordMonth)
+                    },
+                )
+                if (!isInSelectedQuarter) return false
             }
 
             return true
