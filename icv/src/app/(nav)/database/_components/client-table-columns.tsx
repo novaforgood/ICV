@@ -105,21 +105,25 @@ const FilterTags = ({
 
 export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
     columnHelper.accessor('clientCode', {
+        id: 'clientCode',
         header: () => <div>Client Code</div>,
         cell: (info) => renderValue(info.getValue()),
         size: 180,
     }),
     columnHelper.accessor('firstName', {
+        id: 'firstName',
         header: () => <div>First Name</div>,
         cell: (info) => renderValue(info.getValue()),
         size: 200,
     }),
     columnHelper.accessor('lastName', {
+        id: 'lastName',
         header: () => <div>Last Name</div>,
         cell: (info) => renderValue(info.getValue()),
         size: 200,
     }),
     columnHelper.accessor('intakeDate', {
+        id: 'intakeDate',
         header: () => <div>Intake Date</div>,
         cell: (info) => {
             const dateValue = info.getValue()
@@ -174,6 +178,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('caseManager', {
+        id: 'caseManager',
         header: ({ column, table }) => {
             const caseManagers = Array.from(
                 column.getFacetedUniqueValues()?.keys() ?? [],
@@ -243,11 +248,13 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('clientNumber', {
+        id: 'clientNumber',
         header: () => <div>Number</div>,
         cell: (info) => renderValue(info.getValue()),
         size: 200,
     }),
     columnHelper.accessor('dateOfBirth', {
+        id: 'dateOfBirth',
         header: () => <div>DOB</div>,
         cell: (info) => {
             const dateValue = info.getValue()
@@ -259,6 +266,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         size: 180,
     }),
     columnHelper.accessor('age', {
+        id: 'age',
         header: ({ column }) => {
             const ageRanges = [
                 { label: '<17 yrs', value: 'lessThan17' },
@@ -356,6 +364,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('gender', {
+        id: 'gender',
         header: ({ column }) => {
             const genderOptions = [
                 { label: 'Male', value: 'Male' },
@@ -426,6 +435,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('contactSource', {
+        id: 'contactSource',
         header: ({ column }) => {
             const contactSourceOptions = [
                 { label: 'Outreach', value: 'Outreach' },
@@ -502,6 +512,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('homeless', {
+        id: 'homeless',
         header: ({ column }) => {
             const homelessOptions = [
                 { label: 'Homeless', value: 'Homeless' },
@@ -578,16 +589,19 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('sheltered', {
+        id: 'sheltered',
         header: () => <div>Sheltered</div>,
         cell: (info) => renderValue(info.getValue()),
         size: 180,
     }),
     columnHelper.accessor('zipCode', {
+        id: 'zipCode',
         header: () => <div>Zip Code</div>,
         cell: (info) => renderValue(info.getValue()),
         size: 180,
     }),
     columnHelper.accessor('citizenship', {
+        id: 'citizenship',
         header: ({ column }) => {
             const citizenshipOptions = [
                 { label: 'Resident', value: 'Resident' },
@@ -658,6 +672,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('ethnicity', {
+        id: 'ethnicity',
         header: ({ column }) => {
             const ethnicityOptions = [
                 { label: 'African American', value: 'African American' },
@@ -733,6 +748,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('employment', {
+        id: 'employment',
         header: ({ column }) => {
             const employmentOptions = [
                 { label: 'Part time', value: 'Part time' },
@@ -802,6 +818,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('familySize', {
+        id: 'familySize',
         header: ({ column }) => {
             const familySizeOptions = [
                 { label: '1', value: '1' },
@@ -888,6 +905,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('mentalHealthConditions', {
+        id: 'mentalHealthConditions',
         header: ({ column }) => {
             const options = [
                 { label: 'Yes', value: 'Yes' },
@@ -952,6 +970,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('medicalConditions', {
+        id: 'medicalConditions',
         header: ({ column }) => {
             const options = [
                 { label: 'Yes', value: 'Yes' },
@@ -1016,6 +1035,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('substanceAbuse', {
+        id: 'substanceAbuse',
         header: ({ column }) => {
             const options = [
                 { label: 'Yes', value: 'Yes' },
@@ -1080,6 +1100,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('fosterYouth', {
+        id: 'fosterYouth',
         header: ({ column }) => {
             const options = [
                 { label: 'Yes', value: 'Yes' },
@@ -1144,6 +1165,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('openCPS', {
+        id: 'openCPS',
         header: ({ column }) => {
             const options = [
                 { label: 'Yes', value: 'Yes' },
@@ -1211,6 +1233,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         }
     }),
     columnHelper.accessor('openProbation', {
+        id: 'openProbation',
         header: ({ column }) => {
             const options = [
                 { label: 'Yes', value: 'Yes' },
@@ -1275,6 +1298,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
         },
     }),
     columnHelper.accessor('sexOffender', {
+        id: 'sexOffender',
         header: ({ column }) => {
             const options = [
                 { label: 'Yes', value: 'Yes' },
