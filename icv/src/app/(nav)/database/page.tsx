@@ -6,11 +6,24 @@ import { useEffect, useState } from 'react'
 import ClientsTable from './_components/ClientsTable'
 import PieChart from './_components/PieChart'
 import HousingStatusTable from './_components/HousingStatusTable'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 const DatabasePage = () => {
-    const [activeView, setActiveView] = useState<'table' | 'chart' | 'housing'>('table')
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const [activeView, setActiveView] = useState<'table' | 'chart' | 'housing'>(() => {
+        const view = searchParams.get('view')
+        return (view === 'chart' || view === 'housing') ? view : 'table'
+    })
     const [clients, setClients] = useState<NewClient[]>([])
     const [isLoading, setIsLoading] = useState(true)
+
+    // Update URL when activeView changes
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('view', activeView)
+        router.push(`?${params.toString()}`)
+    }, [activeView, router, searchParams])
 
     // Fetch clients when component mounts
     useEffect(() => {

@@ -33,6 +33,7 @@ const QUARTERS = [
 const PieChart = () => {
     const [entries, setEntries] = useState<CheckInCounterEntry[]>([])
     const [years, setYears] = useState<number[]>([])
+    const [isLoading, setIsLoading] = useState(true)
 
     const [data, setData] = useState<ChartData[]>([
         { name: 'Hygiene Kits', value: 0 },
@@ -98,20 +99,25 @@ const PieChart = () => {
     // Fetch data once
     useEffect(() => {
         const fetchData = async () => {
-            const fetchedEntries = await fetchCheckInCounterData()
-            setEntries(fetchedEntries)
+            setIsLoading(true)
+            try {
+                const fetchedEntries = await fetchCheckInCounterData()
+                setEntries(fetchedEntries)
 
-            const uniqueYears = Array.from(
-                new Set(
-                    fetchedEntries.map((entry) =>
-                        parseInt(entry.docId.split('-')[0]),
+                const uniqueYears = Array.from(
+                    new Set(
+                        fetchedEntries.map((entry) =>
+                            parseInt(entry.docId.split('-')[0]),
+                        ),
                     ),
-                ),
-            )
-                .filter((year): year is number => !isNaN(year))
-                .sort((a, b) => b - a)
+                )
+                    .filter((year): year is number => !isNaN(year))
+                    .sort((a, b) => b - a)
 
-            setYears(uniqueYears)
+                setYears(uniqueYears)
+            } finally {
+                setIsLoading(false)
+            }
         }
         fetchData()
     }, [])
@@ -186,68 +192,76 @@ const PieChart = () => {
                     <h2 className="text-2xl font-bold">Check-Ins</h2>
                 </div>
 
-                <div className="relative h-[500px] w-[500px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <RechartsPieChart>
-                            <Pie
-                                data={data}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={120}
-                                outerRadius={240}
-                                dataKey="value"
-                                stroke="none"
-                            >
-                                {data.map((entry, idx) => (
-                                    <Cell
-                                        key={entry.name}
-                                        fill={COLORS[idx % COLORS.length]}
-                                    />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                        </RechartsPieChart>
-                    </ResponsiveContainer>
-                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="mb-1 text-lg font-bold tracking-widest text-gray-400">
-                            TOTAL
-                        </span>
-                        <span className="text-6xl font-extrabold">
-                            {total.toLocaleString()}
-                        </span>
+                {isLoading ? (
+                    <div className="flex h-[500px] w-[500px] items-center justify-center text-lg">
+                        Loading data...
                     </div>
-                </div>
-
-                {/* Custom Legend */}
-                <div className="mt-12 flex justify-center gap-16">
-                    {data.map((entry, idx) => {
-                        const percent = total
-                            ? Math.round((entry.value / total) * 100)
-                            : 0
-                        return (
-                            <div
-                                key={entry.name}
-                                className="flex flex-col items-center"
-                            >
-                                <div className="flex items-center gap-2">
-                                    <span
-                                        className="inline-block h-4 w-4 rounded-full"
-                                        style={{
-                                            backgroundColor:
-                                                COLORS[idx % COLORS.length],
-                                        }}
-                                    />
-                                    <span className="font-semibold text-gray-700">
-                                        {entry.name}
-                                    </span>
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                    {entry.value.toLocaleString()} ({percent}%)
-                                </div>
+                ) : (
+                    <>
+                        <div className="relative h-[500px] w-[500px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RechartsPieChart>
+                                    <Pie
+                                        data={data}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={120}
+                                        outerRadius={240}
+                                        dataKey="value"
+                                        stroke="none"
+                                    >
+                                        {data.map((entry, idx) => (
+                                            <Cell
+                                                key={entry.name}
+                                                fill={COLORS[idx % COLORS.length]}
+                                            />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                </RechartsPieChart>
+                            </ResponsiveContainer>
+                            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                <span className="mb-1 text-lg font-bold tracking-widest text-gray-400">
+                                    TOTAL
+                                </span>
+                                <span className="text-6xl font-extrabold">
+                                    {total.toLocaleString()}
+                                </span>
                             </div>
-                        )
-                    })}
-                </div>
+                        </div>
+
+                        {/* Custom Legend */}
+                        <div className="mt-12 flex justify-center gap-16">
+                            {data.map((entry, idx) => {
+                                const percent = total
+                                    ? Math.round((entry.value / total) * 100)
+                                    : 0
+                                return (
+                                    <div
+                                        key={entry.name}
+                                        className="flex flex-col items-center"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <span
+                                                className="inline-block h-4 w-4 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        COLORS[idx % COLORS.length],
+                                                }}
+                                            />
+                                            <span className="font-semibold text-gray-700">
+                                                {entry.name}
+                                            </span>
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                            {entry.value.toLocaleString()} ({percent}%)
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Filter Panel */}
