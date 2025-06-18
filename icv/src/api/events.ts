@@ -53,10 +53,10 @@ export async function getEventsbyClientId(clientId: string) {
         const data = doc.data() as CheckInType
         data.id = doc.id
         return data
-    })    
+    })
     return events
 }
-  
+
 export async function getScheduledEvents(): Promise<CheckInType[]> {
     const events = await getAllEvents();
     const scheduledEvents = events.filter((event) => event.scheduled === true);
@@ -108,21 +108,21 @@ export async function updateCheckIn(event: CheckInType) {
 }
 
 export async function deleteCheckIn(checkInId: string): Promise<void> {
-  const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser()
-  if (!currentUser) {
-    throw new Error('User not found')
-  }
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser()
+    if (!currentUser) {
+        throw new Error('User not found')
+    }
 
-  const db = getFirestore(firebaseServerApp)
-  const docRef = doc(db, 'events', checkInId)
+    const db = getFirestore(firebaseServerApp)
+    const docRef = doc(db, 'events', checkInId)
 
-  try {
-    await deleteDoc(docRef)
-    console.log(`Deleted check-in: ${checkInId}`)
-  } catch (error) {
-    console.error('Error deleting check-in:', error)
-    throw new Error('Failed to delete check-in', { cause: error })
-  }
+    try {
+        await deleteDoc(docRef)
+        console.log(`Deleted check-in: ${checkInId}`)
+    } catch (error) {
+        console.error('Error deleting check-in:', error)
+        throw new Error('Failed to delete check-in', { cause: error })
+    }
 }
 
 export async function incrementCheckInCount(checkInCategory: CheckInCategoryType, date: Date, count: number = 1) {
@@ -202,7 +202,7 @@ export async function getCheckInCountYear(checkInCategory: CheckInCategoryType, 
 
         const counterCollectionRef = collection(ssrdb, 'checkInCounter');
         let sum = 0;
-        
+
         for (let i = 1; i < 12; i++) {
             const month = String(i + 1).padStart(2, '0');
             const monthDocId = `${yearStr}-${month}`;
@@ -212,7 +212,7 @@ export async function getCheckInCountYear(checkInCategory: CheckInCategoryType, 
                 sum += monthDoc.data()[checkInCategory] || 0;
             }
         }
-        
+
         return sum;
     } catch (error) {
         console.error('Error getting check-in count:', error);
@@ -343,7 +343,7 @@ export async function getEventById(eventId: string): Promise<CheckInType> {
     }
     const ssrdb = getFirestore(firebaseServerApp)
     const eventDoc = await getDoc(doc(ssrdb, 'events', eventId))
-    
+
     if (!eventDoc.exists()) {
         throw new Error('Event not found')
     }
@@ -363,31 +363,50 @@ export async function getLastCheckInDate(clientDocId: string): Promise<Date | nu
     try {
         const eventsCollection = collection(ssrdb, 'events');
         const now = new Date();
-        
-        // Query for events with matching clientDocId and startTime before now
+
+        // Query for events with matching clientDocId
         const q = query(
             eventsCollection,
             where('clientDocId', '==', clientDocId)
         );
 
         const querySnapshot = await getDocs(q);
-        
+
         if (querySnapshot.empty) {
             return null;
         }
 
-        // Find the most recent event
-        let latestDate = new Date(0); // Start with earliest possible date
-        querySnapshot.forEach((doc) => {
-            const eventDate = new Date(doc.data().startTime);
-            if (eventDate < now && eventDate > latestDate) {
-                latestDate = eventDate;
-            }
+        // Convert all events to array
+        const allEvents = querySnapshot.docs.map(doc => ({
+            ...doc.data(),
+            id: doc.id
+        })) as (CheckInType & { id: string })[];
+
+        // Filter for past events
+        const pastEvents = allEvents.filter(event => {
+            const eventDate = new Date(event.startTime);
+            return !isNaN(eventDate.getTime()) && eventDate < now;
         });
 
-        return latestDate;
+        if (pastEvents.length === 0) {
+            return null;
+        }
+
+        // Sort events by startTime in descending order (most recent first)
+        const sortedEvents = pastEvents.sort((a, b) => {
+            const dateA = new Date(a.startTime);
+            const dateB = new Date(b.startTime);
+            return dateB.getTime() - dateA.getTime();
+        });
+
+        // Get the most recent past event's startTime
+        console.log('most recent:', clientDocId, sortedEvents[0]);
+        const mostRecentEvent = sortedEvents[0];
+        return new Date(mostRecentEvent.startTime);
     } catch (error) {
         console.error('Error getting last check-in date:', error);
         throw new Error('Failed to get last check-in date');
     }
 }
+
+

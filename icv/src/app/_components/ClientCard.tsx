@@ -1,63 +1,55 @@
 'use client'
 
+import { getLastCheckInDate } from '@/api/events'
 import { Card } from '@/components/ui/card'
 import { NewClient } from '@/types/client-types'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { getLastCheckInDate } from '@/api/events'
 
 const formatDate = (date: Date | string | null | undefined) => {
-    if (!date) return 'No check-in'
-    
-    let dateObj: Date;
-    if (date instanceof Date) {
-        dateObj = date;
-    } else {
-        try {
-            dateObj = new Date(date);
-            // Check if the date is valid
-            if (isNaN(dateObj.getTime())) {
-                return 'No check-in';
-            }
-        } catch (error) {
-            console.error('Error parsing date:', error);
-            return 'No check-in';
-        }
-    }
-    
-    return dateObj.toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: '2-digit',
+    const parsedDate = date ? new Date(date) : null
+    if (!parsedDate || isNaN(parsedDate.getTime())) return 'N/A'
+
+    return parsedDate.toLocaleDateString('en-US', {
+        month: 'numeric',
+        day: 'numeric',
+        year: 'numeric',
     })
 }
 
 interface ClientCardProps {
     client: NewClient
     showLastCheckin?: boolean
+    docID?: string
 }
 
 const ClientCard: React.FC<ClientCardProps> = ({
     client,
     showLastCheckin = true,
+    docID,
 }) => {
-    const [lastCheckIn, setLastCheckIn] = useState<Date | null>(null);
+    const [lastCheckIn, setLastCheckIn] = useState<Date | null>(null)
 
     useEffect(() => {
         const fetchLastCheckIn = async () => {
-            if (client.docId, showLastCheckin) {
+            if (docID && showLastCheckin) {
                 try {
-                    const date = await getLastCheckInDate(client.docId);
-                    setLastCheckIn(date);
+                    if (docID) {
+                        const date = await getLastCheckInDate(docID)
+                        setLastCheckIn(date)
+                    } else {
+                        console.error('client.docId is undefined')
+                        setLastCheckIn(null)
+                    }
                 } catch (error) {
-                    console.error('Error fetching last check-in date:', error);
-                    setLastCheckIn(null);
+                    console.error('Error fetching last check-in date:', error)
+                    setLastCheckIn(null)
                 }
             }
-        };
+        }
 
-        fetchLastCheckIn();
-    }, [client.docId]);
+        fetchLastCheckIn()
+    }, [client.docId])
 
     return (
         <Card className="flex min-h-24 w-full bg-white p-4 hover:bg-gray-50">

@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { ProgressCircle } from '../../_components/ProgressBar'
+import { ProgressCircle } from '../../_components/intakeForm/ProgressBar'
 
 export default function layout({
     children,

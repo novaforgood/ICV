@@ -23,8 +23,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import FileUpload, { ResetButton } from '../../_components/FileUpload'
-import { CheckboxList } from '../../_components/MakeOptions'
+import FileUpload, { ResetButton } from './FileUpload'
+import { CheckboxList } from './MakeOptions'
 
 interface Props {
     formType: Partial<NewClient>

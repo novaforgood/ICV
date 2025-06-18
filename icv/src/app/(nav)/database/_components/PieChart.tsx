@@ -1,201 +1,494 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
-import FilterPanel from '@/app/_components/FilterPanel'
+import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
+import { Button } from '@/components/ui/button'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table'
 import { fetchCheckInCounterData } from '@/lib/firestoreUtils'
+import html2canvas from 'html2canvas'
+import html2pdf from 'html2pdf.js'
+import { Download } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import {
+    Cell,
+    Pie,
+    PieChart as RechartsPieChart,
+    ResponsiveContainer,
+    Tooltip,
+} from 'recharts'
 
 const COLORS = ['#B6CCE2', '#4A7CA5', '#23425B', '#1A2633']
 
-type Filters = {
-    selectedDates: string[];
-    dateType: string;
-}
-
 type ChartData = {
-    name: string;
-    value: number;
+    name: string
+    value: number
 }
 
 type CheckInCounterEntry = {
-    docId: string;
-    data: Record<string, number>;
+    docId: string
+    data: Record<string, number>
 }
 
+const QUARTERS = [
+    { label: 'Q1: JUL-SEP', months: ['7', '8', '9'] },
+    { label: 'Q2: OCT-DEC', months: ['10', '11', '12'] },
+    { label: 'Q3: JAN-MAR', months: ['1', '2', '3'] },
+    { label: 'Q4: APR-JUN', months: ['4', '5', '6'] },
+]
+
 const PieChart = () => {
+    const [entries, setEntries] = useState<CheckInCounterEntry[]>([])
+    const [years, setYears] = useState<number[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+    const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
+    const [isExporting, setIsExporting] = useState(false)
+
     const [data, setData] = useState<ChartData[]>([
         { name: 'Hygiene Kits', value: 0 },
         { name: 'Hot Meals', value: 0 },
         { name: 'Snack Packs', value: 0 },
         { name: 'Client Check-Ins', value: 0 },
     ])
-    const [isFilterOpen, setIsFilterOpen] = useState(false)
-    const [filters, setFilters] = useState<Filters>({
-        selectedDates: [],
-        dateType: 'Month',
-    })
 
-    const applyDateFilter = (docId: string) => {
-        if (filters.selectedDates.length === 0) return true;
-        const [year, monthNum] = docId.split('-');
-        const date = new Date(Number(year), Number(monthNum) - 1, 1);
-        switch (filters.dateType) {
-            case 'Month':
-                return filters.selectedDates.includes(date.toLocaleString('default', { month: 'long' }));
-            case 'Quarter': {
-                const quarter = Math.floor(date.getMonth() / 3) + 1;
-                return filters.selectedDates.includes(`Q${quarter}`);
+    const [dateFilterType, setDateFilterType] = useState<'calendar' | 'fiscal'>(
+        'calendar',
+    )
+    const [selectedYear, setSelectedYear] = useState<string>('all')
+    const [selectedMonths, setSelectedMonths] = useState<string[]>([
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        '11',
+        '12',
+    ])
+    const [selectedQuarters, setSelectedQuarters] = useState<string[]>([
+        'Q1: JUL-SEP',
+        'Q2: OCT-DEC',
+        'Q3: JAN-MAR',
+        'Q4: APR-JUN',
+    ])
+    const [isFilterVisible, setIsFilterVisible] = useState(true)
+
+    const [isLargeScreen, setIsLargeScreen] = useState(false)
+
+    // Track screen size for layout switching
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(min-width: 1024px)')
+        setIsLargeScreen(mediaQuery.matches)
+
+        const handler = (event: MediaQueryListEvent) =>
+            setIsLargeScreen(event.matches)
+        mediaQuery.addEventListener('change', handler)
+
+        return () => {
+            mediaQuery.removeEventListener('change', handler)
+        }
+    }, [])
+
+    // Set all quarters as selected when switching to fiscal year
+    useEffect(() => {
+        if (dateFilterType === 'fiscal') {
+            setSelectedQuarters([
+                'Q1: JUL-SEP',
+                'Q2: OCT-DEC',
+                'Q3: JAN-MAR',
+                'Q4: APR-JUN',
+            ])
+        }
+    }, [dateFilterType])
+
+    // Fetch data once
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true)
+            try {
+                const fetchedEntries = await fetchCheckInCounterData()
+                setEntries(fetchedEntries)
+
+                const uniqueYears = Array.from(
+                    new Set(
+                        fetchedEntries.map((entry) =>
+                            parseInt(entry.docId.split('-')[0]),
+                        ),
+                    ),
+                )
+                    .filter((year): year is number => !isNaN(year))
+                    .sort((a, b) => b - a)
+
+                setYears(uniqueYears)
+            } finally {
+                setIsLoading(false)
             }
-            case 'Year':
-            case 'Fiscal Year':
-                return filters.selectedDates.includes(year);
-            default:
-                return true;
+        }
+        fetchData()
+    }, [])
+
+    // Apply filters to compute pie data
+    useEffect(() => {
+        const totals = { 'Hygiene Kits': 0, 'Hot Meals': 0, 'Snack Packs': 0 }
+        let checkInCount = 0
+
+        entries.forEach(({ docId, data }) => {
+            const [year, monthStr] = docId.split('-')
+            const recordYear = parseInt(year)
+            const recordMonth = parseInt(monthStr).toString()
+
+            if (selectedYear !== 'all' && recordYear !== parseInt(selectedYear))
+                return
+
+            if (dateFilterType === 'calendar') {
+                if (!selectedMonths.includes(recordMonth)) return
+            } else {
+                const isInSelectedQuarter = selectedQuarters.some((quarter) => {
+                    const quarterMonths =
+                        QUARTERS.find((q) => q.label === quarter)?.months || []
+                    return quarterMonths.includes(recordMonth)
+                })
+                if (!isInSelectedQuarter) return
+            }
+
+            totals['Hygiene Kits'] += data['Hygiene Kit'] || 0
+            totals['Hot Meals'] += data['Hot Meal'] || 0
+            totals['Snack Packs'] += data['Snack Pack'] || 0
+            checkInCount += 1
+        })
+
+        setData([
+            { name: 'Hygiene Kits', value: totals['Hygiene Kits'] },
+            { name: 'Hot Meals', value: totals['Hot Meals'] },
+            { name: 'Snack Packs', value: totals['Snack Packs'] },
+            { name: 'Client Check-Ins', value: checkInCount },
+        ])
+    }, [
+        entries,
+        dateFilterType,
+        selectedYear,
+        selectedMonths,
+        selectedQuarters,
+    ])
+
+    const total = data.reduce((sum, d) => sum + d.value, 0)
+
+    const handleMonthToggle = (month: string) => {
+        setSelectedMonths((prev) =>
+            prev.includes(month)
+                ? prev.filter((m) => m !== month)
+                : [...prev, month],
+        )
+    }
+
+    const handleQuarterToggle = (quarter: string) => {
+        setSelectedQuarters((prev) =>
+            prev.includes(quarter)
+                ? prev.filter((q) => q !== quarter)
+                : [...prev, quarter],
+        )
+    }
+
+    const exportData = async (format: 'pdf' | 'png') => {
+        try {
+            setIsExporting(true)
+            const el = document.getElementById('exportContainer')
+            if (!el) throw new Error('Export element not found')
+
+            const today = new Date().toLocaleDateString('en-CA')
+            const filename = `CheckIns_${today}.${format}`
+
+            if (format === 'pdf') {
+                await html2pdf()
+                    .set({
+                        filename,
+                        image: { type: 'jpeg', quality: 1 },
+                        html2canvas: {
+                            scale: 2,
+                            useCORS: true,
+                            scrollY: 0,
+                            logging: false,
+                            backgroundColor: '#ffffff',
+                        },
+                        jsPDF: {
+                            unit: 'in',
+                            format: 'a4',
+                            orientation: 'portrait',
+                            compress: true,
+                        },
+                    })
+                    .from(el)
+                    .save()
+            } else {
+                // For PNG export
+                const canvas = await html2canvas(el, {
+                    scale: 2,
+                    useCORS: true,
+                    scrollY: 0,
+                })
+                const link = document.createElement('a')
+                link.download = filename
+                link.href = canvas.toDataURL('image/png')
+                link.click()
+            }
+        } catch (err) {
+            console.error('Export failed:', err)
+        } finally {
+            setIsExporting(false)
         }
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const entries: CheckInCounterEntry[] = await fetchCheckInCounterData();
-            const totals = { 'Hygiene Kits': 0, 'Hot Meals': 0, 'Snack Packs': 0 };
-            let checkInCount = 0;
-            entries.forEach(({ docId, data }) => {
-                if (applyDateFilter(docId)) {
-                    totals['Hygiene Kits'] += data['Hygiene Kit'] || 0;
-                    totals['Hot Meals'] += data['Hot Meal'] || 0;
-                    totals['Snack Packs'] += data['Snack Pack'] || 0;
-                    checkInCount += 1;
-                }
-            });
-            setData([
-                { name: 'Hygiene Kits', value: totals['Hygiene Kits'] },
-                { name: 'Hot Meals', value: totals['Hot Meals'] },
-                { name: 'Snack Packs', value: totals['Snack Packs'] },
-                { name: 'Client Check-Ins', value: checkInCount },
-            ]);
-        };
-        fetchData();
-    }, [filters]);
-
-    const total = data.reduce((sum, d) => sum + d.value, 0);
-
     return (
-        <div className="flex flex-col items-left w-full px-10">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Pie Chart</h2>
-                <div className="flex items-center gap-2">
-                    {filters.selectedDates.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                            {filters.selectedDates.map((date) => (
-                                <div 
-                                    key={date} 
-                                    className="flex items-center gap-1 rounded-full bg-white px-3 py-1 text-sm text-black border-spacing-0 border-gray-300 border-2"
-                                >
-                                    <div
-                                        onClick={() => {
-                                            const newSelectedDates = filters.selectedDates.filter(d => d !== date);
-                                            setFilters(prev => ({
-                                                ...prev,
-                                                selectedDates: newSelectedDates
-                                            }));
-                                        }}
-                                        className="mr-1 rounded-full hover:bg-gray-300 cursor-pointer"
-                                    >
-                                        <svg 
-                                            xmlns="http://www.w3.org/2000/svg" 
-                                            className="h-4 w-4" 
-                                            fill="none" 
-                                            viewBox="0 0 24 24" 
-                                            stroke="currentColor"
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </div>
-                                    <span>{date}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    <button
-                        className="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                        onClick={() => setIsFilterOpen(true)}
+        <div className="flex w-full flex-col lg:flex-row lg:justify-between">
+            {/* Chart/Table View */}
+            <div className="order-2 flex flex-col items-center lg:order-1">
+                <div className="mb-4 flex w-full items-center justify-between">
+                    <h2 className="text-2xl font-bold">Check-Ins</h2>
+                    <div className="flex items-center gap-2 text-sm">
+                        <button
+                            onClick={() => setViewMode('chart')}
+                            className={`px-2 py-1 ${
+                                viewMode === 'chart'
+                                    ? 'font-semibold text-black'
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            Chart
+                        </button>
+                        <span className="text-gray-300">|</span>
+                        <button
+                            onClick={() => setViewMode('table')}
+                            className={`px-2 py-1 ${
+                                viewMode === 'table'
+                                    ? 'font-semibold text-black'
+                                    : 'text-gray-500 hover:text-gray-700'
+                            }`}
+                        >
+                            Table
+                        </button>
+                    </div>
+                </div>
+
+                {isLoading ? (
+                    <div className="flex h-[500px] w-[500px] items-center justify-center text-lg">
+                        Loading data...
+                    </div>
+                ) : (
+                    <div
+                        id="exportContainer"
+                        className="flex w-full flex-col items-center p-8"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="h-4 w-4"
+                        {viewMode === 'chart' ? (
+                            <div className="flex flex-col items-center">
+                                <div className="relative h-[500px] w-[500px]">
+                                    <ResponsiveContainer
+                                        width="100%"
+                                        height="100%"
+                                    >
+                                        <RechartsPieChart>
+                                            <Pie
+                                                data={data}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={120}
+                                                outerRadius={240}
+                                                dataKey="value"
+                                                stroke="none"
+                                            >
+                                                {data.map((entry, idx) => (
+                                                    <Cell
+                                                        key={entry.name}
+                                                        fill={
+                                                            COLORS[
+                                                                idx %
+                                                                    COLORS.length
+                                                            ]
+                                                        }
+                                                    />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip />
+                                        </RechartsPieChart>
+                                    </ResponsiveContainer>
+                                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                        <span className="mb-1 text-lg font-bold tracking-widest text-gray-400">
+                                            TOTAL
+                                        </span>
+                                        <span className="text-6xl font-extrabold">
+                                            {total.toLocaleString()}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Custom Legend */}
+                                <div className="mt-12 flex justify-center gap-16">
+                                    {data.map((entry, idx) => {
+                                        const percent = total
+                                            ? Math.round(
+                                                  (entry.value / total) * 100,
+                                              )
+                                            : 0
+                                        return (
+                                            <div
+                                                key={entry.name}
+                                                className="flex flex-col items-center"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <span
+                                                        className="inline-block h-4 w-4 rounded-full"
+                                                        style={{
+                                                            backgroundColor:
+                                                                COLORS[
+                                                                    idx %
+                                                                        COLORS.length
+                                                                ],
+                                                        }}
+                                                    />
+                                                    <span className="font-semibold text-gray-700">
+                                                        {entry.name}
+                                                    </span>
+                                                </div>
+                                                <div className="text-sm text-gray-500">
+                                                    {entry.value.toLocaleString()}{' '}
+                                                    ({percent}%)
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="w-full">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[300px]">
+                                                Category
+                                            </TableHead>
+                                            <TableHead className="w-[200px] text-right">
+                                                Count
+                                            </TableHead>
+                                            <TableHead className="w-[200px] border-r border-gray-200 text-right">
+                                                Percentage
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {data.map((entry, idx) => {
+                                            const percent = total
+                                                ? Math.round(
+                                                      (entry.value / total) *
+                                                          100,
+                                                  )
+                                                : 0
+                                            return (
+                                                <TableRow key={entry.name}>
+                                                    <TableCell>
+                                                        <div className="flex items-center gap-2">
+                                                            <span
+                                                                className="inline-block h-4 w-4 rounded-full"
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        COLORS[
+                                                                            idx %
+                                                                                COLORS.length
+                                                                        ],
+                                                                }}
+                                                            />
+                                                            <span className="font-semibold">
+                                                                {entry.name}
+                                                            </span>
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {entry.value.toLocaleString()}
+                                                    </TableCell>
+                                                    <TableCell className="border-r border-gray-200 text-right">
+                                                        {percent}%
+                                                    </TableCell>
+                                                </TableRow>
+                                            )
+                                        })}
+                                        <TableRow className="border-b border-gray-200 bg-gray-50">
+                                            <TableCell className="font-bold">
+                                                Total
+                                            </TableCell>
+                                            <TableCell className="text-right font-bold">
+                                                {total.toLocaleString()}
+                                            </TableCell>
+                                            <TableCell className="border-r border-gray-200" />
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Export Button */}
+                <div className="mt-4 flex justify-start">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={isExporting}
+                            >
+                                <Download className="mr-2 h-4 w-4" />
+                                {isExporting ? 'Exporting...' : 'Export'}
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            side="bottom"
+                            align="start"
+                            sideOffset={5}
+                            className="w-[160px] data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
                         >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-                            />
-                        </svg>
-                        Filter date
-                    </button>
+                            <DropdownMenuItem onClick={() => exportData('pdf')}>
+                                Export as PDF
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => exportData('png')}>
+                                Export as PNG
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             </div>
-            {isFilterOpen && (
-                <FilterPanel
-                    currentFilters={filters}
-                    onClose={() => setIsFilterOpen(false)}
-                    onFilter={(newFilters: Filters) => {
-                        setFilters(newFilters)
-                        setIsFilterOpen(false)
-                    }}
+
+            {/* Filter Panel */}
+            <div className="order-1 mb-8 w-full lg:order-2 lg:mb-0 lg:w-[400px]">
+                <YearFilter
+                    years={years}
+                    isFilterVisible={isFilterVisible}
+                    setIsFilterVisible={setIsFilterVisible}
+                    dateFilterType={dateFilterType}
+                    setDateFilterType={setDateFilterType}
+                    selectedYear={selectedYear}
+                    setSelectedYear={setSelectedYear}
+                    selectedMonths={selectedMonths}
+                    handleMonthToggle={handleMonthToggle}
+                    selectedQuarters={selectedQuarters}
+                    handleQuarterToggle={handleQuarterToggle}
+                    layout={isLargeScreen ? 'vertical' : 'horizontal'}
                 />
-            )}
-            <div className="relative w-[420px] h-[420px]">
-                <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPieChart>
-                        <Pie
-                            data={data}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={100}
-                            outerRadius={200}
-                            fill="#8884d8"
-                            dataKey="value"
-                            stroke="none"
-                        >
-                            {data.map((entry, idx) => (
-                                <Cell key={entry.name} fill={COLORS[idx % COLORS.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip />
-                    </RechartsPieChart>
-                </ResponsiveContainer>
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-gray-400 font-bold tracking-widest text-lg mb-1">TOTAL</span>
-                    <span className="text-5xl font-extrabold">{total.toLocaleString()}</span>
-                </div>
-            </div>
-            {/* Custom Legend */}
-            <div className="flex justify-left gap-10 mt-8">
-                {data.map((entry, idx) => {
-                    const percent = total ? Math.round((entry.value / total) * 100) : 0
-                    return (
-                        <div key={entry.name} className="flex flex-col items-center">
-                            <div className="flex items-center gap-2">
-                                <span
-                                    className="inline-block w-4 h-4 rounded-full"
-                                    style={{ backgroundColor: COLORS[idx % COLORS.length] }}
-                                />
-                                <span className="font-semibold text-gray-700">{entry.name}</span>
-                            </div>
-                            <div className="text-gray-500 text-sm">
-                                {entry.value.toLocaleString()} ({percent}%)
-                            </div>
-                        </div>
-                    )
-                })}
             </div>
         </div>
     )
 }
 
-
-export default PieChart 
+export default PieChart

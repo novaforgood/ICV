@@ -11,7 +11,7 @@ export const CONTACTSOURCE = [
 ]
 export const SERVICESELECT = ['Recipient', 'Not a recipient']
 export const CITIZEN = ['Citizen', 'Resident', 'Undocumented']
-export const HOMELESS = ['Yes', 'No', 'At risk']
+export const HOMELESS = ['Homeless', 'At risk', 'Vehicle', 'Sheltered', 'Transitional housing', 'Rehabilitation', 'Permanently housed']
 export const ETHNICITY = [
     'White',
     'Black or African American',
@@ -132,6 +132,7 @@ export const ClientIntakeSchema = z.object({
     citizenship: z.string().optional(),
 
     // Housing
+    housingDate: z.string().optional(),
     homeless: z.string().optional(),
     sheltered: z.string().optional(),
     housingNotes: z.string().optional(),
@@ -369,6 +370,7 @@ export const ProfileSchema = ClientIntakeSchema.pick({
     citizenship: true,
 
     // Housing
+    housingDate: true,
     homeless: true,
     sheltered: true,
     housingNotes: true,

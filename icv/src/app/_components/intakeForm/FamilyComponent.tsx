@@ -22,7 +22,7 @@ import {
     RadioChoice,
     RadioWithOther,
     ServicesWithIncome,
-} from '../MakeOptions'
+} from './MakeOptions'
 
 interface Props {
     formType: Partial<NewClient>

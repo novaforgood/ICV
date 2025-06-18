@@ -2,7 +2,7 @@
 import {
     LoadedSignature,
     SignaturePopup,
-} from '@/app/_components/SignatureModal'
+} from '@/app/_components/intakeForm/SignatureModal'
 import { storage } from '@/data/firebase'
 import {
     ClientIntakeSchema,
