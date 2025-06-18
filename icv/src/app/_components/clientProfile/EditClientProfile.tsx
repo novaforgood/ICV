@@ -98,7 +98,7 @@ export const ClientProfileToggle = ({
 
     return (
         <div className="flex min-h-screen px-[48px]">
-            <div className="mb-[48px] h-screen w-screen min-w-[70%] space-y-[48px]">
+            <div className="mb-[48px] w-screen min-w-[70%] space-y-[48px]">
                 {showHousingLog && (
                     <div
                         className="fixed inset-0 z-50 flex justify-end bg-black bg-opacity-50"

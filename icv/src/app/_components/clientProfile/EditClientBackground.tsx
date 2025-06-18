@@ -41,7 +41,7 @@ export const ClientBackgroundToggle = ({
     }, [editMode])
     return (
         <div className="flex min-h-screen px-[48px]">
-            <div className="mb-[48px] h-screen w-screen min-w-[70%] space-y-[48px]">
+            <div className="mb-[48px] w-screen min-w-[70%] space-y-[48px]">
                 {!editMode ? (
                     <>
                         <div className="space-y-[24px]">
