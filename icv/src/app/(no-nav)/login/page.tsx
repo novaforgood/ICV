@@ -1,6 +1,6 @@
 'use client'
+import { start2FA } from '@/api/clients'
 import { auth, clientDb } from '@/data/firebase'
-import { setCookie } from 'cookies-next'
 import { FirebaseError } from 'firebase/app'
 import {
     createUserWithEmailAndPassword,
@@ -64,41 +64,30 @@ const page = () => {
                 await setDoc(doc(clientDb, 'users', `${firstname}`), {
                     name: `${firstname} ${lastname}`,
                     email: `${email}`,
-                    uid: user.uid
+                    uid: user.uid,
                 })
                 console.log('user stored in collections')
             } else {
-                const usercred = await signInWithEmailAndPassword(
-                    auth,
-                    email,
-                    password,
-                )
-                const user = usercred.user
-                if (user) {
-                    const token = await user.getIdToken()
-
-                    // Set cookie
-                    setCookie('idToken', token, {
-                        path: '/',
-                        secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'lax',
-                    })
-
-                    console.log('Token set in cookie:', token)
-                    console.log('Welcome, ', auth.currentUser?.displayName)
-                    router.push('/')
-                }
+                 // Start 2FA process, temporarily store email and pw in session storage
+                 sessionStorage.setItem('2fa-email', email)
+                 sessionStorage.setItem('2fa-pw', password)
+                 await start2FA( email || '')
+                 //router push to 2fa
+                 router.push('/2fa')
             }
         } catch (err) {
             if (err instanceof Error) {
                 const error = err as FirebaseError
 
                 const messages: Record<string, string> = {
-                    "auth/invalid-credential": "Incorrect Password. Please try again or reset password.",
-                    "auth/user-not-found": "No user associated with email.",
-                    "auth/invalid-email": "Invalid Email Address.",
-                    "auth/too-many-requests": "Too many login attempts. Please try again in 5 minutes.",
-                    "auth/missing-password": "You didn't enter a password silly!"
+                    'auth/invalid-credential':
+                        'Incorrect Password. Please try again or reset password.',
+                    'auth/user-not-found': 'No user associated with email.',
+                    'auth/invalid-email': 'Invalid Email Address.',
+                    'auth/too-many-requests':
+                        'Too many login attempts. Please try again in 5 minutes.',
+                    'auth/missing-password':
+                        "You didn't enter a password silly!",
                 }
 
                 const text = messages[error.code] ?? error.message
@@ -115,6 +104,7 @@ const page = () => {
             handleAuth
         }
     }
+
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-white p-6">
             <Image
@@ -167,6 +157,7 @@ const page = () => {
                 </form>
             ) : (
                 // Regular Login/Signup Form
+                //loading = signup
                 <>
                     <form
                         onSubmit={handleAuth}
@@ -231,6 +222,7 @@ const page = () => {
                                 </ul>
                             </label>
                         )}
+
                         {!loading && (
                             <button
                                 type="button" //need this or else default behavior = forgot password when enter key pressed

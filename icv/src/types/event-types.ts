@@ -2,7 +2,7 @@ import { Timestamp } from 'firebase/firestore'
 import { z } from 'zod'
 import { timestampToDateSchema } from './misc-types';
 
-// Enum for contact types
+// Enum for basic contact types
 export const CheckInCategory = z.enum([
     'Hot Meal',
     'Hygiene Kit',
@@ -10,6 +10,7 @@ export const CheckInCategory = z.enum([
     'Other'
 ])
 
+//enum for check in types!!!
 export const ContactType = z.enum([
     'Referral and Intake', // ReferralAndIntake
     'Phone', // Phone

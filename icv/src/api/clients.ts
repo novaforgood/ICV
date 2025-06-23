@@ -3,7 +3,10 @@ import 'server-only'
 
 import { getAuthenticatedAppForUser } from '@/lib/serverApp'
 import { NewClient } from '@/types/client-types'
-import { collection, getDoc, getDocs, getFirestore, doc, where, limit, orderBy, query } from 'firebase/firestore'
+import { collection, getDoc, getDocs, getFirestore, doc, where, limit, orderBy, query, setDoc, deleteDoc } from 'firebase/firestore'
+import { Resend } from "resend"
+import { getApp, getApps, initializeApp, cert } from 'firebase-admin/app';
+
 
 // Extended client type with lastCheckinDate
 interface ClientWithLastCheckin extends NewClient {
@@ -12,8 +15,81 @@ interface ClientWithLastCheckin extends NewClient {
 import  {Users} from '@/types/user-types'
 import { User } from 'firebase/auth'
 
+export async function start2FA(email: string) {
+    if (!getApps().length) {
+        initializeApp({
+          credential: cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+          }),
+        });
+      }
+      
+    const ssrdb = getFirestore();
+
+    const code = Math.floor(100000 + Math.random() * 900000).toString()
+    const expiresAt = Date.now() + 15 * 60 * 1000 // 15 minutes
+
+    // Store in Firestore
+    await setDoc(doc(ssrdb, "2faCodes", email), {
+        code,
+        expiresAt,
+        createdAt: new Date()
+    })
+
+    // Email it 
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    await resend.emails.send({
+        from: "noreply@yourapp.com",
+        to: email,
+        subject: "Your 2FA Code",
+        html: `<p>Your code is <strong>${code}</strong>. Expires in 15 minutes.</p>`
+    })
+
+    return { success: true }
+}
+
+export async function verify2FA(email:string, verificationCode: string) {
+    if (!getApps().length) {
+        initializeApp({
+          credential: cert({
+            projectId: process.env.FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+          }),
+        });
+      }
+      
+    const ssrdb = getFirestore();
+
+    const codeDocRef = doc(ssrdb, "2faCodes", email);
+    const docSnap = await getDoc(codeDocRef);
+
+    if (!docSnap.exists()){
+        throw new Error("Invalid or expired code.");
+    }
+
+    const { code: storedCode, expiresAt } = docSnap.data();
+
+    if (Date.now() > expiresAt) {
+        // Delete the expired code
+        await deleteDoc(codeDocRef);
+        throw new Error("Code has expired.");
+    }
+
+    if (storedCode !== verificationCode) {
+        throw new Error("Invalid code.");
+    }
+
+    // Success! Delete the code so it can't be reused.
+    await deleteDoc(codeDocRef);
+
+    return { success: true };
+}
+
 export async function getAllClients(): Promise<NewClient[]> {
-    const { firebaseServerApp, currentUser } =
+    const { firebaseServerApp, currentUser } = 
         await getAuthenticatedAppForUser()
     if (!currentUser) {
         throw new Error('User not found')

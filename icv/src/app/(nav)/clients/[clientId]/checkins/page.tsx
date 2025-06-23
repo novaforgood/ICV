@@ -7,10 +7,11 @@ import Symbol from '@/components/Symbol'
 import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
 import { CheckInType } from '@/types/event-types'
+import ClickAwayListener from '@mui/material/ClickAwayListener'
 import { collection, getDocs, or, query, where } from 'firebase/firestore'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Dropdown from 'react-dropdown'
 
 interface CheckIn extends CheckInType {
@@ -38,11 +39,30 @@ export default function CheckInsPage() {
     const [selectedCategory, setSelectedCategory] = useState<string | null>(
         null,
     )
+    // tracking state of dropdown box
+    const [isOpen, setIsOpen] = useState(false)
+    const dropdownRef = useRef<HTMLDivElement>(null)
 
-    // Add sorting state
+    // useEffect(() => {
+    //     function handleClickOutside(event: MouseEvent) {
+    //       if (
+    //         dropdownRef.current &&
+    //         !dropdownRef.current.contains(event.target as Node)
+    //       ) {
+    //         setIsOpen(false);
+    //       }
+    //     }
+    //   //need to use click instead of mousedown bc click only fires after mrowser has done mousedown mouseup seq
+    //     document.addEventListener('click', handleClickOutside);
+    //     return () => {
+    //       document.removeEventListener('click', handleClickOutside);
+    //     };
+    //   }, []);
+
+    // sorting state
     const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
 
-    // Define color mapping for categories
+    // color mapping for categories
     const getCategoryColor = (category: string) => {
         const colors: { [key: string]: string } = {
             None: 'bg-white',
@@ -196,6 +216,9 @@ export default function CheckInsPage() {
                     past: pastCheckIns,
                     upcoming: upcomingCheckIns,
                 })
+
+                // Reset newEvents to false after fetching to allow future refreshes
+                setNewEvents(false)
             } catch (error) {
                 console.error('Error fetching check-ins:', error)
             } finally {
@@ -204,7 +227,7 @@ export default function CheckInsPage() {
         }
 
         fetchCheckIns()
-    }, [clientId])
+    }, [clientId, newEvents]) // Add newEvents as a dependency to trigger refresh whenever new event added
 
     const { user } = useUser()
     if (loading) {
@@ -221,66 +244,74 @@ export default function CheckInsPage() {
                 {/* Title */}
                 <h1 className="text-4xl font-bold">Case Notes</h1>
 
-                <div className="flex items-center gap-4">
+                <div className="z-40 flex items-center gap-4">
                     <ScheduledCheckInCreation
                         onNewEvent={() => setNewEvents(true)}
                         clientName={`${client?.firstName} ${client?.lastName}`}
                     />
 
                     {/* Filter controls */}
-                    <div className="relative flex items-center gap-2">
-                        <Dropdown
-                            className="w-full border-black"
-                            placeholderClassName="hidden"
-                            options={filterOptions.map((option) => ({
-                                value: option,
-                                label: (
-                                    <div
-                                        className={`${getCategoryColor(option)} flex h-[30px] w-full items-center justify-center rounded-md border border-gray-200 p-4`}
-                                    >
-                                        <span className="truncate text-sm font-medium">
-                                            {option}
-                                        </span>
-                                    </div>
-                                ),
-                            }))}
-                            onChange={handleCategoryChange}
-                            controlClassName={`flex items-center justify-between border border-black-300 rounded-md px-4 py-2 ${selectedCategory ? 'bg-sky' : 'bg-white'} w-full hover:border-neutral-400`}
-                            menuClassName="dropdown-menu absolute w-400 mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400 [&>div]:!bg-transparent [&>div]:!p-1"
-                            arrowClosed={
-                                <div className="flex w-full items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Symbol
-                                            symbol="filter_list"
-                                            className="h-5 w-5"
-                                        />
-                                        <span>Filter</span>
-                                    </div>
-                                    {selectedCategory && (
-                                        <span className="ml-2">
-                                            {selectedCategory}
-                                        </span>
-                                    )}
+                    {filterOptions.length !== 1 && (
+                        <ClickAwayListener onClickAway={() => setIsOpen(false)}>
+                            <div ref={dropdownRef} className="relative">
+                                <div className="relative z-20 flex items-center gap-2">
+                                    <Dropdown
+                                        className="w-full border-black"
+                                        placeholderClassName="hidden"
+                                        options={filterOptions.map(
+                                            (option) => ({
+                                                value: option,
+                                                label: (
+                                                    <div
+                                                        className={`${getCategoryColor(option)} flex h-[30px] w-full items-center justify-center rounded-md border border-gray-200 p-4`}
+                                                    >
+                                                        <span className="truncate text-sm font-medium">
+                                                            {option}
+                                                        </span>
+                                                    </div>
+                                                ),
+                                            }),
+                                        )}
+                                        onChange={handleCategoryChange}
+                                        controlClassName={`flex items-center justify-between border border-black-300 rounded-md px-4 py-2 ${selectedCategory ? 'bg-sky' : 'bg-white'} w-full hover:border-neutral-400`}
+                                        menuClassName={`dropdown-menu absolute w-400 mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400 [&>div]:!bg-transparent [&>div]:!p-1 `}
+                                        arrowClosed={
+                                            <div className="flex w-full items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Symbol
+                                                        symbol="filter_list"
+                                                        className="h-5 w-5"
+                                                    />
+                                                    <span>Filter</span>
+                                                </div>
+                                                {selectedCategory && (
+                                                    <span className="ml-2">
+                                                        {selectedCategory}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        }
+                                        arrowOpen={
+                                            <div className="flex w-full items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <Symbol
+                                                        symbol="filter_list"
+                                                        className="h-5 w-5"
+                                                    />
+                                                    <span>Filter</span>
+                                                </div>
+                                                {selectedCategory && (
+                                                    <span className="ml-2">
+                                                        {selectedCategory}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        }
+                                    />
                                 </div>
-                            }
-                            arrowOpen={
-                                <div className="flex w-full items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Symbol
-                                            symbol="filter_list"
-                                            className="h-5 w-5"
-                                        />
-                                        <span>Filter</span>
-                                    </div>
-                                    {selectedCategory && (
-                                        <span className="ml-2">
-                                            {selectedCategory}
-                                        </span>
-                                    )}
-                                </div>
-                            }
-                        />
-                    </div>
+                            </div>
+                        </ClickAwayListener>
+                    )}
 
                     {/* Sort controls */}
                     <div className="flex items-center gap-2">
@@ -370,13 +401,19 @@ export default function CheckInsPage() {
                 <div className="flex items-center gap-2"></div>
             </div>
             <div className="grid gap-4">
-                {filteredPastEvents.map((checkIn: CheckIn) => (
-                    <EventCard
-                        key={String(checkIn.id)}
-                        event={checkIn}
-                        variant="checkins-page"
-                    />
-                ))}
+                {filteredPastEvents.length === 0 ? (
+                    <div className="py-4 text-center text-gray-500">
+                        No past check-ins. Yay!
+                    </div>
+                ) : (
+                    filteredPastEvents.map((checkIn: CheckIn) => (
+                        <EventCard
+                            key={String(checkIn.id)}
+                            event={checkIn}
+                            variant="checkins-page"
+                        />
+                    ))
+                )}
             </div>
         </div>
     )
