@@ -20,6 +20,13 @@ const TwoFactorAuthPage = () => {
     const email = sessionStorage.getItem('2fa-email') || ''
     const pw = sessionStorage.getItem('2fa-pw') || ''
 
+    // Auto-send verification code when page loads
+    useEffect(() => {
+        if (email && !codeSent) {
+            sendVerificationCode()
+        }
+    }, [email])
+
     // Countdown timer for resend functionality
     useEffect(() => {
         if (countdown > 0) {
@@ -34,6 +41,8 @@ const TwoFactorAuthPage = () => {
 
         try {
             await start2FA(email)
+            setCodeSent(true)
+            setCountdown(60) // 60 second countdown before allowing resend
         } catch (err) {
             setError('Failed to send verification code. Please try again.')
         } finally {
@@ -48,17 +57,12 @@ const TwoFactorAuthPage = () => {
 
         try {
             await verify2FA(email, verificationCode)
-        } catch (err) {
-            setError('Verification failed. Please try again.')
-        } finally {
-            setLoading(false)
-        }
-        //if no error, then we can successfuly log in and delete sessionstorage
-        const usercred = await signInWithEmailAndPassword(auth, email, pw)
+            //if no error, then we can successfully log in and delete sessionstorage
+            const usercred = await signInWithEmailAndPassword(auth, email, pw)
             const user = usercred.user
             if (user) {
-                sessionStorage.removeItem("2fa-pw")
-                sessionStorage.removeItem("2fa-email")
+                sessionStorage.removeItem('2fa-pw')
+                sessionStorage.removeItem('2fa-email')
                 // Set cookie
                 const token = await user.getIdToken()
                 setCookie('idToken', token, {
@@ -71,6 +75,11 @@ const TwoFactorAuthPage = () => {
                 console.log('Welcome, ', auth.currentUser?.displayName)
                 router.push('/')
             }
+        } catch (err) {
+            setError('Verification failed. Please try again.')
+        } finally {
+            setLoading(false)
+        }
     }
 
     // Handle resend code

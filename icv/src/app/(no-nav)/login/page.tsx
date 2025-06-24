@@ -68,12 +68,21 @@ const page = () => {
                 })
                 console.log('user stored in collections')
             } else {
-                 // Start 2FA process, temporarily store email and pw in session storage
-                 sessionStorage.setItem('2fa-email', email)
-                 sessionStorage.setItem('2fa-pw', password)
-                 await start2FA( email || '')
-                 //router push to 2fa
-                 router.push('/2fa')
+                // First authenticate with Firebase
+                const usercred = await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password,
+                )
+                const user = usercred.user
+                if (user) {
+                    // // Start 2FA process, temporarily store email and pw in session storage
+                    // sessionStorage.setItem('2fa-email', email)
+                    // sessionStorage.setItem('2fa-pw', password)
+                    // await start2FA(email || '')
+                    // router.push('/2fa')
+                    router.push('/')
+                }
             }
         } catch (err) {
             if (err instanceof Error) {

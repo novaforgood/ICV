@@ -6,14 +6,15 @@ import { NewClient } from '@/types/client-types'
 import { collection, getDoc, getDocs, getFirestore, doc, where, limit, orderBy, query, setDoc, deleteDoc } from 'firebase/firestore'
 import { Resend } from "resend"
 import { getApp, getApps, initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
+import  {Users} from '@/types/user-types'
+import { User } from 'firebase/auth'
 
 
 // Extended client type with lastCheckinDate
 interface ClientWithLastCheckin extends NewClient {
     lastCheckinDate?: string;
 }
-import  {Users} from '@/types/user-types'
-import { User } from 'firebase/auth'
 
 export async function start2FA(email: string) {
     if (!getApps().length) {
@@ -26,26 +27,34 @@ export async function start2FA(email: string) {
         });
       }
       
-    const ssrdb = getFirestore();
+    const ssrdb = getAdminFirestore();
 
     const code = Math.floor(100000 + Math.random() * 900000).toString()
     const expiresAt = Date.now() + 15 * 60 * 1000 // 15 minutes
 
-    // Store in Firestore
-    await setDoc(doc(ssrdb, "2faCodes", email), {
+    // Store in Firestore using Admin SDK
+    await ssrdb.collection("2faCodes").doc(email).set({
         code,
         expiresAt,
         createdAt: new Date()
     })
 
+    
     // Email it 
     const resend = new Resend(process.env.RESEND_API_KEY)
-    await resend.emails.send({
-        from: "noreply@yourapp.com",
-        to: email,
-        subject: "Your 2FA Code",
-        html: `<p>Your code is <strong>${code}</strong>. Expires in 15 minutes.</p>`
-    })
+
+    try {
+        await resend.emails.send({
+            from: 'noreply@yourapp.com', 
+            to: email,
+            subject: 'Your ICV 2FA Code',
+            html: `<p>Your verification code is <strong>${code}</strong>. This code expires in 15 minutes.</p>`
+        })
+        console.log('Verification code sent successfully to:', email)
+    } catch (err) {
+        console.error('Failed to send verification code:', err)
+        // Don't throw error here, just log it so the 2FA process can continue
+    }
 
     return { success: true }
 }
@@ -61,20 +70,20 @@ export async function verify2FA(email:string, verificationCode: string) {
         });
       }
       
-    const ssrdb = getFirestore();
+    const ssrdb = getAdminFirestore();
 
-    const codeDocRef = doc(ssrdb, "2faCodes", email);
-    const docSnap = await getDoc(codeDocRef);
+    const codeDocRef = ssrdb.collection("2faCodes").doc(email);
+    const docSnap = await codeDocRef.get();
 
-    if (!docSnap.exists()){
+    if (!docSnap.exists){
         throw new Error("Invalid or expired code.");
     }
 
-    const { code: storedCode, expiresAt } = docSnap.data();
+    const { code: storedCode, expiresAt } = docSnap.data() as { code: string; expiresAt: number };
 
     if (Date.now() > expiresAt) {
         // Delete the expired code
-        await deleteDoc(codeDocRef);
+        await codeDocRef.delete();
         throw new Error("Code has expired.");
     }
 
@@ -83,7 +92,7 @@ export async function verify2FA(email:string, verificationCode: string) {
     }
 
     // Success! Delete the code so it can't be reused.
-    await deleteDoc(codeDocRef);
+    await codeDocRef.delete();
 
     return { success: true };
 }
