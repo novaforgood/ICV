@@ -35,7 +35,7 @@ const FAQItem = ({ question }: { question: string }) => {
             </button>
             {open && (
                 <div className="ml-8 mt-1 text-sm text-gray-500">
-                    We dont have the answer lololol
+                    Please log out and use the Forgot Password Button.
                 </div>
             )}
         </div>
@@ -331,7 +331,7 @@ const SettingsPage = () => {
                 <h2 className="mb-4 font-bold uppercase tracking-wider text-gray-400">
                     FAQ
                 </h2>
-                <FAQItem question="Do you have a question?" />
+                <FAQItem question="Need to Change Your Password?" />
             </div>
 
             <div>
