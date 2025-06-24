@@ -313,7 +313,7 @@ export const ClientProfileToggle = ({
 
                                     clearForm(id)
                                     setEditMode(false)
-                                    router.push(`/clients/${id}`)
+                                    router.push(`/clients/${id}/profile`)
                                 } catch (err) {
                                     console.error('updateClient error:', err)
                                 }
