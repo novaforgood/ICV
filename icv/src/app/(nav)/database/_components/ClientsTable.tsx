@@ -18,7 +18,13 @@ import {
     SortingState,
     useReactTable,
 } from '@tanstack/react-table'
-import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+    ArrowUpDown,
+    ChevronLeft,
+    ChevronRight,
+    Eye,
+    EyeOff,
+} from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
 import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
@@ -129,24 +135,16 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
             }
 
             if (dateFilterType === 'calendar') {
-                if (
-                    selectedMonths.length > 0 &&
-                    !selectedMonths.includes(recordMonth)
-                ) {
-                    return false
-                }
+                if (selectedMonths.length === 0) return false
+                if (!selectedMonths.includes(recordMonth)) return false
             } else {
-                if (selectedQuarters.length > 0) {
-                    const isInSelectedQuarter = selectedQuarters.some(
-                        (quarter) => {
-                            const quarterMonths =
-                                QUARTERS.find((q) => q.label === quarter)
-                                    ?.months || []
-                            return quarterMonths.includes(recordMonth)
-                        },
-                    )
-                    if (!isInSelectedQuarter) return false
-                }
+                if (selectedQuarters.length === 0) return false
+                const isInSelectedQuarter = selectedQuarters.some((quarter) => {
+                    const quarterMonths =
+                        QUARTERS.find((q) => q.label === quarter)?.months || []
+                    return quarterMonths.includes(recordMonth)
+                })
+                if (!isInSelectedQuarter) return false
             }
 
             return true
@@ -195,9 +193,23 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
         sortDirection,
     ])
 
+    const [hiddenColumns, setHiddenColumns] = useState<string[]>([])
+
+    // Helper to reorder columns: visible first, then hidden
+    const getOrderedColumns = (columns: any[]) => {
+        const visible = columns.filter((col) => !hiddenColumns.includes(col.id))
+        const hidden = columns.filter((col) => hiddenColumns.includes(col.id))
+        return [...visible, ...hidden]
+    }
+
+    const orderedColumns = React.useMemo(
+        () => getOrderedColumns(CLIENT_TABLE_COLUMNS),
+        [hiddenColumns],
+    )
+
     const table = useReactTable({
         data: filteredClients,
-        columns: CLIENT_TABLE_COLUMNS,
+        columns: orderedColumns,
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
@@ -242,6 +254,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
     useEffect(() => {
         setCurrentPage(1)
     }, [globalFilter, sortField, sortDirection])
+
+    const anyColumnFiltered = table
+        .getAllColumns()
+        .some((col) => col.getIsFiltered?.())
 
     return (
         <div className="space-y-4">
@@ -379,34 +395,66 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                             </div>
                         </div>
                     </div>
-
-                    <div className="flex flex-row items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div>
-                                <strong>
-                                    {table.getFilteredRowModel().rows.length}
-                                </strong>{' '}
-                                ICV clients
+                    <div className="flex flex-row justify-between">
+                        <div className="flex flex-row items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div>
+                                    <strong>
+                                        {
+                                            table.getFilteredRowModel().rows
+                                                .length
+                                        }
+                                    </strong>{' '}
+                                    ICV clients
+                                </div>
+                                <span className="text-gray-400">/</span>
+                                <div>
+                                    <strong>
+                                        {table
+                                            .getFilteredRowModel()
+                                            .rows.reduce((total, row) => {
+                                                const serviced = parseInt(
+                                                    row.original
+                                                        .familyMembersServiced ||
+                                                        '1',
+                                                )
+                                                return (
+                                                    total +
+                                                    (isNaN(serviced)
+                                                        ? 1
+                                                        : serviced)
+                                                )
+                                            }, 0)}
+                                    </strong>{' '}
+                                    Total clients
+                                </div>
                             </div>
-                            <span className="text-gray-400">/</span>
-                            <div>
-                                <strong>
-                                    {table
-                                        .getFilteredRowModel()
-                                        .rows.reduce((total, row) => {
-                                            const serviced = parseInt(
-                                                row.original
-                                                    .familyMembersServiced ||
-                                                    '0',
-                                            )
-                                            return (
-                                                total +
-                                                (isNaN(serviced) ? 0 : serviced)
-                                            )
-                                        }, 0)}
-                                </strong>{' '}
-                                Total clients
-                            </div>
+                        </div>
+                        <div className="flex flex-row gap-4">
+                            {anyColumnFiltered && (
+                                <button
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium underline transition-colors"
+                                    onClick={() => {
+                                        table.getAllColumns().forEach((col) => {
+                                            if (col.getIsFiltered?.()) {
+                                                col.setFilterValue(undefined)
+                                            }
+                                        })
+                                    }}
+                                    type="button"
+                                >
+                                    Remove all filters
+                                </button>
+                            )}
+                            {hiddenColumns.length > 0 && (
+                                <button
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium underline transition-colors"
+                                    onClick={() => setHiddenColumns([])}
+                                    type="button"
+                                >
+                                    Unhide all
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -417,6 +465,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                 <TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map(
                                         (header, index) => {
+                                            const isHidden =
+                                                hiddenColumns.includes(
+                                                    header.column.id,
+                                                )
                                             const isLastColumn =
                                                 index ===
                                                 headerGroup.headers.length - 1
@@ -425,6 +477,19 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                                     key={header.id}
                                                     style={{
                                                         width: header.column.getSize(),
+                                                        background: isHidden
+                                                            ? '#f3f4f6'
+                                                            : undefined,
+                                                        color: isHidden
+                                                            ? '#a3a3a3'
+                                                            : undefined,
+                                                        opacity: isHidden
+                                                            ? 0.5
+                                                            : 1,
+                                                        pointerEvents: isHidden
+                                                            ? 'none'
+                                                            : 'auto',
+                                                        position: 'relative',
                                                     }}
                                                     className={
                                                         isLastColumn
@@ -439,6 +504,54 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                                                 .header,
                                                             header.getContext(),
                                                         )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation()
+                                                                setHiddenColumns(
+                                                                    (prev) =>
+                                                                        isHidden
+                                                                            ? prev.filter(
+                                                                                  (
+                                                                                      id,
+                                                                                  ) =>
+                                                                                      id !==
+                                                                                      header
+                                                                                          .column
+                                                                                          .id,
+                                                                              )
+                                                                            : [
+                                                                                  ...prev,
+                                                                                  header
+                                                                                      .column
+                                                                                      .id,
+                                                                              ],
+                                                                )
+                                                            }}
+                                                            style={{
+                                                                marginLeft: 8,
+                                                                pointerEvents:
+                                                                    'auto',
+                                                                background:
+                                                                    'none',
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                color: isHidden
+                                                                    ? '#a3a3a3'
+                                                                    : '#6b7280',
+                                                            }}
+                                                            title={
+                                                                isHidden
+                                                                    ? 'Unhide column'
+                                                                    : 'Hide column'
+                                                            }
+                                                        >
+                                                            {isHidden ? (
+                                                                <Eye className="h-4 w-4" />
+                                                            ) : (
+                                                                <EyeOff className="h-4 w-4" />
+                                                            )}
+                                                        </button>
                                                     </div>
                                                 </TableHead>
                                             )
@@ -459,6 +572,10 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                         {row
                                             .getVisibleCells()
                                             .map((cell, index) => {
+                                                const isHidden =
+                                                    hiddenColumns.includes(
+                                                        cell.column.id,
+                                                    )
                                                 const isLastColumn =
                                                     index ===
                                                     row.getVisibleCells()
@@ -469,6 +586,19 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                                         key={cell.id}
                                                         style={{
                                                             width: cell.column.getSize(),
+                                                            background: isHidden
+                                                                ? '#f3f4f6'
+                                                                : undefined,
+                                                            color: isHidden
+                                                                ? '#a3a3a3'
+                                                                : undefined,
+                                                            opacity: isHidden
+                                                                ? 0.5
+                                                                : 1,
+                                                            pointerEvents:
+                                                                isHidden
+                                                                    ? 'none'
+                                                                    : 'auto',
                                                         }}
                                                         className={
                                                             isLastColumn
@@ -476,11 +606,21 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                                                 : ''
                                                         }
                                                     >
-                                                        {flexRender(
-                                                            cell.column
-                                                                .columnDef.cell,
-                                                            cell.getContext(),
-                                                        )}
+                                                        <div
+                                                            style={{
+                                                                pointerEvents:
+                                                                    isHidden
+                                                                        ? 'none'
+                                                                        : 'auto',
+                                                            }}
+                                                        >
+                                                            {flexRender(
+                                                                cell.column
+                                                                    .columnDef
+                                                                    .cell,
+                                                                cell.getContext(),
+                                                            )}
+                                                        </div>
                                                     </TableCell>
                                                 )
                                             })}
@@ -490,10 +630,9 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                 <TableRow>
                                     <TableCell
                                         colSpan={CLIENT_TABLE_COLUMNS.length}
-                                        className="h-24 text-center"
-                                    >
-                                        No results.
-                                    </TableCell>
+                                        className="h-0 border-b border-[#D8DDE7] p-0"
+                                        style={{ height: 0, padding: 0 }}
+                                    />
                                 </TableRow>
                             )}
                         </TableBody>

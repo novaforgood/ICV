@@ -31,7 +31,6 @@ export const ClientProfileToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
-    const [editHousing, setEditHousing] = useState(false)
     const [showHousingLog, setShowHousingLog] = useState(false)
     const [housingStatuses, setHousingStatuses] = useState<any[]>([])
     const [exporting, setExporting] = useState(false)
@@ -314,7 +313,7 @@ export const ClientProfileToggle = ({
 
                                     clearForm(id)
                                     setEditMode(false)
-                                    router.push(`/clients/${id}`)
+                                    router.push(`/clients/${id}/profile`)
                                 } catch (err) {
                                     console.error('updateClient error:', err)
                                 }

@@ -9,10 +9,17 @@ import { useUser } from '@/hooks/useUser'
 import { CheckInType } from '@/types/event-types'
 import ClickAwayListener from '@mui/material/ClickAwayListener'
 import { collection, getDocs, or, query, where } from 'firebase/firestore'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
-import Dropdown from 'react-dropdown'
+import { useEffect, useState } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 
 interface CheckIn extends CheckInType {
     id: string
@@ -251,90 +258,41 @@ export default function CheckInsPage() {
                     />
 
                     {/* Filter controls */}
-                    {filterOptions.length !== 1 && (
-                        <ClickAwayListener onClickAway={() => setIsOpen(false)}>
-                            <div ref={dropdownRef} className="relative">
-                                <div className="relative z-20 flex items-center gap-2">
-                                    <Dropdown
-                                        className="w-full border-black"
-                                        placeholderClassName="hidden"
-                                        options={filterOptions.map(
-                                            (option) => ({
-                                                value: option,
-                                                label: (
-                                                    <div
-                                                        className={`${getCategoryColor(option)} flex h-[30px] w-full items-center justify-center rounded-md border border-gray-200 p-4`}
-                                                    >
-                                                        <span className="truncate text-sm font-medium">
-                                                            {option}
-                                                        </span>
-                                                    </div>
-                                                ),
-                                            }),
-                                        )}
-                                        onChange={handleCategoryChange}
-                                        controlClassName={`flex items-center justify-between border border-black-300 rounded-md px-4 py-2 ${selectedCategory ? 'bg-sky' : 'bg-white'} w-full hover:border-neutral-400`}
-                                        menuClassName={`dropdown-menu absolute w-400 mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400 [&>div]:!bg-transparent [&>div]:!p-1 `}
-                                        arrowClosed={
-                                            <div className="flex w-full items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <Symbol
-                                                        symbol="filter_list"
-                                                        className="h-5 w-5"
-                                                    />
-                                                    <span>Filter</span>
-                                                </div>
-                                                {selectedCategory && (
-                                                    <span className="ml-2">
-                                                        {selectedCategory}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        }
-                                        arrowOpen={
-                                            <div className="flex w-full items-center justify-between">
-                                                <div className="flex items-center gap-2">
-                                                    <Symbol
-                                                        symbol="filter_list"
-                                                        className="h-5 w-5"
-                                                    />
-                                                    <span>Filter</span>
-                                                </div>
-                                                {selectedCategory && (
-                                                    <span className="ml-2">
-                                                        {selectedCategory}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        }
-                                    />
-                                </div>
-                            </div>
-                        </ClickAwayListener>
-                    )}
+                    <div className="flex items-center gap-2">
+                        <Select
+                            value={selectedCategory || 'all'}
+                            onValueChange={(value) => {
+                                setSelectedCategory(value === 'all' ? null : value)
+                                setCurrentPage(1)
+                            }}
+                        >
+                            <SelectTrigger className="w-[180px] h-10 px-4 py-2 text-sm">
+                                <SelectValue placeholder="Filter by category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Categories</SelectItem>
+                                {filterOptions.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                        {option}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
 
                     {/* Sort controls */}
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setSortOrder('newest')}
-                            className={`rounded-md px-3 py-1 ${
-                                sortOrder === 'newest'
-                                    ? 'bg-blue text-white'
-                                    : 'bg-gray-100 hover:bg-gray-200'
-                            }`}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                                setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')
+                            }
+                            className="flex items-center gap-2 h-10 px-4 py-2 text-sm"
                         >
-                            Newest
-                        </button>
-                        <button
-                            onClick={() => setSortOrder('oldest')}
-                            className={`rounded-md px-3 py-1 ${
-                                sortOrder === 'oldest'
-                                    ? 'bg-blue text-white'
-                                    : 'bg-gray-100 hover:bg-gray-200'
-                            }`}
-                        >
-                            Oldest
-                        </button>
+                            <ArrowUpDown className="h-4 w-4" />
+                            {sortOrder === 'newest' ? 'Oldest' : 'Newest'}
+                        </Button>
                     </div>
 
                     {/* Pagination controls */}
@@ -342,11 +300,7 @@ export default function CheckInsPage() {
                         <button
                             onClick={handlePrevPage}
                             disabled={currentPage === 1}
-                            className={`flex h-8 w-8 items-center justify-center rounded-md ${
-                                currentPage === 1
-                                    ? 'cursor-not-allowed bg-gray-100 text-gray-400'
-                                    : 'bg-blue text-white hover:bg-navy'
-                            }`}
+                            className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
                         >
                             <ChevronLeft className="h-5 w-5" />
                         </button>
