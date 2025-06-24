@@ -37,6 +37,7 @@ export async function getAuthenticatedAppForUser() {
 
     if (!auth.currentUser) {
         throw new Error('No user found')
+       
     }
 
 

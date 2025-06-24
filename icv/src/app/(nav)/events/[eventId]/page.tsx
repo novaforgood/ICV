@@ -39,7 +39,7 @@ export default function EventDetailPage() {
 
         fetchEvent()
     }, [eventId])
-
+    //ONLY WORKS with contactcode, not event.category
     function isContactTypeKey(value: any): value is ContactTypeKey {
         return typeof value === 'string' && value in categoryColors
     }
@@ -72,9 +72,9 @@ export default function EventDetailPage() {
                         <h2 className="text-xl font-bold">
                             {format(new Date(event.startTime), 'MMMM d, yyyy')}
                         </h2>
-                        {isContactTypeKey(event.category) ? (
+                        {isContactTypeKey(event.contactCode) ? (
                             <ContactTypeBadge
-                                type={event.category as ContactTypeKey}
+                                type={event.contactCode as ContactTypeKey}
                             />
                         ) : (
                             <ContactTypeBadge type="Other" />

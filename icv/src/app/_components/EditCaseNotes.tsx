@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card'
 import { Mic, MicOff, Save } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-
 interface SpeechRecognition extends EventTarget {
     continuous: boolean
     interimResults: boolean
@@ -18,6 +17,7 @@ interface SpeechRecognition extends EventTarget {
 }
 
 interface SpeechRecognitionEvent extends Event {
+    resultsIndex: number //te;;s us where in the results array the new words start
     results: SpeechRecognitionResultList
 }
 
@@ -63,6 +63,7 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
     onSave,
 }) => {
     const [notes, setNotes] = useState(initialNotes)
+    const [vnotes, setVnotes] = useState("") //seperate voice notes that are kept away from previously saved notes/written notes bc the voice functionality overwrites previous notes if saved in the same state var
     const [isRecording, setIsRecording] = useState(false)
     const [recognition, setRecognition] = useState<SpeechRecognition | null>(
         null,
@@ -83,7 +84,7 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
                     const transcript = Array.from(event.results)
                         .map((result) => result[0].transcript)
                         .join('')
-                    setNotes(transcript)
+                    setVnotes(transcript)
                 }
 
                 recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
@@ -105,15 +106,17 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
         if (isRecording) {
             recognition.stop()
         } else {
+            setNotes((prev) => prev + '\n ---- Speech to Text Notes: \n') //append to written/any previous notes that we are about to start our vnotes (voice notes)
             recognition.start()
+            handleSave
         }
         setIsRecording(!isRecording)
     }
 
     const handleSave = async () => {
         try {
-            await updateCaseNotes(eventId, notes)
-            onSave(notes)
+            await updateCaseNotes(eventId, notes + vnotes)
+            onSave(notes + vnotes)
             onClose()
         } catch (error) {
             console.error('Error saving case notes:', error)
@@ -161,7 +164,7 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
 
                 <div className="relative">
                     <textarea
-                        value={notes}
+                        value={notes + vnotes}
                         onChange={(e) => setNotes(e.target.value)}
                         className="h-64 w-full rounded-md border p-4"
                         placeholder="Enter case notes here..."

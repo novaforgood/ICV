@@ -1,7 +1,15 @@
 'use client'
-import { auth } from '@/data/firebase'
+import { Card } from '@/components/ui/card'
+import { auth, clientDb, storage } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
-import { signOut, updateProfile } from 'firebase/auth'
+import {
+    signOut,
+    updateEmail,
+    updatePassword,
+    updateProfile,
+} from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { useEffect, useState } from 'react'
 import { FiEdit2, FiGlobe, FiMail } from 'react-icons/fi'
 
@@ -14,7 +22,6 @@ const handleLogout = async () => {
     }
 }
 
-// Simple FAQ item with expand/collapse
 const FAQItem = ({ question }: { question: string }) => {
     const [open, setOpen] = useState(false)
     return (
@@ -42,9 +49,13 @@ const SettingsPage = () => {
         firstName: '',
         lastName: '',
         email: '',
+        password: '********',
     })
     const [imageFile, setImageFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const [isSaving, setIsSaving] = useState(false)
+    const [showSuccess, setShowSuccess] = useState(false)
+    const [changePassword, setChangePassword] = useState(false)
 
     // Initialize form data when user data is loaded
     useEffect(() => {
@@ -54,9 +65,17 @@ const SettingsPage = () => {
                 firstName,
                 lastName: rest.join(' '),
                 email: user.email || '',
+                password: '********',
             })
         }
     }, [user])
+
+    //useeffect to display saved successfully
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowSuccess(false)
+        }, 3000)
+    }, [showSuccess])
 
     if (loading) return <p>Loading...</p>
     if (error) return <p>Error: {error.message}</p>
@@ -78,7 +97,7 @@ const SettingsPage = () => {
         const { name, value } = e.target
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: value, //works for all inputs, uses input's name and assigns the inputs's value
         }))
     }
 
@@ -86,20 +105,49 @@ const SettingsPage = () => {
         try {
             if (!user) return
 
+            setIsSaving(true)
+
             // Update profile
+            let photoURL = user.photoURL
+            if (imageFile) {
+                const fileExtension = imageFile.name.split('.').pop()
+                const fileName = `profile-images/${user.uid}`
+                const storageRef = ref(storage, fileName)
+
+                const snapshot = await uploadBytes(storageRef, imageFile)
+                photoURL = await getDownloadURL(snapshot.ref)
+                console.log(
+                    'oimage uploaded successfully, photoURL: ',
+                    photoURL,
+                )
+            }
             await updateProfile(user, {
                 displayName: `${formData.firstName} ${formData.lastName}`,
+                photoURL: photoURL,
+            })
+            await updateEmail(user, formData.email)
+            if(formData.password !== '********'){
+            await updatePassword(user, formData.password)
+            }
+
+            console.log('user name stored: ', auth.currentUser?.displayName)
+            //add username and email to collection to allow display on client form "case manager" box
+            await setDoc(doc(clientDb, 'users', `${formData.firstName}`), {
+                name: `${formData.firstName} ${formData.lastName}`,
+                email: `${formData.email}`,
+                uid: user.uid,
             })
 
-            // TODO: If you need to update the profile picture, you'll need to:
-            // 1. Upload the image to Firebase Storage
-            // 2. Get the URL
-            // 3. Update the user's photoURL
-            // This would require additional Firebase Storage setup
-
             setIsEditing(false)
+            // Clear the image file and preview after successful upload
+            setImageFile(null)
+            setPreviewUrl(null)
         } catch (error) {
             console.error('Error updating profile:', error)
+        } finally {
+            setShowSuccess(true)
+            setIsSaving(false)
+            setIsEditing(false)
         }
     }
 
@@ -112,6 +160,7 @@ const SettingsPage = () => {
                 firstName,
                 lastName: rest.join(' '),
                 email: user.email || '',
+                password: '********',
             })
         }
         setPreviewUrl(null)
@@ -124,13 +173,50 @@ const SettingsPage = () => {
             <h1 className="mb-2 border-b-2 border-dotted pb-2 text-7xl font-bold">
                 Settings
             </h1>
+            {showSuccess && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <Card className="w-fit rounded px-4 py-2 text-center">
+                        User info saved!
+                    </Card>
+                </div>
+            )}
 
             {/* Profile Section */}
             <div className="mb-12 mt-8 flex flex-row items-start justify-between">
                 <div className="flex w-full flex-col">
-                    <h2 className="mb-2 font-bold uppercase tracking-wider text-gray-400">
-                        Profile
-                    </h2>
+                    <div className="flex flex-row items-center justify-between">
+                        <h2 className="mb-2 font-bold uppercase tracking-wider text-gray-400">
+                            Profile
+                        </h2>
+                        <div className="flex gap-2">
+                            {isEditing ? (
+                                <>
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={isSaving}
+                                        className="flex items-center gap-2 rounded-md bg-blue px-4 py-2 text-white disabled:opacity-50"
+                                    >
+                                        {isSaving ? 'Saving...' : 'Save'}
+                                    </button>
+                                    <button
+                                        onClick={handleCancel}
+                                        disabled={isSaving}
+                                        className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-white disabled:opacity-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-white"
+                                >
+                                    <FiEdit2 />
+                                    Edit
+                                </button>
+                            )}
+                        </div>
+                    </div>
                     <div className="relative">
                         <img
                             src={previewUrl || user?.photoURL || '/icv.png'}
@@ -191,36 +277,53 @@ const SettingsPage = () => {
                         </div>
                         <div className="flex-1">
                             <span className="font-bold">Email</span>
-                            <div>{user?.email}</div>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+                                />
+                            ) : (
+                                <div>{user?.email}</div>
+                            )}
                         </div>
+                        
+                        {/* <div className="flex-1">
+                            {isEditing ? (
+                                <div>
+                                    <span className="font-bold">
+                                        Type your new password here:{''}
+                                    </span>
+                                    <input
+                                        type="text"
+                                        name="password"
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                        className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2"
+                                    />
+                                </div>
+                            ) : (
+                                <div>
+                                    <span className="font-bold">Password</span>
+                                    <input
+                                        type="password"
+                                        value="********"
+                                        disabled
+                                        className="mt-1 w-full cursor-not-allowed rounded-md border border-gray-300 bg-gray-100 px-3 py-2 text-gray-400"
+                                    />
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Click{' '}
+                                        <span className="font-semibold">
+                                            Edit
+                                        </span>{' '}
+                                        to change your password.
+                                    </p>
+                                </div>
+                            )}
+                        </div> */}
                     </div>
-                </div>
-
-                <div className="flex w-1/3 justify-end gap-2">
-                    {isEditing ? (
-                        <>
-                            <button
-                                onClick={handleSave}
-                                className="bg-blue-500 flex items-center gap-2 rounded-md px-4 py-2 text-white"
-                            >
-                                Save
-                            </button>
-                            <button
-                                onClick={handleCancel}
-                                className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-white"
-                            >
-                                Cancel
-                            </button>
-                        </>
-                    ) : (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-white"
-                        >
-                            <FiEdit2 />
-                            Edit
-                        </button>
-                    )}
                 </div>
             </div>
 
