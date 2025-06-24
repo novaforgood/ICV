@@ -134,6 +134,7 @@ export const ClientIntakeSchema = z.object({
     // Housing
     housingDate: z.string().optional(),
     homeless: z.string().optional(),
+    recentHousing: z.string().optional(),
     sheltered: z.string().optional(),
     housingNotes: z.string().optional(),
     streetAddress: z.string().optional(),
@@ -372,6 +373,7 @@ export const ProfileSchema = ClientIntakeSchema.pick({
     // Housing
     housingDate: true,
     homeless: true,
+    recentHousing: true,
     sheltered: true,
     housingNotes: true,
     streetAddress: true,

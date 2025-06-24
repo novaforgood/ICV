@@ -31,7 +31,6 @@ export const ClientProfileToggle = ({
     id: string
 }) => {
     const [editMode, setEditMode] = useState(false)
-    const [editHousing, setEditHousing] = useState(false)
     const [showHousingLog, setShowHousingLog] = useState(false)
     const [housingStatuses, setHousingStatuses] = useState<any[]>([])
     const [exporting, setExporting] = useState(false)

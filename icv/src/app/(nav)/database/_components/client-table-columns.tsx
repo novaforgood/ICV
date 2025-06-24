@@ -88,7 +88,7 @@ const FilterTags = ({
             {filters.map((filter, index) => (
                 <div
                     key={index}
-                    className="flex items-center gap-1 rounded-full bg-black text-white px-2 py-1 text-sm"
+                    className="flex items-center gap-1 rounded-full bg-black px-2 py-1 text-sm text-white"
                 >
                     <span>{filter}</span>
                     <button
@@ -511,8 +511,8 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
             })
         },
     }),
-    columnHelper.accessor('homeless', {
-        id: 'homeless',
+    columnHelper.accessor('recentHousing', {
+        id: 'recentHousing',
         header: ({ column }) => {
             const homelessOptions = [
                 { label: 'Homeless', value: 'Homeless' },
@@ -580,7 +580,7 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
             // If no filter selected, show all rows
             if (!filterValues || filterValues.length === 0) return true
 
-            const homeless = row.original.homeless
+            const homeless = row.original.recentHousing
 
             // Check if homeless status matches any of the selected values
             return filterValues.some((filterValue: string) => {
@@ -1229,8 +1229,8 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
             )
         },
         meta: {
-            className: 'border-r border-gray-200'
-        }
+            className: 'border-r border-gray-200',
+        },
     }),
     columnHelper.accessor('openProbation', {
         id: 'openProbation',

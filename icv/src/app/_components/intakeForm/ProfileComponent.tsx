@@ -388,9 +388,13 @@ const ProfileSection: React.FC<Props> = ({
                                     <RadioChoice
                                         options={HOMELESS}
                                         selectedValue={selectedHomeless}
-                                        onChange={(updatedHM) =>
-                                            setValue('homeless', updatedHM)
-                                        }
+                                        onChange={(
+                                            updatedHM: string | undefined,
+                                        ) => {
+                                            const value = updatedHM ?? ''
+                                            setValue('homeless', value)
+                                            setValue('recentHousing', value)
+                                        }}
                                         name="homeless?"
                                     />
                                 </div>
