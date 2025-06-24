@@ -52,16 +52,6 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
 
     const router = useRouter()
 
-
-    useEffect(() => {
-        const auth = getAuth()
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user?.displayName) setAssigneeId(user.displayName)
-        })
-
-        return () => unsubscribe()
-    }, [])
-
     useEffect(() => {
         if (selectedEvent) {
             const start = new Date(selectedEvent.start)
@@ -72,6 +62,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
             setLocation(selectedEvent.location || '')
             setContactType(selectedEvent.contactCode)
             setSelectedClientDocId(selectedEvent.clientDocId)
+            setAssigneeId(selectedEvent.assigneeId || '')
 
             // Fetch client data asynchronously
             const fetchClient = async () => {
@@ -119,10 +110,6 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         if (!clients || !selectedClientDocId) return null
         return clients.find((client) => client.docId === selectedClientDocId)
     }, [clients, selectedClientDocId])
-
-    const filteredStaff = staffNames.filter((name) =>
-        name.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
 
   const handleSubmit = (e: React.FormEvent) => {
     if (submitting) return
