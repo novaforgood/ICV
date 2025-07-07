@@ -328,7 +328,7 @@ export async function getRecentClients(): Promise<NewClient[]> {
             const dateB = new Date(b.intakeDate!).getTime();
             return dateB - dateA; // Descending order
         })
-        .slice(0, 2); // Get top 3
+        .slice(0, 3); // Get top 3
 
     return clientsList;
 }
