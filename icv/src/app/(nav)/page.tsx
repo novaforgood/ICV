@@ -16,6 +16,7 @@ import CheckInCounter from '../_components/CheckInCounter'
 import SpontaneousCheckInModal from '../_components/SpontaneousCheckinCreation'
 import { useUser } from '@/hooks/useUser'
 import { TimeFrameProvider } from '../_context/TimeFrameContext'
+import RecentClients from '../_components/RecentClients'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,13 +51,7 @@ export default function Home() {
         {/* Sidebar layout for md and up */}
         <div className="hidden md:flex w-1/3 flex-col gap-6 p-4">
           <CheckInCounter />
-          <h1 className="text-2xl font-semibold">Recent Clients</h1>
-          <Link href="/clients/1n8OcnTxVGsnhTloPySW/checkins">
-            <Card>
-              <h1 className="text-xl font-bold">Jimin Kim</h1>
-              <p>PK2025</p>
-            </Card>
-          </Link>
+          <RecentClients />
           <SpontaneousCheckInModal />
         </div>
       </TimeFrameProvider>
