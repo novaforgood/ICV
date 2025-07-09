@@ -219,17 +219,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -310,27 +299,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters.map(
-                            (filter) =>
-                                ageRanges.find(
-                                    (range) => range.value === filter,
-                                )?.label || filter,
-                        )}
-                        onClear={(filterToRemove) => {
-                            const filterValue = ageRanges.find(
-                                (range) => range.label === filterToRemove,
-                            )?.value
-                            if (filterValue) {
-                                const newFilters = selectedFilters.filter(
-                                    (f) => f !== filterValue,
-                                )
-                                column.setFilterValue(
-                                    newFilters.length ? newFilters : undefined,
-                                )
-                            }
-                        }}
-                    />
                 </div>
             )
         },
@@ -407,17 +375,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -484,17 +441,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -561,17 +507,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -644,17 +579,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -717,17 +641,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -790,17 +703,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -861,17 +763,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -946,17 +837,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -1011,17 +891,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -1076,17 +945,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -1141,17 +999,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -1206,17 +1053,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -1274,17 +1110,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },
@@ -1339,17 +1164,6 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                             </SelectContent>
                         </Select>
                     </div>
-                    <FilterTags
-                        filters={selectedFilters}
-                        onClear={(filterToRemove) => {
-                            const newFilters = selectedFilters.filter(
-                                (f) => f !== filterToRemove,
-                            )
-                            column.setFilterValue(
-                                newFilters.length ? newFilters : undefined,
-                            )
-                        }}
-                    />
                 </div>
             )
         },

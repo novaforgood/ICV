@@ -36,6 +36,7 @@ import {
     SelectTrigger,
 } from '@/components/ui/select'
 import { CLIENT_TABLE_COLUMNS } from './client-table-columns'
+import ClientTableActiveFilters from './ClientTableActiveFilters'
 
 interface ClientsTableProps {
     clients: NewClient[]
@@ -580,6 +581,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                 </TableRow>
                             ))}
                         </TableHeader>
+                        <ClientTableActiveFilters headers={table.getHeaderGroups()[0].headers} />
                         <TableBody>
                             {paginatedRows.length ? (
                                 paginatedRows.map((row) => (
