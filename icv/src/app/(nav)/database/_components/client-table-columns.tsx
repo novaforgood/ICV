@@ -203,8 +203,8 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
                                 <div className="p-2">
                                     <MultiCheckbox
                                         options={caseManagers.map((cm) => ({
-                                            label: cm,
-                                            value: cm,
+                                            label: cm ? cm : "N/A",
+                                            value: cm ? cm : "N/A"
                                         }))}
                                         selectedValues={selectedFilters}
                                         onChange={(values) =>
@@ -240,10 +240,11 @@ export const CLIENT_TABLE_COLUMNS: ColumnDef<NewClient, any>[] = [
             if (!filterValues || filterValues.length === 0) return true
 
             const caseManager = row.original.caseManager
+            const displayValue = caseManager ? caseManager : "N/A"
 
             // Check if case manager matches any of the selected values
             return filterValues.some((filterValue: string) => {
-                return caseManager === filterValue
+                return displayValue === filterValue
             })
         },
     }),
