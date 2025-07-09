@@ -107,7 +107,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
         )
     }
 
-    const years = Array.from(
+    const calendarYears = Array.from(
         new Set(
             clients.map((record) =>
                 record.intakeDate
@@ -117,6 +117,20 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
         ),
     ).sort((a, b) => b - a)
 
+    const fiscalYears = Array.from(
+        new Set(
+            clients.map((record) => {
+                    if (!record.intakeDate) return NaN;
+                    const date = new Date(record.intakeDate);
+                    const month = date.getMonth(); // 0-indexed (0 = Jan, 6 = Jul)
+                    const year = date.getFullYear();
+                    // Fiscal year starts in July: July-Dec map to next year
+                    return month >= 6 ? year + 1 : year;
+                })
+                .filter((year) => !isNaN(year))
+        )
+    ).sort((a, b) => b - a);
+
     useEffect(() => {
         let filtered = [...clients]
 
@@ -124,7 +138,12 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
             const recordDate = new Date(
                 record.intakeDate || record.intakeDate || new Date(),
             )
-            const recordYear = recordDate.getFullYear()
+            const recordYear =
+                dateFilterType === 'fiscal'
+                    ? recordDate.getMonth() >= 6
+                        ? recordDate.getFullYear() + 1
+                        : recordDate.getFullYear()
+                    : recordDate.getFullYear()
             const recordMonth = (recordDate.getMonth() + 1).toString()
 
             if (
@@ -262,7 +281,8 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
     return (
         <div className="space-y-4">
             <YearFilter
-                years={years}
+                calendarYears={calendarYears}
+                fiscalYears={fiscalYears}
                 isFilterVisible={isFilterVisible}
                 setIsFilterVisible={setIsFilterVisible}
                 dateFilterType={dateFilterType}
