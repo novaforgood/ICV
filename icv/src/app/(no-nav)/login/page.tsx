@@ -76,12 +76,12 @@ const page = () => {
                 )
                 const user = usercred.user
                 if (user) {
-                    // // Start 2FA process, temporarily store email and pw in session storage
-                    // sessionStorage.setItem('2fa-email', email)
-                    // sessionStorage.setItem('2fa-pw', password)
-                    // await start2FA(email || '')
-                    // router.push('/2fa')
-                    router.push('/')
+                    // Start 2FA process, temporarily store email and pw in session storage
+                    sessionStorage.setItem('2fa-email', email)
+                    sessionStorage.setItem('2fa-pw', password)
+                    await start2FA(email || '')
+                    router.push('/2fa')
+                    // router.push('/')
                 }
             }
         } catch (err) {
