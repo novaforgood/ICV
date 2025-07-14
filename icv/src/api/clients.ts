@@ -45,7 +45,7 @@ export async function start2FA(email: string) {
 
     try {
         await resend.emails.send({
-            from: 'noreply@yourapp.com', 
+            from: 'admin@icvcommunity.org', 
             to: email,
             subject: 'Your ICV 2FA Code',
             html: `<p>Your verification code is <strong>${code}</strong>. This code expires in 15 minutes.</p>`
