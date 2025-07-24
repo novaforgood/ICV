@@ -43,6 +43,8 @@ const page = () => {
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (loading) return // Prevent multiple submissions
+        setLoading(true)
         setError('')
 
         try {
@@ -104,13 +106,19 @@ const page = () => {
             } else {
                 setError('An unknown error occurred')
             }
+        } finally {
+            setLoading(false)
         }
     }
 
     //handle enter buttonw hen pressed
     const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            handleAuth
+        if (e.key === 'Enter' && !loading) {
+            // Create a synthetic event to pass to handleAuth
+            const form = e.currentTarget.form
+            if (form) {
+                handleAuth({ preventDefault: () => {}, target: form } as any)
+            }
         }
     }
 
@@ -218,6 +226,7 @@ const page = () => {
                             className="mt-0 w-full rounded-md border border-gray-200 p-2"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            onKeyDown={handleEnter}
                         />
                         {loading && (
                             <label className="mx-auto mb-0 mt-4 w-full rounded-md border p-4 text-sm">
@@ -244,8 +253,13 @@ const page = () => {
                         <button
                             type="submit"
                             className="mx-auto mt-4 w-[128px] items-center rounded-md bg-black p-2 text-white"
+                            disabled={loading}
                         >
-                            {loading ? 'Sign Up' : 'Login'}
+                            {loading
+                                ? 'Signing Up...'
+                                : loading
+                                  ? 'Sign Up'
+                                  : 'Login'}
                         </button>
                     </form>
 
