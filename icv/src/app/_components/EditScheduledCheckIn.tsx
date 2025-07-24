@@ -11,6 +11,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import React, { useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
 import ClientCard from './ClientCard'
+import { useRouter } from 'next/navigation'
 
 interface EditScheduledCheckInProps {
     onClose: () => void
@@ -49,14 +50,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
-    useEffect(() => {
-        const auth = getAuth()
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user?.displayName) setAssigneeId(user.displayName)
-        })
-
-        return () => unsubscribe()
-    }, [])
+    const router = useRouter()
 
     useEffect(() => {
         if (selectedEvent) {
@@ -68,6 +62,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
             setLocation(selectedEvent.location || '')
             setContactType(selectedEvent.contactCode)
             setSelectedClientDocId(selectedEvent.clientDocId)
+            setAssigneeId(selectedEvent.assigneeId || '')
 
             // Fetch client data asynchronously
             const fetchClient = async () => {
@@ -115,10 +110,6 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         if (!clients || !selectedClientDocId) return null
         return clients.find((client) => client.docId === selectedClientDocId)
     }, [clients, selectedClientDocId])
-
-    const filteredStaff = staffNames.filter((name) =>
-        name.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
 
   const handleSubmit = (e: React.FormEvent) => {
     if (submitting) return
@@ -264,11 +255,14 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                     <p>{selectedEvent.location}</p>
                                 </div>
                             )}
-
-          <div className="flex items-center gap-2 text-blue-700 mt-4 underline cursor-pointer">
-            <span className="material-symbols-outlined">description</span>
-            <p>View case notes</p>
-          </div>
+            <button
+                type="button"
+                className="flex items-center gap-2 text-blue-700 mt-4 underline cursor-pointer"
+                onClick={() => router.push(`/events/${selectedEvent.id}`)}
+            >
+                <span className="material-symbols-outlined">description</span>
+                View case notes
+            </button>
         </div>
       </div>
     )}
@@ -409,6 +403,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                             <button
                                 type="button"
                                 className="flex-1 rounded bg-black py-2 text-white shadow transition hover:bg-gray-800"
+                                onClick={() => router.push(`/events/${selectedEvent.id}`)}
                             >
                                 View case notes
                             </button>

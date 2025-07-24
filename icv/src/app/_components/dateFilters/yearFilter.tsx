@@ -5,6 +5,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { fi } from 'date-fns/locale'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 
 // Constants for month display and selection
@@ -32,7 +33,8 @@ const QUARTERS = [
 ]
 
 interface YearFilterProps {
-    years: number[]
+    calendarYears: number[]
+    fiscalYears: number[]
     isFilterVisible: boolean
     setIsFilterVisible: (visible: boolean) => void
     dateFilterType: 'calendar' | 'fiscal'
@@ -48,7 +50,8 @@ interface YearFilterProps {
 }
 
 export const YearFilter: React.FC<YearFilterProps> = ({
-    years,
+    calendarYears,
+    fiscalYears,
     isFilterVisible,
     setIsFilterVisible,
     dateFilterType,
@@ -123,7 +126,7 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                                                 <SelectItem value="all">
                                                     All Years
                                                 </SelectItem>
-                                                {years.map((year) => (
+                                                {calendarYears.map((year) => (
                                                     <SelectItem
                                                         key={year}
                                                         value={year.toString()}
@@ -361,12 +364,12 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                                                 <SelectItem value="all">
                                                     All Years
                                                 </SelectItem>
-                                                {years.map((year) => (
+                                                {(fiscalYears ? fiscalYears : calendarYears).map((year) => (
                                                     <SelectItem
                                                         key={year}
                                                         value={year.toString()}
                                                     >
-                                                        {year}
+                                                        {year - 1}-{year}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>

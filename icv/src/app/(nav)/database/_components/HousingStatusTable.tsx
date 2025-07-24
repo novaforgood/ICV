@@ -24,10 +24,10 @@ import { useEffect, useState } from 'react'
 
 // Constants for quarter display and selection
 const QUARTERS = [
-    { label: 'Q1: JUL-SEP', months: ['1', '2', '3'] },
-    { label: 'Q2: OCT-DEC', months: ['4', '5', '6'] },
-    { label: 'Q3: JAN-MAR', months: ['7', '8', '9'] },
-    { label: 'Q4: APR-JUN', months: ['10', '11', '12'] },
+    { label: 'Q1: JUL-SEP', months: ['7', '8', '9'] },
+    { label: 'Q2: OCT-DEC', months: ['10', '11', '12'] },
+    { label: 'Q3: JAN-MAR', months: ['1', '2', '3'] },
+    { label: 'Q4: APR-JUN', months: ['4', '5', '6'] },
 ]
 
 // Available housing status options
@@ -115,7 +115,12 @@ const HousingStatusTable = () => {
         ) {
             filtered = filtered.filter((record) => {
                 const recordDate = new Date(record.date)
-                const recordYear = recordDate.getFullYear()
+                const recordYear =
+                    dateFilterType === 'fiscal'
+                        ? recordDate.getMonth() >= 6
+                            ? recordDate.getFullYear() + 1
+                            : recordDate.getFullYear()
+                        : recordDate.getFullYear()
                 const recordMonth = (recordDate.getMonth() + 1).toString()
 
                 if (
@@ -183,11 +188,25 @@ const HousingStatusTable = () => {
     }
 
     // show all years available in the data
-    const years = Array.from(
+    const calendarYears = Array.from(
         new Set(
             housingData.map((record) => new Date(record.date).getFullYear()),
         ),
     ).sort((a, b) => b - a)
+
+    const fiscalYears = Array.from(
+        new Set(
+            housingData.map((record) => {
+                    if (!record.date) return NaN;
+                    const date = new Date(record.date);
+                    const month = date.getMonth(); // 0-indexed (0 = Jan, 6 = Jul)
+                    const year = date.getFullYear();
+                    // Fiscal year starts in July: July-Dec map to next year
+                    return month >= 6 ? year + 1 : year;
+                })
+                .filter((year) => !isNaN(year))
+        )
+    ).sort((a, b) => b - a);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage)
     const startIndex = (currentPage - 1) * itemsPerPage
@@ -198,7 +217,8 @@ const HousingStatusTable = () => {
         <div className="flex flex-col gap-8">
             <div className="flex-1 space-y-[20px]">
                 <YearFilter
-                    years={years}
+                    calendarYears={calendarYears}
+                    fiscalYears={fiscalYears}
                     isFilterVisible={isFilterVisible}
                     setIsFilterVisible={setIsFilterVisible}
                     dateFilterType={dateFilterType}

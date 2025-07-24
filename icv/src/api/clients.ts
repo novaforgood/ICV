@@ -306,3 +306,30 @@ export async function getAllClientsByLastCheckinDate(): Promise<ClientWithLastCh
     return clientsWithLatestEvents;
 }
 
+export async function getRecentClients(): Promise<NewClient[]> {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+    if (!currentUser) {
+        throw new Error('User not found');
+    }
+
+    const ssrdb = getFirestore(firebaseServerApp);
+    const clientsCollection = collection(ssrdb, 'clients');
+    const clientsSnapshot = await getDocs(clientsCollection);
+
+    const clientsList = clientsSnapshot.docs
+        .map((doc) => {
+            const data = doc.data() as NewClient;
+            data.docId = doc.id;
+            return data;
+        })
+        .filter((client) => client.intakeDate) // Ensure intakeDate exists
+        .sort((a, b) => {
+            const dateA = new Date(a.intakeDate!).getTime();
+            const dateB = new Date(b.intakeDate!).getTime();
+            return dateB - dateA; // Descending order
+        })
+        .slice(0, 3); // Get top 3
+
+    return clientsList;
+}
+

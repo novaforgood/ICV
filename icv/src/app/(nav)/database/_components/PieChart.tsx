@@ -50,7 +50,8 @@ const QUARTERS = [
 
 const PieChart = () => {
     const [entries, setEntries] = useState<CheckInCounterEntry[]>([])
-    const [years, setYears] = useState<number[]>([])
+    const [calendarYears, setCalendarYears] = useState<number[]>([])
+    const [fiscalYears, setFiscalYears] = useState<number[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart')
     const [isExporting, setIsExporting] = useState(false)
@@ -124,7 +125,7 @@ const PieChart = () => {
                 const fetchedEntries = await fetchCheckInCounterData()
                 setEntries(fetchedEntries)
 
-                const uniqueYears = Array.from(
+                const uniqueCalendarYears = Array.from(
                     new Set(
                         fetchedEntries.map((entry) =>
                             parseInt(entry.docId.split('-')[0]),
@@ -134,7 +135,27 @@ const PieChart = () => {
                     .filter((year): year is number => !isNaN(year))
                     .sort((a, b) => b - a)
 
-                setYears(uniqueYears)
+                setCalendarYears(uniqueCalendarYears)
+
+                const uniqueFiscalYears = Array.from(
+                    new Set(
+                        fetchedEntries.map((entry) => {
+                            const [yearStr, monthStr] = entry.docId.split('-')
+                            const year = parseInt(yearStr)
+                            const month = parseInt(monthStr) // 1-indexed
+
+                            if (isNaN(year) || isNaN(month)) return NaN
+
+                            // Fiscal year: July (7) and onward maps to next year
+                            return month >= 7 ? year + 1 : year
+                        })
+                    )
+                )
+                    .filter((year): year is number => !isNaN(year))
+                    .sort((a, b) => b - a)
+
+                setFiscalYears(uniqueFiscalYears)
+                
             } finally {
                 setIsLoading(false)
             }
@@ -149,7 +170,12 @@ const PieChart = () => {
 
         entries.forEach(({ docId, data }) => {
             const [year, monthStr] = docId.split('-')
-            const recordYear = parseInt(year)
+            const recordYear =
+                dateFilterType === 'fiscal'
+                    ? parseInt(monthStr) >= 7
+                        ? parseInt(year) + 1
+                        : parseInt(year)
+                    : parseInt(year)
             const recordMonth = parseInt(monthStr).toString()
 
             if (selectedYear !== 'all' && recordYear !== parseInt(selectedYear))
@@ -473,7 +499,8 @@ const PieChart = () => {
             {/* Filter Panel */}
             <div className="order-1 mb-8 w-full lg:order-2 lg:mb-0 lg:w-[400px]">
                 <YearFilter
-                    years={years}
+                    calendarYears={calendarYears}
+                    fiscalYears={fiscalYears}
                     isFilterVisible={isFilterVisible}
                     setIsFilterVisible={setIsFilterVisible}
                     dateFilterType={dateFilterType}
