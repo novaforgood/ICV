@@ -20,13 +20,6 @@ const TwoFactorAuthPage = () => {
     const email = sessionStorage.getItem('2fa-email') || ''
     const pw = sessionStorage.getItem('2fa-pw') || ''
 
-    // Auto-send verification code when page loads
-    useEffect(() => {
-        if (email && !codeSent) {
-            sendVerificationCode()
-        }
-    }, [email])
-
     // Countdown timer for resend functionality
     useEffect(() => {
         if (countdown > 0) {
