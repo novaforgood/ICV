@@ -20,13 +20,38 @@ const page = () => {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
+    const [signUp, setSignUp] = useState(false)
     const [forgotPassword, setForgotPassword] = useState(false)
+    const [last2FACall, setLast2FACall] = useState(0) // Track last 2FA call time
     const router = useRouter()
+
+    // Check if enough time has passed since last 2FA call (5 seconds)
+    const canCall2FA = () => {
+        const now = Date.now()
+        const timeSinceLastCall = now - last2FACall
+        return timeSinceLastCall >= 5000 // 5 seconds in milliseconds
+    }
+
+    // Validate email domain
+    const isValidEmailDomain = (email: string) => {
+        const allowedDomains = ['@icvcommunity.org', '@gmail.com']
+        return allowedDomains.some((domain) =>
+            email.toLowerCase().endsWith(domain),
+        )
+    }
 
     // Handle password reset
     const handlePasswordReset = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
+
+        // Validate email domain
+        if (!isValidEmailDomain(email)) {
+            setError(
+                'Please use an email address from @icvcommunity.org or @gmail.com',
+            )
+            return
+        }
 
         try {
             await sendPasswordResetEmail(auth, email)
@@ -47,8 +72,17 @@ const page = () => {
         setLoading(true)
         setError('')
 
+        // Validate email domain
+        if (!isValidEmailDomain(email)) {
+            setError(
+                'Please use an email address from @icvcommunity.org or @gmail.com',
+            )
+            setLoading(false)
+            return
+        }
+
         try {
-            if (loading) {
+            if (signUp) {
                 //if user is creating an account
                 const userCreds = await createUserWithEmailAndPassword(
                     auth,
@@ -69,6 +103,13 @@ const page = () => {
                     uid: user.uid,
                 })
                 console.log('user stored in collections')
+
+                // Switch back to login mode after successful account creation
+                setSignUp(false)
+                setFirstName('') // Clear first name field
+                setLastName('') // Clear last name field
+                setPassword('') // Clear password field
+                setError('Account created successfully! Please log in.')
             } else {
                 // First authenticate with Firebase
                 const usercred = await signInWithEmailAndPassword(
@@ -78,9 +119,21 @@ const page = () => {
                 )
                 const user = usercred.user
                 if (user) {
+                    // Check if enough time has passed since last 2FA call (5 secs)
+                    if (!canCall2FA()) {
+                        const remainingTime = Math.ceil(
+                            (5000 - (Date.now() - last2FACall)) / 1000,
+                        )
+                        setError(
+                            `Please wait ${remainingTime} seconds before requesting another 2FA code.`,
+                        )
+                        return
+                    }
+
                     // Start 2FA process, temporarily store email and pw in session storage
                     sessionStorage.setItem('2fa-email', email)
                     sessionStorage.setItem('2fa-pw', password)
+                    setLast2FACall(Date.now()) // Record the time of this 2FA call
                     await start2FA(email || '')
                     router.push('/2fa')
                     // router.push('/')
@@ -111,13 +164,19 @@ const page = () => {
         }
     }
 
-    //handle enter buttonw hen pressed
+    //handle enter button when pressed
     const handleEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && !loading) {
-            // Create a synthetic event to pass to handleAuth
-            const form = e.currentTarget.form
-            if (form) {
-                handleAuth({ preventDefault: () => {}, target: form } as any)
+        if (e.key === 'Enter') {
+            e.preventDefault() // Prevent default form submission
+            if (!loading && (!signUp || canCall2FA())) {
+                // Create a synthetic event to pass to handleAuth
+                const form = e.currentTarget.form
+                if (form) {
+                    handleAuth({
+                        preventDefault: () => {},
+                        target: form,
+                    } as any)
+                }
             }
         }
     }
@@ -134,11 +193,21 @@ const page = () => {
             <h2 className="text-grey-800 text-center text-3xl font-bold">
                 {forgotPassword
                     ? 'Reset Password'
-                    : loading
+                    : signUp
                       ? 'Sign Up'
                       : 'Login'}
             </h2>
-            {error && <p className="text-sm text-red-500">{error}</p>}
+            {error && (
+                <p
+                    className={`text-sm ${
+                        error.includes('successfully')
+                            ? 'text-green-600'
+                            : 'text-red-500'
+                    }`}
+                >
+                    {error}
+                </p>
+            )}
 
             {forgotPassword ? (
                 // Forgot Password Form
@@ -177,10 +246,16 @@ const page = () => {
                 //loading = signup
                 <>
                     <form
-                        onSubmit={handleAuth}
+                        onSubmit={(e) => {
+                            if (loading || (!signUp && !canCall2FA())) {
+                                e.preventDefault()
+                                return
+                            }
+                            handleAuth(e)
+                        }}
                         className="flex w-[400px] flex-col"
                     >
-                        {loading && (
+                        {signUp && (
                             <>
                                 {/* Label text size reduced to text-sm */}
                                 <label className="mb-0 mt-10 text-sm">
@@ -228,7 +303,7 @@ const page = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             onKeyDown={handleEnter}
                         />
-                        {loading && (
+                        {signUp && (
                             <label className="mx-auto mb-0 mt-4 w-full rounded-md border p-4 text-sm">
                                 {' '}
                                 Your Password Must Contain:
@@ -241,7 +316,7 @@ const page = () => {
                             </label>
                         )}
 
-                        {!loading && (
+                        {!signUp && (
                             <button
                                 type="button" //need this or else default behavior = forgot password when enter key pressed
                                 onClick={() => setForgotPassword(true)}
@@ -252,23 +327,28 @@ const page = () => {
                         )}
                         <button
                             type="submit"
-                            className="mx-auto mt-4 w-[128px] items-center rounded-md bg-black p-2 text-white"
+                            className={`mx-auto mt-4 w-[128px] items-center rounded-md p-2 text-white ${
+                                loading
+                                    ? 'cursor-not-allowed bg-gray-400 opacity-50'
+                                    : 'bg-black hover:bg-gray-800'
+                            }`}
                             disabled={loading}
                         >
                             {loading
-                                ? 'Signing Up...'
-                                : loading
+                                ? 'Loading...'
+                                : signUp
                                   ? 'Sign Up'
                                   : 'Login'}
                         </button>
                     </form>
 
                     <button
-                        onClick={() => setLoading(!loading)}
+                        onClick={() => setSignUp(!signUp)}
                         className="bold mt-4 text-sm text-black"
+                        disabled={loading}
                     >
                         {/*if not loading, then logging in */}
-                        {loading ? (
+                        {signUp ? (
                             <>
                                 Already have an account?{' '}
                                 <span className="font-bold"> Log In</span>
