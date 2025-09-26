@@ -1,6 +1,6 @@
 'use client'
 
-import { getAllEvents, getScheduledEvents } from '@/api/events'
+import { getScheduledEvents } from '@/api/events'
 import Symbol from '@/components/Symbol'
 import { Card } from '@/components/ui/card'
 import { CheckInType } from '@/types/event-types'
@@ -53,7 +53,7 @@ const EventsSchedule: React.FC = () => {
         if (!selectedDate || !events) return events || []
         return events.filter((event) => {
             const eventDate = new Date(event.startTime)
-            console.log('Event name: ', event.name, 'Event Date:', event.startTime)
+            // console.log('Event name: ', event.name, 'Event Date:', event.startTime)
             if (!isValid(eventDate)) return false
             return format(eventDate, 'yyyy-MM-dd') === selectedDate
         })
@@ -74,8 +74,12 @@ const EventsSchedule: React.FC = () => {
                         className="h-6 w-6 flex-shrink-0 text-sm"
                         onClick={() => {
                             const newSelectedDate = parseISO(selectedDate!)
-                            newSelectedDate.setDate(newSelectedDate.getDate() - 7)
-                            setSelectedDate(format(newSelectedDate, 'yyyy-MM-dd'))
+                            newSelectedDate.setDate(
+                                newSelectedDate.getDate() - 7,
+                            )
+                            setSelectedDate(
+                                format(newSelectedDate, 'yyyy-MM-dd'),
+                            )
                             setWeekStart(getStartOfWeek(newSelectedDate))
                         }}
                     >
@@ -91,8 +95,12 @@ const EventsSchedule: React.FC = () => {
                         className="h-6 w-6 flex-shrink-0 text-sm"
                         onClick={() => {
                             const newSelectedDate = parseISO(selectedDate!)
-                            newSelectedDate.setDate(newSelectedDate.getDate() + 7)
-                            setSelectedDate(format(newSelectedDate, 'yyyy-MM-dd'))
+                            newSelectedDate.setDate(
+                                newSelectedDate.getDate() + 7,
+                            )
+                            setSelectedDate(
+                                format(newSelectedDate, 'yyyy-MM-dd'),
+                            )
                             setWeekStart(getStartOfWeek(newSelectedDate))
                         }}
                     >
@@ -144,11 +152,8 @@ const EventsSchedule: React.FC = () => {
                     </p>
                 ) : (
                     filteredEvents.map((event) => (
-                        <EventCard
-                            key={String(event.id)}
-                            event={event}
-                        />
-                    )) 
+                        <EventCard key={String(event.id)} event={event} />
+                    ))
                 )}
             </div>
         </div>
