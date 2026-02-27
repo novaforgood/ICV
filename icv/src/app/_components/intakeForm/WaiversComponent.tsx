@@ -98,6 +98,11 @@ const WaiverSection: React.FC<Props> = ({
                         format: 'a4',
                         orientation: 'portrait',
                     },
+                    pagebreak: {
+                        mode: ['css', 'legacy'],
+                        before: '.pdf-new-page',
+                        avoid: '.pdf-keep-together',
+                    },
                 })
                 .from(el)
                 .toPdf()
@@ -159,7 +164,7 @@ const WaiverSection: React.FC<Props> = ({
             <div className="mt-[24px] flex min-h-screen items-center justify-center">
                 <div className="min-w-full space-y-[48px]">
                     <div id="formToExport" className="space-y-[60px]">
-                        <div className="page-break-after flex flex-col space-y-[24px]">
+                        <div className="pdf-keep-together flex flex-col space-y-[24px]">
                             <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
                                 Consent Form
                             </label>
@@ -231,14 +236,12 @@ const WaiverSection: React.FC<Props> = ({
                                 />
                             </div>
                         </div>
-                        <div>
-                            <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
-                                Authorization to Release Information
-                            </label>
-                        </div>
-
-                        <div className="flex flex-col space-y-[24px]">
-                            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                        <div className="pdf-new-page space-y-[60px]">
+                            <div className="pdf-keep-together flex flex-col space-y-[24px]">
+                                <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
+                                    Authorization to Release Information
+                                </label>
+                                <div className="grid grid-cols-2 gap-x-5 gap-y-3">
                                 <div className="flex flex-col space-y-1">
                                     <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                         Name
@@ -276,103 +279,104 @@ const WaiverSection: React.FC<Props> = ({
                             </div>
                         </div>
 
-                        <div className="space-y-[24px]">
-                            <p>
-                                I do herby consent the exchange of information
-                                and / or disclosure of information contained in
-                                my file.
-                            </p>
-                            <p>
-                                Between <strong>INNER CITY VISIONS</strong> and:
-                            </p>
+                            <div className="space-y-[24px]">
+                                <p>
+                                    I do herby consent the exchange of information
+                                    and / or disclosure of information contained in
+                                    my file.
+                                </p>
+                                <p>
+                                    Between <strong>INNER CITY VISIONS</strong> and:
+                                </p>
+
+                                <div className="flex flex-col space-y-[4px]">
+                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                        3rd Party Organization(s)
+                                    </label>
+                                    <textarea
+                                        {...register('thirdParties')}
+                                        rows={3}
+                                        placeholder="Text"
+                                        className="w-full rounded border p-2"
+                                    />
+                                </div>
+                                <p>1440 E. Florence Ave Los Angeles, CA 90001</p>
+                            </div>
 
                             <div className="flex flex-col space-y-[4px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    3rd Party Organization(s)
+                                    The disclosure of this information and records
+                                    authorized herein is required for the following
+                                    purpose:
                                 </label>
                                 <textarea
-                                    {...register('thirdParties')}
-                                    rows={3}
+                                    {...register('disclosurePurpose')}
                                     placeholder="Text"
+                                    rows={5}
                                     className="w-full rounded border p-2"
                                 />
                             </div>
-                            <p>1440 E. Florence Ave Los Angeles, CA 90001</p>
-                        </div>
 
-                        <div className="flex flex-col space-y-[4px]">
-                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                The disclosure of this information and records
-                                authorized herein is required for the following
-                                purpose:
-                            </label>
-                            <textarea
-                                {...register('disclosurePurpose')}
-                                placeholder="Text"
-                                rows={5}
-                                className="w-full rounded border p-2"
-                            />
-                        </div>
+                            <div className="space-y-[24px]">
+                                <p>
+                                    I have the right to revoke this authorization to
+                                    release and/or exchange information at any time.
+                                    This authorization to exchange information will
+                                    expire one year after the signature date. A
+                                    photocopy or fax is considered as effective as
+                                    the original.
+                                </p>
+                                <div className="flex flex-col space-y-[4px]">
+                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                        Date
+                                    </label>
+                                    <input
+                                        {...register('signDate')}
+                                        type="date"
+                                        placeholder="MM/DD/YYYY"
+                                        className="w-[30%] rounded border p-2"
+                                    />
+                                </div>
+                                <div className="space-y-[8px]">
+                                    <label className="font-bold">
+                                        Client Signature
+                                    </label>
+                                    <LoadedSignature
+                                        fieldKey={'clientSig2'}
+                                        formData={formType}
+                                        updateForm={updateForm}
+                                        isExporting={isExporting}
+                                    />
 
-                        <div className="space-y-[24px]">
-                            <p>
-                                I have the right to revoke this authorization to
-                                release and/or exchange information at any time.
-                                This authorization to exchange information will
-                                expire one year after the signature date. A
-                                photocopy or fax is considered as effective as
-                                the original.
-                            </p>
-                            <div className="flex flex-col space-y-[4px]">
-                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                    Date
-                                </label>
-                                <input
-                                    {...register('signDate')}
-                                    type="date"
-                                    placeholder="MM/DD/YYYY"
-                                    className="w-[30%] rounded border p-2"
-                                />
-                            </div>
-                            <div className="space-y-[8px]">
-                                <label className="font-bold">
-                                    Client Signature
-                                </label>
-                                <LoadedSignature
-                                    fieldKey={'clientSig2'}
-                                    formData={formType}
-                                    updateForm={updateForm}
-                                    isExporting={isExporting}
-                                />
+                                    <SignaturePopup
+                                        data={formType}
+                                        fieldKey="clientSig2"
+                                        padRef={clientSig2}
+                                        updateForm={updateForm}
+                                        open={openSignature2}
+                                        setOpen={setOpenSignature2}
+                                    />
+                                </div>
+                                <div className="space-y-[8px]">
+                                    <label className="font-bold">
+                                        Guardian Signature
+                                    </label>
+                                    <LoadedSignature
+                                        fieldKey="guardianSig"
+                                        formData={formType}
+                                        updateForm={updateForm}
+                                        isExporting={isExporting}
+                                    />
 
-                                <SignaturePopup
-                                    data={formType}
-                                    fieldKey="clientSig2"
-                                    padRef={clientSig2}
-                                    updateForm={updateForm}
-                                    open={openSignature2}
-                                    setOpen={setOpenSignature2}
-                                />
-                            </div>
-                            <div className="space-y-[8px]">
-                                <label className="font-bold">
-                                    Guardian Signature
-                                </label>
-                                <LoadedSignature
-                                    fieldKey="guardianSig"
-                                    formData={formType}
-                                    updateForm={updateForm}
-                                    isExporting={isExporting}
-                                />
-
-                                <SignaturePopup
-                                    data={formType}
-                                    fieldKey="guardianSig"
-                                    padRef={guardianSig}
-                                    updateForm={updateForm}
-                                    open={openGuardianSig}
-                                    setOpen={setOpenGuardianSig}
-                                />
+                                    <SignaturePopup
+                                        data={formType}
+                                        fieldKey="guardianSig"
+                                        padRef={guardianSig}
+                                        updateForm={updateForm}
+                                        open={openGuardianSig}
+                                        setOpen={setOpenGuardianSig}
+                                    />
+                                </div>
                             </div>
                         </div>
 
