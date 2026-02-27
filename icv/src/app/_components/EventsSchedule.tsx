@@ -1,6 +1,5 @@
 'use client'
 
-import { getScheduledEvents } from '@/api/events'
 import Symbol from '@/components/Symbol'
 import { Card } from '@/components/ui/card'
 import { CheckInType } from '@/types/event-types'
@@ -9,10 +8,14 @@ import React, { useMemo, useState } from 'react'
 import useSWR from 'swr'
 import EventCard from './EventsCard'
 
-// Fetcher function for events
+// Fetcher function for events - uses API route to avoid server action serialization issues
 const fetchEvents = async (): Promise<CheckInType[]> => {
-    const events = await getScheduledEvents()
-    return events
+    const res = await fetch('/api/events/scheduled')
+    if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `Failed to fetch events (${res.status})`)
+    }
+    return res.json()
 }
 
 const EventsSchedule: React.FC = () => {

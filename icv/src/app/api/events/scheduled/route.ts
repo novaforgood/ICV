@@ -1,4 +1,4 @@
-import { getScheduledEvents } from "@/api/events"
+import { getScheduledEvents } from '@/api/events'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
