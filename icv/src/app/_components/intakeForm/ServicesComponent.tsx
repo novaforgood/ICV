@@ -1,6 +1,6 @@
 'use client'
 
-import { storage } from '@/data/firebase'
+import { auth, storage } from '@/data/firebase'
 import {
     EDUTRAIN,
     HEALTH_WELLNESS,
@@ -74,7 +74,9 @@ export const ServicesSection: React.FC<Props> = ({
             setUploadingField(field)
 
             const uploadPromises = files.map(async (file) => {
-                const storageRef = ref(storage, file.name)
+                // generate unique path for each file
+                const path = `uploads/${auth.currentUser?.uid}/${field}/${crypto.randomUUID()}/${file.name}`
+                const storageRef = ref(storage, path)
                 try {
                     const snapshot = await uploadBytes(storageRef, file)
                     const downloadURL = await getDownloadURL(snapshot.ref)
