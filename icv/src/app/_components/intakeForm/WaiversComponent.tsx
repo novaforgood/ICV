@@ -8,6 +8,8 @@ import {
     NewClient,
     WaiverSchema,
 } from '@/types/client-types'
+import { auth, storage } from '@/data/firebase'
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -72,7 +74,7 @@ const WaiverSection: React.FC<Props> = ({
         return unsub
     }, [watch, formType])
 
-    const exportPDF = async () => {
+    const exportPDF = async (): Promise<{ name: string; uri: string } | null> => {
         try {
             setIsExporting(true)
             const el = document.getElementById('formToExport')
@@ -82,10 +84,10 @@ const WaiverSection: React.FC<Props> = ({
                 formType.signDate && formType.signDate != ''
                     ? formType.signDate
                     : new Date().toISOString().split('T')[0]
-            const filename = `${formType.clientCode}_${today}.pdf`
+            const filename = `${formType.clientCode ?? 'waiver'}_${today}.pdf`
 
             const html2pdf = (await import('html2pdf.js')).default
-            const pdf = html2pdf()
+            const blob = await html2pdf()
                 .set({
                     margin: 1,
                     filename,
@@ -98,27 +100,39 @@ const WaiverSection: React.FC<Props> = ({
                     },
                 })
                 .from(el)
-                .save()
+                .toPdf()
+                .output('blob')
 
-            // const blob = await pdf.outputPdf('blob')
-            // const fileRef = ref(storage, `waivers/${filename}`)
-            // await uploadBytes(fileRef, blob)
-            // const url = await getDownloadURL(fileRef)
-            // return { name: filename, uri: url }
+            // Upload to Firebase Storage
+            const path = `waivers/${auth.currentUser?.uid ?? 'client'}/${crypto.randomUUID()}/${filename}`
+            const fileRef = ref(storage, path)
+            await uploadBytes(fileRef, blob)
+            const url = await getDownloadURL(fileRef)
+
+            // Also trigger browser download for local save
+            const downloadUrl = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = downloadUrl
+            a.download = filename
+            a.click()
+            URL.revokeObjectURL(downloadUrl)
+
+            return { name: filename, uri: url }
         } catch (err) {
             console.error('Export failed:', err)
-            setIsExporting(false)
             return null
+        } finally {
+            setIsExporting(false)
         }
     }
 
     const handleSubmitType = async (data: ClientType) => {
-        await exportPDF()
+        const pdf = await exportPDF()
 
         const finalData = {
             ...formType,
             ...data,
-            // waivers: [...(formType.waivers ?? []), ...(pdf ? [pdf] : [])],
+            waivers: [...(formType.waivers ?? []), ...(pdf ? [pdf] : [])],
             clientSig1: '',
             clientSig2: '',
             guardianSig: '',
