@@ -108,11 +108,12 @@ const WaiverSection: React.FC<Props> = ({
                 .toPdf()
                 .output('blob')
 
-            // Upload to Firebase Storage
+            // Upload to Firebase Storage (comment out for local testing)
             const path = `waivers/${auth.currentUser?.uid ?? 'client'}/${crypto.randomUUID()}/${filename}`
             const fileRef = ref(storage, path)
             await uploadBytes(fileRef, blob)
             const url = await getDownloadURL(fileRef)
+            // const url = 'local-test' // placeholder when upload disabled for local testing
 
             // Also trigger browser download for local save
             const downloadUrl = URL.createObjectURL(blob)
@@ -157,13 +158,20 @@ const WaiverSection: React.FC<Props> = ({
 
     return (
         <form
-            className="space-y-[24px]"
+            className="space-y-[24px] relative"
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
+            {isExporting && (
+                <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-white/90">
+                    <p className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                        Creating client....
+                    </p>
+                </div>
+            )}
             <div className="mt-[24px] flex min-h-screen items-center justify-center">
                 <div className="min-w-full space-y-[48px]">
-                    <div id="formToExport" className="space-y-[60px]">
+                    <div id="formToExport" className="space-y-[24px]">
                         <div className="pdf-keep-together flex flex-col space-y-[24px]">
                             <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
                                 Consent Form
@@ -317,7 +325,7 @@ const WaiverSection: React.FC<Props> = ({
                                 />
                             </div>
 
-                            <div className="space-y-[24px]">
+                            <div className="pdf-new-page space-y-[24px]">
                                 <p>
                                     I have the right to revoke this authorization to
                                     release and/or exchange information at any time.

@@ -48,6 +48,8 @@
 .pdf-new-page {
     break-before: page;
     page-break-before: always;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 .pdf-keep-together {
