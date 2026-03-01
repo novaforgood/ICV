@@ -4,7 +4,7 @@ import { auth, clientDb } from '@/data/firebase'
 import { FirebaseError } from 'firebase/app'
 import {
     createUserWithEmailAndPassword,
-    sendPasswordResetEmail, // Added import for password reset
+    sendPasswordResetEmail,
     signInWithEmailAndPassword,
     updateProfile,
 } from 'firebase/auth'
@@ -34,7 +34,7 @@ const Page = () => {
 
     // Validate email domain
     const isValidEmailDomain = (email: string) => {
-        const allowedDomains = ['@icvcommunity.org', '@gmail.com']
+        const allowedDomains = ['@icvcommunity.org']
         return allowedDomains.some((domain) =>
             email.toLowerCase().endsWith(domain),
         )
@@ -48,7 +48,7 @@ const Page = () => {
         // Validate email domain
         if (!isValidEmailDomain(email)) {
             setError(
-                'Please use an email address from @icvcommunity.org or @gmail.com',
+                'Please use an email address from @icvcommunity.org'
             )
             return
         }
@@ -59,7 +59,8 @@ const Page = () => {
             setForgotPassword(false)
         } catch (err) {
             if (err instanceof Error) {
-                setError(err.message)
+                const error = err as FirebaseError
+                setError(error.message)
             } else {
                 setError('An unknown error occurred')
             }
@@ -75,15 +76,28 @@ const Page = () => {
         // Validate email domain
         if (!isValidEmailDomain(email)) {
             setError(
-                'Please use an email address from @icvcommunity.org or @gmail.com',
+                'Please use an email address from @icvcommunity.org',
             )
             setLoading(false)
             return
         }
 
+        // When signing up, require first and last name
+        if (signUp) {
+            const trimmedFirst = firstname.trim()
+            const trimmedLast = lastname.trim()
+            if (!trimmedFirst || !trimmedLast) {
+                setError('Please enter both first name and last name.')
+                setLoading(false)
+                return
+            }
+        }
+
         try {
             if (signUp) {
                 //if user is creating an account
+                const trimmedFirst = firstname.trim()
+                const trimmedLast = lastname.trim()
                 const userCreds = await createUserWithEmailAndPassword(
                     auth,
                     email,
@@ -93,12 +107,12 @@ const Page = () => {
 
                 //update display name in firebase auth
                 await updateProfile(user, {
-                    displayName: `${firstname} ${lastname}`,
+                    displayName: `${trimmedFirst} ${trimmedLast}`,
                 })
                 console.log('user name stored: ', auth.currentUser?.displayName)
                 //add username and email to collection to allow display on clinet form "case manager" box
-                await setDoc(doc(clientDb, 'users', `${firstname}`), {
-                    name: `${firstname} ${lastname}`,
+                await setDoc(doc(clientDb, 'users', `${trimmedFirst}`), {
+                    name: `${trimmedFirst} ${trimmedLast}`,
                     email: `${email}`,
                     uid: user.uid,
                 })
@@ -146,12 +160,12 @@ const Page = () => {
                 const messages: Record<string, string> = {
                     'auth/invalid-credential':
                         'Incorrect Password. Please try again or reset password.',
-                    'auth/user-not-found': 'No user associated with email.',
+                    'auth/user-not-found': 'No user associated with email. Please create an account.',
                     'auth/invalid-email': 'Invalid Email Address.',
                     'auth/too-many-requests':
                         'Too many login attempts. Please try again in 5 minutes.',
                     'auth/missing-password':
-                        "You didn't enter a password silly!",
+                        "Please enter a password.",
                 }
 
                 const text = messages[error.code] ?? error.message
@@ -182,7 +196,7 @@ const Page = () => {
     }
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-white p-6">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-white p-6 space-y-[12px]">
             <Image
                 src='/icv.png'
                 alt="icv logo"
@@ -235,7 +249,10 @@ const Page = () => {
                     </button>
                     <button
                         type="button"
-                        onClick={() => setForgotPassword(false)}
+                        onClick={() => {
+                            setError('')
+                            setForgotPassword(false)
+                        }}
                         className="bold mt-4 text-sm text-black"
                     >
                         Back to Login
@@ -319,7 +336,10 @@ const Page = () => {
                         {!signUp && (
                             <button
                                 type="button" //need this or else default behavior = forgot password when enter key pressed
-                                onClick={() => setForgotPassword(true)}
+                                onClick={() => {
+                                    setError('')
+                                    setForgotPassword(true)
+                                }}
                                 className="mt-4 text-sm text-black"
                             >
                                 Forgot Password?
@@ -343,7 +363,10 @@ const Page = () => {
                     </form>
 
                     <button
-                        onClick={() => setSignUp(!signUp)}
+                        onClick={() => {
+                            setError('')
+                            setSignUp(!signUp)
+                        }}
                         className="bold mt-4 text-sm text-black"
                         disabled={loading}
                     >
