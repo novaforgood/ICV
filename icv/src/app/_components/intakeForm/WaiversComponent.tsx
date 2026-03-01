@@ -223,7 +223,7 @@ const WaiverSection: React.FC<Props> = ({
                                 also understand that these photos may be used
                                 for program outreach and publicity.
                             </p>
-                            <div className="space-y-[8px]">
+                            <div className="space-y-[12px]">
                                 <label className="font-bold">
                                     Client Signature
                                 </label>
@@ -297,7 +297,7 @@ const WaiverSection: React.FC<Props> = ({
                                     Between <strong>INNER CITY VISIONS</strong> and:
                                 </p>
 
-                                <div className="flex flex-col space-y-[4px]">
+                                <div className="flex flex-col space-y-[12px]">
                                     <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                         3rd Party Organization(s)
                                     </label>
@@ -311,7 +311,7 @@ const WaiverSection: React.FC<Props> = ({
                                 <p>1440 E. Florence Ave Los Angeles, CA 90001</p>
                             </div>
 
-                            <div className="flex flex-col space-y-[4px]">
+                            <div className="flex flex-col space-y-[12px]">
                                 <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                     The disclosure of this information and records
                                     authorized herein is required for the following
@@ -334,7 +334,7 @@ const WaiverSection: React.FC<Props> = ({
                                     photocopy or fax is considered as effective as
                                     the original.
                                 </p>
-                                <div className="flex flex-col space-y-[4px]">
+                                <div className="flex flex-col space-y-[12px]">
                                     <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                         Date
                                     </label>
@@ -345,7 +345,7 @@ const WaiverSection: React.FC<Props> = ({
                                         className="w-[30%] rounded border p-2"
                                     />
                                 </div>
-                                <div className="space-y-[8px]">
+                                <div className="space-y-[12px]">
                                     <label className="font-bold">
                                         Client Signature
                                     </label>
@@ -365,7 +365,7 @@ const WaiverSection: React.FC<Props> = ({
                                         setOpen={setOpenSignature2}
                                     />
                                 </div>
-                                <div className="space-y-[8px]">
+                                <div className="space-y-[12px]">
                                     <label className="font-bold">
                                         Guardian Signature
                                     </label>
