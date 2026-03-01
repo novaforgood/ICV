@@ -1,4 +1,5 @@
 'use client'
+import FileUpload, { ResetButton } from '@/app/_components/intakeForm/FileUpload'
 import {
     LoadedSignature,
     SignaturePopup,
@@ -9,7 +10,12 @@ import {
     WaiverSchema,
 } from '@/types/client-types'
 import { auth, storage } from '@/data/firebase'
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
+import {
+    deleteObject,
+    getDownloadURL,
+    ref,
+    uploadBytes,
+} from 'firebase/storage'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -52,6 +58,8 @@ const WaiverSection: React.FC<Props> = ({
 
     const router = useRouter()
     const [isExporting, setIsExporting] = useState(false)
+    const [waiverMode, setWaiverMode] = useState<'form' | 'upload'>('form')
+    const [waiverUploading, setWaiverUploading] = useState(false)
     const [openSignature1, setOpenSignature1] = useState(false)
     const [openSignature2, setOpenSignature2] = useState(false)
     const [openGuardianSig, setOpenGuardianSig] = useState(false)
@@ -73,6 +81,62 @@ const WaiverSection: React.FC<Props> = ({
         }).unsubscribe
         return unsub
     }, [watch, formType])
+
+    const handleWaiverFileChange = async (
+        e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const files = Array.from(e.target.files)
+            setWaiverUploading(true)
+            const uploadPromises = files.map(async (file) => {
+                const path = `waivers/${auth.currentUser?.uid ?? 'client'}/${crypto.randomUUID()}/${file.name}`
+                const fileRef = ref(storage, path)
+                try {
+                    await uploadBytes(fileRef, file)
+                    const url = await getDownloadURL(fileRef)
+                    return { name: file.name, uri: url }
+                } catch (error) {
+                    console.error(`Error uploading waiver ${file.name}:`, error)
+                    return null
+                }
+            })
+            const uploaded = (
+                await Promise.all(uploadPromises)
+            ).filter(
+                (f): f is { name: string; uri: string } => f !== null,
+            )
+            if (uploaded.length > 0) {
+                updateForm({
+                    waivers: [...(formType.waivers ?? []), ...uploaded],
+                })
+            }
+            setWaiverUploading(false)
+            e.target.value = ''
+        }
+    }
+
+    const handleAddFile = (fileInputRef: React.RefObject<HTMLInputElement>) => {
+        if (fileInputRef.current) fileInputRef.current.click()
+    }
+
+    const resetWaiverFiles = async () => {
+        const oldFiles = formType.waivers ?? []
+        if (oldFiles.length > 0) {
+            await Promise.all(
+                oldFiles.map(async (file) => {
+                    try {
+                        if (file.uri) {
+                            const fileRef = ref(storage, file.uri)
+                            await deleteObject(fileRef)
+                        }
+                    } catch (error) {
+                        console.error(`Error deleting waiver ${file.uri}:`, error)
+                    }
+                }),
+            )
+            updateForm({ waivers: [] })
+        }
+    }
 
     const exportPDF = async (): Promise<{ name: string; uri: string } | null> => {
         try {
@@ -133,12 +197,16 @@ const WaiverSection: React.FC<Props> = ({
     }
 
     const handleSubmitType = async (data: ClientType) => {
-        const pdf = await exportPDF()
+        let finalWaivers = formType.waivers ?? []
+        if (waiverMode === 'form') {
+            const pdf = await exportPDF()
+            finalWaivers = [...finalWaivers, ...(pdf ? [pdf] : [])]
+        }
 
         const finalData = {
             ...formType,
             ...data,
-            waivers: [...(formType.waivers ?? []), ...(pdf ? [pdf] : [])],
+            waivers: finalWaivers,
             clientSig1: '',
             clientSig2: '',
             guardianSig: '',
@@ -162,20 +230,138 @@ const WaiverSection: React.FC<Props> = ({
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
-            {isExporting && (
-                <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-white/90">
-                    <p className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                        Creating client....
+            {(isExporting || waiverUploading) && (
+                <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-white/100">
+                    <p className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                        {waiverUploading ? 'Uploading waiver(s)...' : 'Creating client....'}
                     </p>
                 </div>
             )}
-            <div className="mt-[24px] flex min-h-screen items-center justify-center">
+            <div className="mt-[24px] flex min-h-screen justify-center">
                 <div className="min-w-full space-y-[48px]">
-                    <div id="formToExport" className="space-y-[24px]">
-                        <div className="pdf-keep-together flex flex-col space-y-[24px]">
-                            <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
-                                Consent Form
-                            </label>
+                    <div className="flex flex-col space-y-[24px]">
+                        <div className="flex flex-row gap-[24px] mb-[24px]">
+                            <button
+                                type="button"
+                                onClick={() => setWaiverMode('form')}
+                                className={`rounded-[5px] px-4 py-2 ${
+                                    waiverMode === 'form'
+                                        ? "bg-neutral-900 text-white"
+                                        : "bg-neutral-200"
+                                }`}
+                            >
+                                Digital Waiver
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setWaiverMode('upload')}
+                                className={`rounded-[5px] px-4 py-2 ${
+                                    waiverMode === 'upload'
+                                        ? "bg-neutral-900 text-white"
+                                        : "bg-neutral-200"
+                                }`}
+                            >
+                                Upload Waiver(s)
+                            </button>
+                        </div>
+
+                        {waiverMode === 'upload' ? (
+                            <div className="space-y-[24px]">
+                                <div className="flex items-center justify-between">
+                                    <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
+                                        Waiver file
+                                    </label>
+                                    <ResetButton
+                                        data={formType}
+                                        field="waivers"
+                                        resetFiles={(field) =>
+                                            field === 'waivers' &&
+                                            resetWaiverFiles()
+                                        }
+                                    />
+                                </div>
+                                <FileUpload
+                                    data={formType}
+                                    handleFileChange={(e) =>
+                                        handleWaiverFileChange(e)
+                                    }
+                                    handleAddFile={handleAddFile}
+                                    field="waivers"
+                                    isUploading={waiverUploading}
+                                />
+                                {!waiverUploading && submitType === 'new' && (
+                                    <div className="flex justify-between">
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                router.push(
+                                                    '/intake/background/family/services/confirmation',
+                                                )
+                                            }
+                                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                                        >
+                                            Back
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={
+                                                !formType.waivers?.length
+                                            }
+                                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            Submit
+                                        </button>
+                                    </div>
+                                )}
+                                {!waiverUploading && submitType === 'save' && (
+                                    <div className="flex justify-start space-x-[24px]">
+                                        <button
+                                            type="submit"
+                                            disabled={
+                                                !formType.waivers?.length
+                                            }
+                                            className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95] disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            <div className="flex flex-row space-x-[8px]">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    height="20px"
+                                                    viewBox="0 -960 960 960"
+                                                    width="20px"
+                                                    fill="#FFFFFF"
+                                                >
+                                                    <path d="M389-267 195-460l51-52 143 143 325-324 51 51-376 375Z" />
+                                                </svg>
+                                                Save
+                                            </div>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={onCancel}
+                                            className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                                        >
+                                            <div className="flex flex-row space-x-[8px]">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    height="20px"
+                                                    viewBox="0 -960 960 960"
+                                                    width="20px"
+                                                    fill="#FFFFFF"
+                                                >
+                                                    <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
+                                                </svg>
+                                                Cancel
+                                            </div>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div id="formToExport" className="space-y-[24px]">
+                                <div className="pdf-keep-together flex flex-col space-y-[24px]">
+                                    <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
+                                        Consent Form
+                                    </label>
                             <p>
                                 By signing below, I consent to recieve services
                                 through the Inner-City Visions Homeless Outreach
@@ -446,7 +632,9 @@ const WaiverSection: React.FC<Props> = ({
                                         </svg>
                                         Cancel
                                     </div>
-                                </button>
+                                        </button>
+                            </div>
+                        )}
                             </div>
                         )}
                     </div>

@@ -1,17 +1,7 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
 import EventsSchedule from '../_components/EventsSchedule'
-import Link from 'next/link'
 import CheckInCounter from '../_components/CheckInCounter'
 import SpontaneousCheckInModal from '../_components/SpontaneousCheckinCreation'
 import { useUser } from '@/hooks/useUser'

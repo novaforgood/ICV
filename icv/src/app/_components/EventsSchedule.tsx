@@ -7,6 +7,7 @@ import { format, isValid, parseISO } from 'date-fns'
 import React, { useMemo, useState } from 'react'
 import useSWR from 'swr'
 import EventCard from './EventsCard'
+import { useUser } from '@/hooks/useUser'
 
 // Fetcher function for events - uses API route to avoid server action serialization issues
 const fetchEvents = async (): Promise<CheckInType[]> => {
@@ -19,7 +20,11 @@ const fetchEvents = async (): Promise<CheckInType[]> => {
 }
 
 const EventsSchedule: React.FC = () => {
-    const { data: events, error, isLoading } = useSWR('events', fetchEvents)
+    const { user, loading: authLoading } = useUser()
+    const { data: events, error, isLoading } = useSWR(
+        user ? 'events' : null,
+        fetchEvents,
+    )
 
     // State to track selected day (YYYY-MM-DD string)
     const [selectedDate, setSelectedDate] = useState<string | null>(() =>
@@ -62,8 +67,8 @@ const EventsSchedule: React.FC = () => {
         })
     }, [selectedDate, events])
 
-    // Handle loading and error states
-    if (isLoading) return <div>Loading...</div>
+    // Handle loading and error states (wait for auth before fetching to avoid race)
+    if (authLoading || isLoading) return <div>Loading...</div>
     if (error) return <div>Error loading data: {error.message}</div>
 
     return (

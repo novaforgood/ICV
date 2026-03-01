@@ -16,7 +16,7 @@ export default async function layout({
     }
     return (
         <>
-            <div className="sticky left-0 top-0 flex w-full flex-col items-start overflow-x-hidden rounded-md border-b bg-white">
+            <div className="sticky left-0 top-0 z-10 flex w-full flex-col items-start overflow-x-hidden rounded-md border-b bg-white">
                 <div className="flex w-full flex-row px-10">
                     <div className="mr-8 pt-4">
                         <div className="h-[100px] w-[100px] overflow-hidden rounded-full">

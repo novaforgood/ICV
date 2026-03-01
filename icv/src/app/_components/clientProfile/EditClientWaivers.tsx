@@ -111,7 +111,7 @@ export const ClientWaiversToggle = ({
                         )}
                     </div>
                 ) : (
-                    <div className="mt-[20px]">
+                    <div className="mt-[20px] isolate">
                         <WaiverSection
                             formType={formData}
                             updateForm={(form) => updateForm(id, form)}
