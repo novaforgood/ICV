@@ -1,8 +1,8 @@
 'use client'
 
 import { getClientById } from '@/api/clients'
-import EventCard from '@/app/_components/EventsCard'
-import ScheduledCheckInCreation from '@/app/_components/ScheduledCheckInCreation'
+import EventCard from '@/app/_components/dashboard/EventsCard'
+import ScheduledCheckInCreation from '@/app/_components/calendar/ScheduledCheckInCreation'
 import { Button } from '@/components/ui/button'
 import {
     Select,

@@ -6,7 +6,7 @@ import categoryColors, {
 } from '@/app/_components/categoryColors'
 import { ContactTypeBadge } from '@/app/_components/ContactTypeBadge'
 import EditCaseNotes from '@/app/_components/EditCaseNotes'
-import EditScheduledCheckIn from '@/app/_components/EditScheduledCheckIn'
+import EditScheduledCheckIn from '@/app/_components/calendar/EditScheduledCheckIn'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { CheckInType } from '@/types/event-types'

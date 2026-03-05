@@ -1,7 +1,7 @@
 'use client'
 
-import ScheduledCheckInCreation from '@/app/_components/ScheduledCheckInCreation'
-import EventsCalendar from '@/app/_components/EventsCalendar'
+import ScheduledCheckInCreation from '@/app/_components/calendar/ScheduledCheckInCreation'
+import EventsCalendar from '@/app/_components/calendar/EventsCalendar'
 import { useState } from 'react'
 
 const Page = () => {
@@ -15,8 +15,8 @@ const Page = () => {
         newEvents = {newEvents}
       />
 
-      {/* Floating popup trigger button in bottom-right */}
-      <div className="absolute bottom-6 right-6 z-50">
+      {/* Floating button overlaid on calendar */}
+      <div className="fixed bottom-6 right-6 z-50">
         <ScheduledCheckInCreation 
           onNewEvent = {() => setNewEvents(true)}
         />

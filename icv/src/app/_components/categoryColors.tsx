@@ -1,17 +1,17 @@
 const categoryColors: { [key: string]: string } = {
-        "Referral and Intake" :'bg-teal-200',
-        "Phone" :'bg-red-200',
-        "Wellness Check" :'bg-amber-300',
-        "Face to Face":'bg-indigo-200',
-        "Team Meeting":'bg-green-200',
-        "Individual Meeting":'bg-purple-200',
-        "Family Meeting":'bg-pink-200',
-        "Referral to Service Provider":'bg-indigo-200',
-        "Employment Job Readiness":'bg-orange-200',
-        "Transportation":'bg-cyan-200',
-        "Tracking Check Up":'bg-indigo-200',
-        "Advocacy":'bg-green-200',
-        'Other': 'bg-purple-200'
+        "Referral and Intake" :'bg-[#FFC7DC]',
+        "Phone" :'bg-[#DAFEBE]' ,
+        "Face to Face":'bg-[#CAC7FF]',
+        "Team Meeting":'bg-[#FFE9A7]',
+        "Individual Meeting":'bg-[#EDD4FF]',
+        "Family Meeting":'bg-[#C8F8FF]',
+        "Referral to Service Provider":'bg-[#FFC7DC]',
+        "Employment Job Readiness":'bg-[#DAFEBE]',
+        "Transportation":'bg-[#CAC7FF]',
+        "Wellness Check" :'bg-[#FFE9A7]',
+        "Tracking Check Up":'bg-[#EDD4FF]',
+        "Advocacy":'bg-[#C8F8FF]',
+        'Other': 'bg-[#D8DDE7]'
 
     } as const;
 

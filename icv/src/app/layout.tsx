@@ -5,7 +5,7 @@ import './globals.css'
 // import AuthSetup from './components/AuthSetup'
 import 'material-symbols/outlined.css'
 import { Epilogue } from 'next/font/google'
-import AuthSetup from './_components/AuthSetup'
+import AuthSetup from './_components/auth/AuthSetup'
 import './globals.css'
 
 const epilogFont = Epilogue({

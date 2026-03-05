@@ -8,7 +8,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { getMyScheduledEvents, getScheduledEvents } from '@/api/events'
 import { CheckInType } from '@/types/event-types'
-import EditScheduledCheckIn from '@/app/_components/EditScheduledCheckIn'
+import EditScheduledCheckIn from '@/app/_components/calendar/EditScheduledCheckIn'
 import { getUserColor } from '@/utils/colorUtils'
 
 import {
@@ -206,7 +206,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
   }
 
   return (
-    <div className="m-[48px] space-y-[40px]">
+    <div className="w-full px-4 py-6 lg:px-6 space-y-6">
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <h1 className="text-6xl font-bold">Calendar</h1>
 
@@ -239,7 +239,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
       </div>
 
       {/* Calendar */}
-      <div className="border rounded-lg overflow-hidden h-[75vh] [&_.rbc-header]:py-3 [&_.rbc-header]:font-medium [&_.rbc-header]:bg-gray-50 [&_.rbc-header]:border-b-0 [&_.rbc-time-gutter_.rbc-timeslot-group]:border-r [&_.rbc-timeslot-group]:border-gray-200 [&_.rbc-time-content]:border-t [&_.rbc-time-content]:border-gray-200 [&_.rbc-time-header]:border-gray-200">
+      <div className="overflow-hidden h-[calc(100vh-12rem)] min-h-[400px] [&_.rbc-header]:py-3 [&_.rbc-header]:font-medium [&_.rbc-header]:bg-gray-50 [&_.rbc-header]:border-b-0 [&_.rbc-time-gutter_.rbc-timeslot-group]:border-r [&_.rbc-timeslot-group]:border-gray-200 [&_.rbc-time-content]:border-t [&_.rbc-time-content]:border-gray-200 [&_.rbc-time-header]:border-gray-200">
         <Calendar<any>
           localizer={localizer}
           events={events}

@@ -3,10 +3,10 @@
 import Symbol from '@/components/Symbol'
 import { Card } from '@/components/ui/card'
 import { CheckInType } from '@/types/event-types'
-import { format, isValid, parseISO } from 'date-fns'
-import React, { useMemo, useState } from 'react'
+import { addDays, format, isValid, parseISO, subDays } from 'date-fns'
+import React, { useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
-import EventCard from './EventsCard'
+import EventCard from '../dashboard/EventsCard'
 import { useUser } from '@/hooks/useUser'
 
 // Fetcher function for events - uses API route to avoid server action serialization issues
@@ -46,6 +46,24 @@ const EventsSchedule: React.FC = () => {
         return result
     }
 
+    // Detect sm screens (below 640px) for compact date picker
+    const [isSmScreen, setIsSmScreen] = useState(false)
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 639px)')
+        const handler = () => setIsSmScreen(mq.matches)
+        handler()
+        mq.addEventListener('change', handler)
+        return () => mq.removeEventListener('change', handler)
+    }, [])
+
+    // On sm: sliding 3-day window. smOffset shifts the window (0 = yesterday/today/tomorrow)
+    const [smOffset, setSmOffset] = useState(0)
+    const smDays = useMemo(() => {
+        const t = new Date()
+        const center = addDays(t, smOffset)
+        return [subDays(center, 1), center, addDays(center, 1)]
+    }, [smOffset])
+
     // Generate date options for the week view based on weekStart
     const weekDays = useMemo(() => {
         return Array.from({ length: 7 }, (_, i) => {
@@ -55,13 +73,13 @@ const EventsSchedule: React.FC = () => {
         })
     }, [weekStart])
 
+    const displayDays = isSmScreen ? smDays : weekDays
+
     // Filter events by selected date and ensure event.date is valid
     const filteredEvents = useMemo(() => {
-        console.log('Selected Date:', selectedDate)
         if (!selectedDate || !events) return events || []
         return events.filter((event) => {
             const eventDate = new Date(event.startTime)
-            // console.log('Event name: ', event.name, 'Event Date:', event.startTime)
             if (!isValid(eventDate)) return false
             return format(eventDate, 'yyyy-MM-dd') === selectedDate
         })
@@ -81,42 +99,54 @@ const EventsSchedule: React.FC = () => {
                     <button
                         className="h-6 w-6 flex-shrink-0 text-sm"
                         onClick={() => {
-                            const newSelectedDate = parseISO(selectedDate!)
-                            newSelectedDate.setDate(
-                                newSelectedDate.getDate() - 7,
-                            )
-                            setSelectedDate(
-                                format(newSelectedDate, 'yyyy-MM-dd'),
-                            )
-                            setWeekStart(getStartOfWeek(newSelectedDate))
+                            if (isSmScreen) {
+                                setSmOffset((o) => o - 1)
+                            } else {
+                                const newSelectedDate = parseISO(selectedDate!)
+                                newSelectedDate.setDate(
+                                    newSelectedDate.getDate() - 7,
+                                )
+                                setSelectedDate(
+                                    format(newSelectedDate, 'yyyy-MM-dd'),
+                                )
+                                setWeekStart(getStartOfWeek(newSelectedDate))
+                            }
                         }}
                     >
                         <Symbol symbol="keyboard_arrow_left" />
                     </button>
                     <div className="text-lg">
-                        {`${format(weekDays[0], 'MMM d')} - ${format(
-                            weekDays[weekDays.length - 1],
+                        {`${format(displayDays[0], 'MMM d')} - ${format(
+                            displayDays[displayDays.length - 1],
                             'MMM d',
                         )}`}
                     </div>
                     <button
                         className="h-6 w-6 flex-shrink-0 text-sm"
                         onClick={() => {
-                            const newSelectedDate = parseISO(selectedDate!)
-                            newSelectedDate.setDate(
-                                newSelectedDate.getDate() + 7,
-                            )
-                            setSelectedDate(
-                                format(newSelectedDate, 'yyyy-MM-dd'),
-                            )
-                            setWeekStart(getStartOfWeek(newSelectedDate))
+                            if (isSmScreen) {
+                                setSmOffset((o) => o + 1)
+                            } else {
+                                const newSelectedDate = parseISO(selectedDate!)
+                                newSelectedDate.setDate(
+                                    newSelectedDate.getDate() + 7,
+                                )
+                                setSelectedDate(
+                                    format(newSelectedDate, 'yyyy-MM-dd'),
+                                )
+                                setWeekStart(getStartOfWeek(newSelectedDate))
+                            }
                         }}
                     >
                         <Symbol symbol="keyboard_arrow_right" />
                     </button>
                 </div>
-                <div className="flex items-center justify-between self-stretch px-6">
-                    {weekDays.map((day) => {
+                <div
+                    className={`flex items-center self-stretch px-6 ${
+                        isSmScreen ? 'justify-between gap-2' : 'justify-between'
+                    }`}
+                >
+                    {displayDays.map((day) => {
                         const formattedDate = format(day, 'yyyy-MM-dd')
                         const isSelected = selectedDate === formattedDate
                         return (
@@ -141,7 +171,7 @@ const EventsSchedule: React.FC = () => {
                                     <div
                                         className={`flex h-12 w-12 items-center justify-center rounded-full bg-background text-primary transition-colors ${
                                             isSelected ? 'font-bold' : ''
-                                        }`}
+                                        } ${isSmScreen ? 'text-sm' : ''}`}
                                     >
                                         {format(day, 'E')}
                                     </div>

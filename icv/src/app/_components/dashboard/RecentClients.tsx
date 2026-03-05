@@ -1,7 +1,7 @@
 import { getAllClientsByLastCheckinDate, getRecentClients } from '@/api/clients'
 import { NewClient } from '@/types/client-types'
 import useSWR from 'swr'
-import ClientCard from './ClientCard'
+import ClientCard from '../ClientCard'
 import React from 'react'
 import Link from 'next/link'
 

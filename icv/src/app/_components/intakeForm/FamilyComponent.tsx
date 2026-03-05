@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
-import ClientSearch from '../ClientSearch'
+import ClientSearch from '../calendar/ClientSearch'
 import {
     CheckboxList,
     RadioChoice,

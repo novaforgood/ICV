@@ -1,8 +1,8 @@
 'use client'
 
 import { getClientById } from '@/api/clients'
-import EventCard from '@/app/_components/EventsCard'
-import ScheduledCheckInCreation from '@/app/_components/ScheduledCheckInCreation'
+import EventCard from '@/app/_components/dashboard/EventsCard'
+import ScheduledCheckInCreation from '@/app/_components/calendar/ScheduledCheckInCreation'
 import Symbol from '@/components/Symbol'
 import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'

@@ -7,11 +7,30 @@ import { Card } from '@/components/ui/card'
 import { NewClient } from '@/types/client-types'
 import { CheckInType, ContactType } from '@/types/event-types'
 import { format } from 'date-fns'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import dayjs from 'dayjs'
 import React, { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import useSWR from 'swr'
-import ClientCard from './ClientCard'
+import ClientCard from '../ClientCard'
 import { useRouter } from 'next/navigation'
+import {
+    LocalizationProvider,
+    TimePicker,
+} from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+
+function roundToNearest10Minutes(date: Date): Date {
+    const d = new Date(date)
+    const minutes = d.getMinutes()
+    const rounded = Math.round(minutes / 10) * 10
+    if (rounded === 60) {
+        d.setHours(d.getHours() + 1)
+        d.setMinutes(0, 0, 0)
+    } else {
+        d.setMinutes(rounded, 0, 0)
+    }
+    return d
+}
 
 interface EditScheduledCheckInProps {
     onClose: () => void
@@ -37,15 +56,12 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         ContactType.Values['Wellness Check'],
     )
     const [assigneeId, setAssigneeId] = useState('')
-    const [clientSearch, setClientSearch] = useState('')
     const [selectedClientDocId, setSelectedClientDocId] = useState('')
     const { data: clients } = useSWR<NewClient[]>('clients', getAllClients)
     const [showUpdateSuccess, setShowUpdateSuccess] = useState(false)
     const [showDeleteSuccess, setShowDeleteSuccess] = useState(false)
     const [client, setClient] = useState<ClientWithLastCheckin | null>(null)
     const [staffNames, setStaffNames] = useState<string[]>([])
-    const [searchTerm, setSearchTerm] = useState('')
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
     const router = useRouter()
@@ -87,6 +103,10 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
             fetchClient()
         }
     }, [selectedEvent])
+
+    useEffect(() => {
+        setEditMode(fromEvent)
+    }, [selectedEvent?.id, fromEvent])
 
     useEffect(() => {
         // Fetch staff names when component mounts
@@ -138,7 +158,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
             clientDocId: selectedClientDocId,
             contactCode: contactType,
             scheduled: true,
-            clientId: selectedClient.id,
+            clientId: selectedClient.clientCode ?? '',
             clientName:
                 `${selectedClient.firstName || ''} ${selectedClient.lastName || ''}`.trim(),
         }
@@ -183,16 +203,29 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
 
     if (!selectedEvent) return null
 
+    const portalTarget =
+        typeof document !== 'undefined' ? document.body : null
+
     return (
         <>
             {/* event info popup*/}
 
-            {!showUpdateSuccess &&
+            {portalTarget &&
+                !showUpdateSuccess &&
                 !showDeleteSuccess &&
                 !editMode &&
-                !fromEvent && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-                        <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
+                !fromEvent &&
+                createPortal(
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        <div
+                            className="absolute inset-0 bg-black bg-opacity-30"
+                            onClick={onClose}
+                            aria-hidden
+                        />
+                        <div
+                            className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-lg z-10"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <div className="absolute right-4 top-4 flex gap-3 text-gray-600">
                                 <button onClick={() => setEditMode(true)}>
                                     <span className="material-symbols-outlined">
@@ -215,7 +248,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                 {selectedEvent.clientName}
                             </h2>
                             <p className="mb-4 text-gray-500">
-                                {selectedEvent.clientId}
+                                {client?.clientCode ?? ''}
                             </p>
 
                             <div className="mb-2 flex items-center gap-2 text-gray-800">
@@ -223,12 +256,12 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                     calendar_today
                                 </span>
                                 <p>
-                                    {new Date(
-                                        selectedEvent.start,
+                                    {roundToNearest10Minutes(
+                                        new Date(selectedEvent.start),
                                     ).toLocaleString()}{' '}
                                     –{' '}
-                                    {new Date(
-                                        selectedEvent.end,
+                                    {roundToNearest10Minutes(
+                                        new Date(selectedEvent.end),
                                     ).toLocaleTimeString([], {
                                         hour: 'numeric',
                                         minute: '2-digit',
@@ -264,20 +297,43 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                 View case notes
             </button>
         </div>
-      </div>
-    )}
+      </div>,
+                    portalTarget
+                )}
     {/* editing event */}
-    {!showUpdateSuccess && !showDeleteSuccess && editMode && (
-      <div className="fixed right-0 top-0 h-full w-[600px] bg-white shadow-lg border-l border-gray-200 p-8 z-[100] overflow-y-auto">
+    {portalTarget &&
+        !showUpdateSuccess &&
+        !showDeleteSuccess &&
+        editMode &&
+        createPortal(
+            <div className="fixed inset-0 z-50 flex">
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-30"
+                    onClick={onClose}
+                    aria-hidden
+                />
+                <div className="fixed right-0 top-0 h-full w-[600px] bg-white shadow-lg border-l border-gray-200 p-8 z-[100] overflow-y-auto">
           <div className="absolute top-4 right-4 flex gap-3 text-gray-600">
-
-            <button onClick={onClose}>
-              <span className="material-symbols-outlined">close</span>
-            </button>
           </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Header */}
+
+          <div className="mb-6 flex items-center justify-between">
+                                <h2 className="font-['Epilogue'] text-[24px] font-[600]">
+                                   Edit Check-In
+                                </h2>
+                                <button
+                                    onClick={onClose}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    <span className="material-symbols-outlined">
+                                        close
+                                    </span>
+                                </button>
+                            </div>
+          
           <div>
+            
             { client && (< ClientCard client={client} /> )}
           </div>
 
@@ -293,39 +349,46 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                         </div>
 
                         {/* Start & End Time */}
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <label
-                                    htmlFor="startTime"
-                                    className="mb-1 block"
-                                >
-                                    Start time
-                                </label>
-                                <input
-                                    id="startTime"
-                                    type="time"
-                                    value={startTime}
-                                    onChange={(e) =>
-                                        setStartTime(e.target.value)
-                                    }
-                                    className="w-full rounded border p-2"
-                                    required
-                                />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <TimePicker
+                                        label="Start time"
+                                        value={date && startTime ? dayjs(roundToNearest10Minutes(new Date(`${date}T${startTime}`))) : null}
+                                        onChange={(newValue) =>
+                                            setStartTime(newValue ? newValue.format('HH:mm') : '')
+                                        }
+                                        minutesStep={5}
+                                        timeSteps={{ minutes: 5 }}
+                                        slotProps={{
+                                            textField: {
+                                                required: true,
+                                                fullWidth: true,
+                                                size: 'small',
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <TimePicker
+                                        label="End time"
+                                        value={date && endTime ? dayjs(roundToNearest10Minutes(new Date(`${date}T${endTime}`))) : null}
+                                        onChange={(newValue) =>
+                                            setEndTime(newValue ? newValue.format('HH:mm') : '')
+                                        }
+                                        minutesStep={5}
+                                        timeSteps={{ minutes: 5 }}
+                                        slotProps={{
+                                            textField: {
+                                                required: true,
+                                                fullWidth: true,
+                                                size: 'small',
+                                            },
+                                        }}
+                                    />
+                                </div>
                             </div>
-                            <div className="flex-1">
-                                <label htmlFor="endTime" className="mb-1 block">
-                                    End time
-                                </label>
-                                <input
-                                    id="endTime"
-                                    type="time"
-                                    value={endTime}
-                                    onChange={(e) => setEndTime(e.target.value)}
-                                    className="w-full rounded border p-2"
-                                    required
-                                />
-                            </div>
-                        </div>
+                        </LocalizationProvider>
 
                         {/* Staff display */}
                         <div className="relative">
@@ -410,23 +473,31 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                         </div>
                     </form>
                 </div>
-            )}
+            </div>,
+            portalTarget
+        )}
             {/* event edit success message */}
-            {showUpdateSuccess && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <Card className="w-fit rounded px-4 py-2 text-center">
-                        Check in updated successfully!
-                    </Card>
-                </div>
-            )}
+            {portalTarget &&
+                showUpdateSuccess &&
+                createPortal(
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        <Card className="w-fit rounded px-4 py-2 text-center">
+                            Check in updated successfully!
+                        </Card>
+                    </div>,
+                    portalTarget
+                )}
             {/* delete event success message */}
-            {showDeleteSuccess && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <Card className="w-fit rounded px-4 py-2 text-center">
-                        Check in deleted.
-                    </Card>
-                </div>
-            )}
+            {portalTarget &&
+                showDeleteSuccess &&
+                createPortal(
+                    <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        <Card className="w-fit rounded px-4 py-2 text-center">
+                            Check in deleted.
+                        </Card>
+                    </div>,
+                    portalTarget
+                )}
         </>
     )
 }

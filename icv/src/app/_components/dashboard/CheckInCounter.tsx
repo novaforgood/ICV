@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import { useTimeFrame } from '../_context/TimeFrameContext'
-import { useCheckInCount } from '../_context/CheckInCountContext'
+import { useTimeFrame } from '../../_context/TimeFrameContext'
+import { useCheckInCount } from '../../_context/CheckInCountContext'
 
 const CheckInCounter: React.FC = () => {
     const { timeFrame, setTimeFrame } = useTimeFrame()

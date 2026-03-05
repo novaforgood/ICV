@@ -13,17 +13,18 @@ export const CheckInCategory = z.enum([
 //enum for check in types!!!
 export const ContactType = z.enum([
     'Referral and Intake', // ReferralAndIntake
-    'Phone', // Phone
-    'Face to Face', // FaceToFace
-    'Team Meeting', // TeamMeeting
-    'Individual Meeting', // IndividualMeeting
-    'Family Meeting', // FamilyMeeting
     'Referral to Service Provider', // ReferralToServiceProvider
+    'Phone', // Phone
     'Employment Job Readiness', // EmploymentJobReadiness and EventActivityFieldTrip
+    'Face to Face', // FaceToFace
     'Transportation', // Transportation
+    'Team Meeting', // TeamMeeting
+    'Wellness Check', // WellnessCheck
+    'Individual Meeting', // IndividualMeeting
     'Tracking Check Up', // TrackingCheckUp
     'Advocacy', // Advocacy
-    'Wellness Check', // WellnessCheck
+    'Family Meeting', // FamilyMeeting
+
     'Other', // Other
 ])
 
@@ -37,7 +38,7 @@ export const CheckInSchema = z.object({
         message: "Choose check-in category."
     }).optional(),
     description: z.string().optional(),
-    name : z.string().optional(),
+    name: z.string().optional(),
     location: z.string().optional(),
     asigneeId: z.string().optional(),
     id: z.string().optional(),
@@ -50,7 +51,7 @@ export const CheckInSchema = z.object({
     clientName: z.string().optional(),
     cliendId: z.string().optional(),
 })
-.passthrough(); // lets fields not in schema pass through (clientId, because always collected properly)
+    .passthrough(); // lets fields not in schema pass through (clientId, because always collected properly)
 
 // Types for enums and main schema
 export type CheckInType = z.infer<typeof CheckInSchema>

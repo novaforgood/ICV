@@ -1,14 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import EventsSchedule from '../_components/EventsSchedule'
-import CheckInCounter from '../_components/CheckInCounter'
-import SpontaneousCheckInModal from '../_components/SpontaneousCheckinCreation'
+import EventsSchedule from '../_components/calendar/EventsSchedule'
+import CheckInCounter from '../_components/dashboard/CheckInCounter'
+import SpontaneousCheckInModal from '../_components/dashboard/SpontaneousCheckinCreation'
 import { useUser } from '@/hooks/useUser'
 import { TimeFrameProvider } from '../_context/TimeFrameContext'
 import { CheckInCountProvider } from '../_context/CheckInCountContext'
-import RecentClients from '../_components/RecentClients'
-
+import RecentClients from '../_components/dashboard/RecentClients'
 export const dynamic = 'force-dynamic'
 
 export default function Home() {

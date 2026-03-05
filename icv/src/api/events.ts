@@ -95,7 +95,11 @@ export async function updateCheckIn(event: CheckInType) {
 
     try {
         const eventDocRef = doc(ssrdb, 'events', event.id)
-        await updateDoc(eventDocRef, { ...event })
+        const updateData = Object.fromEntries(
+            Object.entries(event).filter(([, v]) => v !== undefined)
+        )
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await updateDoc(eventDocRef, updateData as any)
 
         return event.id
     } catch (error) {

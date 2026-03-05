@@ -6,8 +6,8 @@ import { CheckInCategory, CheckInType, ContactType } from '@/types/event-types'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { format } from 'date-fns'
 import { Card } from '@/components/ui/card'
-import ClientCard from './ClientCard'
-import ClientSearch from '@/app/_components/ClientSearch'
+import ClientCard from '../ClientCard'
+import ClientSearch from '@/app/_components/calendar/ClientSearch'
 
 const enum Step {
   ChooseClient,

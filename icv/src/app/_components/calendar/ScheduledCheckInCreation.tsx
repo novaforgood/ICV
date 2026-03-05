@@ -6,10 +6,29 @@ import { ContactTypeBadge } from '@/app/_components/ContactTypeBadge'
 import { Card } from '@/components/ui/card'
 import { CheckInType, ContactType } from '@/types/event-types'
 import { format } from 'date-fns'
+import dayjs from 'dayjs'
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth'
+import {
+    LocalizationProvider,
+    TimePicker,
+} from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useSWR, { mutate } from 'swr'
 import ClientSearch from './ClientSearch'
+
+function roundToNearest10Minutes(date: Date): Date {
+    const d = new Date(date)
+    const minutes = d.getMinutes()
+    const rounded = Math.round(minutes / 10) * 10
+    if (rounded === 60) {
+        d.setHours(d.getHours() + 1)
+        d.setMinutes(0, 0, 0)
+    } else {
+        d.setMinutes(rounded, 0, 0)
+    }
+    return d
+}
 
 interface ScheduledCheckInCreationProps {
     onNewEvent: () => void
@@ -63,9 +82,11 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
 
     const resetFormDefaults = () => {
         const now = new Date()
-        setDate(format(now, 'yyyy-MM-dd'))
-        setStartTime(format(now, 'HH:mm'))
-        setEndTime(format(new Date(now.getTime() + 60 * 60 * 1000), 'HH:mm'))
+        const roundedNow = roundToNearest10Minutes(now)
+        const endTimeDate = new Date(roundedNow.getTime() + 60 * 60 * 1000)
+        setDate(format(roundedNow, 'yyyy-MM-dd'))
+        setStartTime(format(roundedNow, 'HH:mm'))
+        setEndTime(format(roundToNearest10Minutes(endTimeDate), 'HH:mm'))
     }
 
     useEffect(() => {
@@ -168,16 +189,16 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
     return (
         <>
             <button
-                className={buttonClassName ?? 'rounded bg-foreground p-2 text-white'}
+                className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white"
                 onClick={() => setIsOpen(true)}
             >
-                Schedule New Event
+                Create Check-In
             </button>
 
             {isOpen && showSuccess && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
                     <Card className="w-fit rounded px-4 py-2 text-center">
-                        Check in created successfully!
+                        Check-in created successfully!
                     </Card>
                 </div>
             )}
@@ -194,8 +215,8 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
                     <div className="fixed inset-y-0 right-0 z-50 w-[600px] overflow-y-auto bg-white shadow-xl">
                         <div className="p-6">
                             <div className="mb-6 flex items-center justify-between">
-                                <h2 className="text-2xl font-semibold">
-                                    {name}
+                                <h2 className="font-['Epilogue'] text-[24px] font-[600]">
+                                   Create Check-In
                                 </h2>
                                 <button
                                     onClick={closeModal}
@@ -254,36 +275,46 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                                            Start time
-                                        </label>
-                                        <input
-                                            type="time"
-                                            value={startTime}
-                                            onChange={(e) =>
-                                                setStartTime(e.target.value)
-                                            }
-                                            className="focus:ring-blue-500 w-full rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2"
-                                            required
-                                        />
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <div className="flex gap-4">
+                                        <div className="flex-1">
+                                            <TimePicker
+                                                label="Start time"
+                                                value={date && startTime ? dayjs(roundToNearest10Minutes(new Date(`${date}T${startTime}`))) : null}
+                                                onChange={(newValue) =>
+                                                    setStartTime(newValue ? newValue.format('HH:mm') : '')
+                                                }
+                                                minutesStep={5}
+                                                timeSteps={{ minutes: 5 }}
+                                                slotProps={{
+                                                    textField: {
+                                                        required: true,
+                                                        fullWidth: true,
+                                                        size: 'small',
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <TimePicker
+                                                label="End time"
+                                                value={date && endTime ? dayjs(roundToNearest10Minutes(new Date(`${date}T${endTime}`))) : null}
+                                                onChange={(newValue) =>
+                                                    setEndTime(newValue ? newValue.format('HH:mm') : '')
+                                                }
+                                                minutesStep={5}
+                                                timeSteps={{ minutes: 5 }}
+                                                slotProps={{
+                                                    textField: {
+                                                        required: true,
+                                                        fullWidth: true,
+                                                        size: 'small',
+                                                    },
+                                                }}
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="mb-2 block text-sm font-medium text-gray-700">
-                                            End time
-                                        </label>
-                                        <input
-                                            type="time"
-                                            value={endTime}
-                                            onChange={(e) =>
-                                                setEndTime(e.target.value)
-                                            }
-                                            className="focus:ring-blue-500 w-full rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2"
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                                </LocalizationProvider>
 
                                 <div>
                                     <label className="mb-2 block text-sm font-medium text-gray-700">

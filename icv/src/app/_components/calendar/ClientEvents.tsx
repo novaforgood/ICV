@@ -45,11 +45,6 @@ export default function ClientEvents({
             contactCode: data.contactType,
             description: data.description,
         })
-        // await createDog({
-        //     name: data.contactType,
-        //     breed: data.description,
-        //     age: 1,
-        // })
 
         //localStorage.removeItem(storageKey) // no longer save info to local storage when form is submitted
         reset()
