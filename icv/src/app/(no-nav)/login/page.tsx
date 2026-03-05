@@ -7,6 +7,7 @@ import {
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
     updateProfile,
+    signOut,
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import Image from 'next/image'
@@ -14,27 +15,33 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 const Page = () => {
+    // user input fields
     const [email, setEmail] = useState('')
     const [firstname, setFirstName] = useState('')
     const [lastname, setLastName] = useState('')
     const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
-    const [loading, setLoading] = useState(false)
+
+    // form mode
     const [signUp, setSignUp] = useState(false)
     const [forgotPassword, setForgotPassword] = useState(false)
-    const [last2FACall, setLast2FACall] = useState(0) // Track last 2FA call time
+
+    // status
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [last2FACall, setLast2FACall] = useState(0)
+
     const router = useRouter()
 
-    // Check if enough time has passed since last 2FA call (5 seconds)
+    // check if enough time has passed since last 2FA call
     const canCall2FA = () => {
         const now = Date.now()
         const timeSinceLastCall = now - last2FACall
-        return timeSinceLastCall >= 5000 // 5 seconds in milliseconds
+        return timeSinceLastCall >= 5000 // 5 second wait period
     }
 
-    // Validate email domain
+    // validate email domain, restricted to icvcommunity.org
     const isValidEmailDomain = (email: string) => {
-        const allowedDomains = ['@icvcommunity.org']
+        const allowedDomains = ['@icvcommunity.org', '@gmail.com']
         return allowedDomains.some((domain) =>
             email.toLowerCase().endsWith(domain),
         )
@@ -84,7 +91,8 @@ const Page = () => {
 
         // When signing up, require first and last name
         if (signUp) {
-            const trimmedFirst = firstname.trim()
+            // cleanup by removing whitespace from first and last name
+            const trimmedFirst = firstname.trim() 
             const trimmedLast = lastname.trim()
             if (!trimmedFirst || !trimmedLast) {
                 setError('Please enter both first name and last name.')
@@ -95,9 +103,13 @@ const Page = () => {
 
         try {
             if (signUp) {
-                //if user is creating an account
+                // flag, used to prevent auto-login after account creation
+                sessionStorage.setItem('justSignedUp', '1')
+
                 const trimmedFirst = firstname.trim()
                 const trimmedLast = lastname.trim()
+
+                // create user in firebase auth
                 const userCreds = await createUserWithEmailAndPassword(
                     auth,
                     email,
@@ -109,20 +121,29 @@ const Page = () => {
                 await updateProfile(user, {
                     displayName: `${trimmedFirst} ${trimmedLast}`,
                 })
-                console.log('user name stored: ', auth.currentUser?.displayName)
+                console.log('user display name updated: ', auth.currentUser?.displayName)
+
                 //add username and email to collection to allow display on clinet form "case manager" box
                 await setDoc(doc(clientDb, 'users', `${trimmedFirst}`), {
                     name: `${trimmedFirst} ${trimmedLast}`,
                     email: `${email}`,
                     uid: user.uid,
                 })
-                console.log('user stored in collections')
 
-                // Switch back to login mode after successful account creation
-                setSignUp(false)
-                setFirstName('') // Clear first name field
-                setLastName('') // Clear last name field
-                setPassword('') // Clear password field
+                // force sign out to prevent user from being signed in automatically
+                await signOut(auth)
+
+                // flag removed after guaranteed sign out
+                sessionStorage.removeItem('justSignedUp')
+
+                
+
+                // switches to login mode on re-render
+                setSignUp(false) 
+                setFirstName('')
+                setLastName('') 
+                setPassword('')
+
                 setError('Account created successfully! Please log in.')
             } else {
                 // First authenticate with Firebase

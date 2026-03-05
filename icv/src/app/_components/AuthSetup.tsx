@@ -14,15 +14,19 @@ const AuthSetup = () => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                console.log('User is signed in')
-                console.log("Welcome, ", auth.currentUser?.displayName)
+                // prevents setting cookie or redirect if user just created an account
+                // this is done to enforce proper 2FA flow after account creation
+                if (pathname === '/login' && sessionStorage.getItem('justSignedUp')) {
+                    return
+                }
+
                 const idToken = await getIdToken(user)
 
                 await setCookie('idToken', idToken, {
                     maxAge: 60 * 60 * 24 * 7,
                 })
 
-                // Redirect logged-in users away from login page
+                // redirect to home page if user is logged in and on login page
                 if (pathname === '/login') {
                     router.push('/')
                 }
