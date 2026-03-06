@@ -55,8 +55,8 @@ const ClientCard: React.FC<ClientCardProps> = ({
     }, [client.docId, showLastCheckin])
 
     return (
-        <Card className="flex min-h-24 w-full bg-white p-4 hover:bg-gray-50">
-            <div className="flex w-full items-start gap-3">
+        <Card className="flex min-h-24 min-w-0 w-full max-w-full bg-white p-4 hover:bg-gray-50">
+            <div className="flex min-w-0 w-full items-start gap-3">
                 {client.clientPic?.[0]?.uri ? (
                     <Image
                         src={client.clientPic[0].uri}
@@ -80,13 +80,13 @@ const ClientCard: React.FC<ClientCardProps> = ({
                         />
                     </svg>
                 )}
-                <div className="flex w-full flex-col">
-                    <div className="flex items-start justify-between">
-                        <div>
+                <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                    <div className="flex min-w-0 items-start justify-between">
+                        <div className="min-w-0 overflow-hidden">
                             <div className="line-clamp-1 font-medium text-gray-900">
                                 {client.firstName} {client.lastName}
                             </div>
-                            <div className="mt-0.5 text-sm text-gray-500">
+                            <div className="mt-0.5 truncate text-sm text-gray-500">
                                 {client.clientCode || '-'}
                             </div>
                         </div>
