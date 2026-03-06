@@ -170,7 +170,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                         <div className="flex flex-col space-y-2">
                             {files.map((file, index) => (
                                 <div
-                                    key={file.uri || `file-${index}`}
+                                    key={index}
                                     className="mt-4 flex items-center justify-between gap-2"
                                 >
                                     <div className="min-w-0 flex-1">

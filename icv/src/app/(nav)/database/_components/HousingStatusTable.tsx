@@ -343,13 +343,7 @@ const HousingStatusTable = () => {
                                     </TableHeader>
                                     <TableBody>
                                         {currentData.map((record, index) => (
-                                            <TableRow
-                                                key={
-                                                    record.clientID && record.date
-                                                        ? `${record.clientID}-${record.date}`
-                                                        : `housing-${index}`
-                                                }
-                                            >
+                                            <TableRow key={index}>
                                                 <TableCell>
                                                     {record.date &&
                                                     !isNaN(
