@@ -411,7 +411,7 @@ export const ServicesSection: React.FC<Props> = ({
                             <button
                                 type="button"
                                 onClick={onCancel}
-                                className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                                className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white"
                             >
                                 <div className="flex flex-row space-x-[8px]">
                                     <svg

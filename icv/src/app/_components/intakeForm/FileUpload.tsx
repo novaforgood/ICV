@@ -63,10 +63,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 croppedAreaPixels,
                 mimeType,
             )
+            const baseName = cropFile.name.replace(/\.[^/.]+$/, '') || 'image'
             const extension = cropFile.name.split('.').pop() || 'jpg'
-            const croppedFile = new File([blob], `cropped.${extension}`, {
-                type: mimeType,
-            })
+            const croppedFile = new File(
+                [blob],
+                `${baseName}-crop.${extension}`,
+                { type: mimeType },
+            )
 
             const dataTransfer = new DataTransfer()
             dataTransfer.items.add(croppedFile)
@@ -134,7 +137,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             image={cropImageSrc}
                             crop={crop}
                             zoom={zoom}
-                            aspect={isProfilePic ? 1 : 4 / 3}
+                            aspect={isProfilePic ? 1 : undefined}
+                            initialCroppedAreaPercentages={
+                                isProfilePic
+                                    ? undefined
+                                    : { x: 0, y: 0, width: 100, height: 100 }
+                            }
                             onCropChange={setCrop}
                             onCropComplete={onCropAreaChange}
                             onCropAreaChange={onCropAreaChange}
@@ -215,7 +223,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                             onClick={() =>
                                                 onRemoveFile(field, index)
                                             }
-                                            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                                            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded text-gray-500"
                                             aria-label="Remove file"
                                         >
                                             <svg
@@ -238,9 +246,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             ))}
                         </div>
                     )}
-                    {files.length === 0 && (
-                        <div className="flex flex-row space-x-[24px]">
-                            <button
+                    <div className="flex flex-row space-x-[24px]">
+                        <button
                                 type="button"
                                 onClick={() => handleAddFile(fileInputRef)}
                                 className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white hover:bg-[#6D757F]"
@@ -298,7 +305,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                 className="hidden"
                             />
                         </div>
-                    )}
                 </>
             )}
         </div>
