@@ -1,5 +1,6 @@
 import { getClientById } from '@/api/make-cases/make-case'
 import { ClientWaiversToggle } from '@/app/_components/clientProfile/EditClientWaivers'
+import { notFound } from 'next/navigation'
 
 const page = async ({
     params,
@@ -10,6 +11,7 @@ const page = async ({
 }) => {
     const { clientId } = await params
     const client = await getClientById(clientId)
+    if (!client) notFound()
     return <ClientWaiversToggle client={client} id={clientId} />
 }
 
