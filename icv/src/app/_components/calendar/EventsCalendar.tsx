@@ -110,6 +110,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
 }) => {
     const isSmallScreen = useIsSmallScreen()
     const [scheduleType, setScheduleType] = useState<'my' | 'team'>('my')
+    const [hideWeekends, setHideWeekends] = useState(false)
     const [rawEvents, setRawEvents] = useState<CheckInType[]>([])
     const [currentDate, setCurrentDate] = useState(new Date())
     const [loading, setLoading] = useState(true)
@@ -200,38 +201,63 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
         }
 
         return (
-            <div className="flex items-center justify-center border-b px-4 py-3">
-                <button
-                    onClick={goToBack}
-                    className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
-                >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M15 18L9 12L15 6"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+            <div className="flex flex-col gap-3 border-b px-4 py-3">
+                <div className="flex items-center justify-center">
+                    <button
+                        onClick={goToBack}
+                        className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                        >
+                            <path
+                                d="M15 18L9 12L15 6"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+                    </button>
+                    <span className="px-3 text-lg font-medium text-gray-900">
+                        {label()}
+                    </span>
+                    <button
+                        onClick={goToNext}
+                        className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
+                    >
+                        <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                        >
+                            <path
+                                d="M9 6L15 12L9 18"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                        </svg>
+                    </button>
+                </div>
+                <div className="flex justify-start">
+                    <label className="flex cursor-pointer items-center gap-2">
+                        <input
+                            type="checkbox"
+                            checked={hideWeekends}
+                            onChange={(e) => setHideWeekends(e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-300"
                         />
-                    </svg>
-                </button>
-                <span className="px-3 text-lg font-medium text-gray-900">
-                    {label()}
-                </span>
-                <button
-                    onClick={goToNext}
-                    className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100"
-                >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M9 6L15 12L9 18"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
-                </button>
+                        <span className="text-sm text-gray-700">
+                            Hide weekends
+                        </span>
+                    </label>
+                </div>
             </div>
         )
     }
@@ -239,13 +265,15 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
     const CustomEvent = ({ event }: { event: any }) => {
         return (
             <div className="h-full space-y-[8px] p-1">
-                <div className="text-[16px] font-medium text-foreground">
-                    {event.clientName}
+                <div className="flex flex-col gap-1">
+                    <div className="truncate font-['Epilogue'] text-[14px] font-medium text-foreground">
+                        {event.clientName}
+                    </div>
+                    <div className="truncate font-['Epilogue'] text-[12px] text-foreground/80">
+                        {event.clientCode ?? '-'}
+                    </div>
                 </div>
-                <div className="text-[12px] text-foreground/80">
-                    {event.clientCode ?? '-'}
-                </div>
-                <div className="text-[12px] text-foreground/80">
+                <div className="font-['Epilogue'] text-[12px] text-foreground/80">
                     {format(new Date(event.start), 'h:mm a')} -{' '}
                     {format(new Date(event.end), 'h:mm a')}
                 </div>
@@ -293,9 +321,11 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
                 <Calendar<any>
                     localizer={localizer}
                     events={events}
+                    view={hideWeekends ? Views.WORK_WEEK : Views.WEEK}
                     defaultView={Views.WEEK}
                     views={{
                         week: (isSmallScreen ? ThreeDayView : true) as any,
+                        work_week: true,
                     }}
                     date={currentDate}
                     onNavigate={(date) => setCurrentDate(date)}
