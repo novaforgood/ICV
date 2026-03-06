@@ -66,7 +66,7 @@ const renderValue = (value: any, tagMode: boolean = false) => {
     return Array.isArray(value) ? (
         <div className="flex flex-col">
             {value.map((v, idx) => (
-                <div key={idx}>{v}</div>
+                <div key={`${String(v)}-${idx}`}>{v}</div>
             ))}
         </div>
     ) : (
@@ -87,7 +87,7 @@ const FilterTags = ({
         <div className="mt-1 flex flex-wrap gap-1">
             {filters.map((filter, index) => (
                 <div
-                    key={index}
+                    key={`${filter}-${index}`}
                     className="flex items-center gap-1 rounded-full bg-black px-2 py-1 text-sm text-white"
                 >
                     <span>{filter}</span>

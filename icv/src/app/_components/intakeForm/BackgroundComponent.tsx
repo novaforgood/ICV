@@ -360,7 +360,9 @@ export const BackgroundSection: React.FC<Props> = ({
                     {invalidIncome.length > 0 && (
                         <div style={{ color: 'red', marginTop: '1rem' }}>
                             {invalidIncome.map((msg, index) => (
-                                <div key={index}>{msg}</div>
+                                <div key={`income-msg-${index}`}>
+                                    {msg}
+                                </div>
                             ))}
                         </div>
                     )}

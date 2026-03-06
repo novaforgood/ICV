@@ -48,7 +48,10 @@ export const ClientWaiversToggle = ({
                                 </h2>
                                 <div className="mb-[24px] space-y-[8px]">
                                     {client.waivers.map((waiver, index) => (
-                                        <div key={index} className="mt-2">
+                                        <div
+                                            key={waiver.uri || `waiver-${index}`}
+                                            className="mt-2"
+                                        >
                                             <label className="flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
