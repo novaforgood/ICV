@@ -17,8 +17,8 @@ export default function Layout({
                     </button>
                 </div>
 
-                <div className="ml-6 mt-6 space-y-[24px]">
-                    <div className="mx-auto flex w-[95%] items-center justify-between px-10">
+                <div className="ml-6 mt-6 space-y-[24px] overflow-x-auto pb-2">
+                    <div className="mx-auto flex min-w-max flex-nowrap items-center justify-between px-4 md:w-[95%]">
                         <div className="w-[100px]">
                             <ProgressCircle
                                 title="Profile"
@@ -27,8 +27,8 @@ export default function Layout({
                             />
                         </div>
 
-                        <div className="relative flex-1">
-                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        <div className="relative min-w-[16px] flex-1 flex-shrink-0">
+                            <div className="absolute -top-[15px] left-0 right-0 h-px bg-[#27262A]" />
                         </div>
 
                         <div className="w-[100px]">
@@ -39,8 +39,8 @@ export default function Layout({
                             />
                         </div>
 
-                        <div className="relative flex-1">
-                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        <div className="relative min-w-[16px] flex-1 flex-shrink-0">
+                            <div className="absolute -top-[15px] left-0 right-0 h-px bg-[#27262A]" />
                         </div>
 
                         <div className="w-[100px]">
@@ -51,8 +51,8 @@ export default function Layout({
                             />
                         </div>
 
-                        <div className="relative flex-1">
-                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        <div className="relative min-w-[16px] flex-1 flex-shrink-0">
+                            <div className="absolute -top-[15px] left-0 right-0 h-px bg-[#27262A]" />
                         </div>
 
                         <div className="w-[100px]">
@@ -63,8 +63,8 @@ export default function Layout({
                             />
                         </div>
 
-                        <div className="relative flex-1">
-                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        <div className="relative min-w-[16px] flex-1 flex-shrink-0">
+                            <div className="absolute -top-[15px] left-0 right-0 h-px bg-[#27262A]" />
                         </div>
 
                         <div className="w-[100px]">
@@ -75,8 +75,8 @@ export default function Layout({
                             />
                         </div>
 
-                        <div className="relative flex-1">
-                            <div className="absolute -top-[15px] left-4 right-4 h-px bg-[#27262A]" />
+                        <div className="relative min-w-[16px] flex-1 flex-shrink-0">
+                            <div className="absolute -top-[15px] left-0 right-0 h-px bg-[#27262A]" />
                         </div>
 
                         <div className="w-[100px]">
