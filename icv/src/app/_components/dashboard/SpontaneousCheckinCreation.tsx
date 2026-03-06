@@ -1,6 +1,7 @@
 import { getAllClients } from '@/api/clients'
 import { createCheckIn } from '@/api/events'
 import ClientCalendarSearch from '@/app/_components/calendar/ClientCalendarSearch'
+import { useSpontaneousCheckInModal } from '@/app/_context/SpontaneousCheckInModalContext'
 import { CheckInCategory, CheckInType, ContactType } from '@/types/event-types'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
@@ -14,8 +15,23 @@ const enum Step {
     Complete,
 }
 
-const MultiStepCheckIn = () => {
+export function SpontaneousCheckInModalTrigger() {
+    const { openModal } = useSpontaneousCheckInModal()
+
+    return (
+        <button
+            onClick={openModal}
+            className="w-full rounded bg-foreground px-4 py-4 text-white"
+        >
+            + Add Wellness Event
+        </button>
+    )
+}
+
+export function SpontaneousCheckInModalContent() {
     const router = useRouter()
+    const { isOpen, closeModal: contextCloseModal } =
+        useSpontaneousCheckInModal()
     const [step, setStep] = useState<Step>(Step.ChooseClient)
     const [clientSearch, setClientSearch] = useState('')
     const [selectedClientDocId, setSelectedClientDocId] = useState('')
@@ -24,12 +40,9 @@ const MultiStepCheckIn = () => {
     const [category, setCategory] = useState(CheckInCategory.Values.Other)
     const [assigneeId, setAssigneeId] = useState('')
     const [checkInID, setcheckInID] = useState('')
-    const [isOpen, setIsOpen] = useState(false)
     const [submitting, setSubmitting] = useState(false)
 
-    const openModal = () => setIsOpen(true)
     const closeModal = () => {
-        setIsOpen(false)
         setStep(Step.ChooseClient)
         setCategory(CheckInCategory.Values.Other)
         setClientSearch('')
@@ -38,6 +51,7 @@ const MultiStepCheckIn = () => {
         setDate('')
         setAssigneeId('')
         setcheckInID('')
+        contextCloseModal()
     }
 
     const { data: clients } = useSWR('clients', getAllClients)
@@ -152,57 +166,47 @@ const MultiStepCheckIn = () => {
         }
     }
 
+    if (!isOpen) return null
+
     return (
-        <>
-            <button
-                onClick={openModal}
-                className="w-full rounded bg-foreground px-4 py-4 text-white"
-            >
-                + Add Wellness Event
-            </button>
-            {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    {/* Backdrop */}
-                    <div
-                        className="absolute inset-0 bg-black opacity-50"
-                        onClick={closeModal}
-                    />
-                    {/* Modal container */}
-                    <div className="relative z-10 flex h-[80vh] max-h-[600px] w-full max-w-2xl flex-col overflow-hidden rounded-lg bg-white shadow-lg">
-                        <button
-                            type="button"
-                            onClick={closeModal}
-                            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center text-gray-500"
-                            aria-label="Close"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <path d="M18 6 6 18" />
-                                <path d="m6 6 12 12" />
-                            </svg>
-                        </button>
-                        <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col space-y-[24px] p-[36px]">
-                            {step < Step.Complete && (
-                                <h2 className="font-['Epilogue'] text-[22px] font-[500]">
-                                    Wellness Check
-                                </h2>
-                            )}
-                            {renderStep()}
-                        </div>
-                    </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 bg-black opacity-50"
+                onClick={closeModal}
+            />
+            {/* Modal container */}
+            <div className="relative z-10 flex h-[80vh] max-h-[600px] w-full max-w-2xl flex-col overflow-hidden rounded-lg bg-white shadow-lg">
+                <button
+                    type="button"
+                    onClick={closeModal}
+                    className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center text-gray-500"
+                    aria-label="Close"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    >
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                    </svg>
+                </button>
+                <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col space-y-[24px] p-[36px]">
+                    {step < Step.Complete && (
+                        <h2 className="font-['Epilogue'] text-[22px] font-[500]">
+                            Wellness Check
+                        </h2>
+                    )}
+                    {renderStep()}
                 </div>
-            )}
-        </>
+            </div>
+        </div>
     )
 }
-
-export default MultiStepCheckIn

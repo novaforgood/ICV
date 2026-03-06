@@ -3,7 +3,11 @@
 import { useRouter } from 'next/navigation'
 import EventsSchedule from '../_components/calendar/EventsSchedule'
 import CheckInCounter from '../_components/dashboard/CheckInCounter'
-import SpontaneousCheckInModal from '../_components/dashboard/SpontaneousCheckinCreation'
+import {
+    SpontaneousCheckInModalContent,
+    SpontaneousCheckInModalTrigger,
+} from '../_components/dashboard/SpontaneousCheckinCreation'
+import { SpontaneousCheckInModalProvider } from '../_context/SpontaneousCheckInModalContext'
 import { useUser } from '@/hooks/useUser'
 import { TimeFrameProvider } from '../_context/TimeFrameContext'
 import { CheckInCountProvider } from '../_context/CheckInCountContext'
@@ -28,13 +32,14 @@ export default function Home() {
       </div>
       <TimeFrameProvider>
         <CheckInCountProvider>
+        <SpontaneousCheckInModalProvider>
         {/* Mobile: stack with 40px gap; desktop: contents so sidebar stays in flow */}
         <div className="flex flex-col gap-[40px] md:contents">
           <div className="md:hidden w-full">
             <CheckInCounter />
           </div>
           <div className="flex w-full md:hidden">
-            <SpontaneousCheckInModal />
+            <SpontaneousCheckInModalTrigger />
           </div>
           <div className="flex flex-1 flex-col gap-[40px] md:hidden">
             <EventsSchedule />
@@ -45,8 +50,11 @@ export default function Home() {
         <div className="hidden w-1/3 flex-col gap-[40px] md:flex">
           <CheckInCounter />
           <RecentClients />
-          <SpontaneousCheckInModal />
+          <SpontaneousCheckInModalTrigger />
         </div>
+
+        <SpontaneousCheckInModalContent />
+        </SpontaneousCheckInModalProvider>
         </CheckInCountProvider>
       </TimeFrameProvider>
     </div>
