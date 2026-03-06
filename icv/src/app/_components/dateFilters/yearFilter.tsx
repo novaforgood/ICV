@@ -126,14 +126,16 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                                                 <SelectItem value="all">
                                                     All Years
                                                 </SelectItem>
-                                                {calendarYears.map((year) => (
-                                                    <SelectItem
-                                                        key={year}
-                                                        value={year.toString()}
-                                                    >
-                                                        {year}
-                                                    </SelectItem>
-                                                ))}
+                                                {calendarYears
+                                                    .filter((y) => !isNaN(y))
+                                                    .map((year) => (
+                                                        <SelectItem
+                                                            key={year}
+                                                            value={year.toString()}
+                                                        >
+                                                            {year}
+                                                        </SelectItem>
+                                                    ))}
                                             </SelectContent>
                                         </Select>
                                     </div>
@@ -364,14 +366,16 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                                                 <SelectItem value="all">
                                                     All Years
                                                 </SelectItem>
-                                                {(fiscalYears ? fiscalYears : calendarYears).map((year) => (
-                                                    <SelectItem
-                                                        key={year}
-                                                        value={year.toString()}
-                                                    >
-                                                        {year - 1}-{year}
-                                                    </SelectItem>
-                                                ))}
+                                                {(fiscalYears ? fiscalYears : calendarYears)
+                                                    .filter((y) => !isNaN(y))
+                                                    .map((year) => (
+                                                        <SelectItem
+                                                            key={year}
+                                                            value={year.toString()}
+                                                        >
+                                                            {year - 1}-{year}
+                                                        </SelectItem>
+                                                    ))}
                                             </SelectContent>
                                         </Select>
                                     </div>

@@ -190,7 +190,9 @@ const HousingStatusTable = () => {
     // show all years available in the data
     const calendarYears = Array.from(
         new Set(
-            housingData.map((record) => new Date(record.date).getFullYear()),
+            housingData
+                .map((record) => new Date(record.date).getFullYear())
+                .filter((y) => !isNaN(y)),
         ),
     ).sort((a, b) => b - a)
 

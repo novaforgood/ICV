@@ -190,7 +190,7 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
                         : 'Click "Start Recording" to use speech-to-text, or type your notes manually.'}
                 </p>
             </div>
-            <div className="flex flex-row items-center justify-between">
+            <div className="flex flex-col space-y-[12px] sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
                 <div className="flex flex-wrap items-center justify-start space-x-[24px]">
                     <button
                         type="button"
@@ -233,7 +233,7 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
                 <button
                     type="button"
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="rounded-[5px] bg-[#FF394D] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                    className="w-fit rounded-[5px] bg-[#FF394D] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
                 >
                     <div className="flex flex-row space-x-[8px]">
                         <svg

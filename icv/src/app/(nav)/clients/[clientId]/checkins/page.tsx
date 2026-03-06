@@ -238,7 +238,7 @@ export default function CheckInsPage() {
                 <div className="z-40 flex items-center gap-4">
                     <ScheduledCheckInCreation
                         onNewEvent={() => setNewEvents(true)}
-                        clientName={`${client?.firstName} ${client?.lastName}`}
+                        clientDocId={clientId as string}
                     />
 
                     {/* Filter controls */}

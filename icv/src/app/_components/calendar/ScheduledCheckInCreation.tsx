@@ -1,44 +1,29 @@
 'use client'
 
-import { getAllClients } from '@/api/clients'
+import { getAllClients, getUsersCollection } from '@/api/clients'
 import { createCheckIn } from '@/api/events'
-import { ContactTypeBadge } from '@/app/_components/ContactTypeBadge'
 import { Card } from '@/components/ui/card'
+import { roundToNearest10Minutes } from '@/utils/dateUtils'
 import { CheckInType, ContactType } from '@/types/event-types'
 import { format } from 'date-fns'
-import dayjs from 'dayjs'
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth'
-import {
-    LocalizationProvider,
-    TimePicker,
-} from '@mui/x-date-pickers'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useSWR, { mutate } from 'swr'
+import CheckInFormFields from './CheckInFormFields'
+import ClientCard from '../ClientCard'
 import ClientSearch from './ClientSearch'
-
-function roundToNearest10Minutes(date: Date): Date {
-    const d = new Date(date)
-    const minutes = d.getMinutes()
-    const rounded = Math.round(minutes / 10) * 10
-    if (rounded === 60) {
-        d.setHours(d.getHours() + 1)
-        d.setMinutes(0, 0, 0)
-    } else {
-        d.setMinutes(rounded, 0, 0)
-    }
-    return d
-}
 
 interface ScheduledCheckInCreationProps {
     onNewEvent: () => void
     clientName?: string
+    clientDocId?: string
     buttonClassName?: string
 }
 
 const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
     onNewEvent,
     clientName = '',
+    clientDocId,
     buttonClassName,
 }) => {
     const [isOpen, setIsOpen] = useState(false)
@@ -53,6 +38,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
     )
     const [assigneeId, setAssigneeId] = useState('')
     const [selectedClientDocId, setSelectedClientId] = useState('')
+    const [staffNames, setStaffNames] = useState<string[]>([])
     const [submitting, setSubmitting] = useState(false)
 
     const { data: clients } = useSWR('clients', getAllClients)
@@ -80,6 +66,21 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
         return () => unsubscribe()
     }, [])
 
+    useEffect(() => {
+        const fetchStaffNames = async () => {
+            try {
+                const names = await getUsersCollection()
+                if (assigneeId && !names.includes(assigneeId)) {
+                    names.push(assigneeId)
+                }
+                setStaffNames(names)
+            } catch (error) {
+                console.error('Error fetching staff names:', error)
+            }
+        }
+        fetchStaffNames()
+    }, [assigneeId])
+
     const resetFormDefaults = () => {
         const now = new Date()
         const roundedNow = roundToNearest10Minutes(now)
@@ -92,6 +93,12 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
     useEffect(() => {
         resetFormDefaults()
     }, [])
+
+    useEffect(() => {
+        if (clientDocId && isOpen) {
+            setSelectedClientId(clientDocId)
+        }
+    }, [clientDocId, isOpen])
 
     const closeModal = () => {
         setIsOpen(false)
@@ -212,11 +219,11 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
                     />
 
                     {/* Modal */}
-                    <div className="fixed inset-y-0 right-0 z-50 w-[600px] overflow-y-auto bg-white shadow-xl">
+                    <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white shadow-xl sm:w-[600px]">
                         <div className="p-6">
                             <div className="mb-6 flex items-center justify-between">
                                 <h2 className="font-['Epilogue'] text-[24px] font-[600]">
-                                   Create Check-In
+                                    Create Check-In
                                 </h2>
                                 <button
                                     onClick={closeModal}
@@ -234,23 +241,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
                                         Client
                                     </label>
                                     {selectedClientDocId && selectedClient ? (
-                                        <div className="flex items-center justify-between rounded-lg bg-gray-100 p-3">
-                                            <span className="font-medium">
-                                                {selectedClient.firstName}{' '}
-                                                {selectedClient.lastName}
-                                            </span>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setSelectedClientId('')
-                                                }
-                                                className="text-gray-500 hover:text-gray-700"
-                                            >
-                                                <span className="material-symbols-outlined">
-                                                    close
-                                                </span>
-                                            </button>
-                                        </div>
+                                        <ClientCard client={selectedClient} />
                                     ) : (
                                         <ClientSearch
                                             key={clientName}
@@ -260,122 +251,21 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
                                     )}
                                 </div>
 
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                                        Date
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={date}
-                                        onChange={(e) =>
-                                            setDate(e.target.value)
-                                        }
-                                        className="focus:ring-blue-500 w-full rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2"
-                                        required
-                                    />
-                                </div>
-
-                                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                    <div className="flex gap-4">
-                                        <div className="flex-1">
-                                            <TimePicker
-                                                label="Start time"
-                                                value={date && startTime ? dayjs(roundToNearest10Minutes(new Date(`${date}T${startTime}`))) : null}
-                                                onChange={(newValue) =>
-                                                    setStartTime(newValue ? newValue.format('HH:mm') : '')
-                                                }
-                                                minutesStep={5}
-                                                timeSteps={{ minutes: 5 }}
-                                                slotProps={{
-                                                    textField: {
-                                                        required: true,
-                                                        fullWidth: true,
-                                                        size: 'small',
-                                                    },
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <TimePicker
-                                                label="End time"
-                                                value={date && endTime ? dayjs(roundToNearest10Minutes(new Date(`${date}T${endTime}`))) : null}
-                                                onChange={(newValue) =>
-                                                    setEndTime(newValue ? newValue.format('HH:mm') : '')
-                                                }
-                                                minutesStep={5}
-                                                timeSteps={{ minutes: 5 }}
-                                                slotProps={{
-                                                    textField: {
-                                                        required: true,
-                                                        fullWidth: true,
-                                                        size: 'small',
-                                                    },
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                </LocalizationProvider>
-
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                                        Location
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={location}
-                                        onChange={(e) =>
-                                            setLocation(e.target.value)
-                                        }
-                                        placeholder="Enter location"
-                                        className="focus:ring-blue-500 w-full rounded-lg border border-gray-300 p-3 focus:border-transparent focus:ring-2"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                                        Contact code
-                                    </label>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {Object.values(ContactType.Values).map(
-                                            (type) => (
-                                                <div
-                                                    key={type}
-                                                    className="flex items-center gap-2"
-                                                >
-                                                    <input
-                                                        type="radio"
-                                                        id={type
-                                                            .toLowerCase()
-                                                            .replace(
-                                                                /\s+/g,
-                                                                '-',
-                                                            )}
-                                                        name="contact-code"
-                                                        checked={
-                                                            contactType === type
-                                                        }
-                                                        onChange={() =>
-                                                            setContactType(type)
-                                                        }
-                                                        className="h-4 w-4"
-                                                    />
-                                                    <label
-                                                        htmlFor={type
-                                                            .toLowerCase()
-                                                            .replace(
-                                                                /\s+/g,
-                                                                '-',
-                                                            )}
-                                                    >
-                                                        <ContactTypeBadge
-                                                            type={type}
-                                                        />
-                                                    </label>
-                                                </div>
-                                            ),
-                                        )}
-                                    </div>
-                                </div>
+                                <CheckInFormFields
+                                    date={date}
+                                    setDate={setDate}
+                                    startTime={startTime}
+                                    setStartTime={setStartTime}
+                                    endTime={endTime}
+                                    setEndTime={setEndTime}
+                                    assigneeId={assigneeId}
+                                    setAssigneeId={setAssigneeId}
+                                    staffNames={staffNames}
+                                    location={location}
+                                    setLocation={setLocation}
+                                    contactType={contactType}
+                                    setContactType={setContactType}
+                                />
 
                                 <button
                                     type="submit"

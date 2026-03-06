@@ -166,14 +166,14 @@ importers:
         specifier: ^8
         version: 8.5.1
       prettier:
-        specifier: ^3.4.2
-        version: 3.4.2
+        specifier: ^3.6.0
+        version: 3.6.0
       prettier-plugin-organize-imports:
         specifier: ^4.1.0
-        version: 4.1.0(prettier@3.4.2)(typescript@5.7.3)
+        version: 4.1.0(prettier@3.6.0)(typescript@5.7.3)
       prettier-plugin-tailwindcss:
         specifier: ^0.6.10
-        version: 0.6.10(prettier-plugin-organize-imports@4.1.0(prettier@3.4.2)(typescript@5.7.3))(prettier@3.4.2)
+        version: 0.6.10(prettier-plugin-organize-imports@4.1.0(prettier@3.6.0)(typescript@5.7.3))(prettier@3.6.0)
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.17
@@ -3779,11 +3779,6 @@ packages:
         optional: true
       prettier-plugin-svelte:
         optional: true
-
-  prettier@3.4.2:
-    resolution: {integrity: sha512-e9MewbtFo+Fevyuxn/4rrcDAaq0IYxPGLvObpQjiZBMAzB9IGmzlnG9RZy3FFas+eBMu2vA0CszMeduow5dIuQ==}
-    engines: {node: '>=14'}
-    hasBin: true
 
   prettier@3.6.0:
     resolution: {integrity: sha512-ujSB9uXHJKzM/2GBuE0hBOUgC77CN3Bnpqa+g80bkv3T3A93wL/xlzDATHhnhkzifz/UE2SNOvmbTz5hSkDlHw==}
@@ -8328,18 +8323,16 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-organize-imports@4.1.0(prettier@3.4.2)(typescript@5.7.3):
+  prettier-plugin-organize-imports@4.1.0(prettier@3.6.0)(typescript@5.7.3):
     dependencies:
-      prettier: 3.4.2
+      prettier: 3.6.0
       typescript: 5.7.3
 
-  prettier-plugin-tailwindcss@0.6.10(prettier-plugin-organize-imports@4.1.0(prettier@3.4.2)(typescript@5.7.3))(prettier@3.4.2):
+  prettier-plugin-tailwindcss@0.6.10(prettier-plugin-organize-imports@4.1.0(prettier@3.6.0)(typescript@5.7.3))(prettier@3.6.0):
     dependencies:
-      prettier: 3.4.2
+      prettier: 3.6.0
     optionalDependencies:
-      prettier-plugin-organize-imports: 4.1.0(prettier@3.4.2)(typescript@5.7.3)
-
-  prettier@3.4.2: {}
+      prettier-plugin-organize-imports: 4.1.0(prettier@3.6.0)(typescript@5.7.3)
 
   prettier@3.6.0: {}
 

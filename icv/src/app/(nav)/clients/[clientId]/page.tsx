@@ -307,7 +307,7 @@ export default function CheckInsPage() {
                         </h1>
                         <ScheduledCheckInCreation
                             onNewEvent={() => setNewEvents(true)}
-                            clientName={`${client?.firstName} ${client?.lastName}`}
+                            clientDocId={clientId as string}
                             buttonClassName="flex flex-row space-x-[8px] rounded-[5px] bg-black px-[12px] py-[8px] text-[14px] text-white"
                         />
                     </div>

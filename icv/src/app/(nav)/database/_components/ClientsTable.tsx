@@ -110,11 +110,13 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
 
     const calendarYears = Array.from(
         new Set(
-            clients.map((record) =>
-                record.intakeDate
-                    ? new Date(record.intakeDate).getFullYear()
-                    : NaN,
-            ),
+            clients
+                .map((record) =>
+                    record.intakeDate
+                        ? new Date(record.intakeDate).getFullYear()
+                        : NaN,
+                )
+                .filter((y) => !isNaN(y)),
         ),
     ).sort((a, b) => b - a)
 
