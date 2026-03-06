@@ -10,6 +10,7 @@ import { format } from 'date-fns'
 import dayjs from 'dayjs'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
+import DeleteConfirmDialog from '@/app/_components/DeleteConfirmDialog'
 import useSWR from 'swr'
 import ClientCard from '../ClientCard'
 import { useRouter } from 'next/navigation'
@@ -60,6 +61,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     const { data: clients } = useSWR<NewClient[]>('clients', getAllClients)
     const [showUpdateSuccess, setShowUpdateSuccess] = useState(false)
     const [showDeleteSuccess, setShowDeleteSuccess] = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [client, setClient] = useState<ClientWithLastCheckin | null>(null)
     const [staffNames, setStaffNames] = useState<string[]>([])
     const [submitting, setSubmitting] = useState(false)
@@ -181,24 +183,21 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
             })
     }
 
-    const handleDelete = (e: React.FormEvent) => {
-        e.preventDefault()
-
-        deleteCheckIn(selectedEvent.id)
-            .then(() => {
-                setShowDeleteSuccess(true)
-                setEditMode(false)
-
-                setTimeout(() => {
-                    setShowDeleteSuccess(false)
-                    onUpdatedEvent()
-                    onClose()
-                }, 1000)
-            })
-            .catch((err) => {
-                console.error(err)
-                alert('Error deleting event.')
-            })
+    const handleDelete = async () => {
+        try {
+            await deleteCheckIn(selectedEvent.id)
+            setShowDeleteConfirm(false)
+            setShowDeleteSuccess(true)
+            setEditMode(false)
+            setTimeout(() => {
+                setShowDeleteSuccess(false)
+                onUpdatedEvent()
+                onClose()
+            }, 1000)
+        } catch (err) {
+            console.error(err)
+            alert('Error deleting event.')
+        }
     }
 
     if (!selectedEvent) return null
@@ -213,6 +212,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
             {portalTarget &&
                 !showUpdateSuccess &&
                 !showDeleteSuccess &&
+                !showDeleteConfirm &&
                 !editMode &&
                 !fromEvent &&
                 createPortal(
@@ -232,7 +232,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                         edit
                                     </span>
                                 </button>
-                                <button onClick={handleDelete}>
+                                <button onClick={() => setShowDeleteConfirm(true)}>
                                     <span className="material-symbols-outlined">
                                         delete
                                     </span>
@@ -487,6 +487,12 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                     </div>,
                     portalTarget
                 )}
+            <DeleteConfirmDialog
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={handleDelete}
+                entityName={selectedEvent?.clientName}
+            />
             {/* delete event success message */}
             {portalTarget &&
                 showDeleteSuccess &&

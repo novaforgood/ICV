@@ -206,7 +206,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({ newEvents, onReloadEven
   }
 
   return (
-    <div className="w-full px-4 py-6 lg:px-6 space-y-6">
+    <div className="w-full space-y-6">
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <h1 className="text-6xl font-bold">Calendar</h1>
 

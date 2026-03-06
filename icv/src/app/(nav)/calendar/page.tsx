@@ -8,7 +8,7 @@ const Page = () => {
   const [newEvents, setNewEvents] = useState(false)
 
   return (
-    <div className="relative min-h-screen w-full">
+    <div className="relative min-h-screen m-[48px] overflow-x-hidden">
       {/* Full calendar view */}
       <EventsCalendar 
         onReloadEvents = {() => setNewEvents(false)}

@@ -1,8 +1,8 @@
 'use client'
 
+import Symbol from '@/components/Symbol'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import Symbol from '../../components/Symbol'
 
 // Define props interface
 interface ClientCalendarSearchProps {
