@@ -1,7 +1,11 @@
 import { ClientIntakeSchema } from '@/types/client-types'
-import { useRef } from 'react'
+import { getCroppedImg, isImageFile } from '@/utils/cropImage'
+import { useCallback, useRef, useState } from 'react'
+import Cropper, { Area } from 'react-easy-crop'
 import { TypeOf } from 'zod'
 type ClientType = TypeOf<typeof ClientIntakeSchema>
+
+const IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png']
 
 interface FileUploadProps {
     data: ClientType
@@ -28,12 +32,136 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const fileInputRef = useRef<HTMLInputElement>(null!)
     const cameraInputRef = useRef<HTMLInputElement>(null!)
 
+    const [cropImageSrc, setCropImageSrc] = useState<string | null>(null)
+    const [cropFile, setCropFile] = useState<File | null>(null)
+    const [crop, setCrop] = useState({ x: 0, y: 0 })
+    const [zoom, setZoom] = useState(1)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+    const [isCropping, setIsCropping] = useState(false)
+
     const files =
         (data[field as keyof ClientType] as { name: string; uri: string }[]) ||
         []
 
+    const onCropAreaChange = useCallback(
+        (_croppedArea: Area, croppedAreaPixels: Area) => {
+            setCroppedAreaPixels(croppedAreaPixels)
+        },
+        [],
+    )
+
+    const handleCropConfirm = useCallback(async () => {
+        if (!cropImageSrc || !cropFile || !croppedAreaPixels) return
+
+        setIsCropping(true)
+        try {
+            const mimeType = IMAGE_TYPES.includes(cropFile.type)
+                ? cropFile.type
+                : 'image/jpeg'
+            const blob = await getCroppedImg(
+                cropImageSrc,
+                croppedAreaPixels,
+                mimeType,
+            )
+            const extension = cropFile.name.split('.').pop() || 'jpg'
+            const croppedFile = new File([blob], `cropped.${extension}`, {
+                type: mimeType,
+            })
+
+            const dataTransfer = new DataTransfer()
+            dataTransfer.items.add(croppedFile)
+            const syntheticEvent = {
+                target: { files: dataTransfer.files },
+            } as React.ChangeEvent<HTMLInputElement>
+            handleFileChange(syntheticEvent, field)
+        } finally {
+            URL.revokeObjectURL(cropImageSrc)
+            setCropImageSrc(null)
+            setCropFile(null)
+            setCroppedAreaPixels(null)
+            setCrop({ x: 0, y: 0 })
+            setZoom(1)
+            setIsCropping(false)
+            if (fileInputRef.current) fileInputRef.current.value = ''
+            if (cameraInputRef.current) cameraInputRef.current.value = ''
+        }
+    }, [
+        cropImageSrc,
+        cropFile,
+        croppedAreaPixels,
+        field,
+        handleFileChange,
+    ])
+
+    const handleCropCancel = useCallback(() => {
+        if (cropImageSrc) URL.revokeObjectURL(cropImageSrc)
+        setCropImageSrc(null)
+        setCropFile(null)
+        setCroppedAreaPixels(null)
+        setCrop({ x: 0, y: 0 })
+        setZoom(1)
+        if (fileInputRef.current) fileInputRef.current.value = ''
+        if (cameraInputRef.current) cameraInputRef.current.value = ''
+    }, [cropImageSrc])
+
+    const handleFileSelect = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const selectedFiles = e.target.files
+            if (!selectedFiles || selectedFiles.length === 0) return
+
+            const file = selectedFiles[0]
+            const shouldCrop =
+                (isProfilePic || selectedFiles.length === 1) &&
+                isImageFile(file)
+
+            if (shouldCrop) {
+                setCropFile(file)
+                setCropImageSrc(URL.createObjectURL(file))
+            } else {
+                handleFileChange(e, field)
+            }
+        },
+        [field, handleFileChange, isProfilePic],
+    )
+
     return (
         <div className="space-y-[24px]">
+            {/* Crop Modal */}
+            {cropImageSrc && (
+                <div className="fixed inset-0 z-50 flex flex-col bg-black">
+                    <div className="relative flex-1">
+                        <Cropper
+                            image={cropImageSrc}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={isProfilePic ? 1 : 4 / 3}
+                            onCropChange={setCrop}
+                            onCropComplete={onCropAreaChange}
+                            onCropAreaChange={onCropAreaChange}
+                            onZoomChange={setZoom}
+                            cropShape={isProfilePic ? 'round' : 'rect'}
+                        />
+                    </div>
+                    <div className="flex justify-end gap-4 border-t border-gray-700 bg-black p-4">
+                        <button
+                            type="button"
+                            onClick={handleCropCancel}
+                            className="rounded-md px-4 py-2 text-white hover:bg-gray-800"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleCropConfirm}
+                            disabled={isCropping || !croppedAreaPixels}
+                            className="rounded-md bg-white px-4 py-2 text-black disabled:opacity-50 hover:bg-gray-200"
+                        >
+                            {isCropping ? 'Cropping...' : 'Crop'}
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {isUploading ? (
                 <div className="text-[16px] text-gray-400">Uploading...</div>
             ) : (
@@ -139,7 +267,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                         : '*/*'
                                 }
                                 multiple={!isProfilePic}
-                                onChange={(e) => handleFileChange(e, field)}
+                                onChange={handleFileSelect}
                                 className="hidden"
                             />
                             <button
@@ -166,9 +294,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                 accept="image/*"
                                 capture="environment"
                                 multiple={!isProfilePic}
-                                onChange={(e) =>
-                                    handleFileChange(e, field)
-                                }
+                                onChange={handleFileSelect}
                                 className="hidden"
                             />
                         </div>
