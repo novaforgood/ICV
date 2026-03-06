@@ -10,6 +10,7 @@ export default async function layout({
     children: React.ReactNode
 }>) {
     const { clientId } = await params
+    console.log('[clients layout] Trying to load client at path:', `/clients/${clientId}`)
     const client = await getClientById(clientId)
     if (!client) {
         throw new Error('Client does not exist')

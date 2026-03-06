@@ -507,19 +507,24 @@ const SearchComponent = () => {
                     ) : (
                         <>
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                                {currentPageItems.map((client) => (
-                                    <Link
-                                        key={`${client.docId}-${client.firstName}-${client.dateOfBirth}`}
-                                        href={`/clients/${client.docId}`}
-                                        className="text-blue-600 hover:text-blue-800 text-lg font-medium"
-                                    >
-                                        <ClientCard
-                                            client={client}
-                                            showLastCheckin={true}
-                                            docID={client.docId}
-                                        />
-                                    </Link>
-                                ))}
+                                {currentPageItems.map((client) => {
+                                    const clientDocId =
+                                        client.docId ?? (client as { id?: string }).id
+                                    if (!clientDocId) return null
+                                    return (
+                                        <Link
+                                            key={`${clientDocId}-${client.firstName}-${client.dateOfBirth}`}
+                                            href={`/clients/${clientDocId}`}
+                                            className="text-blue-600 hover:text-blue-800 text-lg font-medium"
+                                        >
+                                            <ClientCard
+                                                client={client}
+                                                showLastCheckin={true}
+                                                docID={clientDocId}
+                                            />
+                                        </Link>
+                                    )
+                                })}
                             </div>
                             {displayedClients.length > 0 && totalPages > 1 && (
                                 <div className="mt-8 flex justify-center gap-2">

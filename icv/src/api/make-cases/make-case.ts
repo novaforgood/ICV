@@ -52,10 +52,9 @@ export async function getAllClients() {
 }
 
 export async function getClientById(id: string) {
-    // if (!id) {
-    //     return
-    //     throw new Error('Client ID is required')
-    // }
+    if (!id) {
+        return undefined
+    }
     const { firebaseServerApp, currentUser } =
         await getAuthenticatedAppForUser()
     if (!currentUser) {
@@ -64,9 +63,16 @@ export async function getClientById(id: string) {
     const ssrdb = getFirestore(firebaseServerApp)
 
     const clientsCollection = collection(ssrdb, 'clients')
+
+    // Try direct document lookup first (by Firestore doc ID)
     const clientDoc = await getDoc(doc(clientsCollection, id))
-    const client = clientDoc.data() as NewClient
-    return client
+    if (clientDoc.exists()) {
+        const client = clientDoc.data() as NewClient
+        client.docId = clientDoc.id
+        return client
+    }
+
+    return undefined
 }
 
 function isDifferent(a: any, b: any): boolean {

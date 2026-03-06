@@ -177,6 +177,7 @@ export async function getClientByCaseManager(): Promise<ClientWithLastCheckin[]>
     const clientsList = clientsSnapshot.docs.map((doc) => {
         const data = doc.data() as NewClient;
         data.id = doc.id;
+        data.docId = doc.id;
         return data;
     });
 
@@ -253,6 +254,7 @@ export async function getAllClientsByLastCheckinDate(): Promise<ClientWithLastCh
     const clientsList = clientsSnapshot.docs.map((doc) => {
         const data = doc.data() as NewClient;
         data.id = doc.id;
+        data.docId = doc.id;
         return data;
     });
 
