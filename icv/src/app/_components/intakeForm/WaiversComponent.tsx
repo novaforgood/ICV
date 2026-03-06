@@ -138,6 +138,22 @@ const WaiverSection: React.FC<Props> = ({
         }
     }
 
+    const removeWaiverFile = async (field: string, index: number) => {
+        if (field !== 'waivers') return
+        const oldFiles = formType.waivers ?? []
+        const fileToRemove = oldFiles[index]
+        if (!fileToRemove?.uri) return
+
+        try {
+            await deleteObject(ref(storage, fileToRemove.uri))
+        } catch (error) {
+            console.error(`Error deleting waiver ${fileToRemove.uri}:`, error)
+        }
+
+        const updated = oldFiles.filter((_, i) => i !== index)
+        updateForm({ waivers: updated })
+    }
+
     const exportPDF = async (): Promise<{ name: string; uri: string } | null> => {
         try {
             setIsExporting(true)
@@ -286,6 +302,7 @@ const WaiverSection: React.FC<Props> = ({
                                         handleWaiverFileChange(e)
                                     }
                                     handleAddFile={handleAddFile}
+                                    onRemoveFile={removeWaiverFile}
                                     field="waivers"
                                     isUploading={waiverUploading}
                                 />

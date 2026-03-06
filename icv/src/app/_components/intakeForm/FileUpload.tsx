@@ -10,6 +10,7 @@ interface FileUploadProps {
         field: string,
     ) => void
     handleAddFile: (ref: React.RefObject<HTMLInputElement>) => void
+    onRemoveFile?: (field: string, index: number) => void
     field: string
     isUploading: boolean
     isProfilePic?: boolean
@@ -19,6 +20,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     data,
     handleFileChange,
     handleAddFile,
+    onRemoveFile,
     field,
     isUploading,
     isProfilePic,
@@ -39,40 +41,70 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     {files.length > 0 && (
                         <div className="flex flex-col space-y-2">
                             {files.map((file, index) => (
-                                <div key={index} className="mt-4">
-                                    {isProfilePic ? (
-                                        <a
-                                            href={file.uri}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 underline"
-                                        >
-                                            <img
-                                                src={file.uri}
-                                                alt="Profile"
-                                                className="h-[120px] w-[120px] rounded-full object-cover"
-                                            />
-                                        </a>
-                                    ) : (
-                                        <label className="gap- flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                height="24px"
-                                                viewBox="0 -960 960 960"
-                                                width="24px"
-                                                fill="#000000"
-                                            >
-                                                <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
-                                            </svg>
+                                <div
+                                    key={index}
+                                    className="mt-4 flex items-center justify-between gap-2"
+                                >
+                                    <div className="min-w-0 flex-1">
+                                        {isProfilePic ? (
                                             <a
                                                 href={file.uri}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-600 underline"
                                             >
-                                                {file.name}
+                                                <img
+                                                    src={file.uri}
+                                                    alt="Profile"
+                                                    className="h-[120px] w-[120px] rounded-full object-cover"
+                                                />
                                             </a>
-                                        </label>
+                                        ) : (
+                                            <label className="gap- flex h-[36px] flex-row items-center gap-3 self-stretch rounded-lg bg-gray-200 px-3 py-1.5 text-sm text-gray-800">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    height="24px"
+                                                    viewBox="0 -960 960 960"
+                                                    width="24px"
+                                                    fill="#000000"
+                                                >
+                                                    <path d="M330-250h300v-60H330v60Zm0-160h300v-60H330v60Zm-77.69 310Q222-100 201-121q-21-21-21-51.31v-615.38Q180-818 201-839q21-21 51.31-21H570l210 210v477.69Q780-142 759-121q-21 21-51.31 21H252.31ZM540-620v-180H252.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v615.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85h455.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46V-620H540ZM240-800v180-180V-160v-640Z" />
+                                                </svg>
+                                                <a
+                                                    href={file.uri}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 underline"
+                                                >
+                                                    {file.name}
+                                                </a>
+                                            </label>
+                                        )}
+                                    </div>
+                                    {onRemoveFile && (
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                onRemoveFile(field, index)
+                                            }
+                                            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                                            aria-label="Remove file"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="20"
+                                                height="20"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <path d="M18 6 6 18" />
+                                                <path d="m6 6 12 12" />
+                                            </svg>
+                                        </button>
                                     )}
                                 </div>
                             ))}
@@ -134,7 +166,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                 accept="image/*"
                                 capture="environment"
                                 multiple={!isProfilePic}
-                                onChange={(e) => handleFileChange(e, field)}
+                                onChange={(e) =>
+                                    handleFileChange(e, field)
+                                }
                                 className="hidden"
                             />
                         </div>

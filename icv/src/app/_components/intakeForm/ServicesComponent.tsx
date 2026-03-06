@@ -91,7 +91,16 @@ export const ServicesSection: React.FC<Props> = ({
                 Boolean,
             )
             if (downloadURLs.length > 0) {
-                updateForm({ [field]: downloadURLs })
+                const existingFiles =
+                    (formType[field as keyof typeof formType] as
+                        | { name: string; uri: string }[]
+                        | undefined) ?? []
+                const existingArray = Array.isArray(existingFiles)
+                    ? existingFiles
+                    : []
+                updateForm({
+                    [field]: [...existingArray, ...downloadURLs],
+                })
             }
 
             setUploadingField(null)
@@ -117,6 +126,24 @@ export const ServicesSection: React.FC<Props> = ({
             )
             updateForm({ [field]: [] })
         }
+    }
+
+    const removeFile = async (field: string, index: number) => {
+        const oldFiles =
+            (formType[field as keyof typeof formType] as
+                | { name: string; uri: string }[]
+                | undefined) ?? []
+        const fileToRemove = oldFiles[index]
+        if (!fileToRemove) return
+
+        try {
+            await deleteObject(ref(storage, fileToRemove.uri))
+        } catch (error) {
+            console.error(`Error deleting file ${fileToRemove.uri}:`, error)
+        }
+
+        const updated = oldFiles.filter((_, i) => i !== index)
+        updateForm({ [field]: updated })
     }
 
     useEffect(() => {
@@ -324,6 +351,7 @@ export const ServicesSection: React.FC<Props> = ({
                                     data={formType}
                                     handleFileChange={handleImageChange}
                                     handleAddFile={handleAddFile}
+                                    onRemoveFile={removeFile}
                                     field={field}
                                     isUploading={uploadingField === field}
                                     isProfilePic={isProfile}
