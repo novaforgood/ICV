@@ -33,7 +33,7 @@ const EventsCard: React.FC<EventCardProps> = ({
         ) || '-'
     const eventCategory = String(event.contactCode) || ''
     const clientName = String(event.clientName ?? '') || '-'
-    const clientId = String(event.clientId ?? '') || '-'
+    const clientCode = String(event.clientCode ?? '') || '-'
     const colorClass = categoryColors[String(event.contactCode)]
 
     // Handle card click to navigate to event details
@@ -60,7 +60,7 @@ const EventsCard: React.FC<EventCardProps> = ({
                 <div className="flex min-w-0 flex-1 flex-col gap-1 overflow-hidden text-start">
                     <span className="truncate font-medium">{clientName}</span>
                     <span className="truncate text-sm text-gray-600">
-                        {clientId}
+                        {clientCode}
                     </span>
                 </div>
             </div>

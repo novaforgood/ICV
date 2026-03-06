@@ -243,7 +243,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
                     {event.clientName}
                 </div>
                 <div className="text-[12px] text-foreground/80">
-                    {event.clientCode ?? event.clientID ?? '-'}
+                    {event.clientCode ?? '-'}
                 </div>
                 <div className="text-[12px] text-foreground/80">
                     {format(new Date(event.start), 'h:mm a')} -{' '}

@@ -134,7 +134,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
             return
         }
 
-        const newEvent: CheckInType & { clientId?: string } = {
+        const newEvent: CheckInType & { clientDocId?: string } = {
             name,
             startTime: startDateTime,
             endTime: endDateTime,
@@ -143,7 +143,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
             clientDocId: selectedClientDocId,
             contactCode: contactType,
             scheduled: true,
-            clientId: selectedClient.id,
+            clientCode: selectedClient.clientCode,
             clientName:
                 selectedClient.firstName + ' ' + selectedClient.lastName,
         }
@@ -237,9 +237,23 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
 
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
-                                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                                        Client
-                                    </label>
+                                    <div className="mb-2 flex items-center justify-between">
+                                        <label className="text-sm font-medium text-gray-700">
+                                            Client
+                                        </label>
+                                        {selectedClientDocId && selectedClient && (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setSelectedClientId('')
+                                                }
+                                                className="text-sm text-gray-500 underline hover:text-gray-700"
+                                                aria-label="Clear client selection"
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
                                     {selectedClientDocId && selectedClient ? (
                                         <ClientCard client={selectedClient} />
                                     ) : (

@@ -6,12 +6,12 @@ import DeleteConfirmDialog from '@/app/_components/DeleteConfirmDialog'
 import { Card } from '@/components/ui/card'
 import { NewClient } from '@/types/client-types'
 import { CheckInType, ContactType } from '@/types/event-types'
+import { roundToNearest10Minutes } from '@/utils/dateUtils'
 import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import useSWR from 'swr'
-import { roundToNearest10Minutes } from '@/utils/dateUtils'
 import ClientCard from '../ClientCard'
 import CheckInFormFields from './CheckInFormFields'
 
@@ -146,7 +146,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
             clientDocId: selectedClientDocId,
             contactCode: contactType,
             scheduled: true,
-            clientId: selectedClient.clientCode ?? '',
+            clientCode: selectedClient.clientCode ?? '',
             clientName:
                 `${selectedClient.firstName || ''} ${selectedClient.lastName || ''}`.trim(),
         }

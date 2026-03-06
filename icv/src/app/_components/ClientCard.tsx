@@ -87,7 +87,7 @@ const ClientCard: React.FC<ClientCardProps> = ({
                                 {client.firstName} {client.lastName}
                             </div>
                             <div className="mt-0.5 text-sm text-gray-500">
-                                {client.clientCode || client.id}
+                                {client.clientCode || '-'}
                             </div>
                         </div>
                     </div>

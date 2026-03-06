@@ -49,7 +49,7 @@ export const CheckInSchema = z.object({
     }).optional(),
     clientDocId: z.string().optional(),
     clientName: z.string().optional(),
-    cliendId: z.string().optional(),
+    clientCode: z.string().optional(),
 })
     .passthrough(); // lets fields not in schema pass through (clientId, because always collected properly)
 
