@@ -30,7 +30,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
     isProfilePic,
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null!)
-    const cameraInputRef = useRef<HTMLInputElement>(null!)
 
     const [cropImageSrc, setCropImageSrc] = useState<string | null>(null)
     const [cropFile, setCropFile] = useState<File | null>(null)
@@ -88,7 +87,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
             setZoom(1)
             setIsCropping(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
-            if (cameraInputRef.current) cameraInputRef.current.value = ''
         }
     }, [cropImageSrc, cropFile, croppedAreaPixels, field, handleFileChange])
 
@@ -100,7 +98,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
         setCrop({ x: 0, y: 0 })
         setZoom(1)
         if (fileInputRef.current) fileInputRef.current.value = ''
-        if (cameraInputRef.current) cameraInputRef.current.value = ''
     }, [cropImageSrc])
 
     const handleFileSelect = useCallback(
@@ -252,7 +249,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                     >
                                         <path d="M444-240h72v-150l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.72-96Q234-96 213-117.15T192-168v-624q0-29.7 21.15-50.85Q234.3-864 264-864h312l192 192v504q0 29.7-21.16 50.85Q725.68-96 695.96-96H263.72ZM528-624v-168H264v624h432v-456H528ZM264-792v189-189 624-624Z" />
                                     </svg>
-                                    <label>Upload File</label>
+                                    <label>Add Files</label>
                                 </div>
                             </button>
                             <input
@@ -263,33 +260,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                         ? 'image/png,image/jpeg,image/jpg'
                                         : '*/*'
                                 }
-                                multiple={!isProfilePic}
-                                onChange={handleFileSelect}
-                                className="hidden"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => handleAddFile(cameraInputRef)}
-                                className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white hover:bg-[#6D757F]"
-                            >
-                                <div className="flex flex-row space-x-[8px]">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        height="20px"
-                                        viewBox="0 -960 960 960"
-                                        width="20px"
-                                        fill="#FFFFFF"
-                                    >
-                                        <path d="M444-240h72v-150l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.72-96Q234-96 213-117.15T192-168v-624q0-29.7 21.15-50.85Q234.3-864 264-864h312l192 192v504q0 29.7-21.16 50.85Q725.68-96 695.96-96H263.72ZM528-624v-168H264v624h432v-456H528ZM264-792v189-189 624-624Z" />
-                                    </svg>
-                                    <label>Take Picture</label>
-                                </div>
-                            </button>
-                            <input
-                                ref={cameraInputRef}
-                                type="file"
-                                accept="image/*"
-                                capture="environment"
                                 multiple={!isProfilePic}
                                 onChange={handleFileSelect}
                                 className="hidden"

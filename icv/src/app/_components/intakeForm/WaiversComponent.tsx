@@ -277,7 +277,7 @@ const WaiverSection: React.FC<Props> = ({
                                         : "bg-neutral-200"
                                 }`}
                             >
-                                Upload Waiver(s)
+                                Upload
                             </button>
                         </div>
 
