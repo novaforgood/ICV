@@ -175,34 +175,16 @@ const SearchComponent = () => {
 
             // Apply search term filter if search term exists
             if (searchTerm.trim()) {
-                const searchTerms = searchTerm.toLowerCase().split(' ')
-                const firstName = client.firstName?.toLowerCase() || ''
-                const lastName = client.lastName?.toLowerCase() || ''
+                const searchLower = searchTerm.trim().toLowerCase()
+                const fullName =
+                    client.fullNameLower ??
+                    `${client.firstName ?? ''} ${client.lastName ?? ''}`.toLowerCase()
+                const clientCode = (client.clientCode ?? '').toLowerCase()
 
-                // If there's only one search term, check both first and last name
-                if (searchTerms.length === 1) {
-                    if (
-                        !firstName.includes(searchTerms[0]) &&
-                        !lastName.includes(searchTerms[0])
-                    ) {
-                        return false
-                    }
-                }
-
-                // If there are two search terms, first term should match firstName and second term should match lastName
-                if (searchTerms.length === 2) {
-                    if (
-                        !firstName.includes(searchTerms[0]) ||
-                        !lastName.includes(searchTerms[1])
-                    ) {
-                        return false
-                    }
-                }
-
-                // If more than two terms, don't match
-                if (searchTerms.length > 2) {
-                    return false
-                }
+                const matches =
+                    fullName.includes(searchLower) ||
+                    clientCode.includes(searchLower)
+                if (!matches) return false
             }
 
             return true
@@ -308,21 +290,21 @@ const SearchComponent = () => {
                     />
                     <button
                         onClick={() => handleTabChange('my')}
-                        className={`relative flex items-center justify-center gap-2.5 rounded-[16px] px-5 py-2 transition-colors duration-300 w-[140px] ${
+                        className={`relative flex w-[140px] items-center justify-center gap-2.5 rounded-[16px] px-5 py-2 transition-colors duration-300 ${
                             activeTab === 'my' ? 'text-white' : 'text-black'
                         }`}
                     >
-                        <div className="justify-center font-['Epilogue'] text-base font-normal leading-none text-center w-full">
+                        <div className="w-full justify-center text-center font-['Epilogue'] text-base font-normal leading-none">
                             My clients
                         </div>
                     </button>
                     <button
                         onClick={() => handleTabChange('all')}
-                        className={`relative flex items-center justify-center gap-2.5 rounded-[16px] px-5 py-2 transition-colors duration-300 w-[140px] ${
+                        className={`relative flex w-[140px] items-center justify-center gap-2.5 rounded-[16px] px-5 py-2 transition-colors duration-300 ${
                             activeTab === 'all' ? 'text-white' : 'text-black'
                         }`}
                     >
-                        <div className="justify-center font-['Epilogue'] text-base font-normal leading-none text-center w-full">
+                        <div className="w-full justify-center text-center font-['Epilogue'] text-base font-normal leading-none">
                             All clients
                         </div>
                     </button>
@@ -347,7 +329,7 @@ const SearchComponent = () => {
                     </svg>
                     <input
                         type="text"
-                        placeholder="Search clients..."
+                        placeholder="Search by name or client code..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full bg-transparent text-base outline-none placeholder:text-gray-700"
@@ -426,13 +408,15 @@ const SearchComponent = () => {
                     <>
                         {/* Backdrop */}
                         <div
-                            className="fixed inset-0 z-40 bg-black bg-opacity-50"
+                            className="fixed inset-0 z-50 bg-black bg-opacity-50"
                             onClick={() => setIsFilterVisible(false)}
                         />
                         {/* Side menu */}
                         <div className="fixed right-0 top-0 z-50 h-full w-[400px] bg-white px-6 pb-6 pt-4 shadow-xl">
                             <div className="mb-6 flex items-center justify-between">
-                                <h2 className="text-xl font-semibold">Filter</h2>
+                                <h2 className="text-xl font-semibold">
+                                    Filter
+                                </h2>
                                 <button
                                     onClick={() => setIsFilterVisible(false)}
                                     className="text-gray-500 hover:text-gray-700"
@@ -521,14 +505,14 @@ const SearchComponent = () => {
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                                 {currentPageItems.map((client) => (
                                     <Link
-                                        key={`${client.id}-${client.firstName}-${client.dateOfBirth}`}
-                                        href={`/clients/${client.id}`}
+                                        key={`${client.docId}-${client.firstName}-${client.dateOfBirth}`}
+                                        href={`/clients/${client.docId}`}
                                         className="text-blue-600 hover:text-blue-800 text-lg font-medium"
                                     >
                                         <ClientCard
                                             client={client}
                                             showLastCheckin={true}
-                                            docID={client.id}
+                                            docID={client.docId}
                                         />
                                     </Link>
                                 ))}

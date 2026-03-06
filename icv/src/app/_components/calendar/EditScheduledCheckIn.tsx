@@ -287,7 +287,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                             )}
                             <button
                                 type="button"
-                                className="mx-auto flex cursor-pointer items-center gap-2 rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
+                                className="mx-auto mt-[16px] flex cursor-pointer items-center gap-2 rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
                                 onClick={() =>
                                     router.push(`/events/${selectedEvent.id}`)
                                 }

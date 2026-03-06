@@ -235,7 +235,7 @@ export default function CheckInsPage() {
                 {/* Title */}
                 <h1 className="text-4xl font-bold">Case Notes</h1>
 
-                <div className="z-40 flex items-center gap-4">
+                <div className="z-50 flex items-center gap-4">
                     <ScheduledCheckInCreation
                         onNewEvent={() => setNewEvents(true)}
                         clientDocId={clientId as string}

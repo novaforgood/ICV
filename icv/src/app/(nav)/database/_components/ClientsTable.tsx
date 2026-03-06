@@ -244,27 +244,18 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
         onSortingChange: setSorting,
         onGlobalFilterChange: setGlobalFilter,
         globalFilterFn: (row, columnId, filterValue) => {
-            const searchTerms = filterValue.toLowerCase().split(' ')
-            const firstName = row.original.firstName?.toLowerCase() || ''
-            const lastName = row.original.lastName?.toLowerCase() || ''
+            const searchLower = String(filterValue ?? '').trim().toLowerCase()
+            if (!searchLower) return true
 
-            // If there's only one search term, check both first and last name
-            if (searchTerms.length === 1) {
-                return (
-                    firstName.includes(searchTerms[0]) ||
-                    lastName.includes(searchTerms[0])
-                )
-            }
+            const fullName =
+                row.original.fullNameLower ??
+                `${row.original.firstName ?? ''} ${row.original.lastName ?? ''}`.toLowerCase()
+            const clientCode = (row.original.clientCode ?? '').toLowerCase()
 
-            // If there are two search terms, first term should match firstName and second term should match lastName
-            if (searchTerms.length === 2) {
-                return (
-                    firstName.includes(searchTerms[0]) &&
-                    lastName.includes(searchTerms[1])
-                )
-            }
-
-            return false
+            return (
+                fullName.includes(searchLower) ||
+                clientCode.includes(searchLower)
+            )
         },
     })
 
@@ -325,7 +316,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                             </svg>
                             <input
                                 type="text"
-                                placeholder="Search clients..."
+                                placeholder="Search by name or client code..."
                                 value={globalFilter}
                                 onChange={(e) =>
                                     setGlobalFilter(e.target.value)

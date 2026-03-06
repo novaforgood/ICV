@@ -688,7 +688,7 @@ export const FamilySection: React.FC<Props> = ({
                                         <>
                                             {/* Modal Backdrop */}
                                             <div
-                                                className="fixed inset-0 z-40 bg-black bg-opacity-50"
+                                                className="fixed inset-0 z-50 bg-black bg-opacity-50"
                                                 onClick={() =>
                                                     setShowSpouseSearch(false)
                                                 }

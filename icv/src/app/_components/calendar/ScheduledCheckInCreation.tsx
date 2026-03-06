@@ -214,7 +214,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
                 <>
                     {/* Backdrop */}
                     <div
-                        className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                         onClick={closeModal}
                     />
 
