@@ -68,8 +68,8 @@ const CompletedProfileContent = () => {
 
     if (!createdClient) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-white">
-                <p className="text-lg font-medium text-gray-700">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <p className="text-lg font-medium bg-white rounded-[5px] px-[20px] py-[16px]">
                     Creating Client...
                 </p>
             </div>

@@ -247,8 +247,8 @@ const WaiverSection: React.FC<Props> = ({
             onSubmit={handleSubmit(handleSubmitType)}
         >
             {(isExporting || waiverUploading) && (
-                <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-white/100">
-                    <p className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
+                <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-black bg-opacity-50">
+                    <p className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900 bg-white rounded-[5px] px-[20px] py-[16px]">
                         {waiverUploading ? 'Uploading waiver(s)...' : 'Creating client....'}
                     </p>
                 </div>

@@ -36,7 +36,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const [cropFile, setCropFile] = useState<File | null>(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(
+        null,
+    )
     const [isCropping, setIsCropping] = useState(false)
 
     const files =
@@ -67,7 +69,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             const extension = cropFile.name.split('.').pop() || 'jpg'
             const croppedFile = new File(
                 [blob],
-                `${baseName}-crop.${extension}`,
+                `${baseName}-${crypto.randomUUID()}-crop.${extension}`,
                 { type: mimeType },
             )
 
@@ -88,13 +90,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             if (fileInputRef.current) fileInputRef.current.value = ''
             if (cameraInputRef.current) cameraInputRef.current.value = ''
         }
-    }, [
-        cropImageSrc,
-        cropFile,
-        croppedAreaPixels,
-        field,
-        handleFileChange,
-    ])
+    }, [cropImageSrc, cropFile, croppedAreaPixels, field, handleFileChange])
 
     const handleCropCancel = useCallback(() => {
         if (cropImageSrc) URL.revokeObjectURL(cropImageSrc)
@@ -113,9 +109,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             if (!selectedFiles || selectedFiles.length === 0) return
 
             const file = selectedFiles[0]
-            const shouldCrop =
-                (isProfilePic || selectedFiles.length === 1) &&
-                isImageFile(file)
+            const shouldCrop = isProfilePic && isImageFile(file)
 
             if (shouldCrop) {
                 setCropFile(file)
@@ -137,17 +131,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             image={cropImageSrc}
                             crop={crop}
                             zoom={zoom}
-                            aspect={isProfilePic ? 1 : undefined}
-                            initialCroppedAreaPercentages={
-                                isProfilePic
-                                    ? undefined
-                                    : { x: 0, y: 0, width: 100, height: 100 }
-                            }
+                            aspect={1}
                             onCropChange={setCrop}
                             onCropComplete={onCropAreaChange}
                             onCropAreaChange={onCropAreaChange}
                             onZoomChange={setZoom}
-                            cropShape={isProfilePic ? 'round' : 'rect'}
+                            cropShape="round"
                         />
                     </div>
                     <div className="flex justify-end gap-4 border-t border-gray-700 bg-black p-4">
@@ -162,7 +151,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             type="button"
                             onClick={handleCropConfirm}
                             disabled={isCropping || !croppedAreaPixels}
-                            className="rounded-md bg-white px-4 py-2 text-black disabled:opacity-50 hover:bg-gray-200"
+                            className="rounded-md bg-white px-4 py-2 text-black hover:bg-gray-200 disabled:opacity-50"
                         >
                             {isCropping ? 'Cropping...' : 'Crop'}
                         </button>
@@ -246,8 +235,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             ))}
                         </div>
                     )}
-                    <div className="flex flex-row space-x-[24px]">
-                        <button
+                    {(!isProfilePic || files.length === 0) && (
+                        <div className="flex flex-row items-center gap-[24px]">
+                            <button
                                 type="button"
                                 onClick={() => handleAddFile(fileInputRef)}
                                 className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white hover:bg-[#6D757F]"
@@ -305,6 +295,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                 className="hidden"
                             />
                         </div>
+                    )}
                 </>
             )}
         </div>
