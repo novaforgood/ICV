@@ -146,14 +146,13 @@ const PieChart = () => {
 
                             // Fiscal year: July (7) and onward maps to next year
                             return month >= 7 ? year + 1 : year
-                        })
-                    )
+                        }),
+                    ),
                 )
                     .filter((year): year is number => !isNaN(year))
                     .sort((a, b) => b - a)
 
                 setFiscalYears(uniqueFiscalYears)
-                
             } finally {
                 setIsLoading(false)
             }

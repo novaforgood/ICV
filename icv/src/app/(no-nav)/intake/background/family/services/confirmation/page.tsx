@@ -17,6 +17,8 @@ import {
     ClientServices,
     ClientSpouse,
 } from '@/app/_components/clientProfile/ClientProfileComponents'
+import Autocomplete from '@mui/material/Autocomplete'
+import TextField from '@mui/material/TextField'
 import Symbol from '@/components/Symbol'
 import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
@@ -25,7 +27,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { collection, getDocs } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import Dropdown from 'react-dropdown'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
@@ -41,7 +42,6 @@ const Page = () => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
     type ConfirmType = TypeOf<typeof ConfirmationSchema>
 
-    const [selectedUser, setSelectedUser] = useState<string | undefined>()
 
     const {
         handleSubmit,
@@ -64,20 +64,19 @@ const Page = () => {
         }
     }, [loadedForm.associatedSpouseID])
 
-    const handleSelect = (selected: string) => {
-        setSelectedUser(selected)
-        updateForm({ caseManager: selected })
-        console.log('Selected user:', selected)
-        console.log('available users:', users)
+    const handleCaseManagerChange = (value: string | null) => {
+        updateForm({ caseManager: value ?? '' })
     }
 
     // wait until after render (in case rendering occurs before user is async loaded)
     useEffect(() => {
         if (user?.displayName) {
-            const assessor = user.displayName
-            updateForm({ assessingStaff: assessor })
+            updateForm({ assessingStaff: user.displayName })
+            if (!loadedForm.caseManager) {
+                updateForm({ caseManager: user.displayName })
+            }
         }
-    }, [user])
+    }, [user, loadedForm.caseManager])
 
     // tracks which sections are open/closed
     const [openSections, setOpenSections] = useState<Record<string, boolean>>(
@@ -115,31 +114,41 @@ const Page = () => {
                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                     Case Manager
                                 </label>
-                                <div className="relative">
-                                    <Dropdown
-                                        className="w-full border-black"
-                                        options={users}
-                                        onChange={(option) =>
-                                            handleSelect(option.value)
-                                        }
-                                        placeholder="Select a user"
-                                        controlClassName="flex items-center justify-between border border-black-300 rounded-md px-4 py-2 bg-white w-full hover:border-neutral-400"
-                                        menuClassName="dropdown-menu absolute w-full mt-5 py-2 px-2 border border-black-500 rounded-md bg-white shadow-lg z-50 max-h-60 overflow-auto hover:border-neutral-400"
-                                        placeholderClassName="text-gray-500"
-                                        arrowClosed={
-                                            <Symbol
-                                                symbol="keyboard_arrow_down"
-                                                className="text-neutral-900"
-                                            />
-                                        }
-                                        arrowOpen={
-                                            <Symbol
-                                                symbol="keyboard_arrow_up"
-                                                className="text-neutral-900"
-                                            />
-                                        }
-                                    />
-                                </div>
+                                <Autocomplete
+                                    disableClearable
+                                    value={loadedForm.caseManager ?? ''}
+                                    onChange={(_, newValue) =>
+                                        handleCaseManagerChange(newValue)
+                                    }
+                                    options={
+                                        loadedForm.caseManager &&
+                                        !users.includes(loadedForm.caseManager)
+                                            ? [
+                                                  loadedForm.caseManager,
+                                                  ...users,
+                                              ]
+                                            : users
+                                    }
+                                    getOptionLabel={(option) => option}
+                                    filterOptions={(options, state) => {
+                                        const input = state.inputValue
+                                            .trim()
+                                            .toLowerCase()
+                                        if (!input) return options
+                                        return options.filter((option) =>
+                                            option
+                                                .toLowerCase()
+                                                .includes(input),
+                                        )
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            placeholder="Search case manager..."
+                                            size="small"
+                                        />
+                                    )}
+                                />
                             </div>
                         </div>
                     </div>

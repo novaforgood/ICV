@@ -9,12 +9,19 @@ import { useEffect, useRef, useState } from 'react'
 import Symbol from '../../components/Symbol'
 import LogoutButton from './LogoutButton'
 
+const formatNameForWrap = (name: string | null | undefined) => {
+    if (!name) return ''
+    const parts = name.trim().split(/\s+/)
+    if (parts.length <= 1) return name
+    return parts.slice(0, -1).join(' ') + ' \u200B' + parts[parts.length - 1]
+}
+
 const Navbar = () => {
     const { user } = useUser()
     const [open, setOpen] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
 
-    // Collapse navbar when viewport shrinks below desktop 
+    // Collapse navbar when viewport shrinks below desktop
     useEffect(() => {
         const mediaQuery = window.matchMedia('(min-width: 1024px)')
         const handleResize = () => {
@@ -50,7 +57,7 @@ const Navbar = () => {
             {!open && (
                 <div
                     ref={menuRef}
-                    className="fixed left-0 top-0 flex h-full w-20 flex-col items-center gap-4 bg-foreground text-background lg:hidden"
+                    className="fixed left-0 top-0 z-40 flex h-full w-20 flex-col items-center gap-4 bg-foreground text-background lg:hidden"
                 >
                     <div
                         onClick={() => setOpen(true)}
@@ -93,16 +100,18 @@ const Navbar = () => {
                     ref={menuRef}
                     className="fixed left-0 top-0 z-50 flex h-full w-64 flex-col items-center gap-4 bg-foreground text-background lg:hidden"
                 >
-                    <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
+                    <div className="flex w-full flex-col items-center justify-center gap-2 px-4">
                         <img
                             src={user?.photoURL || '/icv.png'}
                             alt="logo"
                             className="m-4 h-16 w-16 rounded-full"
                         />
-                        <h1 className="text-xl font-bold">
-                            {user?.displayName}
+                        <h1 className="w-full break-words px-4 text-center text-xl font-bold">
+                            {formatNameForWrap(user?.displayName)}
                         </h1>
-                        <p>{user?.email}</p>
+                        <p className="w-full break-words px-4 text-center">
+                            {user?.email?.replace('@', '@\u200B')}
+                        </p>
                     </div>
                     <div className="flex w-full flex-col items-center justify-start">
                         <NavLink href="/">
@@ -135,15 +144,19 @@ const Navbar = () => {
                 </div>
             )}
             {/* desktop view*/}
-            <div className="fixed left-0 top-0 hidden h-full w-64 flex-col items-center gap-4 bg-foreground text-background lg:flex">
+            <div className="fixed left-0 top-0 z-40 hidden h-full w-64 flex-col items-center gap-4 bg-foreground text-background lg:flex">
                 <div className="flex w-full flex-col items-center justify-center gap-2 py-8">
                     <img
                         src={user?.photoURL || '/icv.png'}
                         alt="logo"
                         className="m-4 h-16 w-16 rounded-full"
                     />
-                    <h1 className="text-xl font-bold">{user?.displayName}</h1>
-                    <p>{user?.email}</p>
+                    <h1 className="w-full break-words px-4 text-center text-xl font-bold">
+                        {formatNameForWrap(user?.displayName)}
+                    </h1>
+                    <p className="w-full break-words px-4 text-center">
+                        {user?.email?.replace('@', '@\u200B')}
+                    </p>
                 </div>
                 <div className="flex w-full flex-col items-stretch justify-start">
                     <NavLink href="/">

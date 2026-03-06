@@ -171,7 +171,7 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                                                 )
                                             )}
                                         </div>
-                                        <div className="flex flex-wrap gap-2 sm:hidden">
+                                        <div className="flex flex-wrap gap-2 md:hidden">
                                             {MONTHS.map((month, index) => (
                                                 <button
                                                     key={month.full}
@@ -198,7 +198,7 @@ export const YearFilter: React.FC<YearFilterProps> = ({
                                                 </button>
                                             ))}
                                         </div>
-                                        <div className="hidden gap-2 sm:grid sm:grid-cols-2">
+                                        <div className="hidden gap-2 md:grid md:grid-cols-2">
                                             <div className="flex flex-col gap-2">
                                                 <div className="flex gap-2">
                                                     {MONTHS.slice(0, 3).map(

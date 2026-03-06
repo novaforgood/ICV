@@ -19,6 +19,8 @@ const IntakeContent = () => {
         Object.entries(loadedForm).some(
             ([key, value]) =>
                 key !== 'clientCode' &&
+                key !== 'assessingStaff' &&
+                key !== 'caseManager' &&
                 value !== null &&
                 value !== undefined &&
                 value !== '',
