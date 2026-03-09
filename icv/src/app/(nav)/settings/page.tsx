@@ -12,7 +12,15 @@ import {
     updateProfile,
     verifyBeforeUpdateEmail,
 } from 'firebase/auth'
-import { collection, doc, getDocs, limit, query, setDoc, where } from 'firebase/firestore'
+import {
+    collection,
+    doc,
+    getDocs,
+    limit,
+    query,
+    setDoc,
+    where,
+} from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -491,7 +499,9 @@ const SettingsPage = () => {
                                 <div className="flex justify-center gap-[12px]">
                                     <button
                                         type="button"
-                                        onClick={() => void handleReauthenticate()}
+                                        onClick={() =>
+                                            void handleReauthenticate()
+                                        }
                                         disabled={isReauthenticating}
                                         className="rounded-md bg-[#4EA0C9] px-4 py-2 text-white disabled:opacity-50"
                                     >
@@ -683,7 +693,7 @@ const SettingsPage = () => {
                         <>
                             You can find a walkthrough video{' '}
                             <a
-                                href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                                href="https://drive.google.com/file/d/1G85CXbho0roHkWZYX5PkF0wn3e8_4ElH/view?usp=drive_link"
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-blue-600 hover:text-blue-800 underline"
