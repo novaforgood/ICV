@@ -21,6 +21,7 @@ import {
 } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import SignatureCanvas from 'react-signature-canvas'
 import { TypeOf } from 'zod'
@@ -244,6 +245,17 @@ const WaiverSection: React.FC<Props> = ({
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
+            {isExporting &&
+                waiverMode === 'form' &&
+                typeof document !== 'undefined' &&
+                createPortal(
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <p className="rounded-[5px] bg-white px-[20px] py-[16px] text-lg font-medium">
+                            Creating waiver...
+                        </p>
+                    </div>,
+                    document.body,
+                )}
             <div className="mt-[24px] flex min-h-screen justify-center">
                 <div className="min-w-full space-y-[48px]">
                     <div className="flex flex-col space-y-[24px]">

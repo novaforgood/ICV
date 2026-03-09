@@ -21,6 +21,7 @@ const IntakeContent = () => {
                 key !== 'clientCode' &&
                 key !== 'assessingStaff' &&
                 key !== 'caseManager' &&
+                key !== 'associatedSpouseID' &&
                 value !== null &&
                 value !== undefined &&
                 value !== '',

@@ -284,6 +284,8 @@ const SettingsPage = () => {
                 displayName: `${formData.firstName} ${formData.lastName}`,
                 photoURL: photoURL,
             })
+            await user.reload()
+            window.dispatchEvent(new Event('auth-profile-updated'))
 
             if (emailChanged) {
                 await verifyBeforeUpdateEmail(user, trimmedEmail)

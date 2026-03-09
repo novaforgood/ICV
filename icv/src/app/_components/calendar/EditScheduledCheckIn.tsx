@@ -20,6 +20,7 @@ interface EditScheduledCheckInProps {
     onUpdatedEvent: () => void
     selectedEvent: any
     fromEvent: boolean
+    showViewCaseNotes?: boolean
 }
 
 type ClientWithLastCheckin = NewClient & { lastCheckinDate?: string }
@@ -29,6 +30,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     selectedEvent,
     onUpdatedEvent,
     fromEvent,
+    showViewCaseNotes = true,
 }) => {
     const [editMode, setEditMode] = useState(fromEvent)
     const [date, setDate] = useState('')
@@ -285,15 +287,17 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                     <p>{selectedEvent.location}</p>
                                 </div>
                             )}
-                            <button
-                                type="button"
-                                className="mx-auto mt-[16px] flex cursor-pointer items-center gap-2 rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
-                                onClick={() =>
-                                    router.push(`/events/${selectedEvent.id}`)
-                                }
-                            >
-                                View case notes
-                            </button>
+                            {showViewCaseNotes && (
+                                <button
+                                    type="button"
+                                    className="mx-auto mt-[16px] flex cursor-pointer items-center gap-2 rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
+                                    onClick={() =>
+                                        router.push(`/events/${selectedEvent.id}`)
+                                    }
+                                >
+                                    View case notes
+                                </button>
+                            )}
                         </div>
                     </div>,
                     portalTarget,
@@ -359,17 +363,19 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                             ? 'Submitting...'
                                             : 'Save changes'}
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="flex-1 rounded bg-black py-2 text-white shadow transition hover:bg-gray-800"
-                                        onClick={() =>
-                                            router.push(
-                                                `/events/${selectedEvent.id}`,
-                                            )
-                                        }
-                                    >
-                                        View case notes
-                                    </button>
+                                    {showViewCaseNotes && (
+                                        <button
+                                            type="button"
+                                            className="flex-1 rounded bg-black py-2 text-white shadow transition hover:bg-gray-800"
+                                            onClick={() =>
+                                                router.push(
+                                                    `/events/${selectedEvent.id}`,
+                                                )
+                                            }
+                                        >
+                                            View case notes
+                                        </button>
+                                    )}
                                 </div>
                             </form>
                         </div>

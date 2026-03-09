@@ -201,6 +201,7 @@ export default function EventDetailPage() {
                         }
                     }}
                     fromEvent={true}
+                    showViewCaseNotes={false}
                 />
             )}
 

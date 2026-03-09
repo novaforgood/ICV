@@ -83,7 +83,7 @@ const CompletedProfileContent = () => {
                     {'<'} Back to dashboard
                 </button>
             </div>
-            <div className="flex min-h-[calc(100vh-72px)] items-center justify-center px-6 pb-6">
+            <div className="flex min-h-[calc(100vh-72px)] items-start justify-center px-6 pb-6 pt-10 sm:items-center sm:pt-6">
                 <div className="w-full max-w-[800px] space-y-[48px]">
                     <div className="space-y-[24px]">
                         <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">

@@ -310,10 +310,11 @@ export const ClientProfileToggle = ({
                                     }
 
                                     await updateClient(id, data)
+                                    await fetchHousingStatuses()
 
                                     clearForm(id)
                                     setEditMode(false)
-                                    router.push(`/clients/${id}/profile`)
+                                    router.refresh()
                                 } catch (err) {
                                     console.error('updateClient error:', err)
                                 }

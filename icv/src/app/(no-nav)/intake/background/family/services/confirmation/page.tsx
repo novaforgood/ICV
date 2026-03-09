@@ -1,5 +1,5 @@
 'use client'
-import { getClientById } from '@/api/clients'
+import { getAllUsers, getClientById } from '@/api/clients'
 import {
     ClientBio,
     ClientCitizenship,
@@ -20,23 +20,20 @@ import {
 import Autocomplete from '@mui/material/Autocomplete'
 import TextField from '@mui/material/TextField'
 import Symbol from '@/components/Symbol'
-import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
 import { ConfirmationSchema, NewClient } from '@/types/client-types'
+import { Users } from '@/types/user-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { collection, getDocs } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
 
-// JIMIN IS TRIPPINGGGGGGGG
-
-//collecting users document from database in string array
-const collectRef = collection(clientDb, 'users')
-const querySnapshot = await getDocs(collectRef)
-const users = querySnapshot.docs.map((doc) => String(doc.data().name))
+type CaseManagerOption = {
+    label: string
+    value: string
+}
 
 const Page = () => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
@@ -55,6 +52,27 @@ const Page = () => {
     const router = useRouter()
     const { user } = useUser()
     const [spouseInfo, setSpouseInfo] = useState<NewClient>({} as NewClient)
+    const [users, setUsers] = useState<Users[]>([])
+
+    const caseManagerOptions: CaseManagerOption[] = users
+        .map((staff) => ({
+            label: staff.name,
+            value: staff.uid ?? staff.id ?? '',
+        }))
+        .filter((option) => option.value)
+
+    const selectedCaseManager =
+        caseManagerOptions.find(
+            (option) =>
+                option.value === loadedForm.caseManager ||
+                option.label === loadedForm.caseManager,
+        ) ??
+        (loadedForm.caseManager
+            ? {
+                  label: loadedForm.caseManager,
+                  value: loadedForm.caseManager,
+              }
+            : undefined)
 
     useEffect(() => {
         if (loadedForm.associatedSpouseID) {
@@ -64,16 +82,24 @@ const Page = () => {
         }
     }, [loadedForm.associatedSpouseID])
 
-    const handleCaseManagerChange = (value: string | null) => {
-        updateForm({ caseManager: value ?? '' })
+    useEffect(() => {
+        getAllUsers()
+            .then((userList) => setUsers(userList))
+            .catch((error) =>
+                console.error('Error fetching case managers:', error),
+            )
+    }, [])
+
+    const handleCaseManagerChange = (value: CaseManagerOption | null) => {
+        updateForm({ caseManager: value?.value ?? '' })
     }
 
     // wait until after render (in case rendering occurs before user is async loaded)
     useEffect(() => {
         if (user?.displayName) {
             updateForm({ assessingStaff: user.displayName })
-            if (!loadedForm.caseManager) {
-                updateForm({ caseManager: user.displayName })
+            if (!loadedForm.caseManager && user.uid) {
+                updateForm({ caseManager: user.uid })
             }
         }
     }, [user, loadedForm.caseManager])
@@ -116,27 +142,22 @@ const Page = () => {
                                 </label>
                                 <Autocomplete
                                     disableClearable
-                                    value={loadedForm.caseManager ?? ''}
+                                    value={selectedCaseManager}
                                     onChange={(_, newValue) =>
                                         handleCaseManagerChange(newValue)
                                     }
-                                    options={
-                                        loadedForm.caseManager &&
-                                        !users.includes(loadedForm.caseManager)
-                                            ? [
-                                                  loadedForm.caseManager,
-                                                  ...users,
-                                              ]
-                                            : users
+                                    options={caseManagerOptions}
+                                    getOptionLabel={(option) => option.label}
+                                    isOptionEqualToValue={(option, value) =>
+                                        option.value === value.value
                                     }
-                                    getOptionLabel={(option) => option}
                                     filterOptions={(options, state) => {
                                         const input = state.inputValue
                                             .trim()
                                             .toLowerCase()
                                         if (!input) return options
                                         return options.filter((option) =>
-                                            option
+                                            option.label
                                                 .toLowerCase()
                                                 .includes(input),
                                         )
