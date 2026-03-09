@@ -33,13 +33,18 @@ const EventsCard: React.FC<EventCardProps> = ({
                 event.asigneeId ??
                 '',
         ) || '-'
+    const assigneeUser = users?.find(
+        (staff) =>
+            staff.uid === eventAssignee ||
+            staff.id === eventAssignee ||
+            staff.name === eventAssignee,
+    )
+    const assigneeDisplayName = assigneeUser?.name ?? eventAssignee
     const eventCategory = String(event.contactCode) || ''
     const clientName = String(event.clientName ?? '') || '-'
     const clientCode = String(event.clientCode ?? '') || '-'
     const colorClass = categoryColors[String(event.contactCode)]
-    const assigneePhotoURL =
-        users?.find((staff) => staff.name === eventAssignee)?.photoURL ||
-        '/icv.png'
+    const assigneePhotoURL = assigneeUser?.photoURL || '/icv.png'
 
     // Handle card click to navigate to event details
     const handleCardClick = () => {
@@ -86,7 +91,7 @@ const EventsCard: React.FC<EventCardProps> = ({
                         className="h-8 w-8 shrink-0 rounded-full"
                     />
                     <span className="min-w-0 truncate text-sm">
-                        {eventAssignee}
+                        {assigneeDisplayName}
                     </span>
                 </div>
             </div>

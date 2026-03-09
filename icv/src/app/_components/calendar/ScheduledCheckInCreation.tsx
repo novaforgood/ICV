@@ -1,15 +1,16 @@
 'use client'
 
-import { getAllClients, getUsersCollection } from '@/api/clients'
+import { getAllClients, getAllUsers } from '@/api/clients'
 import { createCheckIn } from '@/api/events'
 import { Card } from '@/components/ui/card'
 import { roundToNearest10Minutes } from '@/utils/dateUtils'
 import { CheckInType, ContactType } from '@/types/event-types'
+import { Users } from '@/types/user-types'
 import { format } from 'date-fns'
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useSWR, { mutate } from 'swr'
-import CheckInFormFields from './CheckInFormFields'
+import CheckInFormFields, { StaffOption } from './CheckInFormFields'
 import ClientCard from '../ClientCard'
 import ClientSearch from './ClientSearch'
 
@@ -38,7 +39,8 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
     )
     const [assigneeId, setAssigneeId] = useState('')
     const [selectedClientDocId, setSelectedClientId] = useState('')
-    const [staffNames, setStaffNames] = useState<string[]>([])
+    const [staffOptions, setStaffOptions] = useState<StaffOption[]>([])
+    const [currentUserName, setCurrentUserName] = useState('')
     const [submitting, setSubmitting] = useState(false)
 
     const { data: clients } = useSWR('clients', getAllClients)
@@ -60,26 +62,39 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
     useEffect(() => {
         const auth = getAuth()
         const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
-            if (user?.displayName) setAssigneeId(user.displayName)
-            else setAssigneeId('')
+            setCurrentUserName(user?.displayName ?? '')
+            setAssigneeId(user?.uid ?? '')
         })
         return () => unsubscribe()
     }, [])
 
     useEffect(() => {
-        const fetchStaffNames = async () => {
+        const fetchStaffOptions = async () => {
             try {
-                const names = await getUsersCollection()
-                if (assigneeId && !names.includes(assigneeId)) {
-                    names.push(assigneeId)
+                const users = await getAllUsers()
+                const options = users
+                    .map((staff: Users) => ({
+                        label: staff.name,
+                        value: staff.uid ?? staff.id ?? '',
+                    }))
+                    .filter((option) => option.value)
+
+                if (
+                    assigneeId &&
+                    !options.some((option) => option.value === assigneeId)
+                ) {
+                    options.unshift({
+                        label: currentUserName || assigneeId,
+                        value: assigneeId,
+                    })
                 }
-                setStaffNames(names)
+                setStaffOptions(options)
             } catch (error) {
-                console.error('Error fetching staff names:', error)
+                console.error('Error fetching staff options:', error)
             }
         }
-        fetchStaffNames()
-    }, [assigneeId])
+        fetchStaffOptions()
+    }, [assigneeId, currentUserName])
 
     const resetFormDefaults = () => {
         const now = new Date()
@@ -274,7 +289,7 @@ const ScheduledCheckInCreation: React.FC<ScheduledCheckInCreationProps> = ({
                                     setEndTime={setEndTime}
                                     assigneeId={assigneeId}
                                     setAssigneeId={setAssigneeId}
-                                    staffNames={staffNames}
+                                    staffOptions={staffOptions}
                                     location={location}
                                     setLocation={setLocation}
                                     contactType={contactType}

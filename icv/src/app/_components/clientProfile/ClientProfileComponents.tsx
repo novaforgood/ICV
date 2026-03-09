@@ -1,8 +1,11 @@
 'use client'
+import { getAllUsers } from '@/api/clients'
 import { ClientIntakeSchema } from '@/types/client-types'
 import { NewHousing } from '@/types/housingStatus-types'
+import { Users } from '@/types/user-types'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import useSWR from 'swr'
 import { TypeOf } from 'zod'
 
 type ClientType = TypeOf<typeof ClientIntakeSchema>
@@ -13,9 +16,39 @@ interface ClientProps {
     recentHousing?: NewHousing
 }
 
-// Profile Section
+// Profile Sections
+
+export const ClientStaffDetails = ({ data }: ClientProps) => {
+    const { data: users } = useSWR<Users[]>('users', getAllUsers)
+    const resolveStaffName = (value?: string) =>
+        users?.find(
+            (user) =>
+                user.uid === value || user.id === value || user.name === value,
+        )?.name ??
+        value
+
+    return (
+        <div className="space-y-[24px]">
+            <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                <div className="flex flex-col space-y-1">
+                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                        Assessing Staff
+                    </label>
+                    <div>{resolveStaffName(data.assessingStaff) || <p>N/A</p>}</div>
+                </div>
+                <div className="flex flex-col space-y-1">
+                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                        Case Manager
+                    </label>
+                    <div>{resolveStaffName(data.caseManager) || <p>N/A</p>}</div>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 export const ClientBio = ({ data }: ClientProps) => {
+
     return (
         <div className="space-y-[24px]">
             {/* Row 1: Name & Gender */}

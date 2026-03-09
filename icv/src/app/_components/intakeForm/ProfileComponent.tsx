@@ -1,5 +1,6 @@
 'use client'
 
+import { getAllUsers } from '@/api/clients'
 import {
     CITIZEN,
     CONTACTSOURCE,
@@ -10,8 +11,11 @@ import {
     ProfileSchema,
     YESNO,
 } from '@/types/client-types'
+import { Users } from '@/types/user-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import Autocomplete from '@mui/material/Autocomplete'
+import TextField from '@mui/material/TextField'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import {
@@ -42,6 +46,7 @@ const ProfileSection: React.FC<Props> = ({
     submitType,
     titleStyle,
 }) => {
+    const [users, setUsers] = useState<Users[]>([])
     const {
         register,
         handleSubmit,
@@ -56,9 +61,26 @@ const ProfileSection: React.FC<Props> = ({
         defaultValues: formType,
     })
 
+    const staffOptions = users
+        .map((staff) => ({
+            label: staff.name,
+            value: staff.uid ?? staff.id ?? '',
+        }))
+        .filter((option) => option.value)
+
+    const staffLabels = staffOptions.map((option) => option.label)
+
     useEffect(() => {
         reset(formType)
     }, [formType, reset])
+
+    useEffect(() => {
+        getAllUsers()
+            .then((userList) => setUsers(userList))
+            .catch((error) =>
+                console.error('Error fetching staff options:', error),
+            )
+    }, [])
 
     useEffect(() => {
         if (spouseID) {
@@ -142,12 +164,45 @@ const ProfileSection: React.FC<Props> = ({
         : []
     const selectedSheltered = watch('sheltered') ?? ''
 
+    const resolveStaffLabel = (value?: string) =>
+        staffOptions.find(
+            (option) => option.value === value || option.label === value,
+        )?.label ??
+        value ??
+        ''
+
+    const buildStaffAutocompleteOptions = (currentValue?: string) => {
+        const selectedLabel = resolveStaffLabel(currentValue)
+        if (!selectedLabel) return staffLabels
+
+        return staffLabels.includes(selectedLabel)
+            ? staffLabels
+            : [selectedLabel, ...staffLabels]
+    }
+
+    const handleStaffChange = (
+        field: 'assessingStaff' | 'caseManager',
+        value: string | null,
+    ) => {
+        const selectedOption = staffOptions.find(
+            (option) => option.label === value,
+        )
+
+        updateForm({ [field]: selectedOption?.value ?? value ?? '' })
+    }
+
     const handleSubmitType = (data: ProfileType) => {
+        const profileData = {
+            ...data,
+            assessingStaff: formType.assessingStaff,
+            caseManager: formType.caseManager,
+        }
+
         console.log('onSubmitEdit called with:', data)
         if (submitType === 'save' && onSubmitEdit) {
-            onSubmitEdit(data)
+            onSubmitEdit(profileData as NewClient)
         } else if (submitType === 'next' && onSubmitNew) {
-            onSubmitNew(data)
+            onSubmitNew(profileData as NewClient)
         }
     }
 
@@ -158,6 +213,89 @@ const ProfileSection: React.FC<Props> = ({
         >
             <div className="flex min-h-screen items-center justify-center">
                 <div className="w-full space-y-[60px]">
+                    {submitType === 'save' && (
+                        <div className="space-y-[24px]">
+                            <label className={titleStyle}>Staff Details</label>
+                            <div className="grid grid-cols-2 gap-[12px]">
+                                <div className="flex flex-col space-y-[4px]">
+                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                        Assessing Staff
+                                    </label>
+                                    <Autocomplete
+                                        disableClearable
+                                        value={resolveStaffLabel(
+                                            formType.assessingStaff,
+                                        )}
+                                        onChange={(_, newValue) =>
+                                            handleStaffChange(
+                                                'assessingStaff',
+                                                newValue,
+                                            )
+                                        }
+                                        options={buildStaffAutocompleteOptions(
+                                            formType.assessingStaff,
+                                        )}
+                                        filterOptions={(options, state) => {
+                                            const input = state.inputValue
+                                                .trim()
+                                                .toLowerCase()
+                                            if (!input) return options
+                                            return options.filter((option) =>
+                                                option
+                                                    .toLowerCase()
+                                                    .includes(input),
+                                            )
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                placeholder="Search staff..."
+                                                size="small"
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                <div className="flex flex-col space-y-[4px]">
+                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                        Case Manager
+                                    </label>
+                                    <Autocomplete
+                                        disableClearable
+                                        value={resolveStaffLabel(
+                                            formType.caseManager,
+                                        )}
+                                        onChange={(_, newValue) =>
+                                            handleStaffChange(
+                                                'caseManager',
+                                                newValue,
+                                            )
+                                        }
+                                        options={buildStaffAutocompleteOptions(
+                                            formType.caseManager,
+                                        )}
+                                        filterOptions={(options, state) => {
+                                            const input = state.inputValue
+                                                .trim()
+                                                .toLowerCase()
+                                            if (!input) return options
+                                            return options.filter((option) =>
+                                                option
+                                                    .toLowerCase()
+                                                    .includes(input),
+                                            )
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                placeholder="Search case manager..."
+                                                size="small"
+                                            />
+                                        )}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {/* Basic Information */}
                     <div className="space-y-[24px]">
                         {titleStyle ==
@@ -208,7 +346,9 @@ const ProfileSection: React.FC<Props> = ({
                                 <input
                                     {...register('intakeDate')}
                                     type="date"
-                                    defaultValue={new Date().toLocaleDateString('en-CA')}
+                                    defaultValue={new Date().toLocaleDateString(
+                                        'en-CA',
+                                    )}
                                     className="rounded border p-2"
                                 />
                             </div>

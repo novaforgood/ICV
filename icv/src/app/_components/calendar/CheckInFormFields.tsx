@@ -10,6 +10,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import React from 'react'
 
+export type StaffOption = {
+    label: string
+    value: string
+}
+
 interface CheckInFormFieldsProps {
     date: string
     setDate: (v: string) => void
@@ -19,7 +24,7 @@ interface CheckInFormFieldsProps {
     setEndTime: (v: string) => void
     assigneeId: string
     setAssigneeId: (v: string) => void
-    staffNames: string[]
+    staffOptions: StaffOption[]
     location: string
     setLocation: (v: string) => void
     contactType: string
@@ -35,12 +40,26 @@ const CheckInFormFields: React.FC<CheckInFormFieldsProps> = ({
     setEndTime,
     assigneeId,
     setAssigneeId,
-    staffNames,
+    staffOptions,
     location,
     setLocation,
     contactType,
     setContactType,
 }) => {
+    const selectedStaffOption =
+        staffOptions.find(
+            (option) =>
+                option.value === assigneeId || option.label === assigneeId,
+        ) ??
+        (assigneeId
+            ? {
+                  label:
+                      staffOptions.find((option) => option.value === assigneeId)
+                          ?.label ?? assigneeId,
+                  value: assigneeId,
+              }
+            : undefined)
+
     return (
         <>
             <div>
@@ -123,19 +142,28 @@ const CheckInFormFields: React.FC<CheckInFormFieldsProps> = ({
                 </label>
                 <Autocomplete
                     disableClearable
-                    value={assigneeId ?? ''}
-                    onChange={(_, newValue) => setAssigneeId(newValue ?? '')}
-                    options={
-                        assigneeId && !staffNames.includes(assigneeId)
-                            ? [assigneeId, ...staffNames]
-                            : staffNames
+                    value={selectedStaffOption}
+                    onChange={(_, newValue) =>
+                        setAssigneeId(newValue?.value ?? '')
                     }
-                    getOptionLabel={(option) => option}
+                    options={
+                        selectedStaffOption &&
+                        !staffOptions.some(
+                            (option) =>
+                                option.value === selectedStaffOption.value,
+                        )
+                            ? [selectedStaffOption, ...staffOptions]
+                            : staffOptions
+                    }
+                    getOptionLabel={(option) => option.label}
+                    isOptionEqualToValue={(option, value) =>
+                        option.value === value.value
+                    }
                     filterOptions={(options, state) => {
                         const input = state.inputValue.trim().toLowerCase()
                         if (!input) return options
                         return options.filter((option) =>
-                            option.toLowerCase().includes(input),
+                            option.label.toLowerCase().includes(input),
                         )
                     }}
                     renderInput={(params) => (
