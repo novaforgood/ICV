@@ -204,15 +204,19 @@ const WaiverSection: React.FC<Props> = ({
 
             exportHost = document.createElement('div')
             exportHost.setAttribute('aria-hidden', 'true')
-            exportHost.style.position = 'fixed'
-            exportHost.style.left = '-10000px'
+            exportHost.style.position = 'absolute'
+            exportHost.style.left = '0'
             exportHost.style.top = '0'
             exportHost.style.width = `${exportWidth}px`
             exportHost.style.padding = '24px'
             exportHost.style.background = '#ffffff'
+            exportHost.style.pointerEvents = 'none'
+            exportHost.style.overflow = 'hidden'
             exportHost.style.zIndex = '-1'
             exportHost.appendChild(clonedEl)
             document.body.appendChild(exportHost)
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
 
             const today =
                 formType.signDate && formType.signDate != ''
@@ -252,7 +256,7 @@ const WaiverSection: React.FC<Props> = ({
                         avoid: '.pdf-keep-together',
                     },
                 })
-                .from(exportHost)
+                .from(clonedEl)
                 .toPdf()
                 .output('blob')
 
