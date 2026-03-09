@@ -78,11 +78,11 @@ export function SpontaneousCheckInModalContent() {
             )
             const end = new Date(roundedStart.getTime() + 15 * 60 * 1000)
 
-            const clientName =
-                selectedClient &&
-                `${selectedClient.firstName || ''} ${
-                    selectedClient.lastName || ''
-                }`.trim()
+            const clientName: string | undefined = selectedClient
+                ? `${selectedClient.firstName || ''} ${
+                      selectedClient.lastName || ''
+                  }`.trim()
+                : undefined
             const clientCode = selectedClient?.clientCode ?? ''
 
             const newEvent: CheckInType & { clientId?: string } = {
