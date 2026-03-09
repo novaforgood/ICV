@@ -1,6 +1,13 @@
 'use client'
 
-import { auth } from '@/data/firebase'
+import { clientDb, auth } from '@/data/firebase'
+import {
+    collection,
+    getDocs,
+    query,
+    updateDoc,
+    where,
+} from 'firebase/firestore'
 import { setCookie } from 'cookies-next'
 import { getIdToken, onAuthStateChanged } from 'firebase/auth'
 import { useEffect } from 'react'
@@ -25,6 +32,22 @@ const AuthSetup = () => {
                 await setCookie('idToken', idToken, {
                     maxAge: 60 * 60 * 24 * 7,
                 })
+
+                if (user.email) {
+                    const usersQuery = query(
+                        collection(clientDb, 'users'),
+                        where('uid', '==', user.uid),
+                    )
+                    const usersSnapshot = await getDocs(usersQuery)
+
+                    await Promise.all(
+                        usersSnapshot.docs
+                            .filter((doc) => doc.data().email !== user.email)
+                            .map((doc) =>
+                                updateDoc(doc.ref, { email: user.email }),
+                            ),
+                    )
+                }
 
                 // redirect to home page if user is logged in and on login page
                 if (pathname === '/login') {

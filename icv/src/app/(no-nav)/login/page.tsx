@@ -6,13 +6,13 @@ import {
     createUserWithEmailAndPassword,
     sendPasswordResetEmail,
     signInWithEmailAndPassword,
-    updateProfile,
     signOut,
+    updateProfile,
 } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const Page = () => {
     // user input fields
@@ -27,10 +27,19 @@ const Page = () => {
 
     // status
     const [error, setError] = useState('')
+    const [statusMessage, setStatusMessage] = useState('')
     const [loading, setLoading] = useState(false)
     const [last2FACall, setLast2FACall] = useState(0)
 
     const router = useRouter()
+
+    useEffect(() => {
+        const message = sessionStorage.getItem('postLogoutMessage')
+        if (!message) return
+
+        setStatusMessage(message)
+        sessionStorage.removeItem('postLogoutMessage')
+    }, [])
 
     // check if enough time has passed since last 2FA call
     const canCall2FA = () => {
@@ -41,7 +50,11 @@ const Page = () => {
 
     // validate email domain, restricted to icvcommunity.org
     const isValidEmailDomain = (email: string) => {
-        const allowedDomains = ['@icvcommunity.org', '@gmail.com']
+        const allowedDomains = [
+            '@icvcommunity.org',
+            '@gmail.com',
+            '@g.ucla.edu',
+        ]
         return allowedDomains.some((domain) =>
             email.toLowerCase().endsWith(domain),
         )
@@ -54,9 +67,7 @@ const Page = () => {
 
         // Validate email domain
         if (!isValidEmailDomain(email)) {
-            setError(
-                'Please use an email address from @icvcommunity.org'
-            )
+            setError('Please use an email address from @icvcommunity.org')
             return
         }
 
@@ -82,9 +93,7 @@ const Page = () => {
 
         // Validate email domain
         if (!isValidEmailDomain(email)) {
-            setError(
-                'Please use an email address from @icvcommunity.org',
-            )
+            setError('Please use an email address from @icvcommunity.org')
             setLoading(false)
             return
         }
@@ -92,7 +101,7 @@ const Page = () => {
         // When signing up, require first and last name
         if (signUp) {
             // cleanup by removing whitespace from first and last name
-            const trimmedFirst = firstname.trim() 
+            const trimmedFirst = firstname.trim()
             const trimmedLast = lastname.trim()
             if (!trimmedFirst || !trimmedLast) {
                 setError('Please enter both first name and last name.')
@@ -121,7 +130,10 @@ const Page = () => {
                 await updateProfile(user, {
                     displayName: `${trimmedFirst} ${trimmedLast}`,
                 })
-                console.log('user display name updated: ', auth.currentUser?.displayName)
+                console.log(
+                    'user display name updated: ',
+                    auth.currentUser?.displayName,
+                )
 
                 //add username and email to collection to allow display on clinet form "case manager" box
                 await setDoc(doc(clientDb, 'users', `${trimmedFirst}`), {
@@ -136,12 +148,10 @@ const Page = () => {
                 // flag removed after guaranteed sign out
                 sessionStorage.removeItem('justSignedUp')
 
-                
-
                 // switches to login mode on re-render
-                setSignUp(false) 
+                setSignUp(false)
                 setFirstName('')
-                setLastName('') 
+                setLastName('')
                 setPassword('')
 
                 setError('Account created successfully! Please log in.')
@@ -181,12 +191,12 @@ const Page = () => {
                 const messages: Record<string, string> = {
                     'auth/invalid-credential':
                         'Incorrect Password. Please try again or reset password.',
-                    'auth/user-not-found': 'No user associated with email. Please create an account.',
+                    'auth/user-not-found':
+                        'No user associated with email. Please create an account.',
                     'auth/invalid-email': 'Invalid Email Address.',
                     'auth/too-many-requests':
                         'Too many login attempts. Please try again in 5 minutes.',
-                    'auth/missing-password':
-                        "Please enter a password.",
+                    'auth/missing-password': 'Please enter a password.',
                 }
 
                 const text = messages[error.code] ?? error.message
@@ -217,9 +227,9 @@ const Page = () => {
     }
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-white p-6 space-y-[12px]">
+        <div className="flex min-h-screen flex-col items-center justify-center space-y-[12px] bg-white p-6">
             <Image
-                src='/icv.png'
+                src="/icv.png"
                 alt="icv logo"
                 width={100}
                 height={100}
@@ -232,6 +242,9 @@ const Page = () => {
                       ? 'Sign Up'
                       : 'Login'}
             </h2>
+            {statusMessage && (
+                <p className="text-sm text-green-600">{statusMessage}</p>
+            )}
             {error && (
                 <p
                     className={`text-sm ${
