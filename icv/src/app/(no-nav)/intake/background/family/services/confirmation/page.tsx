@@ -61,16 +61,22 @@ const Page = () => {
         }))
         .filter((option) => option.value)
 
+    const defaultCaseManagerValue =
+        loadedForm.caseManager ?? user?.uid ?? user?.displayName ?? ''
+
     const selectedCaseManager =
         caseManagerOptions.find(
             (option) =>
-                option.value === loadedForm.caseManager ||
-                option.label === loadedForm.caseManager,
+                option.value === defaultCaseManagerValue ||
+                option.label === defaultCaseManagerValue,
         ) ??
-        (loadedForm.caseManager
+        (defaultCaseManagerValue
             ? {
-                  label: loadedForm.caseManager,
-                  value: loadedForm.caseManager,
+                  label:
+                      caseManagerOptions.find(
+                          (option) => option.value === defaultCaseManagerValue,
+                      )?.label ?? user?.displayName ?? defaultCaseManagerValue,
+                  value: defaultCaseManagerValue,
               }
             : undefined)
 
@@ -98,11 +104,11 @@ const Page = () => {
     useEffect(() => {
         if (user?.displayName) {
             updateForm({ assessingStaff: user.displayName })
-            if (!loadedForm.caseManager && user.uid) {
-                updateForm({ caseManager: user.uid })
+            if (!loadedForm.caseManager) {
+                updateForm({ caseManager: user.uid ?? user.displayName })
             }
         }
-    }, [user, loadedForm.caseManager])
+    }, [user, loadedForm.caseManager, updateForm])
 
     // tracks which sections are open/closed
     const [openSections, setOpenSections] = useState<Record<string, boolean>>(

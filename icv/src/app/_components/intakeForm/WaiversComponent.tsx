@@ -188,7 +188,7 @@ const WaiverSection: React.FC<Props> = ({
             if (!el) throw new Error('Form element not found')
             exportEl = el
 
-            const exportWidth = Math.max(el.scrollWidth, 1024)
+            const exportWidth = 794
             originalContainerStyles = {
                 width: el.style.width,
                 maxWidth: el.style.maxWidth,
@@ -259,7 +259,7 @@ const WaiverSection: React.FC<Props> = ({
                         orientation: 'portrait',
                     },
                     pagebreak: {
-                        mode: ['css', 'legacy'],
+                        mode: ['avoid-all', 'css', 'legacy'],
                         before: '.pdf-new-page',
                         avoid: '.pdf-keep-together',
                     },
@@ -330,6 +330,24 @@ const WaiverSection: React.FC<Props> = ({
             onSubmitEdit(finalData as NewClient)
         }
     }
+
+    const thirdPartiesValue = watch('thirdParties') ?? formType.thirdParties ?? ''
+    const disclosurePurposeValue =
+        watch('disclosurePurpose') ?? formType.disclosurePurpose ?? ''
+    const signDateValue = watch('signDate') ?? formType.signDate ?? ''
+
+    const renderExportTextField = (
+        value: string,
+        className: string,
+        minHeight: string,
+    ) => (
+        <div
+            className={`${className} whitespace-pre-wrap rounded border bg-white p-2 text-black`}
+            style={{ minHeight }}
+        >
+            {value.trim() ? value : 'N/A'}
+        </div>
+    )
 
     return (
         <form
@@ -486,8 +504,14 @@ const WaiverSection: React.FC<Props> = ({
                                 )}
                             </div>
                         ) : (
-                            <div id="formToExport" className="space-y-[24px]">
-                                <div className="pdf-keep-together flex flex-col space-y-[24px]">
+                            <div
+                                id="formToExport"
+                                className={`${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
+                            >
+                                <div
+                                    className={`pdf-keep-together flex flex-col ${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
+                                    style={{ breakInside: 'avoid-page' }}
+                                >
                                     <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
                                         Consent Form
                                     </label>
@@ -503,7 +527,9 @@ const WaiverSection: React.FC<Props> = ({
                                         services may include but are not limited
                                         to the following:
                                     </p>
-                                    <div className="flex flex-row items-center justify-center space-x-[60px]">
+                                    <div
+                                        className={`items-center justify-center ${isExporting ? 'flex flex-col gap-[16px]' : 'flex flex-row space-x-[60px]'}`}
+                                    >
                                         <ul className="list-disc space-y-[4px] pl-6">
                                             <li>Informal Case Management</li>
                                             <li>Shelter Support</li>
@@ -568,12 +594,19 @@ const WaiverSection: React.FC<Props> = ({
                                         )}
                                     </div>
                                 </div>
-                                <div className="pdf-new-page space-y-[60px]">
-                                    <div className="pdf-keep-together flex flex-col space-y-[24px]">
+                                <div
+                                    className={`pdf-new-page ${isExporting ? 'space-y-[32px]' : 'space-y-[60px]'}`}
+                                >
+                                    <div
+                                        className={`pdf-keep-together flex flex-col ${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
+                                        style={{ breakInside: 'avoid-page' }}
+                                    >
                                         <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
                                             Authorization to Release Information
                                         </label>
-                                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                        <div
+                                            className={`grid gap-y-3 ${isExporting ? 'grid-cols-1 gap-x-0' : 'grid-cols-2 gap-x-5'}`}
+                                        >
                                             <div className="flex flex-col space-y-1">
                                                 <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
                                                     Name
@@ -617,7 +650,10 @@ const WaiverSection: React.FC<Props> = ({
                                         </div>
                                     </div>
 
-                                    <div className="space-y-[24px]">
+                                    <div
+                                        className={`${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
+                                        style={{ breakInside: 'avoid-page' }}
+                                    >
                                         <p>
                                             I do herby consent the exchange of
                                             information and / or disclosure of
@@ -633,12 +669,22 @@ const WaiverSection: React.FC<Props> = ({
                                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                                 3rd Party Organization(s)
                                             </label>
-                                            <textarea
-                                                {...register('thirdParties')}
-                                                rows={3}
-                                                placeholder="Text"
-                                                className="w-full rounded border p-2"
-                                            />
+                                            {isExporting
+                                                ? renderExportTextField(
+                                                      thirdPartiesValue,
+                                                      'w-full',
+                                                      '92px',
+                                                  )
+                                                : (
+                                                      <textarea
+                                                          {...register(
+                                                              'thirdParties',
+                                                          )}
+                                                          rows={3}
+                                                          placeholder="Text"
+                                                          className="w-full rounded border p-2"
+                                                      />
+                                                  )}
                                         </div>
                                         <p>
                                             1440 E. Florence Ave Los Angeles, CA
@@ -646,21 +692,36 @@ const WaiverSection: React.FC<Props> = ({
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-col space-y-[12px]">
+                                    <div
+                                        className="flex flex-col space-y-[12px]"
+                                        style={{ breakInside: 'avoid-page' }}
+                                    >
                                         <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                             The disclosure of this information
                                             and records authorized herein is
                                             required for the following purpose:
                                         </label>
-                                        <textarea
-                                            {...register('disclosurePurpose')}
-                                            placeholder="Text"
-                                            rows={5}
-                                            className="w-full rounded border p-2"
-                                        />
+                                        {isExporting
+                                            ? renderExportTextField(
+                                                  disclosurePurposeValue,
+                                                  'w-full',
+                                                  '140px',
+                                              )
+                                            : (
+                                                  <textarea
+                                                      {...register(
+                                                          'disclosurePurpose',
+                                                      )}
+                                                      placeholder="Text"
+                                                      rows={5}
+                                                      className="w-full rounded border p-2"
+                                                  />
+                                              )}
                                     </div>
 
-                                    <div className="pdf-new-page space-y-[24px]">
+                                    <div
+                                        className={`pdf-new-page ${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
+                                    >
                                         <p>
                                             I have the right to revoke this
                                             authorization to release and/or
@@ -671,18 +732,30 @@ const WaiverSection: React.FC<Props> = ({
                                             photocopy or fax is considered as
                                             effective as the original.
                                         </p>
-                                        <div className="flex flex-col space-y-[12px]">
+                                        <div
+                                            className="flex flex-col space-y-[12px]"
+                                            style={{ breakInside: 'avoid-page' }}
+                                        >
                                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                                 Date
                                             </label>
-                                            <input
-                                                {...register('signDate')}
-                                                type="date"
-                                                placeholder="MM/DD/YYYY"
-                                                className="w-[30%] rounded border p-2"
-                                            />
+                                            {isExporting ? (
+                                                <div className="w-[30%] rounded border bg-white p-2 text-black">
+                                                    {signDateValue || 'N/A'}
+                                                </div>
+                                            ) : (
+                                                <input
+                                                    {...register('signDate')}
+                                                    type="date"
+                                                    placeholder="MM/DD/YYYY"
+                                                    className="w-[30%] rounded border p-2"
+                                                />
+                                            )}
                                         </div>
-                                        <div className="space-y-[12px]">
+                                        <div
+                                            className="space-y-[12px]"
+                                            style={{ breakInside: 'avoid-page' }}
+                                        >
                                             <label className="font-bold">
                                                 Client Signature
                                             </label>
@@ -704,7 +777,10 @@ const WaiverSection: React.FC<Props> = ({
                                                 />
                                             )}
                                         </div>
-                                        <div className="space-y-[12px]">
+                                        <div
+                                            className="space-y-[12px]"
+                                            style={{ breakInside: 'avoid-page' }}
+                                        >
                                             <label className="font-bold">
                                                 Guardian Signature
                                             </label>

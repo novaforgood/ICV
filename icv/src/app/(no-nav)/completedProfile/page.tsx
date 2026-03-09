@@ -77,13 +77,13 @@ const CompletedProfileContent = () => {
     }
 
     return (
-        <div className="flex min-h-screen flex-col bg-white">
+        <div className="flex min-h-[100dvh] flex-col bg-white">
             <div className="space-y-[24px] px-6 pt-6">
                 <button type="button" onClick={() => router.push('/')}>
                     {'<'} Back to dashboard
                 </button>
             </div>
-            <div className="flex flex-1 items-center justify-center px-6 pb-6 pt-10 sm:pt-6">
+            <div className="flex min-h-0 flex-1 items-center justify-center px-6 py-6">
                 <div className="w-full max-w-[800px] space-y-[48px]">
                     <div className="space-y-[24px]">
                         <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
