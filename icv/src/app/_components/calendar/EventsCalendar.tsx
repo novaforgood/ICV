@@ -231,7 +231,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
     useEffect(() => {
         const auth = getAuth()
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user?.displayName) setAssigneeId(user.displayName)
+            if (user?.uid) setAssigneeId(user.uid)
         })
         return () => unsubscribe()
     }, [])
