@@ -21,6 +21,7 @@ import {
 } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import SignatureCanvas from 'react-signature-canvas'
 import { TypeOf } from 'zod'
@@ -162,17 +163,56 @@ const WaiverSection: React.FC<Props> = ({
         name: string
         uri: string
     } | null> => {
+        let exportHost: HTMLDivElement | null = null
+
         try {
             setIsExporting(true)
-            await new Promise((resolve) =>
-                requestAnimationFrame(() => resolve(null)),
-            )
-            await new Promise((resolve) =>
-                requestAnimationFrame(() => resolve(null)),
-            )
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
 
             const el = document.getElementById('formToExport')
             if (!el) throw new Error('Form element not found')
+
+            const exportWidth = Math.max(el.scrollWidth, 1024)
+            const clonedEl = el.cloneNode(true) as HTMLElement
+            clonedEl.removeAttribute('id')
+
+            const originalFields = el.querySelectorAll<
+                HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+            >('input, textarea, select')
+            const clonedFields = clonedEl.querySelectorAll<
+                HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+            >('input, textarea, select')
+
+            originalFields.forEach((field, index) => {
+                const clonedField = clonedFields[index]
+                if (!clonedField) return
+
+                clonedField.value = field.value
+
+                if (
+                    field instanceof HTMLInputElement &&
+                    clonedField instanceof HTMLInputElement
+                ) {
+                    clonedField.checked = field.checked
+                }
+            })
+
+            clonedEl
+                .querySelectorAll('[data-html2canvas-ignore]')
+                .forEach((node: Element) => node.remove())
+
+            exportHost = document.createElement('div')
+            exportHost.setAttribute('aria-hidden', 'true')
+            exportHost.style.position = 'fixed'
+            exportHost.style.left = '-10000px'
+            exportHost.style.top = '0'
+            exportHost.style.width = `${exportWidth}px`
+            exportHost.style.padding = '24px'
+            exportHost.style.background = '#ffffff'
+            exportHost.style.zIndex = '-1'
+            exportHost.appendChild(clonedEl)
+            document.body.appendChild(exportHost)
 
             const today =
                 formType.signDate && formType.signDate != ''
@@ -189,7 +229,10 @@ const WaiverSection: React.FC<Props> = ({
                     html2canvas: {
                         scale: 3,
                         useCORS: true,
+                        scrollX: 0,
                         scrollY: 0,
+                        windowWidth: exportWidth,
+                        backgroundColor: '#ffffff',
                         ignoreElements: (element: Element) =>
                             element.hasAttribute('data-html2canvas-ignore'),
                         onclone: (clonedDoc: Document) => {
@@ -209,7 +252,7 @@ const WaiverSection: React.FC<Props> = ({
                         avoid: '.pdf-keep-together',
                     },
                 })
-                .from(el)
+                .from(exportHost)
                 .toPdf()
                 .output('blob')
 
@@ -227,6 +270,7 @@ const WaiverSection: React.FC<Props> = ({
             console.error('Export failed:', err)
             return null
         } finally {
+            exportHost?.remove()
             setShowExportOverlay(false)
             setIsExporting(false)
         }
@@ -266,7 +310,7 @@ const WaiverSection: React.FC<Props> = ({
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
-            {/* {showExportOverlay &&
+            {showExportOverlay &&
                 waiverMode === 'form' &&
                 typeof document !== 'undefined' &&
                 createPortal(
@@ -279,7 +323,7 @@ const WaiverSection: React.FC<Props> = ({
                         </p>
                     </div>,
                     document.body,
-                )} */}
+                )}
             <div className="mt-[24px] flex min-h-screen justify-center">
                 <div className="min-w-full space-y-[48px]">
                     <div className="flex flex-col space-y-[24px]">
@@ -485,14 +529,16 @@ const WaiverSection: React.FC<Props> = ({
                                             isExporting={isExporting}
                                         />
 
-                                        <SignaturePopup
-                                            data={formType}
-                                            fieldKey="clientSig1"
-                                            padRef={clientSig1}
-                                            updateForm={updateForm}
-                                            open={openSignature1}
-                                            setOpen={setOpenSignature1}
-                                        />
+                                        {!isExporting && (
+                                            <SignaturePopup
+                                                data={formType}
+                                                fieldKey="clientSig1"
+                                                padRef={clientSig1}
+                                                updateForm={updateForm}
+                                                open={openSignature1}
+                                                setOpen={setOpenSignature1}
+                                            />
+                                        )}
                                     </div>
                                 </div>
                                 <div className="pdf-new-page space-y-[60px]">
@@ -620,14 +666,16 @@ const WaiverSection: React.FC<Props> = ({
                                                 isExporting={isExporting}
                                             />
 
-                                            <SignaturePopup
-                                                data={formType}
-                                                fieldKey="clientSig2"
-                                                padRef={clientSig2}
-                                                updateForm={updateForm}
-                                                open={openSignature2}
-                                                setOpen={setOpenSignature2}
-                                            />
+                                            {!isExporting && (
+                                                <SignaturePopup
+                                                    data={formType}
+                                                    fieldKey="clientSig2"
+                                                    padRef={clientSig2}
+                                                    updateForm={updateForm}
+                                                    open={openSignature2}
+                                                    setOpen={setOpenSignature2}
+                                                />
+                                            )}
                                         </div>
                                         <div className="space-y-[12px]">
                                             <label className="font-bold">
@@ -640,14 +688,16 @@ const WaiverSection: React.FC<Props> = ({
                                                 isExporting={isExporting}
                                             />
 
-                                            <SignaturePopup
-                                                data={formType}
-                                                fieldKey="guardianSig"
-                                                padRef={guardianSig}
-                                                updateForm={updateForm}
-                                                open={openGuardianSig}
-                                                setOpen={setOpenGuardianSig}
-                                            />
+                                            {!isExporting && (
+                                                <SignaturePopup
+                                                    data={formType}
+                                                    fieldKey="guardianSig"
+                                                    padRef={guardianSig}
+                                                    updateForm={updateForm}
+                                                    open={openGuardianSig}
+                                                    setOpen={setOpenGuardianSig}
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                 </div>
