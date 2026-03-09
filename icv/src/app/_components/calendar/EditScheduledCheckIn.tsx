@@ -57,24 +57,25 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         if (selectedEvent) {
             const start = new Date(selectedEvent.start)
             const end = new Date(selectedEvent.end)
+            const clientId =
+                selectedEvent.clientDocId || selectedEvent.clientId || ''
+
             setDate(format(start, 'yyyy-MM-dd'))
             setStartTime(format(start, 'HH:mm'))
             setEndTime(format(end, 'HH:mm'))
             setLocation(selectedEvent.location || '')
             setContactType(selectedEvent.contactCode)
-            setSelectedClientDocId(selectedEvent.clientDocId)
+            setSelectedClientDocId(clientId)
             setAssigneeId(selectedEvent.assigneeId || selectedEvent.asigneeId || '')
 
             // Fetch client data asynchronously
             const fetchClient = async () => {
-                if (!selectedEvent.clientDocId) {
+                if (!clientId) {
                     setClient(null)
                     return
                 }
                 try {
-                    const clientData = await getClientById(
-                        selectedEvent.clientDocId,
-                    )
+                    const clientData = await getClientById(clientId)
                     if (clientData) {
                         setClient(clientData)
                         console.log('client updated:', clientData)
