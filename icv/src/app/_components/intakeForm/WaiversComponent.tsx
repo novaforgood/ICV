@@ -201,14 +201,6 @@ const WaiverSection: React.FC<Props> = ({
             const url = await getDownloadURL(fileRef)
             // const url = 'local-test' // placeholder when upload disabled for local testing
 
-            // Also trigger browser download for local save
-            const downloadUrl = URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = downloadUrl
-            a.download = filename
-            a.click()
-            URL.revokeObjectURL(downloadUrl)
-
             return { name: filename, uri: url }
         } catch (err) {
             console.error('Export failed:', err)
