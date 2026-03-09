@@ -52,8 +52,8 @@ const Page = () => {
     const isValidEmailDomain = (email: string) => {
         const allowedDomains = [
             '@icvcommunity.org',
-            '@gmail.com',
-            '@g.ucla.edu',
+            // '@gmail.com',
+            // '@g.ucla.edu',
         ]
         return allowedDomains.some((domain) =>
             email.toLowerCase().endsWith(domain),
