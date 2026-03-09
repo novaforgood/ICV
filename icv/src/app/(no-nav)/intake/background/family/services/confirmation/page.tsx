@@ -30,11 +30,6 @@ import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
 
-type CaseManagerOption = {
-    label: string
-    value: string
-}
-
 const Page = () => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
     type ConfirmType = TypeOf<typeof ConfirmationSchema>
@@ -54,31 +49,23 @@ const Page = () => {
     const [spouseInfo, setSpouseInfo] = useState<NewClient>({} as NewClient)
     const [users, setUsers] = useState<Users[]>([])
 
-    const caseManagerOptions: CaseManagerOption[] = users
+    const caseManagerOptions = users
         .map((staff) => ({
             label: staff.name,
             value: staff.uid ?? staff.id ?? '',
         }))
         .filter((option) => option.value)
 
-    const defaultCaseManagerValue =
-        loadedForm.caseManager ?? user?.uid ?? user?.displayName ?? ''
-
     const selectedCaseManager =
         caseManagerOptions.find(
             (option) =>
-                option.value === defaultCaseManagerValue ||
-                option.label === defaultCaseManagerValue,
-        ) ??
-        (defaultCaseManagerValue
-            ? {
-                  label:
-                      caseManagerOptions.find(
-                          (option) => option.value === defaultCaseManagerValue,
-                      )?.label ?? user?.displayName ?? defaultCaseManagerValue,
-                  value: defaultCaseManagerValue,
-              }
-            : undefined)
+                option.value === loadedForm.caseManager ||
+                option.label === loadedForm.caseManager,
+        )?.label ??
+        user?.displayName ??
+        ''
+
+    const caseManagerLabels = caseManagerOptions.map((option) => option.label)
 
     useEffect(() => {
         if (loadedForm.associatedSpouseID) {
@@ -96,8 +83,12 @@ const Page = () => {
             )
     }, [])
 
-    const handleCaseManagerChange = (value: CaseManagerOption | null) => {
-        updateForm({ caseManager: value?.value ?? '' })
+    const handleCaseManagerChange = (value: string | null) => {
+        const selectedOption = caseManagerOptions.find(
+            (option) => option.label === value,
+        )
+
+        updateForm({ caseManager: selectedOption?.value ?? value ?? '' })
     }
 
     // wait until after render (in case rendering occurs before user is async loaded)
@@ -152,10 +143,16 @@ const Page = () => {
                                     onChange={(_, newValue) =>
                                         handleCaseManagerChange(newValue)
                                     }
-                                    options={caseManagerOptions}
-                                    getOptionLabel={(option) => option.label}
-                                    isOptionEqualToValue={(option, value) =>
-                                        option.value === value.value
+                                    options={
+                                        selectedCaseManager &&
+                                        !caseManagerLabels.includes(
+                                            selectedCaseManager,
+                                        )
+                                            ? [
+                                                  selectedCaseManager,
+                                                  ...caseManagerLabels,
+                                              ]
+                                            : caseManagerLabels
                                     }
                                     filterOptions={(options, state) => {
                                         const input = state.inputValue
@@ -163,9 +160,7 @@ const Page = () => {
                                             .toLowerCase()
                                         if (!input) return options
                                         return options.filter((option) =>
-                                            option.label
-                                                .toLowerCase()
-                                                .includes(input),
+                                            option.toLowerCase().includes(input),
                                         )
                                     }}
                                     renderInput={(params) => (
