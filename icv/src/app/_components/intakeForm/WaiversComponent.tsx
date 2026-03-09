@@ -61,6 +61,7 @@ const WaiverSection: React.FC<Props> = ({
 
     const router = useRouter()
     const [isExporting, setIsExporting] = useState(false)
+    const [showExportOverlay, setShowExportOverlay] = useState(false)
     const [waiverMode, setWaiverMode] = useState<'form' | 'upload'>('form')
     const [waiverUploading, setWaiverUploading] = useState(false)
     const [openSignature1, setOpenSignature1] = useState(false)
@@ -164,6 +165,9 @@ const WaiverSection: React.FC<Props> = ({
     } | null> => {
         try {
             setIsExporting(true)
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+
             const el = document.getElementById('formToExport')
             if (!el) throw new Error('Form element not found')
 
@@ -179,7 +183,18 @@ const WaiverSection: React.FC<Props> = ({
                     margin: 1,
                     filename,
                     image: { type: 'jpeg', quality: 0.95 },
-                    html2canvas: { scale: 3, useCORS: true, scrollY: 0 },
+                    html2canvas: {
+                        scale: 3,
+                        useCORS: true,
+                        scrollY: 0,
+                        ignoreElements: (element: Element) =>
+                            element.hasAttribute('data-html2canvas-ignore'),
+                        onclone: (clonedDoc: Document) => {
+                            clonedDoc
+                                .querySelectorAll('[data-html2canvas-ignore]')
+                                .forEach((node: Element) => node.remove())
+                        },
+                    },
                     jsPDF: {
                         unit: 'in',
                         format: 'a4',
@@ -195,6 +210,8 @@ const WaiverSection: React.FC<Props> = ({
                 .toPdf()
                 .output('blob')
 
+            setShowExportOverlay(true)
+
             // Upload to Firebase Storage (comment out for local testing)
             const path = `waivers/${auth.currentUser?.uid ?? 'client'}/${crypto.randomUUID()}/${filename}`
             const fileRef = ref(storage, path)
@@ -207,6 +224,7 @@ const WaiverSection: React.FC<Props> = ({
             console.error('Export failed:', err)
             return null
         } finally {
+            setShowExportOverlay(false)
             setIsExporting(false)
         }
     }
@@ -245,7 +263,7 @@ const WaiverSection: React.FC<Props> = ({
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
-            {isExporting &&
+            {showExportOverlay &&
                 waiverMode === 'form' &&
                 typeof document !== 'undefined' &&
                 createPortal(
