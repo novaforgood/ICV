@@ -69,7 +69,7 @@ const CompletedProfileContent = () => {
     if (!createdClient) {
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                <p className="text-lg font-medium bg-white rounded-[5px] px-[20px] py-[16px]">
+                <p className="rounded-[5px] bg-white px-[20px] py-[16px] text-lg font-medium">
                     Creating Client...
                 </p>
             </div>
@@ -77,13 +77,13 @@ const CompletedProfileContent = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white">
-            <div className="px-6 pt-6 space-y-[24px]">
+        <div className="flex min-h-screen flex-col bg-white">
+            <div className="space-y-[24px] px-6 pt-6">
                 <button type="button" onClick={() => router.push('/')}>
                     {'<'} Back to dashboard
                 </button>
             </div>
-            <div className="flex min-h-[calc(100vh-72px)] items-start justify-center px-6 pb-6 pt-10 sm:items-center sm:pt-6">
+            <div className="flex flex-1 items-center justify-center px-6 pb-6 pt-10 sm:pt-6">
                 <div className="w-full max-w-[800px] space-y-[48px]">
                     <div className="space-y-[24px]">
                         <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
@@ -95,14 +95,7 @@ const CompletedProfileContent = () => {
                         </p>
                     </div>
                     <div className="flex flex-col justify-center gap-[24px] sm:flex-row">
-                        <div
-                            className={
-                                createdClient?.spouseClientStatus === 'Yes' &&
-                                !createdClient?.associatedSpouseID
-                                    ? 'w-full sm:w-[300px]'
-                                    : 'w-full sm:w-[400px]'
-                            }
-                        >
+                        <div className="w-full">
                             <button
                                 type="button"
                                 onClick={() => {
@@ -115,7 +108,7 @@ const CompletedProfileContent = () => {
                         </div>
                         {createdClient?.spouseClientStatus === 'Yes' &&
                             !createdClient?.associatedSpouseID && (
-                                <div className="w-full sm:w-[300px]">
+                                <div className="w-full">
                                     <button
                                         type="submit"
                                         onClick={onSubmit}

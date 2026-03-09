@@ -249,7 +249,10 @@ const WaiverSection: React.FC<Props> = ({
                 waiverMode === 'form' &&
                 typeof document !== 'undefined' &&
                 createPortal(
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div
+                        data-html2canvas-ignore="true"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                    >
                         <p className="rounded-[5px] bg-white px-[20px] py-[16px] text-lg font-medium">
                             Creating waiver...
                         </p>
