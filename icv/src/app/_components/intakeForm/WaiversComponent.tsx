@@ -21,7 +21,6 @@ import {
 } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import SignatureCanvas from 'react-signature-canvas'
 import { TypeOf } from 'zod'
@@ -165,8 +164,12 @@ const WaiverSection: React.FC<Props> = ({
     } | null> => {
         try {
             setIsExporting(true)
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
-            await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+            await new Promise((resolve) =>
+                requestAnimationFrame(() => resolve(null)),
+            )
+            await new Promise((resolve) =>
+                requestAnimationFrame(() => resolve(null)),
+            )
 
             const el = document.getElementById('formToExport')
             if (!el) throw new Error('Form element not found')
@@ -263,7 +266,7 @@ const WaiverSection: React.FC<Props> = ({
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
-            {showExportOverlay &&
+            {/* {showExportOverlay &&
                 waiverMode === 'form' &&
                 typeof document !== 'undefined' &&
                 createPortal(
@@ -276,7 +279,7 @@ const WaiverSection: React.FC<Props> = ({
                         </p>
                     </div>,
                     document.body,
-                )}
+                )} */}
             <div className="mt-[24px] flex min-h-screen justify-center">
                 <div className="min-w-full space-y-[48px]">
                     <div className="flex flex-col space-y-[24px]">
