@@ -78,11 +78,21 @@ export function SpontaneousCheckInModalContent() {
             )
             const end = new Date(roundedStart.getTime() + 15 * 60 * 1000)
 
+            const clientName =
+                selectedClient &&
+                `${selectedClient.firstName || ''} ${
+                    selectedClient.lastName || ''
+                }`.trim()
+            const clientCode = selectedClient?.clientCode ?? ''
+
             const newEvent: CheckInType & { clientId?: string } = {
                 startTime: roundedStart.toLocaleString('en-US'),
                 endTime: end.toLocaleString('en-US'),
                 assigneeId,
                 clientId: selectedClientDocId,
+                clientDocId: selectedClientDocId,
+                clientName,
+                clientCode,
                 category: category,
                 scheduled: false,
                 contactCode: ContactType.Values['Wellness Check'],
