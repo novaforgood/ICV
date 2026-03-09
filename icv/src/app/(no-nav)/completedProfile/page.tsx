@@ -77,14 +77,14 @@ const CompletedProfileContent = () => {
     }
 
     return (
-        <div className="fixed w-full bg-white">
-            <div className="ml-6 mt-6 space-y-[24px]">
+        <div className="min-h-screen bg-white">
+            <div className="px-6 pt-6 space-y-[24px]">
                 <button type="button" onClick={() => router.push('/')}>
                     {'<'} Back to dashboard
                 </button>
             </div>
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="min-w-[800px] space-y-[48px]">
+            <div className="flex min-h-[calc(100vh-72px)] items-center justify-center px-6 pb-6">
+                <div className="w-full max-w-[800px] space-y-[48px]">
                     <div className="space-y-[24px]">
                         <label className="block text-center font-['Epilogue'] text-[40px] font-bold leading-[56px] text-neutral-900">
                             Saved!
@@ -94,13 +94,13 @@ const CompletedProfileContent = () => {
                             &apos;s profile has been created.
                         </p>
                     </div>
-                    <div className="flex justify-center gap-[24px]">
+                    <div className="flex flex-col justify-center gap-[24px] sm:flex-row">
                         <div
                             className={
                                 createdClient?.spouseClientStatus === 'Yes' &&
                                 !createdClient?.associatedSpouseID
-                                    ? 'w-[300px]'
-                                    : 'w-[400px]'
+                                    ? 'w-full sm:w-[300px]'
+                                    : 'w-full sm:w-[400px]'
                             }
                         >
                             <button
@@ -115,7 +115,7 @@ const CompletedProfileContent = () => {
                         </div>
                         {createdClient?.spouseClientStatus === 'Yes' &&
                             !createdClient?.associatedSpouseID && (
-                                <div className="w-[300px]">
+                                <div className="w-full sm:w-[300px]">
                                     <button
                                         type="submit"
                                         onClick={onSubmit}
