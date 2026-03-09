@@ -137,7 +137,7 @@ const Page = () => {
                 )
 
                 //add username and email to collection to allow display on clinet form "case manager" box
-                await setDoc(doc(clientDb, 'users', `${trimmedFirst}`), {
+                await setDoc(doc(clientDb, 'users', user.uid), {
                     name: `${trimmedFirst} ${trimmedLast}`,
                     email: `${email}`,
                     uid: user.uid,

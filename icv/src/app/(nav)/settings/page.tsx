@@ -12,7 +12,7 @@ import {
     updateProfile,
     verifyBeforeUpdateEmail,
 } from 'firebase/auth'
-import { doc, setDoc } from 'firebase/firestore'
+import { collection, doc, getDocs, limit, query, setDoc, where } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -198,12 +198,45 @@ const SettingsPage = () => {
         setPreviewUrl(null)
     }
 
+    const upsertUserDirectoryEntry = async ({
+        firstName,
+        lastName,
+        email,
+        uid,
+        photoURL,
+    }: {
+        firstName: string
+        lastName: string
+        email: string
+        uid: string
+        photoURL: string
+    }) => {
+        const usersQuery = query(
+            collection(clientDb, 'users'),
+            where('uid', '==', uid),
+            limit(1),
+        )
+        const usersSnapshot = await getDocs(usersQuery)
+        const userDocRef =
+            usersSnapshot.docs[0]?.ref ?? doc(clientDb, 'users', uid)
+
+        await setDoc(userDocRef, {
+            name: `${firstName} ${lastName}`,
+            email,
+            uid,
+            photoURL,
+        })
+    }
+
     const completeEmailChangeFlow = async (currentEmail: string) => {
-        await setDoc(doc(clientDb, 'users', `${formData.firstName}`), {
-            name: `${formData.firstName} ${formData.lastName}`,
+        if (!user) return
+
+        await upsertUserDirectoryEntry({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
             email: currentEmail,
-            uid: user?.uid,
-            photoURL: user?.photoURL || '',
+            uid: user.uid,
+            photoURL: user.photoURL || '',
         })
 
         clearPendingImageState()
@@ -264,8 +297,9 @@ const SettingsPage = () => {
             }
 
             //add username and email to collection to allow display on client form "case manager" box
-            await setDoc(doc(clientDb, 'users', `${formData.firstName}`), {
-                name: `${formData.firstName} ${formData.lastName}`,
+            await upsertUserDirectoryEntry({
+                firstName: formData.firstName,
+                lastName: formData.lastName,
                 email: trimmedEmail,
                 uid: user.uid,
                 photoURL: photoURL || '',
