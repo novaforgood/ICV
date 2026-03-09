@@ -5,11 +5,18 @@ import { useUser } from '@/hooks/useUser'
 import { getCroppedImg } from '@/utils/cropImage'
 import { deleteCookie } from 'cookies-next'
 import { FirebaseError } from 'firebase/app'
-import { signOut, updateProfile, verifyBeforeUpdateEmail } from 'firebase/auth'
+import {
+    EmailAuthProvider,
+    reauthenticateWithCredential,
+    signOut,
+    updateProfile,
+    verifyBeforeUpdateEmail,
+} from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import Cropper, { Area } from 'react-easy-crop'
 import { FiEdit2, FiGlobe, FiMail } from 'react-icons/fi'
 
@@ -53,6 +60,11 @@ const SettingsPage = () => {
     const [showSuccess, setShowSuccess] = useState(false)
     const [saveError, setSaveError] = useState('')
     const [changePassword, setChangePassword] = useState(false)
+    const [pendingEmailChange, setPendingEmailChange] = useState('')
+    const [showReauthModal, setShowReauthModal] = useState(false)
+    const [reauthPassword, setReauthPassword] = useState('')
+    const [reauthError, setReauthError] = useState('')
+    const [isReauthenticating, setIsReauthenticating] = useState(false)
     const [cropImageSrc, setCropImageSrc] = useState<string | null>(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
@@ -178,6 +190,38 @@ const SettingsPage = () => {
         }))
     }
 
+    const clearPendingImageState = () => {
+        setImageFile(null)
+        if (previewUrl?.startsWith('blob:')) {
+            URL.revokeObjectURL(previewUrl)
+        }
+        setPreviewUrl(null)
+    }
+
+    const completeEmailChangeFlow = async (currentEmail: string) => {
+        await setDoc(doc(clientDb, 'users', `${formData.firstName}`), {
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: currentEmail,
+            uid: user?.uid,
+        })
+
+        clearPendingImageState()
+        sessionStorage.setItem(
+            'postLogoutMessage',
+            'Check your new email to verify the change, then sign in again.',
+        )
+        await signOut(auth)
+        deleteCookie('idToken', { path: '/' })
+        router.push('/login')
+    }
+
+    const closeReauthModal = () => {
+        setShowReauthModal(false)
+        setPendingEmailChange('')
+        setReauthPassword('')
+        setReauthError('')
+    }
+
     const handleSave = async () => {
         if (!user || isSaving) return
 
@@ -212,36 +256,37 @@ const SettingsPage = () => {
             }
 
             console.log('user name stored: ', auth.currentUser?.displayName)
-            //add username and email to collection to allow display on client form "case manager" box
-            await setDoc(doc(clientDb, 'users', `${formData.firstName}`), {
-                name: `${formData.firstName} ${formData.lastName}`,
-                email: emailChanged ? user.email || '' : trimmedEmail,
-                uid: user.uid,
-            })
-
-            // Clear the image file and preview after successful upload
-            setImageFile(null)
-            if (previewUrl?.startsWith('blob:')) {
-                URL.revokeObjectURL(previewUrl)
-            }
-            setPreviewUrl(null)
 
             if (emailChanged) {
-                sessionStorage.setItem(
-                    'postLogoutMessage',
-                    'Check your new email to verify the change, then sign in again.',
-                )
-                await signOut(auth)
-                deleteCookie('idToken', { path: '/' })
-                router.push('/login')
+                await completeEmailChangeFlow(user.email || '')
                 return
             }
 
+            //add username and email to collection to allow display on client form "case manager" box
+            await setDoc(doc(clientDb, 'users', `${formData.firstName}`), {
+                name: `${formData.firstName} ${formData.lastName}`,
+                email: trimmedEmail,
+                uid: user.uid,
+            })
+
+            clearPendingImageState()
             setShowSuccess(true)
             setIsEditing(false)
         } catch (error) {
             console.error('Error updating profile:', error)
             if (error instanceof FirebaseError) {
+                if (
+                    error.code === 'auth/requires-recent-login' &&
+                    emailChanged
+                ) {
+                    setPendingEmailChange(trimmedEmail)
+                    setReauthPassword('')
+                    setReauthError('')
+                    setSaveError('')
+                    setShowReauthModal(true)
+                    return
+                }
+
                 const messages: Record<string, string> = {
                     'auth/requires-recent-login':
                         'Please log in again before changing your email.',
@@ -263,9 +308,54 @@ const SettingsPage = () => {
         }
     }
 
+    const handleReauthenticate = async () => {
+        if (!user || !user.email || !pendingEmailChange || !reauthPassword) {
+            setReauthError('Enter your current password to continue.')
+            return
+        }
+
+        setIsReauthenticating(true)
+        setReauthError('')
+
+        try {
+            const credential = EmailAuthProvider.credential(
+                user.email,
+                reauthPassword,
+            )
+            await reauthenticateWithCredential(user, credential)
+            await verifyBeforeUpdateEmail(user, pendingEmailChange)
+            closeReauthModal()
+            await completeEmailChangeFlow(user.email || '')
+        } catch (error) {
+            console.error('Error reauthenticating user:', error)
+            if (error instanceof FirebaseError) {
+                const messages: Record<string, string> = {
+                    'auth/invalid-credential':
+                        'Incorrect password. Please try again.',
+                    'auth/wrong-password':
+                        'Incorrect password. Please try again.',
+                    'auth/too-many-requests':
+                        'Too many attempts. Please wait a few minutes and try again.',
+                    'auth/email-already-in-use':
+                        'That email address is already in use.',
+                    'auth/invalid-email': 'Please enter a valid email address.',
+                }
+
+                setReauthError(messages[error.code] ?? error.message)
+            } else if (error instanceof Error) {
+                setReauthError(error.message)
+            } else {
+                setReauthError('Unable to verify your password right now.')
+            }
+        } finally {
+            setIsReauthenticating(false)
+        }
+    }
+
     const handleCancel = () => {
         setIsEditing(false)
         setSaveError('')
+        closeReauthModal()
         // Reset form data
         if (user) {
             const [firstName, ...rest] = (user.displayName || '').split(' ')
@@ -276,14 +366,10 @@ const SettingsPage = () => {
                 password: '********',
             })
         }
-        if (previewUrl?.startsWith('blob:')) {
-            URL.revokeObjectURL(previewUrl)
-        }
         if (cropImageSrc) {
             URL.revokeObjectURL(cropImageSrc)
         }
-        setPreviewUrl(null)
-        setImageFile(null)
+        clearPendingImageState()
         setCropImageSrc(null)
         setCrop({ x: 0, y: 0 })
         setZoom(1)
@@ -302,6 +388,85 @@ const SettingsPage = () => {
                     </Card>
                 </div>
             )}
+            {showReauthModal &&
+                createPortal(
+                    <div
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+                        onClick={closeReauthModal}
+                    >
+                        <Card
+                            className="relative w-full max-w-md rounded-lg bg-white p-0 shadow-lg"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                type="button"
+                                onClick={closeReauthModal}
+                                disabled={isReauthenticating}
+                                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center text-gray-500 disabled:opacity-50"
+                                aria-label="Close"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="24"
+                                    height="24"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M18 6 6 18" />
+                                    <path d="m6 6 12 12" />
+                                </svg>
+                            </button>
+                            <div className="flex w-full flex-col space-y-[24px] p-[36px]">
+                                <h2 className="text-center text-[24px] font-[600]">
+                                    Confirm Your Password
+                                </h2>
+                                <p className="text-center text-[16px] text-gray-600">
+                                    Enter your current password to continue
+                                    changing your email to {pendingEmailChange}.
+                                </p>
+                                <div>
+                                    <input
+                                        type="password"
+                                        value={reauthPassword}
+                                        onChange={(e) =>
+                                            setReauthPassword(e.target.value)
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                void handleReauthenticate()
+                                            }
+                                        }}
+                                        className="w-full rounded-md border border-gray-300 px-3 py-2"
+                                        placeholder="Current password"
+                                        autoFocus
+                                    />
+                                    {reauthError && (
+                                        <p className="mt-2 text-sm text-red-500">
+                                            {reauthError}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="flex justify-center gap-[12px]">
+                                    <button
+                                        type="button"
+                                        onClick={() => void handleReauthenticate()}
+                                        disabled={isReauthenticating}
+                                        className="rounded-md bg-[#4EA0C9] px-4 py-2 text-white disabled:opacity-50"
+                                    >
+                                        {isReauthenticating
+                                            ? 'Verifying...'
+                                            : 'Continue'}
+                                    </button>
+                                </div>
+                            </div>
+                        </Card>
+                    </div>,
+                    document.body,
+                )}
             {cropImageSrc && (
                 <div className="fixed inset-0 z-50 flex flex-col bg-black">
                     <div className="relative flex-1">
@@ -343,25 +508,8 @@ const SettingsPage = () => {
                         <h2 className="mb-2 font-bold uppercase tracking-wider text-gray-400">
                             Profile
                         </h2>
-                        <div className="flex gap-2">
-                            {isEditing ? (
-                                <>
-                                    <button
-                                        onClick={handleSave}
-                                        disabled={isSaving}
-                                        className="flex items-center gap-2 rounded-md bg-blue px-4 py-2 text-white disabled:opacity-50"
-                                    >
-                                        {isSaving ? 'Saving...' : 'Save'}
-                                    </button>
-                                    <button
-                                        onClick={handleCancel}
-                                        disabled={isSaving}
-                                        className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-white disabled:opacity-50"
-                                    >
-                                        Cancel
-                                    </button>
-                                </>
-                            ) : (
+                        <div>
+                            {!isEditing && (
                                 <button
                                     onClick={() => setIsEditing(true)}
                                     className="flex items-center gap-2 rounded-md bg-black px-4 py-2 text-white"
@@ -447,6 +595,46 @@ const SettingsPage = () => {
                     </div>
                 </div>
             </div>
+            {isEditing && (
+                <div className="mb-12 flex justify-start space-x-[24px]">
+                    <button
+                        onClick={handleSave}
+                        disabled={isSaving}
+                        className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95] disabled:opacity-50"
+                    >
+                        <div className="flex flex-row space-x-[8px]">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="20px"
+                                viewBox="0 -960 960 960"
+                                width="20px"
+                                fill="#FFFFFF"
+                            >
+                                <path d="M389-267 195-460l51-52 143 143 325-324 51 51-376 375Z" />
+                            </svg>
+                            {isSaving ? 'Saving...' : 'Save'}
+                        </div>
+                    </button>
+                    <button
+                        onClick={handleCancel}
+                        disabled={isSaving}
+                        className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F] disabled:opacity-50"
+                    >
+                        <div className="flex flex-row space-x-[8px]">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="20px"
+                                viewBox="0 -960 960 960"
+                                width="20px"
+                                fill="#FFFFFF"
+                            >
+                                <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
+                            </svg>
+                            Cancel
+                        </div>
+                    </button>
+                </div>
+            )}
             <div className="mb-12">
                 <h2 className="mb-4 font-bold uppercase tracking-wider text-gray-400">
                     FAQ
