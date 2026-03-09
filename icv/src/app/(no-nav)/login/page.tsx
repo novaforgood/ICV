@@ -90,6 +90,7 @@ const Page = () => {
         if (loading) return // Prevent multiple submissions
         setLoading(true)
         setError('')
+        let pending2FASignIn = false
 
         // Validate email domain
         if (!isValidEmailDomain(email)) {
@@ -140,6 +141,7 @@ const Page = () => {
                     name: `${trimmedFirst} ${trimmedLast}`,
                     email: `${email}`,
                     uid: user.uid,
+                    photoURL: user.photoURL || '',
                 })
 
                 // force sign out to prevent user from being signed in automatically
@@ -156,35 +158,49 @@ const Page = () => {
 
                 setError('Account created successfully! Please log in.')
             } else {
+                if (!canCall2FA()) {
+                    const remainingTime = Math.ceil(
+                        (5000 - (Date.now() - last2FACall)) / 1000,
+                    )
+                    setError(
+                        `Please wait ${remainingTime} seconds before requesting another 2FA code.`,
+                    )
+                    return
+                }
+
+                // Mark the login as pending 2FA before Firebase auth changes.
+                sessionStorage.setItem('pending2fa', '1')
+
                 // First authenticate with Firebase
                 const usercred = await signInWithEmailAndPassword(
                     auth,
                     email,
                     password,
                 )
+                pending2FASignIn = true
                 const user = usercred.user
                 if (user) {
-                    // Check if enough time has passed since last 2FA call (5 secs)
-                    if (!canCall2FA()) {
-                        const remainingTime = Math.ceil(
-                            (5000 - (Date.now() - last2FACall)) / 1000,
-                        )
-                        setError(
-                            `Please wait ${remainingTime} seconds before requesting another 2FA code.`,
-                        )
-                        return
-                    }
-
                     // Start 2FA process, temporarily store email and pw in session storage
                     sessionStorage.setItem('2fa-email', email)
                     sessionStorage.setItem('2fa-pw', password)
                     setLast2FACall(Date.now()) // Record the time of this 2FA call
                     await start2FA(email || '')
+
+                    // Do not leave a Firebase session active before 2FA completes.
+                    await signOut(auth)
+                    pending2FASignIn = false
                     router.push('/2fa')
-                    // router.push('/')
                 }
             }
         } catch (err) {
+            sessionStorage.removeItem('pending2fa')
+            sessionStorage.removeItem('2fa-email')
+            sessionStorage.removeItem('2fa-pw')
+
+            if (pending2FASignIn) {
+                await signOut(auth)
+            }
+
             if (err instanceof Error) {
                 const error = err as FirebaseError
 

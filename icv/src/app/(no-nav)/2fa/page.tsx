@@ -54,6 +54,7 @@ const TwoFactorAuthContent = () => {
             const usercred = await signInWithEmailAndPassword(auth, email, pw)
             const user = usercred.user
             if (user) {
+                sessionStorage.removeItem('pending2fa')
                 sessionStorage.removeItem('2fa-pw')
                 sessionStorage.removeItem('2fa-email')
                 // Set cookie
@@ -84,6 +85,7 @@ const TwoFactorAuthContent = () => {
     // Handle back to login
     const handleBackToLogin = async () => {
         // Clear any pending 2FA credentials
+        sessionStorage.removeItem('pending2fa')
         sessionStorage.removeItem('2fa-email')
         sessionStorage.removeItem('2fa-pw')
 

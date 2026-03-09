@@ -203,6 +203,7 @@ const SettingsPage = () => {
             name: `${formData.firstName} ${formData.lastName}`,
             email: currentEmail,
             uid: user?.uid,
+            photoURL: user?.photoURL || '',
         })
 
         clearPendingImageState()
@@ -267,6 +268,7 @@ const SettingsPage = () => {
                 name: `${formData.firstName} ${formData.lastName}`,
                 email: trimmedEmail,
                 uid: user.uid,
+                photoURL: photoURL || '',
             })
 
             clearPendingImageState()

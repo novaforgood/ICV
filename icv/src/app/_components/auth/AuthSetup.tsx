@@ -21,9 +21,16 @@ const AuthSetup = () => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
+                const pending2FA = sessionStorage.getItem('pending2fa')
+
                 // prevents setting cookie or redirect if user just created an account
                 // this is done to enforce proper 2FA flow after account creation
                 if (pathname === '/login' && sessionStorage.getItem('justSignedUp')) {
+                    return
+                }
+
+                // During the login -> 2FA handoff, do not persist auth yet.
+                if (pending2FA) {
                     return
                 }
 
