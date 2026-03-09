@@ -63,9 +63,10 @@ const ProfileSection: React.FC<Props> = ({
     useEffect(() => {
         if (spouseID) {
             setValue('associatedSpouseID', spouseID)
+            updateForm({ associatedSpouseID: spouseID })
         }
         console.log(spouseID)
-    }, [spouseID])
+    }, [spouseID, setValue, updateForm])
 
     useEffect(() => {
         const unsubscribe = watch((data) => {
