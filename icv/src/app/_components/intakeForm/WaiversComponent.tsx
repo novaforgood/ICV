@@ -163,7 +163,21 @@ const WaiverSection: React.FC<Props> = ({
         name: string
         uri: string
     } | null> => {
-        let exportHost: HTMLDivElement | null = null
+        let exportEl: HTMLElement | null = null
+        let originalContainerStyles: {
+            width: string
+            maxWidth: string
+            margin: string
+            backgroundColor: string
+        } | null = null
+        let originalFieldStyles: Array<{
+            field: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+            backgroundColor: string
+            color: string
+            appearance: string
+            webkitAppearance: string
+            boxShadow: string
+        }> = []
 
         try {
             setIsExporting(true)
@@ -172,49 +186,42 @@ const WaiverSection: React.FC<Props> = ({
 
             const el = document.getElementById('formToExport')
             if (!el) throw new Error('Form element not found')
+            exportEl = el
 
             const exportWidth = Math.max(el.scrollWidth, 1024)
-            const clonedEl = el.cloneNode(true) as HTMLElement
-            clonedEl.removeAttribute('id')
+            originalContainerStyles = {
+                width: el.style.width,
+                maxWidth: el.style.maxWidth,
+                margin: el.style.margin,
+                backgroundColor: el.style.backgroundColor,
+            }
+            const originalFields = Array.from(
+                el.querySelectorAll<
+                    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+                >('input, textarea, select'),
+            )
+            originalFieldStyles = originalFields.map((field) => ({
+                field,
+                backgroundColor: field.style.backgroundColor,
+                color: field.style.color,
+                appearance: field.style.appearance,
+                webkitAppearance: field.style.webkitAppearance,
+                boxShadow: field.style.boxShadow,
+            }))
 
-            const originalFields = el.querySelectorAll<
-                HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-            >('input, textarea, select')
-            const clonedFields = clonedEl.querySelectorAll<
-                HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-            >('input, textarea, select')
+            el.style.width = `${exportWidth}px`
+            el.style.maxWidth = 'none'
+            el.style.margin = '0 auto'
+            el.style.backgroundColor = '#ffffff'
 
-            originalFields.forEach((field, index) => {
-                const clonedField = clonedFields[index]
-                if (!clonedField) return
-
-                clonedField.value = field.value
-
-                if (
-                    field instanceof HTMLInputElement &&
-                    clonedField instanceof HTMLInputElement
-                ) {
-                    clonedField.checked = field.checked
-                }
+            originalFields.forEach((field) => {
+                field.style.backgroundColor = '#ffffff'
+                field.style.color = '#000000'
+                field.style.appearance = 'none'
+                field.style.webkitAppearance = 'none'
+                field.style.boxShadow = 'none'
             })
 
-            clonedEl
-                .querySelectorAll('[data-html2canvas-ignore]')
-                .forEach((node: Element) => node.remove())
-
-            exportHost = document.createElement('div')
-            exportHost.setAttribute('aria-hidden', 'true')
-            exportHost.style.position = 'absolute'
-            exportHost.style.left = '0'
-            exportHost.style.top = '0'
-            exportHost.style.width = `${exportWidth}px`
-            exportHost.style.padding = '24px'
-            exportHost.style.background = '#ffffff'
-            exportHost.style.pointerEvents = 'none'
-            exportHost.style.overflow = 'hidden'
-            exportHost.style.zIndex = '-1'
-            exportHost.appendChild(clonedEl)
-            document.body.appendChild(exportHost)
             await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
             await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
 
@@ -235,6 +242,7 @@ const WaiverSection: React.FC<Props> = ({
                         useCORS: true,
                         scrollX: 0,
                         scrollY: 0,
+                        width: exportWidth,
                         windowWidth: exportWidth,
                         backgroundColor: '#ffffff',
                         ignoreElements: (element: Element) =>
@@ -256,7 +264,7 @@ const WaiverSection: React.FC<Props> = ({
                         avoid: '.pdf-keep-together',
                     },
                 })
-                .from(clonedEl)
+                .from(el)
                 .toPdf()
                 .output('blob')
 
@@ -274,7 +282,22 @@ const WaiverSection: React.FC<Props> = ({
             console.error('Export failed:', err)
             return null
         } finally {
-            exportHost?.remove()
+            if (exportEl && originalContainerStyles) {
+                exportEl.style.width = originalContainerStyles.width
+                exportEl.style.maxWidth = originalContainerStyles.maxWidth
+                exportEl.style.margin = originalContainerStyles.margin
+                exportEl.style.backgroundColor =
+                    originalContainerStyles.backgroundColor
+            }
+
+            originalFieldStyles.forEach(({ field, ...styles }) => {
+                field.style.backgroundColor = styles.backgroundColor
+                field.style.color = styles.color
+                field.style.appearance = styles.appearance
+                field.style.webkitAppearance = styles.webkitAppearance
+                field.style.boxShadow = styles.boxShadow
+                })
+
             setShowExportOverlay(false)
             setIsExporting(false)
         }
