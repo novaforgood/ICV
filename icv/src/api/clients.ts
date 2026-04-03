@@ -32,6 +32,28 @@ interface ClientWithLastCheckin extends NewClient {
     lastCheckinDate?: string;
 }
 
+async function getUserNameMap(ssrdb: ReturnType<typeof getFirestore>) {
+    const usersSnapshot = await getDocs(collection(ssrdb, 'users'))
+    return new Map(
+        usersSnapshot.docs
+            .map((doc) => doc.data() as Users)
+            .map((user) => [user.uid, user.name] as const)
+            .filter(([uid, name]) => Boolean(uid && name)),
+    )
+}
+
+function withCaseManagerName<T extends NewClient>(
+    client: T,
+    userNameMap: Map<string | undefined, string>,
+): T {
+    if (!client.caseManager) return client
+
+    return {
+        ...client,
+        caseManager: userNameMap.get(client.caseManager) ?? client.caseManager,
+    }
+}
+
 export async function start2FA(email: string) {
     const ssrdb = await getAdminFirestore();
 
@@ -100,13 +122,14 @@ export async function getAllClients(): Promise<NewClient[]> {
         throw new Error('User not found')
     }
     const ssrdb = getFirestore(firebaseServerApp)
+    const userNameMap = await getUserNameMap(ssrdb)
 
     const clientsCollection = collection(ssrdb, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
     const clientsList = clientsSnapshot.docs.map((doc) => {//returns array of client objects by applying arrow function to docs snapshot
         const data = doc.data() as NewClient
         data.docId = doc.id
-        return data
+        return withCaseManagerName(data, userNameMap)
     })
     return clientsList
 }
@@ -168,8 +191,9 @@ export async function getClientByCaseManager(): Promise<ClientWithLastCheckin[]>
         throw new Error('User not found')
     }
     const ssrdb = getFirestore(firebaseServerApp)
+    const userNameMap = await getUserNameMap(ssrdb)
 
-    const caseManagerId = currentUser.displayName
+    const caseManagerId = currentUser.uid
 
     const clientsCollection = collection(ssrdb, 'clients')
     const clientsQuery = query(clientsCollection, where('caseManager', '==', caseManagerId))
@@ -178,7 +202,7 @@ export async function getClientByCaseManager(): Promise<ClientWithLastCheckin[]>
         const data = doc.data() as NewClient;
         data.id = doc.id;
         data.docId = doc.id;
-        return data;
+        return withCaseManagerName(data, userNameMap);
     });
 
     // Get the latest event date for each client
@@ -248,6 +272,7 @@ export async function getAllClientsByLastCheckinDate(): Promise<ClientWithLastCh
         throw new Error('User not found')
     }
     const ssrdb = getFirestore(firebaseServerApp)
+    const userNameMap = await getUserNameMap(ssrdb)
 
     const clientsCollection = collection(ssrdb, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
@@ -255,7 +280,7 @@ export async function getAllClientsByLastCheckinDate(): Promise<ClientWithLastCh
         const data = doc.data() as NewClient;
         data.id = doc.id;
         data.docId = doc.id;
-        return data;
+        return withCaseManagerName(data, userNameMap);
     });
 
     // Get the latest event date for each client
@@ -311,6 +336,7 @@ export async function getRecentClients(): Promise<NewClient[]> {
     }
 
     const ssrdb = getFirestore(firebaseServerApp);
+    const userNameMap = await getUserNameMap(ssrdb);
     const clientsCollection = collection(ssrdb, 'clients');
     const clientsSnapshot = await getDocs(clientsCollection);
 
@@ -318,7 +344,7 @@ export async function getRecentClients(): Promise<NewClient[]> {
         .map((doc) => {
             const data = doc.data() as NewClient;
             data.docId = doc.id;
-            return data;
+            return withCaseManagerName(data, userNameMap);
         })
         .filter((client) => client.intakeDate) // Ensure intakeDate exists
         .sort((a, b) => {

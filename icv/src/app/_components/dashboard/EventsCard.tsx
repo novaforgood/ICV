@@ -1,10 +1,12 @@
 //for use in client profile checkins tab (sorts by client id) as well as Home Dashboard page (sorts by specific date)
+import { getAllUsers } from '@/api/clients'
 import { Card } from '@/components/ui/card'
-import { useUser } from '@/hooks/useUser'
 import { CheckInType } from '@/types/event-types'
+import { Users } from '@/types/user-types'
 import { format, isValid } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import useSWR from 'swr'
 import categoryColors from '../categoryColors'
 
 interface EventCardProps {
@@ -19,7 +21,7 @@ const EventsCard: React.FC<EventCardProps> = ({
     variant = 'default',
 }) => {
     const router = useRouter()
-    const { user } = useUser()
+    const { data: users } = useSWR<Users[]>('users', getAllUsers)
 
     const eventDate = new Date(event.startTime)
     const startTime = eventDate.getTime()
@@ -31,10 +33,18 @@ const EventsCard: React.FC<EventCardProps> = ({
                 event.asigneeId ??
                 '',
         ) || '-'
+    const assigneeUser = users?.find(
+        (staff) =>
+            staff.uid === eventAssignee ||
+            staff.id === eventAssignee ||
+            staff.name === eventAssignee,
+    )
+    const assigneeDisplayName = assigneeUser?.name ?? eventAssignee
     const eventCategory = String(event.contactCode) || ''
     const clientName = String(event.clientName ?? '') || '-'
     const clientCode = String(event.clientCode ?? '') || '-'
     const colorClass = categoryColors[String(event.contactCode)]
+    const assigneePhotoURL = assigneeUser?.photoURL || '/icv.png'
 
     // Handle card click to navigate to event details
     const handleCardClick = () => {
@@ -76,12 +86,12 @@ const EventsCard: React.FC<EventCardProps> = ({
                 </div>
                 <div className="flex min-w-0 items-center gap-2 overflow-hidden">
                     <img
-                        src={user?.photoURL || '/icv.png'}
+                        src={assigneePhotoURL}
                         alt="assignee"
                         className="h-8 w-8 shrink-0 rounded-full"
                     />
                     <span className="min-w-0 truncate text-sm">
-                        {eventAssignee}
+                        {assigneeDisplayName}
                     </span>
                 </div>
             </div>

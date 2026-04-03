@@ -4,13 +4,13 @@ import { persist } from 'zustand/middleware'
 
 export type State = {
     form: Partial<NewClient>
- }
+}
  
  
  export type Actions = {
     updateForm: (form: Partial<NewClient>) => void
     clearForm: () => void
- }
+}
  
  
  export const useIntakeFormStore = create<State & Actions>()(

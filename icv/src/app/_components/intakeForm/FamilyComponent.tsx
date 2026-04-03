@@ -1,6 +1,7 @@
 'use client'
 
 import { getClientById } from '@/api/clients'
+import { updateClient } from '@/api/make-cases/make-case'
 import {
     FamilySchema,
     GENDER,
@@ -722,7 +723,7 @@ export const FamilySection: React.FC<Props> = ({
                                                     </button>
                                                 </div>
                                                 <ClientSearch
-                                                    onSelect={(docId) => {
+                                                    onSelect={async (docId) => {
                                                         manualUpdateRef.current =
                                                             false
                                                         setValue(
@@ -733,6 +734,25 @@ export const FamilySection: React.FC<Props> = ({
                                                             associatedSpouseID:
                                                                 docId,
                                                         })
+                                                        const currentClientDocId =
+                                                            formType.docId
+
+                                                        if (currentClientDocId) {
+                                                            try {
+                                                                await updateClient(
+                                                                    docId,
+                                                                    {
+                                                                        associatedSpouseID:
+                                                                            currentClientDocId,
+                                                                    },
+                                                                )
+                                                            } catch (error) {
+                                                                console.error(
+                                                                    'Error linking spouse profile:',
+                                                                    error,
+                                                                )
+                                                            }
+                                                        }
                                                         setShowSpouseSearch(
                                                             false,
                                                         )

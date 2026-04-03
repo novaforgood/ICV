@@ -71,10 +71,28 @@ export function SpontaneousCheckInModalContent() {
     const handleSubmit = async () => {
         try {
             setSubmitting(true)
+            const now = new Date()
+            const intervalMs = 5 * 60 * 1000
+            const roundedStart = new Date(
+                Math.round(now.getTime() / intervalMs) * intervalMs,
+            )
+            const end = new Date(roundedStart.getTime() + 15 * 60 * 1000)
+
+            const clientName: string | undefined = selectedClient
+                ? `${selectedClient.firstName || ''} ${
+                      selectedClient.lastName || ''
+                  }`.trim()
+                : undefined
+            const clientCode = selectedClient?.clientCode ?? ''
+
             const newEvent: CheckInType & { clientId?: string } = {
-                startTime: new Date().toLocaleString('en-US'),
+                startTime: roundedStart.toLocaleString('en-US'),
+                endTime: end.toLocaleString('en-US'),
                 assigneeId,
                 clientId: selectedClientDocId,
+                clientDocId: selectedClientDocId,
+                clientName,
+                clientCode,
                 category: category,
                 scheduled: false,
                 contactCode: ContactType.Values['Wellness Check'],

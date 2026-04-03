@@ -1,11 +1,12 @@
 'use client'
 
-import { getAllClients, getClientById, getUsersCollection } from '@/api/clients'
+import { getAllClients, getAllUsers, getClientById } from '@/api/clients'
 import { deleteCheckIn, updateCheckIn } from '@/api/events'
 import DeleteConfirmDialog from '@/app/_components/DeleteConfirmDialog'
 import { Card } from '@/components/ui/card'
 import { NewClient } from '@/types/client-types'
 import { CheckInType, ContactType } from '@/types/event-types'
+import { Users } from '@/types/user-types'
 import { roundToNearest10Minutes } from '@/utils/dateUtils'
 import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
@@ -13,13 +14,14 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import useSWR from 'swr'
 import ClientCard from '../ClientCard'
-import CheckInFormFields from './CheckInFormFields'
+import CheckInFormFields, { StaffOption } from './CheckInFormFields'
 
 interface EditScheduledCheckInProps {
     onClose: () => void
     onUpdatedEvent: () => void
     selectedEvent: any
     fromEvent: boolean
+    showViewCaseNotes?: boolean
 }
 
 type ClientWithLastCheckin = NewClient & { lastCheckinDate?: string }
@@ -29,6 +31,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     selectedEvent,
     onUpdatedEvent,
     fromEvent,
+    showViewCaseNotes = true,
 }) => {
     const [editMode, setEditMode] = useState(fromEvent)
     const [date, setDate] = useState('')
@@ -45,7 +48,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     const [showDeleteSuccess, setShowDeleteSuccess] = useState(false)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [client, setClient] = useState<ClientWithLastCheckin | null>(null)
-    const [staffNames, setStaffNames] = useState<string[]>([])
+    const [staffOptions, setStaffOptions] = useState<StaffOption[]>([])
     const [submitting, setSubmitting] = useState(false)
 
     const router = useRouter()
@@ -54,24 +57,25 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
         if (selectedEvent) {
             const start = new Date(selectedEvent.start)
             const end = new Date(selectedEvent.end)
+            const clientId =
+                selectedEvent.clientDocId || selectedEvent.clientId || ''
+
             setDate(format(start, 'yyyy-MM-dd'))
             setStartTime(format(start, 'HH:mm'))
             setEndTime(format(end, 'HH:mm'))
             setLocation(selectedEvent.location || '')
             setContactType(selectedEvent.contactCode)
-            setSelectedClientDocId(selectedEvent.clientDocId)
-            setAssigneeId(selectedEvent.assigneeId || '')
+            setSelectedClientDocId(clientId)
+            setAssigneeId(selectedEvent.assigneeId || selectedEvent.asigneeId || '')
 
             // Fetch client data asynchronously
             const fetchClient = async () => {
-                if (!selectedEvent.clientDocId) {
+                if (!clientId) {
                     setClient(null)
                     return
                 }
                 try {
-                    const clientData = await getClientById(
-                        selectedEvent.clientDocId,
-                    )
+                    const clientData = await getClientById(clientId)
                     if (clientData) {
                         setClient(clientData)
                         console.log('client updated:', clientData)
@@ -93,25 +97,49 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
     }, [selectedEvent?.id, fromEvent])
 
     useEffect(() => {
-        // Fetch staff names when component mounts
-        const fetchStaffNames = async () => {
+        const fetchStaffOptions = async () => {
             try {
-                const names = await getUsersCollection()
-                if (assigneeId && !names.includes(assigneeId)) {
-                    names.push(assigneeId)
+                const users = await getAllUsers()
+                const options = users
+                    .map((staff: Users) => ({
+                        label: staff.name,
+                        value: staff.uid ?? staff.id ?? '',
+                    }))
+                    .filter((option) => option.value)
+
+                if (
+                    assigneeId &&
+                    !options.some(
+                        (option) =>
+                            option.value === assigneeId ||
+                            option.label === assigneeId,
+                    )
+                ) {
+                    options.unshift({
+                        label: assigneeId,
+                        value: assigneeId,
+                    })
                 }
-                setStaffNames(names)
+                setStaffOptions(options)
             } catch (error) {
-                console.error('Error fetching staff names:', error)
+                console.error('Error fetching staff options:', error)
             }
         }
-        fetchStaffNames()
+        fetchStaffOptions()
     }, [assigneeId])
 
     const selectedClient = useMemo(() => {
         if (!clients || !selectedClientDocId) return null
         return clients.find((client) => client.docId === selectedClientDocId)
     }, [clients, selectedClientDocId])
+
+    const selectedAssigneeName =
+        staffOptions.find(
+            (option) =>
+                option.value === assigneeId || option.label === assigneeId,
+        )?.label ??
+        assigneeId ??
+        '-'
 
     const handleSubmit = (e: React.FormEvent) => {
         if (submitting) return
@@ -274,7 +302,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                 <span className="material-symbols-outlined">
                                     person
                                 </span>
-                                <p>{selectedEvent.assigneeId}</p>
+                                <p>{selectedAssigneeName}</p>
                             </div>
 
                             {selectedEvent.location && (
@@ -285,15 +313,17 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                     <p>{selectedEvent.location}</p>
                                 </div>
                             )}
-                            <button
-                                type="button"
-                                className="mx-auto mt-[16px] flex cursor-pointer items-center gap-2 rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
-                                onClick={() =>
-                                    router.push(`/events/${selectedEvent.id}`)
-                                }
-                            >
-                                View case notes
-                            </button>
+                            {showViewCaseNotes && (
+                                <button
+                                    type="button"
+                                    className="mx-auto mt-[16px] flex cursor-pointer items-center gap-2 rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
+                                    onClick={() =>
+                                        router.push(`/events/${selectedEvent.id}`)
+                                    }
+                                >
+                                    View case notes
+                                </button>
+                            )}
                         </div>
                     </div>,
                     portalTarget,
@@ -342,7 +372,7 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                     setEndTime={setEndTime}
                                     assigneeId={assigneeId}
                                     setAssigneeId={setAssigneeId}
-                                    staffNames={staffNames}
+                                    staffOptions={staffOptions}
                                     location={location}
                                     setLocation={setLocation}
                                     contactType={contactType}
@@ -359,17 +389,19 @@ const EditScheduledCheckIn: React.FC<EditScheduledCheckInProps> = ({
                                             ? 'Submitting...'
                                             : 'Save changes'}
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="flex-1 rounded bg-black py-2 text-white shadow transition hover:bg-gray-800"
-                                        onClick={() =>
-                                            router.push(
-                                                `/events/${selectedEvent.id}`,
-                                            )
-                                        }
-                                    >
-                                        View case notes
-                                    </button>
+                                    {showViewCaseNotes && (
+                                        <button
+                                            type="button"
+                                            className="flex-1 rounded bg-black py-2 text-white shadow transition hover:bg-gray-800"
+                                            onClick={() =>
+                                                router.push(
+                                                    `/events/${selectedEvent.id}`,
+                                                )
+                                            }
+                                        >
+                                            View case notes
+                                        </button>
+                                    )}
                                 </div>
                             </form>
                         </div>

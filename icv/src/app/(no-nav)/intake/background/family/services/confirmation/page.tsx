@@ -1,5 +1,5 @@
 'use client'
-import { getClientById } from '@/api/clients'
+import { getAllUsers, getClientById } from '@/api/clients'
 import {
     ClientBio,
     ClientCitizenship,
@@ -20,23 +20,15 @@ import {
 import Autocomplete from '@mui/material/Autocomplete'
 import TextField from '@mui/material/TextField'
 import Symbol from '@/components/Symbol'
-import { clientDb } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
 import { ConfirmationSchema, NewClient } from '@/types/client-types'
+import { Users } from '@/types/user-types'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { collection, getDocs } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { TypeOf } from 'zod'
 import { useIntakeFormStore } from '../../../../../../_lib/useIntakeFormStore'
-
-// JIMIN IS TRIPPINGGGGGGGG
-
-//collecting users document from database in string array
-const collectRef = collection(clientDb, 'users')
-const querySnapshot = await getDocs(collectRef)
-const users = querySnapshot.docs.map((doc) => String(doc.data().name))
 
 const Page = () => {
     const { form: loadedForm, updateForm } = useIntakeFormStore()
@@ -55,6 +47,25 @@ const Page = () => {
     const router = useRouter()
     const { user } = useUser()
     const [spouseInfo, setSpouseInfo] = useState<NewClient>({} as NewClient)
+    const [users, setUsers] = useState<Users[]>([])
+
+    const caseManagerOptions = users
+        .map((staff) => ({
+            label: staff.name,
+            value: staff.uid ?? staff.id ?? '',
+        }))
+        .filter((option) => option.value)
+
+    const selectedCaseManager =
+        caseManagerOptions.find(
+            (option) =>
+                option.value === loadedForm.caseManager ||
+                option.label === loadedForm.caseManager,
+        )?.label ??
+        user?.displayName ??
+        ''
+
+    const caseManagerLabels = caseManagerOptions.map((option) => option.label)
 
     useEffect(() => {
         if (loadedForm.associatedSpouseID) {
@@ -64,8 +75,20 @@ const Page = () => {
         }
     }, [loadedForm.associatedSpouseID])
 
+    useEffect(() => {
+        getAllUsers()
+            .then((userList) => setUsers(userList))
+            .catch((error) =>
+                console.error('Error fetching case managers:', error),
+            )
+    }, [])
+
     const handleCaseManagerChange = (value: string | null) => {
-        updateForm({ caseManager: value ?? '' })
+        const selectedOption = caseManagerOptions.find(
+            (option) => option.label === value,
+        )
+
+        updateForm({ caseManager: selectedOption?.value ?? value ?? '' })
     }
 
     // wait until after render (in case rendering occurs before user is async loaded)
@@ -73,10 +96,10 @@ const Page = () => {
         if (user?.displayName) {
             updateForm({ assessingStaff: user.displayName })
             if (!loadedForm.caseManager) {
-                updateForm({ caseManager: user.displayName })
+                updateForm({ caseManager: user.uid ?? user.displayName })
             }
         }
-    }, [user, loadedForm.caseManager])
+    }, [user, loadedForm.caseManager, updateForm])
 
     // tracks which sections are open/closed
     const [openSections, setOpenSections] = useState<Record<string, boolean>>(
@@ -116,29 +139,28 @@ const Page = () => {
                                 </label>
                                 <Autocomplete
                                     disableClearable
-                                    value={loadedForm.caseManager ?? ''}
+                                    value={selectedCaseManager}
                                     onChange={(_, newValue) =>
                                         handleCaseManagerChange(newValue)
                                     }
                                     options={
-                                        loadedForm.caseManager &&
-                                        !users.includes(loadedForm.caseManager)
+                                        selectedCaseManager &&
+                                        !caseManagerLabels.includes(
+                                            selectedCaseManager,
+                                        )
                                             ? [
-                                                  loadedForm.caseManager,
-                                                  ...users,
+                                                  selectedCaseManager,
+                                                  ...caseManagerLabels,
                                               ]
-                                            : users
+                                            : caseManagerLabels
                                     }
-                                    getOptionLabel={(option) => option}
                                     filterOptions={(options, state) => {
                                         const input = state.inputValue
                                             .trim()
                                             .toLowerCase()
                                         if (!input) return options
                                         return options.filter((option) =>
-                                            option
-                                                .toLowerCase()
-                                                .includes(input),
+                                            option.toLowerCase().includes(input),
                                         )
                                     }}
                                     renderInput={(params) => (

@@ -210,7 +210,7 @@ export default function CheckInsPage() {
         }
 
         fetchCheckIns()
-    }, [clientId])
+    }, [clientId, newEvents])
 
     const { user } = useUser()
     if (loading) {
@@ -306,7 +306,9 @@ export default function CheckInsPage() {
                             Upcoming check ins
                         </h1>
                         <ScheduledCheckInCreation
-                            onNewEvent={() => setNewEvents(true)}
+                            onNewEvent={() =>
+                                setNewEvents((previousValue) => !previousValue)
+                            }
                             clientDocId={clientId as string}
                             buttonClassName="flex flex-row space-x-[8px] rounded-[5px] bg-black px-[12px] py-[8px] text-[14px] text-white"
                         />

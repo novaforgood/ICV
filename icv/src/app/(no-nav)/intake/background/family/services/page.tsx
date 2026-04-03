@@ -29,6 +29,7 @@ const Page = () => {
                     }}
                     submitType="new"
                     titleStyle="font-['Epilogue'] text-[28px] font-semibold leading-[40px] text-neutral-900"
+                    fileUploadLabelStyle="font-['Epilogue'] text-[16px] font-semibold leading-[24px] text-neutral-900"
                 />
             </div>
         </div>

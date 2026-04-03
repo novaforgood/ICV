@@ -34,6 +34,8 @@ interface Props {
     onCancel?: () => void
     submitType: 'save' | 'new'
     titleStyle: string
+    /** Optional style for file upload labels (ID, Passport, etc.). Defaults to titleStyle. */
+    fileUploadLabelStyle?: string
 }
 
 type ServiceType = TypeOf<typeof ServicesSchema>
@@ -46,6 +48,7 @@ export const ServicesSection: React.FC<Props> = ({
     onCancel,
     submitType,
     titleStyle,
+    fileUploadLabelStyle,
 }) => {
     const router = useRouter()
 
@@ -231,9 +234,9 @@ export const ServicesSection: React.FC<Props> = ({
                             <label className={titleStyle}>ICV SERVICES</label>
                         )}
                         {/* Grid Checkboxes */}
-                        <div className="grid grid-cols-2 gap-[12px]">
+                        <div className="flex flex-col space-y-[24px] min-[800px]:grid min-[800px]:grid-cols-2 min-[800px]:gap-[12px]">
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] text-neutral-900">
+                                <label className="mb-[4px] block font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                     Mentoring
                                 </label>
                                 <CheckboxList
@@ -246,7 +249,7 @@ export const ServicesSection: React.FC<Props> = ({
                                 />
                             </div>
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] text-neutral-900">
+                                <label className="mb-[4px] block font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                     Personal Development
                                 </label>
                                 <CheckboxList
@@ -259,7 +262,7 @@ export const ServicesSection: React.FC<Props> = ({
                                 />
                             </div>
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] text-neutral-900">
+                                <label className="mb-[4px] block font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                     Housing Assistance
                                 </label>
                                 <CheckboxList
@@ -270,7 +273,7 @@ export const ServicesSection: React.FC<Props> = ({
                                 />
                             </div>
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] text-neutral-900">
+                                <label className="mb-[4px] block font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                     Redirection Program
                                 </label>
                                 <CheckboxList
@@ -283,7 +286,7 @@ export const ServicesSection: React.FC<Props> = ({
                                 />
                             </div>
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] text-neutral-900">
+                                <label className="mb-[4px] block font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                     Education & Training Support
                                 </label>
                                 <CheckboxList
@@ -296,7 +299,7 @@ export const ServicesSection: React.FC<Props> = ({
                                 />
                             </div>
                             <div>
-                                <label className="font-['Epilogue'] text-[16px] text-neutral-900">
+                                <label className="mb-[4px] block font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                     Health & Wellness Support
                                 </label>
                                 <CheckboxList
@@ -311,7 +314,7 @@ export const ServicesSection: React.FC<Props> = ({
                         </div>
 
                         <div>
-                            <label className="font-['Epilogue'] text-[16px] text-neutral-900">
+                            <label className="mb-[4px] block font-['Epilogue'] text-[16px] font-bold text-neutral-900">
                                 Referrals/Linkages Services
                             </label>
                             <CheckboxList
@@ -323,22 +326,80 @@ export const ServicesSection: React.FC<Props> = ({
                         </div>
                     </div>
 
-                    {/* File Upload Sections */}
-                    {[
-                        ['clientPic', 'Profile Picture'],
-                        ['clientIDocs', 'ID'],
-                        ['clientPassport', 'Passport'],
-                        ['clientMediCal', 'MediCal'],
-                        ['clientSSN', 'SSN'],
-                        ['clientBC', 'Birth Certificate'],
-                        ['otherFiles', 'Other Documents'],
-                    ].map(([field, label]) => {
-                        const isProfile = field === 'clientPic'
+                    <div className="space-y-[24px]">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-[8px]">
+                                <label className={titleStyle}>
+                                    Profile Picture
+                                </label>
+                                <span className="group relative flex">
+                                    <span className="flex cursor-help items-center justify-center">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            height="20px"
+                                            viewBox="0 -960 960 960"
+                                            width="20px"
+                                        >
+                                            <path d="M480-96v-96q-140.33 0-238.16-97.77-97.84-97.77-97.84-238Q144-668 241.89-766t238.29-98q70.2 0 131.01 26.5Q672-811 717.5-765.5t72 106.37Q816-598.27 816-528q0 69-29.5 134t-77 121Q662-217 602-171.5T480-96Zm72-128q80-60 136-139.5T744-528q0-109-77.5-186.5T480-792q-109 0-186.5 77.5T216-528q0 109 77.5 186.5T480-264h72v40Zm-43.5-123.5Q520-359 520-376t-11.5-28.5Q497-416 480-416t-28.5 11.5Q440-393 440-376t11.5 28.5Q463-336 480-336t28.5-11.5ZM451-458h58q0-26 4-39.5t23-32.5q18-17 36-36t18-54q0-48-32-74t-78-26q-41.88 0-70.44 24Q381-672 370-640l52.33 22q4.67-17 18.16-32T480-665q27 0 39.5 15t12.5 32q0 21-14.5 35.5T486-552q-26 24-30.5 41.5T451-458Zm29-50Z" />
+                                        </svg>
+                                    </span>
+                                    <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-3 py-2 text-sm text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-hover:delay-100">
+                                        Camera is not available on desktop
+                                    </span>
+                                </span>
+                            </div>
+                            <ResetButton
+                                data={formType}
+                                field="clientPic"
+                                resetFiles={resetFiles}
+                            />
+                        </div>
+                        <FileUpload
+                            data={formType}
+                            handleFileChange={handleImageChange}
+                            handleAddFile={handleAddFile}
+                            onRemoveFile={removeFile}
+                            field="clientPic"
+                            isUploading={uploadingField === 'clientPic'}
+                            isProfilePic
+                        />
+                    </div>
 
-                        return (
+                    {/* Documents */}
+                    <div className="space-y-[24px]">
+                        <div className="flex items-center space-x-[8px]">
+                            <label className={titleStyle}>Documents</label>
+                            <span className="group relative flex">
+                                <span className="flex cursor-help items-center justify-center">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        height="20px"
+                                        viewBox="0 -960 960 960"
+                                        width="20px"
+                                    >
+                                        <path d="M480-96v-96q-140.33 0-238.16-97.77-97.84-97.77-97.84-238Q144-668 241.89-766t238.29-98q70.2 0 131.01 26.5Q672-811 717.5-765.5t72 106.37Q816-598.27 816-528q0 69-29.5 134t-77 121Q662-217 602-171.5T480-96Zm72-128q80-60 136-139.5T744-528q0-109-77.5-186.5T480-792q-109 0-186.5 77.5T216-528q0 109 77.5 186.5T480-264h72v40Zm-43.5-123.5Q520-359 520-376t-11.5-28.5Q497-416 480-416t-28.5 11.5Q440-393 440-376t11.5 28.5Q463-336 480-336t28.5-11.5ZM451-458h58q0-26 4-39.5t23-32.5q18-17 36-36t18-54q0-48-32-74t-78-26q-41.88 0-70.44 24Q381-672 370-640l52.33 22q4.67-17 18.16-32T480-665q27 0 39.5 15t12.5 32q0 21-14.5 35.5T486-552q-26 24-30.5 41.5T451-458Zm29-50Z" />
+                                    </svg>
+                                </span>
+                                <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-3 py-2 text-sm text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100 group-hover:delay-100">
+                                    Camera is not available on desktop
+                                </span>
+                            </span>
+                        </div>
+                        {[
+                            ['clientIDocs', 'ID'],
+                            ['clientPassport', 'Passport'],
+                            ['clientMediCal', 'MediCal'],
+                            ['clientSSN', 'SSN'],
+                            ['clientBC', 'Birth Certificate'],
+                            ['otherFiles', 'Other Documents'],
+                        ].map(([field, label]) => (
                             <div className="space-y-[8px]" key={field}>
                                 <div className="flex items-center justify-between">
-                                    <label className={titleStyle}>
+                                    <label
+                                        className={
+                                            fileUploadLabelStyle ?? titleStyle
+                                        }
+                                    >
                                         {label}
                                     </label>
                                     <ResetButton
@@ -354,11 +415,11 @@ export const ServicesSection: React.FC<Props> = ({
                                     onRemoveFile={removeFile}
                                     field={field}
                                     isUploading={uploadingField === field}
-                                    isProfilePic={isProfile}
+                                    isProfilePic={false}
                                 />
                             </div>
-                        )
-                    })}
+                        ))}
+                    </div>
 
                     <div className="space-y-[8px]">
                         <label className={titleStyle}>Additional Notes</label>
@@ -411,7 +472,7 @@ export const ServicesSection: React.FC<Props> = ({
                             <button
                                 type="button"
                                 onClick={onCancel}
-                                className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                                className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white"
                             >
                                 <div className="flex flex-row space-x-[8px]">
                                     <svg

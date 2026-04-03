@@ -12,6 +12,7 @@ import {
     ClientContactInfo,
     ClientEthnicity,
     ClientHousing,
+    ClientStaffDetails,
 } from '@/app/_components/clientProfile/ClientProfileComponents'
 import { ClientIntakeSchema } from '@/types/client-types'
 import html2pdf from 'html2pdf.js'
@@ -223,7 +224,7 @@ export const ClientProfileToggle = ({
                         <div className="space-y-[24px]">
                             <div className="flex flex-row items-center justify-between">
                                 <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
-                                    BIO
+                                    STAFF DETAILS
                                 </label>
                                 <button
                                     onClick={toggleButton}
@@ -241,6 +242,12 @@ export const ClientProfileToggle = ({
                                     <label>Edit</label>
                                 </button>
                             </div>
+                            <ClientStaffDetails data={client} />
+                        </div>
+                        <div className="space-y-[24px]">
+                            <label className="font-epilogue text-[18px] font-bold uppercase leading-[18px] tracking-[0.9px] text-[#A2AFC3]">
+                                BIO
+                            </label>
                             <ClientBio data={client} />
                         </div>
                         <div className="space-y-[24px]">
@@ -310,10 +317,11 @@ export const ClientProfileToggle = ({
                                     }
 
                                     await updateClient(id, data)
+                                    await fetchHousingStatuses()
 
                                     clearForm(id)
                                     setEditMode(false)
-                                    router.push(`/clients/${id}/profile`)
+                                    router.refresh()
                                 } catch (err) {
                                     console.error('updateClient error:', err)
                                 }

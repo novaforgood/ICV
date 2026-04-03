@@ -9,15 +9,32 @@ export function useUser(): {
     loading: boolean
     error: any
 } {
-    const [user, setUser] = useState<User | null>(null)
+    const [userState, setUserState] = useState<{
+        user: User | null
+        version: number
+    }>({
+        user: null,
+        version: 0,
+    })
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<any>(null)
 
     useEffect(() => {
+        const syncCurrentUser = () => {
+            setUserState((prev) => ({
+                user: auth.currentUser,
+                version: prev.version + 1,
+            }))
+            setLoading(false)
+        }
+
         const unsubscribe = onAuthStateChanged(
             auth,
             (user) => {
-                setUser(user)
+                setUserState((prev) => ({
+                    user,
+                    version: prev.version + 1,
+                }))
                 setLoading(false)
             },
             (error) => {
@@ -26,8 +43,13 @@ export function useUser(): {
             },
         )
 
-        return () => unsubscribe()
+        window.addEventListener('auth-profile-updated', syncCurrentUser)
+
+        return () => {
+            unsubscribe()
+            window.removeEventListener('auth-profile-updated', syncCurrentUser)
+        }
     }, [])
 
-    return { user, loading, error }
+    return { user: userState.user, loading, error }
 }

@@ -30,13 +30,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
     isProfilePic,
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null!)
-    const cameraInputRef = useRef<HTMLInputElement>(null!)
 
     const [cropImageSrc, setCropImageSrc] = useState<string | null>(null)
     const [cropFile, setCropFile] = useState<File | null>(null)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(
+        null,
+    )
     const [isCropping, setIsCropping] = useState(false)
 
     const files =
@@ -63,10 +64,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 croppedAreaPixels,
                 mimeType,
             )
+            const baseName = cropFile.name.replace(/\.[^/.]+$/, '') || 'image'
             const extension = cropFile.name.split('.').pop() || 'jpg'
-            const croppedFile = new File([blob], `cropped.${extension}`, {
-                type: mimeType,
-            })
+            const croppedFile = new File(
+                [blob],
+                `${baseName}-${crypto.randomUUID()}-crop.${extension}`,
+                { type: mimeType },
+            )
 
             const dataTransfer = new DataTransfer()
             dataTransfer.items.add(croppedFile)
@@ -83,15 +87,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
             setZoom(1)
             setIsCropping(false)
             if (fileInputRef.current) fileInputRef.current.value = ''
-            if (cameraInputRef.current) cameraInputRef.current.value = ''
         }
-    }, [
-        cropImageSrc,
-        cropFile,
-        croppedAreaPixels,
-        field,
-        handleFileChange,
-    ])
+    }, [cropImageSrc, cropFile, croppedAreaPixels, field, handleFileChange])
 
     const handleCropCancel = useCallback(() => {
         if (cropImageSrc) URL.revokeObjectURL(cropImageSrc)
@@ -101,7 +98,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
         setCrop({ x: 0, y: 0 })
         setZoom(1)
         if (fileInputRef.current) fileInputRef.current.value = ''
-        if (cameraInputRef.current) cameraInputRef.current.value = ''
     }, [cropImageSrc])
 
     const handleFileSelect = useCallback(
@@ -110,9 +106,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             if (!selectedFiles || selectedFiles.length === 0) return
 
             const file = selectedFiles[0]
-            const shouldCrop =
-                (isProfilePic || selectedFiles.length === 1) &&
-                isImageFile(file)
+            const shouldCrop = isProfilePic && isImageFile(file)
 
             if (shouldCrop) {
                 setCropFile(file)
@@ -134,12 +128,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             image={cropImageSrc}
                             crop={crop}
                             zoom={zoom}
-                            aspect={isProfilePic ? 1 : 4 / 3}
+                            aspect={1}
                             onCropChange={setCrop}
                             onCropComplete={onCropAreaChange}
                             onCropAreaChange={onCropAreaChange}
                             onZoomChange={setZoom}
-                            cropShape={isProfilePic ? 'round' : 'rect'}
+                            cropShape="round"
                         />
                     </div>
                     <div className="flex justify-end gap-4 border-t border-gray-700 bg-black p-4">
@@ -154,7 +148,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             type="button"
                             onClick={handleCropConfirm}
                             disabled={isCropping || !croppedAreaPixels}
-                            className="rounded-md bg-white px-4 py-2 text-black disabled:opacity-50 hover:bg-gray-200"
+                            className="rounded-md bg-white px-4 py-2 text-black hover:bg-gray-200 disabled:opacity-50"
                         >
                             {isCropping ? 'Cropping...' : 'Crop'}
                         </button>
@@ -215,7 +209,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                             onClick={() =>
                                                 onRemoveFile(field, index)
                                             }
-                                            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded text-gray-500 hover:bg-gray-200 hover:text-gray-700"
+                                            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded text-gray-500"
                                             aria-label="Remove file"
                                         >
                                             <svg
@@ -238,8 +232,8 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             ))}
                         </div>
                     )}
-                    {files.length === 0 && (
-                        <div className="flex flex-row space-x-[24px]">
+                    {(!isProfilePic || files.length === 0) && (
+                        <div className="flex flex-row items-center gap-[24px]">
                             <button
                                 type="button"
                                 onClick={() => handleAddFile(fileInputRef)}
@@ -255,7 +249,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                     >
                                         <path d="M444-240h72v-150l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.72-96Q234-96 213-117.15T192-168v-624q0-29.7 21.15-50.85Q234.3-864 264-864h312l192 192v504q0 29.7-21.16 50.85Q725.68-96 695.96-96H263.72ZM528-624v-168H264v624h432v-456H528ZM264-792v189-189 624-624Z" />
                                     </svg>
-                                    <label>Upload File</label>
+                                    <label>Add Files</label>
                                 </div>
                             </button>
                             <input
@@ -266,33 +260,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
                                         ? 'image/png,image/jpeg,image/jpg'
                                         : '*/*'
                                 }
-                                multiple={!isProfilePic}
-                                onChange={handleFileSelect}
-                                className="hidden"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => handleAddFile(cameraInputRef)}
-                                className="flex h-[52px] items-center justify-center gap-[8px] rounded-[5px] bg-[#27262A] px-[12px] py-[16px] text-white hover:bg-[#6D757F]"
-                            >
-                                <div className="flex flex-row space-x-[8px]">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        height="20px"
-                                        viewBox="0 -960 960 960"
-                                        width="20px"
-                                        fill="#FFFFFF"
-                                    >
-                                        <path d="M444-240h72v-150l57 57 51-51-144-144-144 144 51 51 57-57v150ZM263.72-96Q234-96 213-117.15T192-168v-624q0-29.7 21.15-50.85Q234.3-864 264-864h312l192 192v504q0 29.7-21.16 50.85Q725.68-96 695.96-96H263.72ZM528-624v-168H264v624h432v-456H528ZM264-792v189-189 624-624Z" />
-                                    </svg>
-                                    <label>Take Picture</label>
-                                </div>
-                            </button>
-                            <input
-                                ref={cameraInputRef}
-                                type="file"
-                                accept="image/*"
-                                capture="environment"
                                 multiple={!isProfilePic}
                                 onChange={handleFileSelect}
                                 className="hidden"

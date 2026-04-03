@@ -1,6 +1,7 @@
 'use client'
 
 import { getEventById } from '@/api/events'
+import { getAllUsers } from '@/api/clients'
 import categoryColors, {
     ContactTypeKey,
 } from '@/app/_components/categoryColors'
@@ -10,10 +11,12 @@ import EditScheduledCheckIn from '@/app/_components/calendar/EditScheduledCheckI
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { CheckInType } from '@/types/event-types'
+import { Users } from '@/types/user-types'
 import { format } from 'date-fns'
 import { ArrowLeft, Edit2 } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 
 export default function EventDetailPage() {
     const { eventId } = useParams()
@@ -22,6 +25,7 @@ export default function EventDetailPage() {
     const [isEditing, setIsEditing] = useState(false)
     const [isEditingCaseNotes, setIsEditingCaseNotes] = useState(false)
     const [loading, setLoading] = useState(true)
+    const { data: users } = useSWR<Users[]>('users', getAllUsers)
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -43,6 +47,23 @@ export default function EventDetailPage() {
     function isContactTypeKey(value: any): value is ContactTypeKey {
         return typeof value === 'string' && value in categoryColors
     }
+
+    const rawAssigneeId = String(
+        (event as { assigneeId?: string } | null)?.assigneeId ??
+            (event as { asigneeId?: string } | null)?.asigneeId ??
+            '',
+    )
+
+    const assigneeUser =
+        users?.find(
+            (staff) =>
+                staff.uid === rawAssigneeId ||
+                staff.id === rawAssigneeId ||
+                staff.name === rawAssigneeId,
+        ) ?? null
+
+    const assigneeDisplayName =
+        assigneeUser?.name || (rawAssigneeId || 'Not assigned')
 
     if (loading) {
         return <div className="m-[48px]">Loading...</div>
@@ -121,7 +142,7 @@ export default function EventDetailPage() {
 
                         <div>
                             <h3 className="font-bold text-gray-700">Staff</h3>
-                            <p>{String(event.assigneeId || 'Not assigned')}</p>
+                            <p>{assigneeDisplayName}</p>
                         </div>
 
                         {event.description && (
@@ -201,6 +222,7 @@ export default function EventDetailPage() {
                         }
                     }}
                     fromEvent={true}
+                    showViewCaseNotes={false}
                 />
             )}
 

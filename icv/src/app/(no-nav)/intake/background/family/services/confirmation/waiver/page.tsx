@@ -26,9 +26,7 @@ const Page = () => {
                         const newClientID = await createClient(data)
                         clearForm()
                         if (newClientID) {
-                            router.push(
-                                `/completedProfile?clientID=${newClientID}`,
-                            )
+                            router.push(`/completedProfile?clientID=${newClientID}`)
                         } else {
                             console.error('Failed to create client')
                         }

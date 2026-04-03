@@ -114,6 +114,7 @@ export const ClientIntakeSchema = z.object({
     // ----- PAGE 1: Basic intake information -----
 
     // Client Profile
+    id: z.string().optional(),
     docId: z.string().optional(),
     clientId: z.string().optional(),
     firstName: z.string().optional(),

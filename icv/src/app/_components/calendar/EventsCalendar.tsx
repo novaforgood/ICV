@@ -89,6 +89,102 @@ ThreeDayView.title = function (date: Date, options: any) {
     )
 }
 
+// 3-day work week view for small screens (weekdays only, no weekends)
+function normalizeToWeekday(date: Date): Date {
+    const normalized = startOfDay(date)
+    const day = getDay(normalized)
+
+    if (day === 0) return addDays(normalized, 1)
+    if (day === 6) return addDays(normalized, 2)
+
+    return normalized
+}
+
+function getNextWeekday(date: Date): Date {
+    const next = addDays(startOfDay(date), 1)
+    const day = getDay(next)
+
+    if (day === 6) return addDays(next, 2)
+    if (day === 0) return addDays(next, 1)
+
+    return next
+}
+
+function getPreviousWeekday(date: Date): Date {
+    const previous = addDays(startOfDay(date), -1)
+    const day = getDay(previous)
+
+    if (day === 6) return addDays(previous, -1)
+    if (day === 0) return addDays(previous, -2)
+
+    return previous
+}
+
+function getThreeWeekdayRange(date: Date): Date[] {
+    const start = normalizeToWeekday(date)
+    const second = getNextWeekday(start)
+    const third = getNextWeekday(second)
+
+    return [start, second, third]
+}
+
+function ThreeDayWorkWeekView(props: any) {
+    const {
+        date,
+        localizer,
+        min,
+        max,
+        scrollToTime,
+        enableAutoScroll,
+        ...rest
+    } = props
+    const range = ThreeDayWorkWeekView.range(date)
+    const minProp = min ?? localizer.startOf(new Date(), 'day')
+    const maxProp = max ?? localizer.endOf(new Date(), 'day')
+    const scrollToTimeProp =
+        scrollToTime ?? localizer.startOf(new Date(), 'day')
+    const enableAutoScrollProp = enableAutoScroll ?? true
+    return (
+        <TimeGrid
+            {...rest}
+            range={range}
+            eventOffset={15}
+            localizer={localizer}
+            min={minProp}
+            max={maxProp}
+            scrollToTime={scrollToTimeProp}
+            enableAutoScroll={enableAutoScrollProp}
+        />
+    )
+}
+ThreeDayWorkWeekView.range = function (date: Date, _opts?: unknown) {
+    return getThreeWeekdayRange(date)
+}
+ThreeDayWorkWeekView.navigate = function (
+    date: Date,
+    action: string,
+    _props?: unknown,
+) {
+    const start = normalizeToWeekday(date)
+
+    switch (action) {
+        case 'PREV':
+            return getPreviousWeekday(
+                getPreviousWeekday(getPreviousWeekday(start)),
+            )
+        case 'NEXT':
+            return getNextWeekday(getNextWeekday(getNextWeekday(start)))
+        default:
+            return date
+    }
+}
+ThreeDayWorkWeekView.title = function (date: Date, options: any) {
+    const [start, , end] = ThreeDayWorkWeekView.range(date)
+    return (
+        options?.localizer?.format({ start, end }, 'dayRangeHeaderFormat') ?? ''
+    )
+}
+
 // Localizer setup
 const locales = { 'en-US': enUS }
 const localizer = dateFnsLocalizer({
@@ -135,7 +231,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
     useEffect(() => {
         const auth = getAuth()
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user?.displayName) setAssigneeId(user.displayName)
+            if (user?.uid) setAssigneeId(user.uid)
         })
         return () => unsubscribe()
     }, [])
@@ -325,7 +421,9 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
                     defaultView={Views.WEEK}
                     views={{
                         week: (isSmallScreen ? ThreeDayView : true) as any,
-                        work_week: true,
+                        work_week: (isSmallScreen
+                            ? ThreeDayWorkWeekView
+                            : true) as any,
                     }}
                     date={currentDate}
                     onNavigate={(date) => setCurrentDate(date)}
