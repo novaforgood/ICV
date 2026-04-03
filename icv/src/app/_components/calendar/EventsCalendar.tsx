@@ -200,12 +200,14 @@ interface EventsCalendarProps {
     onReloadEvents: () => void
 }
 
+type ScheduleType = 'my' | 'team'
+
 const EventsCalendar: React.FC<EventsCalendarProps> = ({
     newEvents,
     onReloadEvents,
 }) => {
     const isSmallScreen = useIsSmallScreen()
-    const [scheduleType, setScheduleType] = useState<'my' | 'team'>('my')
+    const [scheduleType, setScheduleType] = useState<ScheduleType>('my')
     const [hideWeekends, setHideWeekends] = useState(false)
     const [rawEvents, setRawEvents] = useState<CheckInType[]>([])
     const [currentDate, setCurrentDate] = useState(new Date())
@@ -239,6 +241,8 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
     useEffect(() => {
         const fetchEvents = async () => {
             setLoading(true)
+            setError('')
+
             try {
                 const data =
                     scheduleType === 'my' && assigneeId
@@ -247,6 +251,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
                 setRawEvents(data)
             } catch (err) {
                 console.error('Failed to fetch events:', err)
+                setError('Error loading events')
             } finally {
                 setLoading(false)
             }
@@ -258,7 +263,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
 
         setReloadEvents(false)
         onReloadEvents()
-    }, [scheduleType, assigneeId, reloadEvents, newEvents])
+    }, [scheduleType, assigneeId, reloadEvents, newEvents, onReloadEvents])
 
     const events = useMemo(() => {
         if (!rawEvents) return []
@@ -277,10 +282,6 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
                       ),
             }))
     }, [rawEvents])
-
-    if (loading) return <div className="p-4">Loading calendar...</div>
-    if (error)
-        return <div className="p-4 text-red-500">Error loading events</div>
 
     const CustomToolbar = (toolbar: any) => {
         const goToBack = () => {
@@ -385,7 +386,11 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
                 {/* Toggle - row below title on screens smaller than lg, same width at all breakpoints */}
                 <div className="relative inline-flex w-fit items-center justify-start self-start rounded-[20px] bg-zinc-200 p-1 lg:self-center">
                     <div
-                        className={`absolute transition-all duration-300 ease-in-out ${scheduleType === 'my' ? 'left-1' : 'left-[calc(100%-50%-4px)]'} h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-[16px] bg-black`}
+                        className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-[16px] bg-black transition-transform duration-300 ease-out ${
+                            scheduleType === 'team'
+                                ? 'translate-x-full'
+                                : 'translate-x-0'
+                        }`}
                     />
                     <button
                         onClick={() => setScheduleType('my')}
@@ -413,43 +418,68 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
             </div>
 
             {/* Calendar */}
-            <div className="h-[calc(100vh-12rem)] min-h-[400px] overflow-hidden [&_.rbc-header]:border-b-0 [&_.rbc-header]:bg-gray-50 [&_.rbc-header]:py-3 [&_.rbc-header]:font-medium [&_.rbc-time-content]:border-t [&_.rbc-time-content]:border-gray-200 [&_.rbc-time-gutter_.rbc-timeslot-group]:border-r [&_.rbc-time-header]:border-gray-200 [&_.rbc-timeslot-group]:border-gray-200">
-                <Calendar<any>
-                    localizer={localizer}
-                    events={events}
-                    view={hideWeekends ? Views.WORK_WEEK : Views.WEEK}
-                    defaultView={Views.WEEK}
-                    views={{
-                        week: (isSmallScreen ? ThreeDayView : true) as any,
-                        work_week: (isSmallScreen
-                            ? ThreeDayWorkWeekView
-                            : true) as any,
-                    }}
-                    date={currentDate}
-                    onNavigate={(date) => setCurrentDate(date)}
-                    startAccessor="start"
-                    endAccessor="end"
-                    style={{ height: '100%' }}
-                    className="[&_.rbc-event-label]:hidden [&_.rbc-timeslot-group]:!min-h-[100px]"
-                    timeslots={1}
-                    step={60}
-                    defaultDate={new Date()}
-                    scrollToTime={scrollTime}
-                    tooltipAccessor="location"
-                    onSelectEvent={(event) => setSelectedEvent(event)}
-                    components={{
-                        toolbar: CustomToolbar,
-                        event: CustomEvent,
-                    }}
-                    eventPropGetter={(event) => ({
-                        className: 'rounded-md border-none bg-background',
-                        style: {
-                            backgroundColor: event.assigneeId
-                                ? getUserColor(event.assigneeId)
-                                : '#4EA0C9',
-                        },
-                    })}
-                />
+            <div className="relative h-[calc(100vh-12rem)] min-h-[400px] overflow-hidden [&_.rbc-header]:border-b-0 [&_.rbc-header]:bg-gray-50 [&_.rbc-header]:py-3 [&_.rbc-header]:font-medium [&_.rbc-time-content]:border-t [&_.rbc-time-content]:border-gray-200 [&_.rbc-time-gutter_.rbc-timeslot-group]:border-r [&_.rbc-time-header]:border-gray-200 [&_.rbc-timeslot-group]:border-gray-200">
+                {error ? (
+                    <div className="flex h-full items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 text-red-600">
+                        {error}
+                    </div>
+                ) : (
+                    <>
+                        <div
+                            className={`h-full transition-opacity duration-200 ${
+                                loading ? 'pointer-events-none opacity-40' : ''
+                            }`}
+                        >
+                            <Calendar<any>
+                                localizer={localizer}
+                                events={events}
+                                view={hideWeekends ? Views.WORK_WEEK : Views.WEEK}
+                                defaultView={Views.WEEK}
+                                views={{
+                                    week: (isSmallScreen
+                                        ? ThreeDayView
+                                        : true) as any,
+                                    work_week: (isSmallScreen
+                                        ? ThreeDayWorkWeekView
+                                        : true) as any,
+                                }}
+                                date={currentDate}
+                                onNavigate={(date) => setCurrentDate(date)}
+                                startAccessor="start"
+                                endAccessor="end"
+                                style={{ height: '100%' }}
+                                className="[&_.rbc-event-label]:hidden [&_.rbc-timeslot-group]:!min-h-[100px]"
+                                timeslots={1}
+                                step={60}
+                                defaultDate={new Date()}
+                                scrollToTime={scrollTime}
+                                tooltipAccessor="location"
+                                onSelectEvent={(event) => setSelectedEvent(event)}
+                                components={{
+                                    toolbar: CustomToolbar,
+                                    event: CustomEvent,
+                                }}
+                                eventPropGetter={(event) => ({
+                                    className: 'rounded-md border-none bg-background',
+                                    style: {
+                                        backgroundColor: event.assigneeId
+                                            ? getUserColor(event.assigneeId)
+                                            : '#4EA0C9',
+                                    },
+                                })}
+                            />
+                        </div>
+
+                        {loading && (
+                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-[1px]">
+                                <div className="flex items-center gap-3 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm">
+                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
+                                    Loading calendar...
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
 
             <EditScheduledCheckIn
