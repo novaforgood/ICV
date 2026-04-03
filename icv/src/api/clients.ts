@@ -175,22 +175,21 @@ export async function getClientByCaseManager(): Promise<ClientWithLastCheckin[]>
     const clientsQuery = query(clientsCollection, where('caseManager', '==', caseManagerId))
     const clientsSnapshot = await getDocs(clientsQuery)
     const clientsList = clientsSnapshot.docs.map((doc) => {
-        const data = doc.data() as NewClient;
-        data.id = doc.id;
-        data.docId = doc.id;
-        return data;
-    });
+        const data = doc.data() as NewClient
+        data.docId = doc.id
+        return data
+    })
 
     // Get the latest event date for each client
     const clientsWithLatestEvents = await Promise.all(
         clientsList.map(async (client) => {
-            if (!client.id) return client as ClientWithLastCheckin;
+            if (!client.docId) return client as ClientWithLastCheckin
 
             // Query the events collection for this client
             const eventsCollection = collection(ssrdb, 'events');
             const eventsQuery = query(
                 eventsCollection,
-                where('clientId', '==', client.id),
+                where('clientId', '==', client.docId),
                 orderBy('endTime', 'desc'),
                 limit(1)
             );
@@ -252,22 +251,21 @@ export async function getAllClientsByLastCheckinDate(): Promise<ClientWithLastCh
     const clientsCollection = collection(ssrdb, 'clients')
     const clientsSnapshot = await getDocs(clientsCollection)
     const clientsList = clientsSnapshot.docs.map((doc) => {
-        const data = doc.data() as NewClient;
-        data.id = doc.id;
-        data.docId = doc.id;
-        return data;
-    });
+        const data = doc.data() as NewClient
+        data.docId = doc.id
+        return data
+    })
 
     // Get the latest event date for each client
     const clientsWithLatestEvents = await Promise.all(
         clientsList.map(async (client) => {
-            if (!client.id) return client as ClientWithLastCheckin;
+            if (!client.docId) return client as ClientWithLastCheckin
 
             // Query the events collection for this client
             const eventsCollection = collection(ssrdb, 'events');
             const eventsQuery = query(
                 eventsCollection,
-                where('clientId', '==', client.id),
+                where('clientId', '==', client.docId),
                 orderBy('endTime', 'desc'),
                 limit(1)
             );
