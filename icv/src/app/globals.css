@@ -44,19 +44,6 @@
     scrollbar-width: none; /* Firefox */
 }
 
-/* PDF/print page break utilities for html2pdf.js */
-.pdf-new-page {
-    break-before: page;
-    page-break-before: always;
-    margin-top: 0;
-    padding-top: 0;
-}
-
-.pdf-keep-together {
-    break-inside: avoid;
-    page-break-inside: avoid;
-}
-
 @layer base {
     :root {
         --background: 0 0% 100%;

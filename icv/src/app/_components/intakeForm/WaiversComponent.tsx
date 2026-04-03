@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useForm } from 'react-hook-form'
+import generatePDF, { Margin, Resolution, usePDF } from 'react-to-pdf'
 import SignatureCanvas from 'react-signature-canvas'
 import { TypeOf } from 'zod'
 
@@ -61,8 +62,8 @@ const WaiverSection: React.FC<Props> = ({
 
     const router = useRouter()
     const [isExporting, setIsExporting] = useState(false)
-    const [showExportOverlay, setShowExportOverlay] = useState(false)
     const [waiverMode, setWaiverMode] = useState<'form' | 'upload'>('form')
+    const { targetRef } = usePDF()
     const [waiverUploading, setWaiverUploading] = useState(false)
     const [openSignature1, setOpenSignature1] = useState(false)
     const [openSignature2, setOpenSignature2] = useState(false)
@@ -159,153 +160,71 @@ const WaiverSection: React.FC<Props> = ({
         updateForm({ waivers: updated })
     }
 
+    const buildWaiverPdfBlob = async (): Promise<{
+        blob: Blob
+        filename: string
+    } | null> => {
+        await new Promise((resolve) =>
+            requestAnimationFrame(() => resolve(null)),
+        )
+        await new Promise((resolve) =>
+            requestAnimationFrame(() => resolve(null)),
+        )
+
+        const today =
+            formType.signDate && formType.signDate != ''
+                ? formType.signDate
+                : new Date().toISOString().split('T')[0]
+        const filename = `${formType.clientCode ?? 'waiver'}_${today}.pdf`
+
+        const pdfDoc = await generatePDF(targetRef, {
+            method: 'build',
+            filename,
+            resolution: Resolution.HIGH,
+            page: {
+                format: 'a4',
+                orientation: 'portrait',
+                margin: Margin.LARGE,
+            },
+            canvas: {
+                mimeType: 'image/jpeg',
+                qualityRatio: 0.95,
+            },
+            overrides: {
+                canvas: {
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                },
+            },
+        })
+
+        if (!pdfDoc) {
+            throw new Error('PDF generation failed')
+        }
+
+        const blob = pdfDoc.output('blob')
+        return { blob, filename }
+    }
+
     const exportPDF = async (): Promise<{
         name: string
         uri: string
     } | null> => {
-        let exportEl: HTMLElement | null = null
-        let originalContainerStyles: {
-            width: string
-            maxWidth: string
-            margin: string
-            backgroundColor: string
-        } | null = null
-        let originalFieldStyles: Array<{
-            field: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-            backgroundColor: string
-            color: string
-            appearance: string
-            webkitAppearance: string
-            boxShadow: string
-        }> = []
-
         try {
             setIsExporting(true)
-            await new Promise((resolve) =>
-                requestAnimationFrame(() => resolve(null)),
-            )
-            await new Promise((resolve) =>
-                requestAnimationFrame(() => resolve(null)),
-            )
+            const result = await buildWaiverPdfBlob()
+            if (!result) return null
 
-            const el = document.getElementById('formToExport')
-            if (!el) throw new Error('Form element not found')
-            exportEl = el
-
-            const exportWidth = 794
-            originalContainerStyles = {
-                width: el.style.width,
-                maxWidth: el.style.maxWidth,
-                margin: el.style.margin,
-                backgroundColor: el.style.backgroundColor,
-            }
-            const originalFields = Array.from(
-                el.querySelectorAll<
-                    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-                >('input, textarea, select'),
-            )
-            originalFieldStyles = originalFields.map((field) => ({
-                field,
-                backgroundColor: field.style.backgroundColor,
-                color: field.style.color,
-                appearance: field.style.appearance,
-                webkitAppearance: field.style.webkitAppearance,
-                boxShadow: field.style.boxShadow,
-            }))
-
-            el.style.width = `${exportWidth}px`
-            el.style.maxWidth = 'none'
-            el.style.margin = '0 auto'
-            el.style.backgroundColor = '#ffffff'
-
-            originalFields.forEach((field) => {
-                field.style.backgroundColor = '#ffffff'
-                field.style.color = '#000000'
-                field.style.appearance = 'none'
-                field.style.webkitAppearance = 'none'
-                field.style.boxShadow = 'none'
-            })
-
-            await new Promise((resolve) =>
-                requestAnimationFrame(() => resolve(null)),
-            )
-            await new Promise((resolve) =>
-                requestAnimationFrame(() => resolve(null)),
-            )
-
-            const today =
-                formType.signDate && formType.signDate != ''
-                    ? formType.signDate
-                    : new Date().toISOString().split('T')[0]
-            const filename = `${formType.clientCode ?? 'waiver'}_${today}.pdf`
-
-            const html2pdf = (await import('html2pdf.js')).default
-            const blob = await html2pdf()
-                .set({
-                    margin: 1,
-                    filename,
-                    image: { type: 'jpeg', quality: 0.95 },
-                    html2canvas: {
-                        scale: 3,
-                        useCORS: true,
-                        scrollX: 0,
-                        scrollY: 0,
-                        width: exportWidth,
-                        windowWidth: exportWidth,
-                        backgroundColor: '#ffffff',
-                        ignoreElements: (element: Element) =>
-                            element.hasAttribute('data-html2canvas-ignore'),
-                        onclone: (clonedDoc: Document) => {
-                            clonedDoc
-                                .querySelectorAll('[data-html2canvas-ignore]')
-                                .forEach((node: Element) => node.remove())
-                        },
-                    },
-                    jsPDF: {
-                        unit: 'in',
-                        format: 'a4',
-                        orientation: 'portrait',
-                    },
-                    pagebreak: {
-                        mode: ['css', 'legacy'],
-                        avoid: '.pdf-keep-together',
-                    },
-                })
-                .from(el)
-                .toPdf()
-                .output('blob')
-
-            setShowExportOverlay(true)
-
-            // Upload to Firebase Storage (comment out for local testing)
-            const path = `waivers/${auth.currentUser?.uid ?? 'client'}/${crypto.randomUUID()}/${filename}`
+            const path = `waivers/${auth.currentUser?.uid ?? 'client'}/${crypto.randomUUID()}/${result.filename}`
             const fileRef = ref(storage, path)
-            await uploadBytes(fileRef, blob)
+            await uploadBytes(fileRef, result.blob)
             const url = await getDownloadURL(fileRef)
-            // const url = 'local-test' // placeholder when upload disabled for local testing
 
-            return { name: filename, uri: url }
+            return { name: result.filename, uri: url }
         } catch (err) {
             console.error('Export failed:', err)
             return null
         } finally {
-            if (exportEl && originalContainerStyles) {
-                exportEl.style.width = originalContainerStyles.width
-                exportEl.style.maxWidth = originalContainerStyles.maxWidth
-                exportEl.style.margin = originalContainerStyles.margin
-                exportEl.style.backgroundColor =
-                    originalContainerStyles.backgroundColor
-            }
-
-            originalFieldStyles.forEach(({ field, ...styles }) => {
-                field.style.backgroundColor = styles.backgroundColor
-                field.style.color = styles.color
-                field.style.appearance = styles.appearance
-                field.style.webkitAppearance = styles.webkitAppearance
-                field.style.boxShadow = styles.boxShadow
-            })
-
-            setShowExportOverlay(false)
             setIsExporting(false)
         }
     }
@@ -363,14 +282,11 @@ const WaiverSection: React.FC<Props> = ({
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
-            {showExportOverlay &&
+            {isExporting &&
                 waiverMode === 'form' &&
                 typeof document !== 'undefined' &&
                 createPortal(
-                    <div
-                        data-html2canvas-ignore="true"
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                    >
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <p className="rounded-[5px] bg-white px-[20px] py-[16px] text-lg font-medium">
                             Creating waiver...
                         </p>
@@ -514,11 +430,11 @@ const WaiverSection: React.FC<Props> = ({
                         ) : (
                             <div
                                 id="formToExport"
+                                ref={targetRef}
                                 className={`${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
                             >
                                 <div
-                                    className={`pdf-keep-together flex flex-col ${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
-                                    style={{ breakInside: 'avoid-page' }}
+                                    className={`flex flex-col ${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
                                 >
                                     <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
                                         Consent Form
@@ -601,20 +517,14 @@ const WaiverSection: React.FC<Props> = ({
                                     </div>
                                 </div>
                                 <div
-                                    className="html2pdf__page-break"
-                                    aria-hidden
-                                />
-                                <div
-                                    className={`pdf-new-page ${isExporting ? 'space-y-[32px]' : 'space-y-[60px]'}`}
+                                    className={
+                                        isExporting
+                                            ? 'space-y-[32px]'
+                                            : 'space-y-[60px]'
+                                    }
                                 >
                                     <div
-                                        className={`pdf-keep-together ${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
-                                        style={{
-                                            breakInside: 'avoid-page',
-                                            display: 'block',
-                                            breakBefore: 'page',
-                                            pageBreakBefore: 'always',
-                                        }}
+                                        className={`flex flex-col ${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
                                     >
                                         <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
                                             Authorization to Release Information
@@ -667,7 +577,6 @@ const WaiverSection: React.FC<Props> = ({
 
                                     <div
                                         className={`${isExporting ? 'space-y-[16px]' : 'space-y-[24px]'}`}
-                                        style={{ breakInside: 'avoid-page' }}
                                     >
                                         <p>
                                             I do herby consent the exchange of
@@ -707,10 +616,7 @@ const WaiverSection: React.FC<Props> = ({
                                         </p>
                                     </div>
 
-                                    <div
-                                        className="flex flex-col space-y-[12px]"
-                                        style={{ breakInside: 'avoid-page' }}
-                                    >
+                                    <div className="flex flex-col space-y-[12px]">
                                         <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                             The disclosure of this information
                                             and records authorized herein is
@@ -735,20 +641,11 @@ const WaiverSection: React.FC<Props> = ({
                                     </div>
 
                                     <div
-                                        className="html2pdf__page-break"
-                                        aria-hidden
-                                    />
-                                    <div
                                         className={
                                             isExporting
                                                 ? 'space-y-[16px]'
                                                 : 'space-y-[24px]'
                                         }
-                                        style={{
-                                            display: 'block',
-                                            breakBefore: 'page',
-                                            pageBreakBefore: 'always',
-                                        }}
                                     >
                                         <p>
                                             I have the right to revoke this
@@ -760,12 +657,7 @@ const WaiverSection: React.FC<Props> = ({
                                             photocopy or fax is considered as
                                             effective as the original.
                                         </p>
-                                        <div
-                                            className="flex flex-col space-y-[12px]"
-                                            style={{
-                                                breakInside: 'avoid-page',
-                                            }}
-                                        >
+                                        <div className="flex flex-col space-y-[12px]">
                                             <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
                                                 Date
                                             </label>
@@ -782,12 +674,7 @@ const WaiverSection: React.FC<Props> = ({
                                                 />
                                             )}
                                         </div>
-                                        <div
-                                            className="space-y-[12px]"
-                                            style={{
-                                                breakInside: 'avoid-page',
-                                            }}
-                                        >
+                                        <div className="space-y-[12px]">
                                             <label className="font-bold">
                                                 Client Signature
                                             </label>
@@ -809,12 +696,7 @@ const WaiverSection: React.FC<Props> = ({
                                                 />
                                             )}
                                         </div>
-                                        <div
-                                            className="space-y-[12px]"
-                                            style={{
-                                                breakInside: 'avoid-page',
-                                            }}
-                                        >
+                                        <div className="space-y-[12px]">
                                             <label className="font-bold">
                                                 Guardian Signature
                                             </label>
