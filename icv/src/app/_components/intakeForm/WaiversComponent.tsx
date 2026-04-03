@@ -1,24 +1,22 @@
 'use client'
-import FileUpload, {
-    ResetButton,
-} from '@/app/_components/intakeForm/FileUpload'
+import FileUpload, { ResetButton } from '@/app/_components/intakeForm/FileUpload'
 import {
     LoadedSignature,
     SignaturePopup,
 } from '@/app/_components/intakeForm/SignatureModal'
-import { auth, storage } from '@/data/firebase'
 import {
     ClientIntakeSchema,
     NewClient,
     WaiverSchema,
 } from '@/types/client-types'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { auth, storage } from '@/data/firebase'
 import {
     deleteObject,
     getDownloadURL,
     ref,
     uploadBytes,
 } from 'firebase/storage'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -102,7 +100,9 @@ const WaiverSection: React.FC<Props> = ({
                     return null
                 }
             })
-            const uploaded = (await Promise.all(uploadPromises)).filter(
+            const uploaded = (
+                await Promise.all(uploadPromises)
+            ).filter(
                 (f): f is { name: string; uri: string } => f !== null,
             )
             if (uploaded.length > 0) {
@@ -130,10 +130,7 @@ const WaiverSection: React.FC<Props> = ({
                             await deleteObject(fileRef)
                         }
                     } catch (error) {
-                        console.error(
-                            `Error deleting waiver ${file.uri}:`,
-                            error,
-                        )
+                        console.error(`Error deleting waiver ${file.uri}:`, error)
                     }
                 }),
             )
@@ -157,10 +154,7 @@ const WaiverSection: React.FC<Props> = ({
         updateForm({ waivers: updated })
     }
 
-    const exportPDF = async (): Promise<{
-        name: string
-        uri: string
-    } | null> => {
+    const exportPDF = async (): Promise<{ name: string; uri: string } | null> => {
         try {
             setIsExporting(true)
             const el = document.getElementById('formToExport')
@@ -184,9 +178,9 @@ const WaiverSection: React.FC<Props> = ({
                         format: 'a4',
                         orientation: 'portrait',
                     },
-                    // Legacy `.html2pdf__page-break` + css break-* are reliable; the
                     pagebreak: {
                         mode: ['css', 'legacy'],
+                        before: '.pdf-new-page',
                         avoid: '.pdf-keep-together',
                     },
                 })
@@ -248,30 +242,28 @@ const WaiverSection: React.FC<Props> = ({
 
     return (
         <form
-            className="relative space-y-[24px]"
+            className="space-y-[24px] relative"
             style={{ padding: '24px' }}
             onSubmit={handleSubmit(handleSubmitType)}
         >
             {(isExporting || waiverUploading) && (
                 <div className="fixed inset-0 z-50 flex min-h-screen items-center justify-center bg-white/100">
                     <p className="font-['Epilogue'] text-[16px] leading-[18px] text-neutral-900">
-                        {waiverUploading
-                            ? 'Uploading waiver(s)...'
-                            : 'Creating client....'}
+                        {waiverUploading ? 'Uploading waiver(s)...' : 'Creating client....'}
                     </p>
                 </div>
             )}
             <div className="mt-[24px] flex min-h-screen justify-center">
                 <div className="min-w-full space-y-[48px]">
                     <div className="flex flex-col space-y-[24px]">
-                        <div className="mb-[24px] flex flex-row gap-[24px]">
+                        <div className="flex flex-row gap-[24px] mb-[24px]">
                             <button
                                 type="button"
                                 onClick={() => setWaiverMode('form')}
                                 className={`rounded-[5px] px-4 py-2 ${
                                     waiverMode === 'form'
-                                        ? 'bg-neutral-900 text-white'
-                                        : 'bg-neutral-200'
+                                        ? "bg-neutral-900 text-white"
+                                        : "bg-neutral-200"
                                 }`}
                             >
                                 Digital Waiver
@@ -281,8 +273,8 @@ const WaiverSection: React.FC<Props> = ({
                                 onClick={() => setWaiverMode('upload')}
                                 className={`rounded-[5px] px-4 py-2 ${
                                     waiverMode === 'upload'
-                                        ? 'bg-neutral-900 text-white'
-                                        : 'bg-neutral-200'
+                                        ? "bg-neutral-900 text-white"
+                                        : "bg-neutral-200"
                                 }`}
                             >
                                 Upload Waiver(s)
@@ -329,8 +321,10 @@ const WaiverSection: React.FC<Props> = ({
                                         </button>
                                         <button
                                             type="submit"
-                                            disabled={!formType.waivers?.length}
-                                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
+                                            disabled={
+                                                !formType.waivers?.length
+                                            }
+                                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             Submit
                                         </button>
@@ -340,8 +334,10 @@ const WaiverSection: React.FC<Props> = ({
                                     <div className="flex justify-start space-x-[24px]">
                                         <button
                                             type="submit"
-                                            disabled={!formType.waivers?.length}
-                                            className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95] disabled:cursor-not-allowed disabled:opacity-50"
+                                            disabled={
+                                                !formType.waivers?.length
+                                            }
+                                            className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95] disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <div className="flex flex-row space-x-[8px]">
                                                 <svg
@@ -383,335 +379,279 @@ const WaiverSection: React.FC<Props> = ({
                                     <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
                                         Consent Form
                                     </label>
-                                    <p>
-                                        By signing below, I consent to recieve
-                                        services through the Inner-City Visions
-                                        Homeless Outreach Program.
-                                    </p>
-                                    <p>
-                                        I consent to participate with Inner-City
-                                        Visions and receive services provided by
-                                        the organization. I understand that
-                                        services may include but are not limited
-                                        to the following:
-                                    </p>
-                                    {/* <div className="flex flex-row items-center justify-center space-x-[60px]">
-                                        <ul className="list-disc space-y-[4px] pl-6">
-                                            <li>Informal Case Management</li>
-                                            <li>Shelter Support</li>
-                                            <li>Hygiene Kits/Snack Packs</li>
-                                            <li>
-                                                Drug & Alcohol Referral Services
-                                            </li>
-                                        </ul>
-                                        <ul className="list-disc space-y-[4px] pl-6">
-                                            <li>Personal & Job Development</li>
-                                            <li>Transportation</li>
-                                            <li>Departmental Mental Health</li>
-                                            <li>Advocacy</li>
-                                        </ul>
-                                    </div> */}
-                                    <div className="flex flex-row items-center justify-start space-x-[60px]">
-                                        <ul className="list-disc space-y-[4px] pl-6">
-                                            <li>Informal Case Management</li>
-                                            <li>Shelter Support</li>
-                                            <li>Hygiene Kits/Snack Packs</li>
-                                            <li>
-                                                Drug & Alcohol Referral Services
-                                            </li>
-                                            <li>Personal & Job Development</li>
-                                            <li>Transportation</li>
-                                            <li>Departmental Mental Health</li>
-                                            <li>Advocacy</li>
-                                        </ul>
-                                    </div>
-                                    <p>
-                                        I understand that all information
-                                        collected will be kept locked at 1440 E.
-                                        Florence Ave. Los Angeles, Ca 90001 and
-                                        only authorized personnel will have
-                                        access to these records.
-                                    </p>
-                                    <p>
-                                        I understand that all information
-                                        collected will be kept confidential and
-                                        that laws require that Inner City
-                                        Visions and its programs receive written
-                                        consent from my behalf before releasing
-                                        information. The exception to this would
-                                        be if there is suspected child abuse or
-                                        neglect, or if I am thought to be a
-                                        danger to others or myself.
-                                    </p>
-                                    <p>
-                                        I also give permission for pictures of
-                                        myself to be taken and placed in my file
-                                        and displayed at Inner City Visions
-                                        Intervention Program sites. I also
-                                        understand that these photos may be used
-                                        for program outreach and publicity.
-                                    </p>
-                                    <div className="space-y-[12px]">
-                                        <label className="font-bold">
-                                            Client Signature
-                                        </label>
-                                        <LoadedSignature
-                                            fieldKey={'clientSig1'}
-                                            formData={formType}
-                                            updateForm={updateForm}
-                                            isExporting={isExporting}
-                                        />
-
-                                        <SignaturePopup
-                                            data={formType}
-                                            fieldKey="clientSig1"
-                                            padRef={clientSig1}
-                                            updateForm={updateForm}
-                                            open={openSignature1}
-                                            setOpen={setOpenSignature1}
-                                        />
-                                    </div>
-                                </div>
-                                <div
-                                    className="html2pdf__page-break"
-                                    aria-hidden
+                            <p>
+                                By signing below, I consent to recieve services
+                                through the Inner-City Visions Homeless Outreach
+                                Program.
+                            </p>
+                            <p>
+                                I consent to participate with Inner-City Visions
+                                and receive services provided by the
+                                organization. I understand that services may
+                                include but are not limited to the following:
+                            </p>
+                            <div className="flex flex-row items-center justify-center space-x-[60px]">
+                                <ul className="list-disc space-y-[4px] pl-6">
+                                    <li>Informal Case Management</li>
+                                    <li>Shelter Support</li>
+                                    <li>Hygiene Kits/Snack Packs</li>
+                                    <li>Drug & Alcohol Referral Services</li>
+                                </ul>
+                                <ul className="list-disc space-y-[4px] pl-6">
+                                    <li>Personal & Job Development</li>
+                                    <li>Transportation</li>
+                                    <li>Departmental Mental Health</li>
+                                    <li>Advocacy</li>
+                                </ul>
+                            </div>
+                            <p>
+                                I understand that all information collected will
+                                be kept locked at 1440 E. Florence Ave. Los
+                                Angeles, Ca 90001 and only authorized personnel
+                                will have access to these records.
+                            </p>
+                            <p>
+                                I understand that all information collected will
+                                be kept confidential and that laws require that
+                                Inner City Visions and its programs receive
+                                written consent from my behalf before releasing
+                                information. The exception to this would be if
+                                there is suspected child abuse or neglect, or if
+                                I am thought to be a danger to others or myself.
+                            </p>
+                            <p>
+                                I also give permission for pictures of myself to
+                                be taken and placed in my file and displayed at
+                                Inner City Visions Intervention Program sites. I
+                                also understand that these photos may be used
+                                for program outreach and publicity.
+                            </p>
+                            <div className="space-y-[12px]">
+                                <label className="font-bold">
+                                    Client Signature
+                                </label>
+                                <LoadedSignature
+                                    fieldKey={'clientSig1'}
+                                    formData={formType}
+                                    updateForm={updateForm}
+                                    isExporting={isExporting}
                                 />
-                                <div
-                                    className="pdf-new-page space-y-[60px]"
-                                    style={{
-                                        display: 'block',
-                                        breakBefore: 'page',
-                                        pageBreakBefore: 'always',
-                                    }}
-                                >
-                                    <div className="pdf-keep-together flex flex-col space-y-[24px]">
-                                        <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
-                                            Authorization to Release Information
-                                        </label>
-                                        <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                                            <div className="flex flex-col space-y-1">
-                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                    Name
-                                                </label>
-                                                <div className="flex flex-row space-x-[4px]">
-                                                    {formType.firstName && (
-                                                        <p>
-                                                            {formType.firstName}
-                                                        </p>
-                                                    )}
-                                                    {formType.lastName && (
-                                                        <p>
-                                                            {formType.lastName}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-col space-y-1">
-                                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                    DOB
-                                                </label>
-                                                <div>
-                                                    {formType.dateOfBirth || (
-                                                        <p>N/A</p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        <div className="flex flex-col space-y-1">
-                                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                                                Street Address/Point of Contact
-                                            </label>
-                                            <div>
-                                                {formType.streetAddress ? (
-                                                    formType.streetAddress
-                                                ) : (
-                                                    <p>N/A</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-[24px]">
-                                        <p>
-                                            I do herby consent the exchange of
-                                            information and / or disclosure of
-                                            information contained in my file.
-                                        </p>
-                                        <p>
-                                            Between{' '}
-                                            <strong>INNER CITY VISIONS</strong>{' '}
-                                            and:
-                                        </p>
-
-                                        <div className="flex flex-col space-y-[12px]">
-                                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                                3rd Party Organization(s)
-                                            </label>
-                                            <textarea
-                                                {...register('thirdParties')}
-                                                rows={3}
-                                                placeholder="Text"
-                                                className="w-full rounded border p-2"
-                                            />
-                                        </div>
-                                        <p>
-                                            1440 E. Florence Ave Los Angeles, CA
-                                            90001
-                                        </p>
-                                    </div>
-
-                                    <div className="flex flex-col space-y-[12px]">
-                                        <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                            The disclosure of this information
-                                            and records authorized herein is
-                                            required for the following purpose:
-                                        </label>
-                                        <textarea
-                                            {...register('disclosurePurpose')}
-                                            placeholder="Text"
-                                            rows={5}
-                                            className="w-full rounded border p-2"
-                                        />
-                                    </div>
-
-                                    <div
-                                        className="html2pdf__page-break"
-                                        aria-hidden
-                                    />
-                                    <div
-                                        className="space-y-[24px]"
-                                        style={{
-                                            display: 'block',
-                                            breakBefore: 'page',
-                                            pageBreakBefore: 'always',
-                                        }}
-                                    >
-                                        <p>
-                                            I have the right to revoke this
-                                            authorization to release and/or
-                                            exchange information at any time.
-                                            This authorization to exchange
-                                            information will expire one year
-                                            after the signature date. A
-                                            photocopy or fax is considered as
-                                            effective as the original.
-                                        </p>
-                                        <div className="flex flex-col space-y-[12px]">
-                                            <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
-                                                Date
-                                            </label>
-                                            <input
-                                                {...register('signDate')}
-                                                type="date"
-                                                placeholder="MM/DD/YYYY"
-                                                className="w-[30%] rounded border p-2"
-                                            />
-                                        </div>
-                                        <div className="space-y-[12px]">
-                                            <label className="font-bold">
-                                                Client Signature
-                                            </label>
-                                            <LoadedSignature
-                                                fieldKey={'clientSig2'}
-                                                formData={formType}
-                                                updateForm={updateForm}
-                                                isExporting={isExporting}
-                                            />
-
-                                            <SignaturePopup
-                                                data={formType}
-                                                fieldKey="clientSig2"
-                                                padRef={clientSig2}
-                                                updateForm={updateForm}
-                                                open={openSignature2}
-                                                setOpen={setOpenSignature2}
-                                            />
-                                        </div>
-                                        <div className="space-y-[12px]">
-                                            <label className="font-bold">
-                                                Guardian Signature
-                                            </label>
-                                            <LoadedSignature
-                                                fieldKey="guardianSig"
-                                                formData={formType}
-                                                updateForm={updateForm}
-                                                isExporting={isExporting}
-                                            />
-
-                                            <SignaturePopup
-                                                data={formType}
-                                                fieldKey="guardianSig"
-                                                padRef={guardianSig}
-                                                updateForm={updateForm}
-                                                open={openGuardianSig}
-                                                setOpen={setOpenGuardianSig}
-                                            />
-                                        </div>
+                                <SignaturePopup
+                                    data={formType}
+                                    fieldKey="clientSig1"
+                                    padRef={clientSig1}
+                                    updateForm={updateForm}
+                                    open={openSignature1}
+                                    setOpen={setOpenSignature1}
+                                />
+                            </div>
+                        </div>
+                        <div className="pdf-new-page space-y-[60px]">
+                            <div className="pdf-keep-together flex flex-col space-y-[24px]">
+                                <label className="font-['Epilogue'] text-[24px] font-semibold leading-[28px] text-[#1A1D20]">
+                                    Authorization to Release Information
+                                </label>
+                                <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                                <div className="flex flex-col space-y-1">
+                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                        Name
+                                    </label>
+                                    <div className="flex flex-row space-x-[4px]">
+                                        {formType.firstName && (
+                                            <p>{formType.firstName}</p>
+                                        )}
+                                        {formType.lastName && (
+                                            <p>{formType.lastName}</p>
+                                        )}
                                     </div>
                                 </div>
-
-                                {!isExporting && submitType == 'new' && (
-                                    <div className="flex justify-between">
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                router.push(
-                                                    '/intake/background/family/services/confirmation',
-                                                )
-                                            }
-                                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
-                                        >
-                                            Back
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
-                                        >
-                                            Submit
-                                        </button>
+                                <div className="flex flex-col space-y-1">
+                                    <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                        DOB
+                                    </label>
+                                    <div>
+                                        {formType.dateOfBirth || <p>N/A</p>}
                                     </div>
-                                )}
+                                </div>
+                            </div>
 
-                                {!isExporting && submitType == 'save' && (
-                                    <div className="flex justify-start space-x-[24px]">
-                                        <button
-                                            type="submit"
-                                            className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95]"
+                            <div className="flex flex-col space-y-1">
+                                <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                    Street Address/Point of Contact
+                                </label>
+                                <div>
+                                    {formType.streetAddress ? (
+                                        formType.streetAddress
+                                    ) : (
+                                        <p>N/A</p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                            <div className="space-y-[24px]">
+                                <p>
+                                    I do herby consent the exchange of information
+                                    and / or disclosure of information contained in
+                                    my file.
+                                </p>
+                                <p>
+                                    Between <strong>INNER CITY VISIONS</strong> and:
+                                </p>
+
+                                <div className="flex flex-col space-y-[12px]">
+                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                        3rd Party Organization(s)
+                                    </label>
+                                    <textarea
+                                        {...register('thirdParties')}
+                                        rows={3}
+                                        placeholder="Text"
+                                        className="w-full rounded border p-2"
+                                    />
+                                </div>
+                                <p>1440 E. Florence Ave Los Angeles, CA 90001</p>
+                            </div>
+
+                            <div className="flex flex-col space-y-[12px]">
+                                <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                    The disclosure of this information and records
+                                    authorized herein is required for the following
+                                    purpose:
+                                </label>
+                                <textarea
+                                    {...register('disclosurePurpose')}
+                                    placeholder="Text"
+                                    rows={5}
+                                    className="w-full rounded border p-2"
+                                />
+                            </div>
+
+                            <div className="pdf-new-page space-y-[24px]">
+                                <p>
+                                    I have the right to revoke this authorization to
+                                    release and/or exchange information at any time.
+                                    This authorization to exchange information will
+                                    expire one year after the signature date. A
+                                    photocopy or fax is considered as effective as
+                                    the original.
+                                </p>
+                                <div className="flex flex-col space-y-[12px]">
+                                    <label className="font-['Epilogue'] text-[16px] font-normal leading-[18px] text-neutral-900">
+                                        Date
+                                    </label>
+                                    <input
+                                        {...register('signDate')}
+                                        type="date"
+                                        placeholder="MM/DD/YYYY"
+                                        className="w-[30%] rounded border p-2"
+                                    />
+                                </div>
+                                <div className="space-y-[12px]">
+                                    <label className="font-bold">
+                                        Client Signature
+                                    </label>
+                                    <LoadedSignature
+                                        fieldKey={'clientSig2'}
+                                        formData={formType}
+                                        updateForm={updateForm}
+                                        isExporting={isExporting}
+                                    />
+
+                                    <SignaturePopup
+                                        data={formType}
+                                        fieldKey="clientSig2"
+                                        padRef={clientSig2}
+                                        updateForm={updateForm}
+                                        open={openSignature2}
+                                        setOpen={setOpenSignature2}
+                                    />
+                                </div>
+                                <div className="space-y-[12px]">
+                                    <label className="font-bold">
+                                        Guardian Signature
+                                    </label>
+                                    <LoadedSignature
+                                        fieldKey="guardianSig"
+                                        formData={formType}
+                                        updateForm={updateForm}
+                                        isExporting={isExporting}
+                                    />
+
+                                    <SignaturePopup
+                                        data={formType}
+                                        fieldKey="guardianSig"
+                                        padRef={guardianSig}
+                                        updateForm={updateForm}
+                                        open={openGuardianSig}
+                                        setOpen={setOpenGuardianSig}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {!isExporting && submitType == 'new' && (
+                            <div className="flex justify-between">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        router.push(
+                                            '/intake/background/family/services/confirmation',
+                                        )
+                                    }
+                                    className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                                >
+                                    Back
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="rounded-[5px] bg-neutral-900 px-4 py-2 text-white"
+                                >
+                                    Submit
+                                </button>
+                            </div>
+                        )}
+
+                        {!isExporting && submitType == 'save' && (
+                            <div className="flex justify-start space-x-[24px]">
+                                <button
+                                    type="submit"
+                                    className="rounded-[5px] bg-[#4EA0C9] px-[20px] py-[16px] text-white hover:bg-[#246F95]"
+                                >
+                                    <div className="flex flex-row space-x-[8px]">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            height="20px"
+                                            viewBox="0 -960 960 960"
+                                            width="20px"
+                                            fill="#FFFFFF"
                                         >
-                                            <div className="flex flex-row space-x-[8px]">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    height="20px"
-                                                    viewBox="0 -960 960 960"
-                                                    width="20px"
-                                                    fill="#FFFFFF"
-                                                >
-                                                    <path d="M389-267 195-460l51-52 143 143 325-324 51 51-376 375Z" />
-                                                </svg>
-                                                Save
-                                            </div>
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={onCancel}
-                                            className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
-                                        >
-                                            <div className="flex flex-row space-x-[8px]">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    height="20px"
-                                                    viewBox="0 -960 960 960"
-                                                    width="20px"
-                                                    fill="#FFFFFF"
-                                                >
-                                                    <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
-                                                </svg>
-                                                Cancel
-                                            </div>
-                                        </button>
+                                            <path d="M389-267 195-460l51-52 143 143 325-324 51 51-376 375Z" />
+                                        </svg>
+                                        Save
                                     </div>
-                                )}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={onCancel}
+                                    className="rounded-[5px] bg-[#1A1D20] px-[20px] py-[16px] text-white hover:bg-[#6D757F]"
+                                >
+                                    <div className="flex flex-row space-x-[8px]">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            height="20px"
+                                            viewBox="0 -960 960 960"
+                                            width="20px"
+                                            fill="#FFFFFF"
+                                        >
+                                            <path d="m291-240-51-51 189-189-189-189 51-51 189 189 189-189 51 51-189 189 189 189-51 51-189-189-189 189Z" />
+                                        </svg>
+                                        Cancel
+                                    </div>
+                                        </button>
+                            </div>
+                        )}
                             </div>
                         )}
                     </div>
