@@ -19,6 +19,7 @@ import {
 import { fetchCheckInCounterData } from '@/lib/firestoreUtils'
 import { Download } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import generatePDF, { Margin, Resolution, usePDF } from 'react-to-pdf'
 import {
     Cell,
     Pie,
@@ -88,6 +89,7 @@ const PieChart = () => {
     const [isFilterVisible, setIsFilterVisible] = useState(true)
 
     const [isLargeScreen, setIsLargeScreen] = useState(false)
+    const { targetRef } = usePDF()
 
     // Track screen size for layout switching
     useEffect(() => {
@@ -237,29 +239,36 @@ const PieChart = () => {
             const filename = `CheckIns_${today}.${format}`
 
             if (format === 'pdf') {
-                const html2pdf = (await import('html2pdf.js')).default
-                await html2pdf()
-                    .set({
-                        filename,
-                        image: { type: 'jpeg', quality: 1 },
-                        html2canvas: {
-                            scale: 2,
+                await new Promise((r) =>
+                    requestAnimationFrame(() => r(null)),
+                )
+                await new Promise((r) =>
+                    requestAnimationFrame(() => r(null)),
+                )
+
+                await generatePDF(targetRef, {
+                    method: 'save',
+                    filename,
+                    resolution: Resolution.NORMAL,
+                    page: {
+                        format: 'a4',
+                        orientation: 'portrait',
+                        margin: Margin.SMALL,
+                    },
+                    canvas: {
+                        mimeType: 'image/jpeg',
+                        qualityRatio: 1,
+                    },
+                    overrides: {
+                        canvas: {
                             useCORS: true,
                             scrollY: 0,
                             logging: false,
                             backgroundColor: '#ffffff',
                         },
-                        jsPDF: {
-                            unit: 'in',
-                            format: 'a4',
-                            orientation: 'portrait',
-                            compress: true,
-                        },
-                    })
-                    .from(el)
-                    .save()
+                    },
+                })
             } else {
-                // For PNG export
                 const html2canvas = (await import('html2canvas')).default
                 const canvas = await html2canvas(el, {
                     scale: 2,
@@ -316,6 +325,7 @@ const PieChart = () => {
                 ) : (
                     <div
                         id="exportContainer"
+                        ref={targetRef}
                         className="flex w-full flex-col items-center p-8"
                     >
                         {viewMode === 'chart' ? (
@@ -472,7 +482,7 @@ const PieChart = () => {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                disabled={isExporting}
+                                disabled={isExporting || isLoading}
                             >
                                 <Download className="mr-2 h-4 w-4" />
                                 {isExporting ? 'Exporting...' : 'Export'}

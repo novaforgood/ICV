@@ -15,9 +15,9 @@ import {
     ClientStaffDetails,
 } from '@/app/_components/clientProfile/ClientProfileComponents'
 import { ClientIntakeSchema } from '@/types/client-types'
-import html2pdf from 'html2pdf.js'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import generatePDF, { Margin, Resolution, usePDF } from 'react-to-pdf'
 import { TypeOf } from 'zod'
 import { useEditFormStore } from '../../_lib/useEditFormStore'
 import ProfileSection from '../intakeForm/ProfileComponent'
@@ -35,6 +35,7 @@ export const ClientProfileToggle = ({
     const [showHousingLog, setShowHousingLog] = useState(false)
     const [housingStatuses, setHousingStatuses] = useState<any[]>([])
     const [exporting, setExporting] = useState(false)
+    const { targetRef } = usePDF()
     const { getForm, updateForm, clearForm } = useEditFormStore()
     const formData = getForm(id)
     const router = useRouter()
@@ -69,26 +70,33 @@ export const ClientProfileToggle = ({
     const exportHousingLogPDF = async () => {
         try {
             setExporting(true)
-            const el = document.getElementById('housingLogExport')
-            if (!el) throw new Error('Housing log element not found')
+            await new Promise((r) => requestAnimationFrame(() => r(null)))
+            await new Promise((r) => requestAnimationFrame(() => r(null)))
 
             const today = new Date().toLocaleDateString('en-CA')
-
             const filename = `HousingLog_${client.clientCode}_${today}.pdf`
 
-            await html2pdf()
-                .set({
-                    filename,
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-                    jsPDF: {
-                        unit: 'in',
-                        format: 'a4',
-                        orientation: 'portrait',
+            await generatePDF(targetRef, {
+                method: 'save',
+                filename,
+                resolution: Resolution.NORMAL,
+                page: {
+                    format: 'a4',
+                    orientation: 'portrait',
+                    margin: Margin.SMALL,
+                },
+                canvas: {
+                    mimeType: 'image/jpeg',
+                    qualityRatio: 1,
+                },
+                overrides: {
+                    canvas: {
+                        useCORS: true,
+                        scrollY: 0,
+                        backgroundColor: '#ffffff',
                     },
-                })
-                .from(el)
-                .save() // <-- this directly downloads the PDF
+                },
+            })
         } catch (err) {
             console.error('Export housing log failed:', err)
         } finally {
@@ -106,7 +114,8 @@ export const ClientProfileToggle = ({
                     >
                         <div
                             id="housingLogExport"
-                            className="m-[240xp h-full w-[70%] overflow-y-auto bg-white p-[24px] shadow-lg"
+                            ref={targetRef}
+                            className="h-full w-[70%] overflow-y-auto bg-white p-[24px] shadow-lg"
                             onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
                         >
                             <div className="m-[20px] flex flex-row justify-between">
