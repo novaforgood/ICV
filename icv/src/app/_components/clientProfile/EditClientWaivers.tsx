@@ -122,7 +122,7 @@ export const ClientWaiversToggle = ({
                                                         href={waiver.uri}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className={`truncate text-blue-600 underline ${listEditMode ? 'pointer-events-none opacity-60' : ''}`}
+                                                        className="truncate text-blue-600 underline"
                                                     >
                                                         {waiver.name}
                                                     </a>
