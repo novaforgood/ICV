@@ -6,6 +6,7 @@ import { Users } from '@/types/user-types'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import useSWR from 'swr'
+import { formatLocalDateUS } from '@/utils/dateUtils'
 import { TypeOf } from 'zod'
 
 type ClientType = TypeOf<typeof ClientIntakeSchema>
@@ -215,7 +216,7 @@ export const ClientHousing = ({
         <div className="space-y-[24px]">
             {recentHousing ? (
                 <div className="space-y-[24px] rounded-[10px] border border-[#DBD8E4] p-[24px]">
-                    <div className="flex flex-row justify-between">
+                    <div className="flex flex-row flex-wrap items-center justify-between gap-2">
                         <div className="max-w-[200px] truncate font-['Epilogue'] text-[22px] text-neutral-900">
                             Current status
                         </div>
@@ -224,7 +225,6 @@ export const ClientHousing = ({
                             className="flex h-[32px] min-w-[96px] items-center gap-[4px] rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
                             onClick={() => {
                                 if (setShowHousingLog) setShowHousingLog(true)
-                                console.log('Clicked')
                             }}
                         >
                             View Log
@@ -237,13 +237,7 @@ export const ClientHousing = ({
                             </label>
                             <div>
                                 {recentHousing.date ? (
-                                    new Date(
-                                        recentHousing.date,
-                                    ).toLocaleDateString('en-US', {
-                                        month: '2-digit',
-                                        day: '2-digit',
-                                        year: 'numeric',
-                                    })
+                                    formatLocalDateUS(recentHousing.date)
                                 ) : (
                                     <p>N/A</p>
                                 )}
@@ -276,21 +270,37 @@ export const ClientHousing = ({
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 gap-x-5 gap-y-3">
-                    <div className="flex flex-col space-y-1">
-                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                            Housing status
-                        </label>
-                        <div>
-                            <p>N/A</p>
+                <div className="space-y-[24px] rounded-[10px] border border-[#DBD8E4] p-[24px]">
+                    <div className="flex flex-row flex-wrap items-center justify-between gap-2">
+                        <div className="font-['Epilogue'] text-[22px] text-neutral-900">
+                            Current status
                         </div>
+                        {setShowHousingLog && (
+                            <button
+                                type="button"
+                                className="flex h-[32px] min-w-[96px] items-center gap-[4px] rounded-[5px] bg-[#4EA0C9] px-[12px] py-[8px] text-white"
+                                onClick={() => setShowHousingLog(true)}
+                            >
+                                View Log
+                            </button>
+                        )}
                     </div>
-                    <div className="flex flex-col space-y-1">
-                        <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
-                            Sheltered by ICV
-                        </label>
-                        <div>
-                            <p>N/A</p>
+                    <div className="grid grid-cols-2 gap-x-5 gap-y-3">
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                Housing status
+                            </label>
+                            <div>
+                                <p>N/A</p>
+                            </div>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                            <label className="font-['Epilogue'] text-[16px] font-bold leading-[18px] text-neutral-900">
+                                Sheltered by ICV
+                            </label>
+                            <div>
+                                <p>N/A</p>
+                            </div>
                         </div>
                     </div>
                 </div>

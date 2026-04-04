@@ -33,6 +33,7 @@ interface Props {
     onCancel?: () => void
     submitType: 'save' | 'next'
     titleStyle: string
+    hideHousingSection?: boolean
 }
 
 type ProfileType = TypeOf<typeof ProfileSchema>
@@ -45,6 +46,7 @@ const ProfileSection: React.FC<Props> = ({
     onCancel,
     submitType,
     titleStyle,
+    hideHousingSection = false,
 }) => {
     const [users, setUsers] = useState<Users[]>([])
     const {
@@ -492,6 +494,7 @@ const ProfileSection: React.FC<Props> = ({
                     <div className="space-y-[24px]">
                         <label className={titleStyle}>Housing</label>
 
+                        {!hideHousingSection && (
                         <div className="grid grid-cols-2 gap-[24px] rounded-[10px] border border-[#DBD8E4] p-[24px]">
                             <div className="flex flex-col gap-[24px]">
                                 <div className="flex flex-col space-y-[4px]">
@@ -542,6 +545,7 @@ const ProfileSection: React.FC<Props> = ({
                                 </div>
                             </div>
                         </div>
+                        )}
 
                         {/* Street Address & Apt No. (Same Row) */}
                         <div className="grid grid-cols-[3fr_1fr] gap-[12px]">

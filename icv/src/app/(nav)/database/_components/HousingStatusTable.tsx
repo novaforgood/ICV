@@ -18,6 +18,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
+import {
+    formatLocalDateUS,
+    parseLocalDateOnly,
+} from '@/utils/dateUtils'
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -114,7 +118,8 @@ const HousingStatusTable = () => {
             selectedQuarters.length > 0
         ) {
             filtered = filtered.filter((record) => {
-                const recordDate = new Date(record.date)
+                const recordDate = parseLocalDateOnly(record.date)
+                if (!recordDate) return false
                 const recordYear =
                     dateFilterType === 'fiscal'
                         ? recordDate.getMonth() >= 6
@@ -150,11 +155,11 @@ const HousingStatusTable = () => {
         }
 
         filtered.sort((a, b) => {
-            const dateA = new Date(a.date)
-            const dateB = new Date(b.date)
+            const dateA = parseLocalDateOnly(a.date)?.getTime() ?? 0
+            const dateB = parseLocalDateOnly(b.date)?.getTime() ?? 0
             return sortOrder === 'newest'
-                ? dateB.getTime() - dateA.getTime()
-                : dateA.getTime() - dateB.getTime()
+                ? dateB - dateA
+                : dateA - dateB
         })
 
         setFilteredData(filtered)
@@ -191,24 +196,25 @@ const HousingStatusTable = () => {
     const calendarYears = Array.from(
         new Set(
             housingData
-                .map((record) => new Date(record.date).getFullYear())
-                .filter((y) => !isNaN(y)),
+                .map((record) => parseLocalDateOnly(record.date)?.getFullYear())
+                .filter((y): y is number => y !== undefined && !isNaN(y)),
         ),
     ).sort((a, b) => b - a)
 
     const fiscalYears = Array.from(
         new Set(
-            housingData.map((record) => {
-                    if (!record.date) return NaN;
-                    const date = new Date(record.date);
-                    const month = date.getMonth(); // 0-indexed (0 = Jan, 6 = Jul)
-                    const year = date.getFullYear();
-                    // Fiscal year starts in July: July-Dec map to next year
-                    return month >= 6 ? year + 1 : year;
+            housingData
+                .map((record) => {
+                    if (!record.date) return NaN
+                    const date = parseLocalDateOnly(record.date)
+                    if (!date) return NaN
+                    const month = date.getMonth()
+                    const year = date.getFullYear()
+                    return month >= 6 ? year + 1 : year
                 })
-                .filter((year) => !isNaN(year))
-        )
-    ).sort((a, b) => b - a);
+                .filter((year) => !isNaN(year)),
+        ),
+    ).sort((a, b) => b - a)
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage)
     const startIndex = (currentPage - 1) * itemsPerPage
@@ -345,15 +351,10 @@ const HousingStatusTable = () => {
                                         {currentData.map((record, index) => (
                                             <TableRow key={index}>
                                                 <TableCell>
-                                                    {record.date &&
-                                                    !isNaN(
-                                                        new Date(
-                                                            record.date,
-                                                        ).getTime(),
-                                                    )
-                                                        ? new Date(
+                                                    {record.date
+                                                        ? formatLocalDateUS(
                                                               record.date,
-                                                          ).toLocaleDateString()
+                                                          )
                                                         : 'N/A'}
                                                 </TableCell>
                                                 <TableCell>
