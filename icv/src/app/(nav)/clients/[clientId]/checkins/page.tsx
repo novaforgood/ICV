@@ -1,17 +1,9 @@
 'use client'
 
 import { getClientById } from '@/api/clients'
-import EventCard from '@/app/_components/dashboard/EventsCard'
+import { NavMainContentLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import ScheduledCheckInCreation from '@/app/_components/calendar/ScheduledCheckInCreation'
-import Symbol from '@/components/Symbol'
-import { clientDb } from '@/data/firebase'
-import { useUser } from '@/hooks/useUser'
-import { CheckInType } from '@/types/event-types'
-import ClickAwayListener from '@mui/material/ClickAwayListener'
-import { collection, getDocs, or, query, where } from 'firebase/firestore'
-import { ChevronLeft, ChevronRight, ArrowUpDown } from 'lucide-react'
-import { useParams } from 'next/navigation'
-import { useEffect, useState, useRef } from 'react'
+import EventCard from '@/app/_components/dashboard/EventsCard'
 import { Button } from '@/components/ui/button'
 import {
     Select,
@@ -20,6 +12,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import { clientDb } from '@/data/firebase'
+import { useUser } from '@/hooks/useUser'
+import { CheckInType } from '@/types/event-types'
+import { collection, getDocs, or, query, where } from 'firebase/firestore'
+import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useParams } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 
 interface CheckIn extends CheckInType {
     id: string
@@ -223,9 +222,7 @@ export default function CheckInsPage() {
     const { user } = useUser()
     if (loading) {
         return (
-            <div className="flex h-screen items-center justify-center">
-                <h1 className="text-2xl font-medium">Loading...</h1>
-            </div>
+            <NavMainContentLoadingOverlay />
         )
     }
 
@@ -246,15 +243,19 @@ export default function CheckInsPage() {
                         <Select
                             value={selectedCategory || 'all'}
                             onValueChange={(value) => {
-                                setSelectedCategory(value === 'all' ? null : value)
+                                setSelectedCategory(
+                                    value === 'all' ? null : value,
+                                )
                                 setCurrentPage(1)
                             }}
                         >
-                            <SelectTrigger className="w-[180px] h-10 px-4 py-2 text-sm">
+                            <SelectTrigger className="h-10 w-[180px] px-4 py-2 text-sm">
                                 <SelectValue placeholder="Filter by category" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All Categories</SelectItem>
+                                <SelectItem value="all">
+                                    All Categories
+                                </SelectItem>
                                 {filterOptions.map((option) => (
                                     <SelectItem key={option} value={option}>
                                         {option}
@@ -270,9 +271,13 @@ export default function CheckInsPage() {
                             variant="outline"
                             size="sm"
                             onClick={() =>
-                                setSortOrder(sortOrder === 'newest' ? 'oldest' : 'newest')
+                                setSortOrder(
+                                    sortOrder === 'newest'
+                                        ? 'oldest'
+                                        : 'newest',
+                                )
                             }
-                            className="flex items-center gap-2 h-10 px-4 py-2 text-sm"
+                            className="flex h-10 items-center gap-2 px-4 py-2 text-sm"
                         >
                             <ArrowUpDown className="h-4 w-4" />
                             {sortOrder === 'newest' ? 'Oldest' : 'Newest'}
@@ -286,17 +291,18 @@ export default function CheckInsPage() {
                             disabled={currentPage === 1}
                             className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
                         >
-                            <ChevronLeft/>
+                            <ChevronLeft />
                         </button>
                         <span className="text-sm">
-                            Page {currentPage} of {totalPages == 0 ? 1 : totalPages}
+                            Page {currentPage} of{' '}
+                            {totalPages == 0 ? 1 : totalPages}
                         </span>
                         <button
                             onClick={handleNextPage}
                             disabled={currentPage === totalPages}
                             className="text-[16px] disabled:cursor-not-allowed disabled:text-gray-300"
                         >
-                            <ChevronRight/>
+                            <ChevronRight />
                         </button>
                     </div>
                 </div>

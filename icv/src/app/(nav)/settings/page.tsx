@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import Cropper, { Area } from 'react-easy-crop'
+import { NavMainContentLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import { FiEdit2, FiGlobe, FiMail } from 'react-icons/fi'
 
 const FAQItem = ({
@@ -116,7 +117,7 @@ const SettingsPage = () => {
         }
     }, [previewUrl, cropImageSrc])
 
-    if (loading) return <p>Loading...</p>
+    if (loading) return <NavMainContentLoadingOverlay />
     if (error) return <p>Error: {error.message}</p>
 
     const displayName = user?.displayName

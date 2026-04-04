@@ -2,12 +2,13 @@
 
 import Symbol from '@/components/Symbol'
 import { Card } from '@/components/ui/card'
+import { useUser } from '@/hooks/useUser'
 import { CheckInType } from '@/types/event-types'
 import { addDays, format, isValid, parseISO, subDays } from 'date-fns'
 import React, { useEffect, useMemo, useState } from 'react'
+import { useHomePageLoadingReporter } from '@/app/_context/HomePageLoadingContext'
 import useSWR from 'swr'
 import EventCard from '../dashboard/EventsCard'
-import { useUser } from '@/hooks/useUser'
 
 // Fetcher function for events - uses API route to avoid server action serialization issues
 const fetchEvents = async (): Promise<CheckInType[]> => {
@@ -21,10 +22,13 @@ const fetchEvents = async (): Promise<CheckInType[]> => {
 
 const EventsSchedule: React.FC = () => {
     const { user, loading: authLoading } = useUser()
-    const { data: events, error, isLoading } = useSWR(
-        user ? 'events' : null,
-        fetchEvents,
-    )
+    const {
+        data: events,
+        error,
+        isLoading,
+    } = useSWR(user ? 'events' : null, fetchEvents)
+
+    useHomePageLoadingReporter('schedule', authLoading || isLoading)
 
     // State to track selected day (YYYY-MM-DD string)
     const [selectedDate, setSelectedDate] = useState<string | null>(() =>
@@ -86,7 +90,7 @@ const EventsSchedule: React.FC = () => {
     }, [selectedDate, events])
 
     // Handle loading and error states (wait for auth before fetching to avoid race)
-    if (authLoading || isLoading) return <div>Loading...</div>
+    if (authLoading || isLoading) return null
     if (error) return <div>Error loading data: {error.message}</div>
 
     return (

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import useSWR from 'swr'
 import { getAllClients } from '@/api/clients'
 import { NewClient } from '@/types/client-types'
+import { useState } from 'react'
+import useSWR from 'swr'
+import { ContainedLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import ClientCard from '../ClientCard'
 
 // Define props interface
@@ -17,7 +18,10 @@ const ClientCalendarSearch = ({
     onSelect,
 }: ClientCalendarSearchProps) => {
     const [clientSearch, setClientSearch] = useState('')
-    const { data: clients } = useSWR<NewClient[]>(onSelect ? 'clients' : null, getAllClients)
+    const { data: clients } = useSWR<NewClient[]>(
+        onSelect ? 'clients' : null,
+        getAllClients,
+    )
 
     if (!onSelect) return null
 
@@ -42,7 +46,7 @@ const ClientCalendarSearch = ({
         }) ?? []
 
     return (
-        <div className="min-w-0 w-full max-w-full space-y-2">
+        <div className="w-full min-w-0 max-w-full space-y-2">
             <div className="flex min-w-0 flex-1 flex-row items-center gap-2 rounded bg-midground px-4 py-2 text-black">
                 <svg
                     className="h-4 w-4 flex-shrink-0 -translate-y-[1px] text-gray-700"
@@ -67,11 +71,9 @@ const ClientCalendarSearch = ({
                     className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-gray-700"
                 />
             </div>
-            <div className="min-w-0 max-h-96 space-y-2 overflow-y-auto">
+            <div className="relative max-h-96 min-h-[120px] min-w-0 space-y-2 overflow-y-auto">
                 {clients === undefined ? (
-                    <p className="py-4 text-center text-sm text-gray-500">
-                        Loading clients...
-                    </p>
+                    <ContainedLoadingOverlay />
                 ) : filteredClients.length === 0 ? (
                     <p className="py-4 text-center text-sm text-gray-500">
                         {clientSearch.trim()
@@ -82,10 +84,15 @@ const ClientCalendarSearch = ({
                     filteredClients.map((client) => (
                         <div
                             key={client.docId}
-                            onClick={() => client.docId && onSelect?.(client.docId)}
+                            onClick={() =>
+                                client.docId && onSelect?.(client.docId)
+                            }
                             className="min-w-0 cursor-pointer"
                         >
-                            <ClientCard client={client} showLastCheckin={false} />
+                            <ClientCard
+                                client={client}
+                                showLastCheckin={false}
+                            />
                         </div>
                     ))
                 )}

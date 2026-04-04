@@ -1,5 +1,6 @@
 'use client'
 
+import { ContainedLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
 import { Button } from '@/components/ui/button'
 import {
@@ -239,12 +240,8 @@ const PieChart = () => {
             const filename = `CheckIns_${today}.${format}`
 
             if (format === 'pdf') {
-                await new Promise((r) =>
-                    requestAnimationFrame(() => r(null)),
-                )
-                await new Promise((r) =>
-                    requestAnimationFrame(() => r(null)),
-                )
+                await new Promise((r) => requestAnimationFrame(() => r(null)))
+                await new Promise((r) => requestAnimationFrame(() => r(null)))
 
                 await generatePDF(targetRef, {
                     method: 'save',
@@ -290,7 +287,7 @@ const PieChart = () => {
     return (
         <div className="flex w-full flex-col lg:flex-row lg:justify-between">
             {/* Chart/Table View */}
-            <div className="order-2 flex flex-col items-center lg:order-1">
+            <div className="relative order-2 flex min-h-[500px] flex-col items-center lg:order-1">
                 <div className="mb-4 flex w-full items-center justify-between">
                     <h2 className="text-2xl font-bold">Check-Ins</h2>
                     <div className="flex items-center gap-2 text-sm">
@@ -319,9 +316,7 @@ const PieChart = () => {
                 </div>
 
                 {isLoading ? (
-                    <div className="flex h-[500px] w-[500px] items-center justify-center text-lg">
-                        Loading data...
-                    </div>
+                    <ContainedLoadingOverlay />
                 ) : (
                     <div
                         id="exportContainer"

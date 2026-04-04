@@ -8,6 +8,7 @@ import ClientCard from '@/app/_components/ClientCard'
 import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
 import { useUser } from '@/hooks/useUser'
 import { NewClient } from '@/types/client-types'
+import { ContainedLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -311,6 +312,11 @@ const SearchComponent = () => {
                 </div>
             </div>
 
+            <div className="relative min-h-[min(60vh,560px)] space-y-8">
+                {isLoadingPage && (
+                    <ContainedLoadingOverlay message="Loading clients..." />
+                )}
+
             <div className="mb-8 mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <div className="flex flex-1 flex-row items-center gap-2 rounded bg-midground px-4 py-2 text-black">
                     <svg
@@ -335,7 +341,7 @@ const SearchComponent = () => {
                         className="w-full bg-transparent text-base outline-none placeholder:text-gray-700"
                     />
                 </div>
-                <div className="flex flex-col space-y-[12px] sm:flex-row sm:space-y-0 sm:gap-4">
+                <div className="flex flex-col space-y-[12px] sm:flex-row sm:gap-4 sm:space-y-0">
                     <button
                         className="flex items-center justify-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                         onClick={() => {
@@ -410,10 +416,11 @@ const SearchComponent = () => {
                 typeof document !== 'undefined' &&
                 createPortal(
                     <>
-                        {/* Backdrop */}
+                        {/* Backdrop: main column only, matches nav layout + loading overlays */}
                         <div
-                            className="fixed inset-0 z-50 bg-black bg-opacity-50"
+                            className="fixed top-0 right-0 bottom-0 left-20 z-50 bg-background/70 backdrop-blur-[1px] lg:left-64"
                             onClick={() => setIsFilterVisible(false)}
+                            aria-hidden={true}
                         />
                         {/* Side menu */}
                         <div className="fixed right-0 top-0 z-50 h-full w-[400px] bg-white px-6 pb-6 pt-4 shadow-xl">
@@ -499,17 +506,14 @@ const SearchComponent = () => {
                 )}
 
             <div className="grid gap-4">
-                <div className="mb-4">
-                    {isLoadingPage ? (
-                        <div className="text-center text-gray-500">
-                            Loading assigned clients...
-                        </div>
-                    ) : (
+                <div className="mb-4 min-h-[min(320px,100%)]">
+                    {!isLoadingPage ? (
                         <>
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                                 {currentPageItems.map((client) => {
                                     const clientDocId =
-                                        client.docId ?? (client as { id?: string }).id
+                                        client.docId ??
+                                        (client as { id?: string }).id
                                     if (!clientDocId) return null
                                     return (
                                         <Link
@@ -552,8 +556,9 @@ const SearchComponent = () => {
                                 </div>
                             )}
                         </>
-                    )}
+                    ) : null}
                 </div>
+            </div>
             </div>
         </div>
     )

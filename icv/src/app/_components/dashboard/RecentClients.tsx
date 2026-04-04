@@ -1,27 +1,32 @@
-import { getAllClientsByLastCheckinDate, getRecentClients } from '@/api/clients'
+import { getRecentClients } from '@/api/clients'
+import { useHomePageLoadingReporter } from '@/app/_context/HomePageLoadingContext'
 import { NewClient } from '@/types/client-types'
+import Link from 'next/link'
+import React from 'react'
 import useSWR from 'swr'
 import ClientCard from '../ClientCard'
-import React from 'react'
-import Link from 'next/link'
 
 const RecentClients: React.FC = () => {
-    const { data: clients } = useSWR<NewClient[]>('recentClients', getRecentClients)
+    const { data: clients } = useSWR<NewClient[]>(
+        'recentClients',
+        getRecentClients,
+    )
+
+    useHomePageLoadingReporter('recentClients', clients === undefined)
 
     if (!clients) {
-        return (
-            <div>
-                <h1 className="text-2xl font-semibold">Recent Clients</h1>
-                <div className="text-center text-gray-500">Loading clients...</div> 
-            </div>
-        )
+        return null
     }
     return (
         <div className="flex flex-col gap-4">
             <h1 className="text-2xl font-semibold">Recent Clients</h1>
             <div className="flex flex-col gap-4">
                 {clients.map((client) => (
-                    <Link href={`/clients/${client.docId}`} key={client.docId} className="block">
+                    <Link
+                        href={`/clients/${client.docId}`}
+                        key={client.docId}
+                        className="block"
+                    >
                         <ClientCard client={client} showLastCheckin={true} />
                     </Link>
                 ))}

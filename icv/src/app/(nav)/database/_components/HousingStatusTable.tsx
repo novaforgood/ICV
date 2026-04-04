@@ -1,6 +1,7 @@
 'use client'
 
 import { getAllHousing } from '@/api/make-cases/make-housing'
+import { ContainedLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,10 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import {
-    formatLocalDateUS,
-    parseLocalDateOnly,
-} from '@/utils/dateUtils'
+import { formatLocalDateUS, parseLocalDateOnly } from '@/utils/dateUtils'
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -157,9 +155,7 @@ const HousingStatusTable = () => {
         filtered.sort((a, b) => {
             const dateA = parseLocalDateOnly(a.date)?.getTime() ?? 0
             const dateB = parseLocalDateOnly(b.date)?.getTime() ?? 0
-            return sortOrder === 'newest'
-                ? dateB - dateA
-                : dateA - dateB
+            return sortOrder === 'newest' ? dateB - dateA : dateA - dateB
         })
 
         setFilteredData(filtered)
@@ -223,7 +219,7 @@ const HousingStatusTable = () => {
 
     return (
         <div className="flex flex-col gap-8">
-            <div className="flex-1 space-y-[20px]">
+            <div className="relative flex min-h-[400px] flex-1 space-y-[20px]">
                 <YearFilter
                     calendarYears={calendarYears}
                     fiscalYears={fiscalYears}
@@ -240,9 +236,7 @@ const HousingStatusTable = () => {
                 />
 
                 {isLoading ? (
-                    <div className="flex h-[400px] items-center justify-center text-lg">
-                        Loading records...
-                    </div>
+                    <ContainedLoadingOverlay />
                 ) : (
                     <>
                         {/* record count and filter controls */}

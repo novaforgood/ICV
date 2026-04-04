@@ -1,8 +1,9 @@
 'use client'
 
 import { getClientById } from '@/api/clients'
-import EventCard from '@/app/_components/dashboard/EventsCard'
+import { NavMainContentLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import ScheduledCheckInCreation from '@/app/_components/calendar/ScheduledCheckInCreation'
+import EventCard from '@/app/_components/dashboard/EventsCard'
 import { Button } from '@/components/ui/button'
 import {
     Select,
@@ -214,11 +215,7 @@ export default function CheckInsPage() {
 
     const { user } = useUser()
     if (loading) {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <h1 className="text-2xl font-medium">Loading...</h1>
-            </div>
-        )
+        return <NavMainContentLoadingOverlay />
     }
 
     return (
@@ -228,7 +225,6 @@ export default function CheckInsPage() {
                 <div className="flex w-full flex-wrap items-center justify-between gap-4">
                     <h1 className="text-4xl font-bold">Case Notes</h1>
                     <div className="flex w-full flex-wrap items-center gap-4 lg:w-auto">
-                      
                         {/* Filter controls */}
                         <div className="flex items-center gap-2">
                             <Select
@@ -285,7 +281,8 @@ export default function CheckInsPage() {
                                 <ChevronLeft className="h-5 w-5" />
                             </button>
                             <span className="text-sm">
-                                Page {currentPage} of {totalPages == 0 ? 1 : totalPages}
+                                Page {currentPage} of{' '}
+                                {totalPages == 0 ? 1 : totalPages}
                             </span>
                             <button
                                 onClick={handleNextPage}

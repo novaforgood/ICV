@@ -1,12 +1,12 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import EventsSchedule from '../_components/calendar/EventsSchedule'
 import CheckInCounter from '../_components/dashboard/CheckInCounter'
 import {
     SpontaneousCheckInModalContent,
     SpontaneousCheckInModalTrigger,
 } from '../_components/dashboard/SpontaneousCheckinCreation'
+import { HomePageLoadingProvider } from '../_context/HomePageLoadingContext'
 import { SpontaneousCheckInModalProvider } from '../_context/SpontaneousCheckInModalContext'
 import { useUser } from '@/hooks/useUser'
 import { TimeFrameProvider } from '../_context/TimeFrameContext'
@@ -15,10 +15,10 @@ import RecentClients from '../_components/dashboard/RecentClients'
 export const dynamic = 'force-dynamic'
 
 export default function Home() {
-  const router = useRouter()
   const { user } = useUser()
 
   return (
+    <HomePageLoadingProvider>
     <div className="m-[48px] flex flex-col justify-between gap-[40px] md:flex-row">
       {/* desktop view */}
       <div className="hidden flex-2/3 w-full flex-col gap-[40px] md:flex">
@@ -58,5 +58,6 @@ export default function Home() {
         </CheckInCountProvider>
       </TimeFrameProvider>
     </div>
+    </HomePageLoadingProvider>
   )
 }

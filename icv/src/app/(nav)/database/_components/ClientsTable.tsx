@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
+import { ContainedLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import { YearFilter } from '@/app/_components/dateFilters/yearFilter'
 import { Button } from '@/components/ui/button'
 import {
@@ -81,12 +82,15 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
     ])
     const [isFilterVisible, setIsFilterVisible] = useState(true)
 
-    const QUARTERS = React.useMemo(() => [
-        { label: 'Q1: JUL-SEP', months: ['7', '8', '9'] },
-        { label: 'Q2: OCT-DEC', months: ['10', '11', '12'] },
-        { label: 'Q3: JAN-MAR', months: ['1', '2', '3'] },
-        { label: 'Q4: APR-JUN', months: ['4', '5', '6'] },
-    ], [])
+    const QUARTERS = React.useMemo(
+        () => [
+            { label: 'Q1: JUL-SEP', months: ['7', '8', '9'] },
+            { label: 'Q2: OCT-DEC', months: ['10', '11', '12'] },
+            { label: 'Q3: JAN-MAR', months: ['1', '2', '3'] },
+            { label: 'Q4: APR-JUN', months: ['4', '5', '6'] },
+        ],
+        [],
+    )
 
     // Filtering logic
     const [filteredClients, setFilteredClients] = useState<NewClient[]>(clients)
@@ -122,17 +126,18 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
 
     const fiscalYears = Array.from(
         new Set(
-            clients.map((record) => {
-                    if (!record.intakeDate) return NaN;
-                    const date = new Date(record.intakeDate);
-                    const month = date.getMonth(); // 0-indexed (0 = Jan, 6 = Jul)
-                    const year = date.getFullYear();
+            clients
+                .map((record) => {
+                    if (!record.intakeDate) return NaN
+                    const date = new Date(record.intakeDate)
+                    const month = date.getMonth() // 0-indexed (0 = Jan, 6 = Jul)
+                    const year = date.getFullYear()
                     // Fiscal year starts in July: July-Dec map to next year
-                    return month >= 6 ? year + 1 : year;
+                    return month >= 6 ? year + 1 : year
                 })
-                .filter((year) => !isNaN(year))
-        )
-    ).sort((a, b) => b - a);
+                .filter((year) => !isNaN(year)),
+        ),
+    ).sort((a, b) => b - a)
 
     useEffect(() => {
         let filtered = [...clients]
@@ -244,7 +249,9 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
         onSortingChange: setSorting,
         onGlobalFilterChange: setGlobalFilter,
         globalFilterFn: (row, columnId, filterValue) => {
-            const searchLower = String(filterValue ?? '').trim().toLowerCase()
+            const searchLower = String(filterValue ?? '')
+                .trim()
+                .toLowerCase()
             if (!searchLower) return true
 
             const fullName =
@@ -274,7 +281,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
         .some((col) => col.getIsFiltered?.())
 
     return (
-        <div className="space-y-4">
+        <div className="relative min-h-[400px] space-y-4">
             <YearFilter
                 calendarYears={calendarYears}
                 fiscalYears={fiscalYears}
@@ -291,9 +298,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
             />
 
             {isLoading ? (
-                <div className="flex h-[400px] items-center justify-center text-lg">
-                    Loading clients...
-                </div>
+                <ContainedLoadingOverlay />
             ) : (
                 <>
                     <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:gap-12">
@@ -325,7 +330,7 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                             />
                         </div>
 
-                        <div className="flex flex-col space-y-[12px] sm:flex-row sm:items-center sm:space-y-0 sm:gap-4">
+                        <div className="flex flex-col space-y-[12px] sm:flex-row sm:items-center sm:gap-4 sm:space-y-0">
                             {/* Sort Controls */}
                             <div className="flex items-center gap-2">
                                 <Select
@@ -575,7 +580,9 @@ const ClientsTable: React.FC<ClientsTableProps> = ({
                                 </TableRow>
                             ))}
                         </TableHeader>
-                        <ClientTableActiveFilters headers={table.getHeaderGroups()[0].headers} />
+                        <ClientTableActiveFilters
+                            headers={table.getHeaderGroups()[0].headers}
+                        />
                         <TableBody>
                             {paginatedRows.length ? (
                                 paginatedRows.map((row) => (

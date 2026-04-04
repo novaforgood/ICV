@@ -22,6 +22,8 @@ import {
 
 import { enUS } from 'date-fns/locale'
 
+import { ContainedLoadingOverlay } from '@/app/_components/LoadingOverlay'
+
 function useIsSmallScreen() {
     const [isSmall, setIsSmall] = useState(false)
     useEffect(() => {
@@ -471,12 +473,7 @@ const EventsCalendar: React.FC<EventsCalendarProps> = ({
                         </div>
 
                         {loading && (
-                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-[1px]">
-                                <div className="flex items-center gap-3 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground shadow-sm">
-                                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-foreground/20 border-t-foreground" />
-                                    Loading calendar...
-                                </div>
-                            </div>
+                            <ContainedLoadingOverlay message="Loading calendar..." />
                         )}
                     </>
                 )}
