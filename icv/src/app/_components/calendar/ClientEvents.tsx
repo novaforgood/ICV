@@ -46,7 +46,7 @@ export default function ClientEvents({
             description: data.description,
         })
 
-        //localStorage.removeItem(storageKey) // no longer save info to local storage when form is submitted
+        localStorage.removeItem(storageKey)
         reset()
         await refetchEvents()
     }
@@ -122,7 +122,7 @@ export default function ClientEvents({
                     {/* Cancel Button */}
                     <button
                         type="button"
-                        className="`mt-4 rounded bg-blue-500 p-2 text-white"
+                        className="`mt-4 bg-blue-500 rounded p-2 text-white"
                         onClick={() => {
                             reset() // Clears form fields
                             localStorage.removeItem(storageKey) // Deletes saved data
