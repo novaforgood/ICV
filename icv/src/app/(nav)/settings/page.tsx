@@ -1,4 +1,5 @@
 'use client'
+import { NavMainContentLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import { Card } from '@/components/ui/card'
 import { auth, clientDb, storage } from '@/data/firebase'
 import { useUser } from '@/hooks/useUser'
@@ -26,7 +27,6 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import Cropper, { Area } from 'react-easy-crop'
-import { NavMainContentLoadingOverlay } from '@/app/_components/LoadingOverlay'
 import { FiEdit2, FiGlobe, FiMail } from 'react-icons/fi'
 
 const FAQItem = ({
@@ -694,7 +694,7 @@ const SettingsPage = () => {
                         <>
                             You can find a walkthrough video{' '}
                             <a
-                                href="https://drive.google.com/file/d/1G85CXbho0roHkWZYX5PkF0wn3e8_4ElH/view?usp=drive_link"
+                                href="https://drive.google.com/drive/folders/1pP9qxoG5GD0XCdVRzn2fRpz6O-eZ3rhP?usp=sharing"
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-blue-600 hover:text-blue-800 underline"
