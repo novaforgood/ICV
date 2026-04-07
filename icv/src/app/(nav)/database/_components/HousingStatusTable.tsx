@@ -218,8 +218,8 @@ const HousingStatusTable = () => {
     const currentData = filteredData.slice(startIndex, endIndex)
 
     return (
-        <div className="flex flex-col gap-8">
-            <div className="relative flex min-h-[400px] flex-1 space-y-[20px]">
+        <div className="flex w-full flex-col gap-8">
+            <div className="relative w-full min-h-[400px] space-y-5">
                 <YearFilter
                     calendarYears={calendarYears}
                     fiscalYears={fiscalYears}
@@ -326,8 +326,8 @@ const HousingStatusTable = () => {
                         </div>
 
                         {/* data table */}
-                        <div className="space-y-[16px]">
-                            <div className="rounded-md border">
+                        <div className="space-y-4">
+                            <div className="w-full overflow-x-auto rounded-md border">
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
