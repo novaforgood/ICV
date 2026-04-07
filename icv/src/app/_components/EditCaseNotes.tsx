@@ -109,6 +109,11 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
 
         if (isRecording) {
             recognition.stop()
+            // Merge dictated text once when stopping so typing won't duplicate it.
+            if (vnotes) {
+                setNotes((prev) => prev + vnotes)
+                setVnotes('')
+            }
         } else {
             setNotes((prev) => prev + '\n ---- Speech to Text Notes: \n') //append to written/any previous notes that we are about to start our vnotes (voice notes)
             recognition.start()
@@ -117,9 +122,10 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
     }
 
     const handleSave = async () => {
+        const finalNotes = notes + (isRecording ? vnotes : '')
         try {
-            await updateCaseNotes(eventId, notes + vnotes)
-            onSave(notes + vnotes)
+            await updateCaseNotes(eventId, finalNotes)
+            onSave(finalNotes)
             onClose()
         } catch (error) {
             console.error('Error saving case notes:', error)
@@ -169,8 +175,13 @@ const EditCaseNotes: React.FC<EditCaseNotesProps> = ({
 
                 <div className="relative">
                     <textarea
-                        value={notes + vnotes}
-                        onChange={(e) => setNotes(e.target.value)}
+                        value={notes + (isRecording ? vnotes : '')}
+                        onChange={(e) => {
+                            setNotes(e.target.value)
+                            if (!isRecording && vnotes) {
+                                setVnotes('')
+                            }
+                        }}
                         className="h-48 w-full rounded-md border p-4"
                         placeholder="Enter case notes here..."
                     />
